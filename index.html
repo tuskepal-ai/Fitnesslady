@@ -1,721 +1,300 @@
+
 <!doctype html>
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fitness Lady — Női edzésprogramok</title>
-  <meta name="description" content="Női edzésprogramok, amiket tényleg lehet tartani. Személyre szabott edzés és táplálkozás — a te életedhez igazítva." />
+  <title>FitnessLady – Hero BG + Overlay (stabil desktop)</title>
 
   <style>
     :root{
-      --bg: #07060b;
-      --panel: rgba(20, 12, 26, .62);
-      --panel2: rgba(20, 12, 26, .45);
-      --stroke: rgba(255,255,255,.10);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --muted2: rgba(255,255,255,.55);
-      --pink: #ff4fd8;
-      --pink2:#b14cff;
-      --glow: rgba(255, 79, 216, .35);
-      --radius: 22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1120px;
+      /* Cseréld a képet itt (lehet .webp is) */
+      --hero-image: url("https://images.unsplash.com/photo-1517836357463-d25dfeac3438?auto=format&fit=crop&w=2400&q=80");
+      /* Overlay színek és erősség */
+      --overlay-start: rgba(10, 10, 10, 0.55);
+      --overlay-end:   rgba(10, 10, 10, 0.20);
+      /* Fókusz (background-position) */
+      --hero-pos-x: 50%;
+      --hero-pos-y: 35%;
+      /* Tartalom max szélesség */
+      --container: 1120px;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
     body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background: radial-gradient(1200px 600px at 30% 10%, rgba(255,79,216,.14), transparent 60%),
-                  radial-gradient(900px 500px at 75% 20%, rgba(177,76,255,.12), transparent 60%),
-                  var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      color: #fff;
+      background: #0b0b0b;
     }
 
-    a{ color:inherit; text-decoration:none; }
-    button{ font:inherit; }
-
-    /* ---------- Top Bar ---------- */
-    .topbar{
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      padding: 14px 14px;
-      backdrop-filter: blur(10px);
-      background: rgba(10, 8, 14, .55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .topbar-inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: .2px;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:99px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-    }
-    .nav{
-      display:flex; align-items:center; gap: 18px;
-      color: var(--muted);
-      font-size: 14px;
-    }
-    .nav a{ opacity:.92; }
-    .nav a:hover{ opacity:1; color: var(--text); }
-
-    .cta-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#120613;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 30px rgba(255,79,216,.22);
-      white-space: nowrap;
-    }
-
-    .menu-btn{
-      width: 40px; height: 40px; border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      display:none;
-      align-items:center; justify-content:center;
-    }
-
-    /* ---------- Hero ---------- */
+    /* ===== HERO WRAPPER ===== */
     .hero{
       position: relative;
-      padding-top: 80px; /* topbar */
-      min-height: 88vh;
-      display:flex;
-      align-items: stretch;
-      justify-content:center;
+      overflow: hidden;
+      min-height: clamp(540px, 72vh, 900px);
+      display: grid;
+      align-items: center;
+      isolation: isolate; /* garantálja a z-index rétegzést */
     }
 
+    /* ===== BACKGROUND LAYER ===== */
     .hero-bg{
-      position:absolute; inset:0;
-      background-image: url("hero.png");
-      background-size: cover;
-      background-position: center right;
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+
+      background-image: var(--hero-image);
       background-repeat: no-repeat;
-      transform: scale(1.02);
-      filter: none; /* nagyon fontos: nincs blur */
+      background-size: cover;
+      background-position: var(--hero-pos-x) var(--hero-pos-y);
+
+      /* stabil render + smooth scaling */
+      transform: translateZ(0);
+      will-change: transform;
     }
 
-    /* finom sötétítés, hogy a szöveg olvasható legyen, de a háttér látszódjon */
-    .hero-overlay{
-      position:absolute; inset:0;
+    /* ===== OVERLAY LAYER ===== */
+    .hero-bg::after{
+      content: "";
+      position: absolute;
+      inset: 0;
+
+      /* finom overlay: gradient + enyhe “fény” */
       background:
-        radial-gradient(1100px 650px at 22% 35%, rgba(10,7,14,.20), rgba(10,7,14,.62) 62%, rgba(10,7,14,.78) 100%),
-        linear-gradient(to bottom, rgba(10,7,14,.25), rgba(10,7,14,.62));
-      pointer-events:none;
+        radial-gradient(1200px 600px at 20% 30%, rgba(255,255,255,0.08), transparent 55%),
+        linear-gradient(180deg, var(--overlay-start), var(--overlay-end));
+      z-index: 1;
+      pointer-events: none;
     }
 
-    .wrap{
+    /* ===== OPTIONAL: subtle blur/contrast boost on bg (safe) ===== */
+    .hero-bg::before{
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: transparent;
+      backdrop-filter: none;
+      pointer-events: none;
+    }
+
+    /* ===== CONTENT ===== */
+    .hero-content{
       position: relative;
-      width: 100%;
-      max-width: var(--max);
+      z-index: 2;
+      width: min(var(--container), calc(100% - 40px));
       margin: 0 auto;
-      padding: 34px 14px 50px;
+      padding: 72px 0;
     }
 
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 26px;
-      align-items: start;
-    }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
+    .kicker{
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
       padding: 8px 12px;
       border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 13px;
-      width: fit-content;
-      backdrop-filter: blur(10px);
+      background: rgba(255,255,255,0.10);
+      border: 1px solid rgba(255,255,255,0.14);
+      backdrop-filter: blur(6px);
+      font-size: 14px;
+      letter-spacing: 0.2px;
     }
 
     h1{
-      margin: 14px 0 12px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-weight: 700;
+      margin: 18px 0 12px;
+      font-size: clamp(34px, 4.2vw, 58px);
       line-height: 1.05;
-      font-size: clamp(34px, 4.3vw, 62px);
-      letter-spacing: -0.8px;
-      text-shadow: 0 10px 40px rgba(0,0,0,.55);
+      letter-spacing: -0.02em;
     }
 
-    .lead{
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 15.5px;
-      line-height: 1.65;
-      max-width: 56ch;
-      text-shadow: 0 10px 30px rgba(0,0,0,.45);
+    p{
+      margin: 0 0 22px;
+      max-width: 62ch;
+      font-size: clamp(16px, 1.3vw, 20px);
+      line-height: 1.5;
+      color: rgba(255,255,255,0.88);
     }
 
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
+    .cta-row{
+      display: flex;
+      flex-wrap: wrap;
       gap: 12px;
-      margin: 14px 0 10px;
+      margin-top: 18px;
     }
 
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      cursor:pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      height: 46px;
+      padding: 0 18px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,0.18);
+      background: rgba(255,255,255,0.12);
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
       transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      white-space: nowrap;
+      user-select: none;
     }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .btn:hover{ transform: translateY(-1px); background: rgba(255,255,255,0.16); border-color: rgba(255,255,255,0.26); }
     .btn.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 800;
+      background: rgba(255, 110, 199, 0.22);
+      border-color: rgba(255, 110, 199, 0.40);
     }
-    .btn.ghost{ background: rgba(255,255,255,.06); }
+    .btn.primary:hover{ background: rgba(255, 110, 199, 0.28); border-color: rgba(255, 110, 199, 0.55); }
 
-    .meta-row{
-      display:flex; flex-wrap:wrap;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted2);
-      font-size: 13px;
-    }
-    .meta-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
+    /* ===== RESPONSIVE FINOMHANGOLÁS (desktop fókusz) ===== */
+    @media (min-width: 1024px){
+      :root{
+        --hero-pos-x: 50%;
+        --hero-pos-y: 30%; /* desktopon feljebb húzza a fókuszt */
+      }
+      .hero-content{ padding: 92px 0; }
     }
 
-    /* ---------- “Mit kapsz pontosan?” cards a hero alatt ---------- */
-    .hero-cards{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
+    /* ===== SAFE: iOS/Android viewport bar jitter védelem ===== */
+    @supports (height: 100svh) {
+      .hero{ min-height: clamp(540px, 72svh, 900px); }
+    }
+
+    /* ===== DEMO: oldal többi része ===== */
+    .section{
+      width: min(var(--container), calc(100% - 40px));
+      margin: 0 auto;
+      padding: 56px 0;
+      color: rgba(255,255,255,0.85);
     }
     .card{
-      background: var(--panel);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      overflow:hidden;
-      position: relative;
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(700px 220px at 10% 0%, rgba(255,79,216,.22), transparent 55%),
-                  radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.18), transparent 60%);
-      opacity:.8;
-      pointer-events:none;
-    }
-    .card-inner{ position:relative; padding: 16px; }
-    .card h3{ margin:0 0 8px; font-size: 14px; letter-spacing: .2px; }
-    .card p{ margin:0; color: var(--muted); font-size: 12.8px; line-height: 1.5; }
-
-    .hero-rating{
-      margin-top: 10px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .stars{ letter-spacing: 1px; }
-
-    /* ---------- Section base ---------- */
-    section{
-      position: relative;
-      padding: 52px 0;
-    }
-    .container{
-      max-width: var(--max);
-      padding: 0 14px;
-      margin: 0 auto;
-    }
-    .section-title{
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 34px;
-      letter-spacing: -.3px;
-      margin: 0 0 14px;
-    }
-    .section-sub{
-      color: var(--muted);
-      margin: 0 0 24px;
-      max-width: 70ch;
-      line-height: 1.6;
-    }
-
-    /* ---------- Packages ---------- */
-    .packages{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    .pkg{
-      background: var(--panel2);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
       padding: 18px;
-      position: relative;
-      overflow:hidden;
-    }
-    .pkg::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.18), transparent 55%),
-                  radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.14), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
-    }
-    .pkg-inner{ position:relative; }
-    .pkg-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 10px;
-    }
-    .pkg h4{ margin:0; font-size: 22px; font-family: ui-serif, Georgia, serif; }
-    .tag{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      color: var(--muted);
-      white-space: nowrap;
-    }
-    .tag.hot{
-      color:#1b0717;
-      background: linear-gradient(135deg, #ffd8a8, #ff88e6);
-      border-color: rgba(255,255,255,.25);
-      box-shadow: 0 12px 30px rgba(255,136,230,.18);
-      font-weight: 800;
-    }
-    .pkg p{ margin: 0 0 12px; color: var(--muted); line-height: 1.6; font-size: 13.5px; }
-    .list{ margin: 0; padding: 0; list-style:none; display:grid; gap:8px; }
-    .list li{
-      display:flex; align-items:flex-start; gap:10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .check{
-      width: 18px; height: 18px; border-radius: 6px;
-      background: rgba(255,79,216,.18);
-      border: 1px solid rgba(255,79,216,.30);
-      box-shadow: 0 0 22px rgba(255,79,216,.16);
-      flex: 0 0 auto;
-      margin-top: 1px;
-      position:relative;
-    }
-    .check:after{
-      content:"";
-      position:absolute;
-      left: 5px; top: 4px;
-      width: 6px; height: 9px;
-      border-right: 2px solid rgba(255,255,255,.85);
-      border-bottom: 2px solid rgba(255,255,255,.85);
-      transform: rotate(40deg);
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(255,255,255,0.05);
     }
 
-    .pkg-actions{
-      display:flex; justify-content:flex-end;
-      margin-top: 14px;
-    }
-
-    /* ---------- How it works ---------- */
-    .how-grid{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* ---------- Footer strip ---------- */
-    .footer-strip{
-      padding: 18px 0 52px;
-      border-top: 1px solid rgba(255,255,255,.08);
-      background: rgba(10,8,14,.55);
+    /* ===== DEBUG PANEL (opcionális) ===== */
+    .debug{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 50;
+      width: 320px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,0.14);
+      background: rgba(0,0,0,0.55);
       backdrop-filter: blur(10px);
-    }
-    .footer-inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 14px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
+      display: grid;
+      gap: 10px;
       font-size: 13px;
-      flex-wrap: wrap;
     }
-
-    /* ---------- Responsive ---------- */
-    @media (max-width: 980px){
-      .hero-grid{ grid-template-columns: 1fr; }
-      .hero-bg{ background-position: center right; }
-      .hero-cards{ grid-template-columns: repeat(2, 1fr); }
-      .packages{ grid-template-columns: 1fr; }
-      .how-grid{ grid-template-columns: 1fr; }
-      .nav{ display:none; }
-      .menu-btn{ display:inline-flex; }
-    }
-    @media (max-width: 520px){
-      .hero-cards{ grid-template-columns: 1fr; }
-    }
-
-    /* smooth scroll */
-    html{ scroll-behavior:smooth; }
-
-    /* Small section separator glow (mint a mockup alsó ív) */
-    .glow-sep{
-      position:absolute;
-      left: 0; right: 0;
-      bottom: -2px;
-      height: 90px;
-      pointer-events:none;
-      background: radial-gradient(900px 70px at 50% 0%, rgba(255,79,216,.22), transparent 65%);
-      opacity: .9;
-    }
+    .debug label{ display: grid; gap: 6px; }
+    .debug input[type="range"]{ width: 100%; }
+    .debug .row{ display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 10px; }
+    .debug code{ color: rgba(255,255,255,0.90); }
+    .debug small{ color: rgba(255,255,255,0.70); }
   </style>
 </head>
 
 <body>
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="#top" aria-label="Fitness Lady">
-        <span class="dot"></span>
-        <span>Fitness Lady</span>
-      </a>
 
-      <nav class="nav" aria-label="Főmenü">
-        <a href="#csomagok">Csomagok</a>
-        <a href="#hogyan">Hogyan működik?</a>
-        <a href="#velemenyek">Vélemények</a>
-      </nav>
+  <header class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
 
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="menu-btn" id="menuBtn" aria-label="Menü">
-          ☰
-        </button>
-        <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
+    <div class="hero-content">
+      <div class="kicker">💗 FitnessLady • Desktop hero stabil • overlay finomhangolás</div>
+      <h1>Erős hero háttérkép, stabil desktopon is.</h1>
+      <p>
+        A háttér <b>cover</b>-rel tölti ki a herót, a fókuszt a
+        <code>background-position</code> változókkal állítod, az overlay pedig egy
+        stabil pseudo-element rétegen fut.
+      </p>
+
+      <div class="cta-row">
+        <a class="btn primary" href="#">Kezdjük</a>
+        <a class="btn" href="#details">Részletek</a>
       </div>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main id="top" class="hero">
-    <div class="hero-bg" aria-hidden="true"></div>
-    <div class="hero-overlay" aria-hidden="true"></div>
-
-    <div class="wrap">
-      <div class="hero-grid">
-        <div>
-          <div class="badge">✨ Prémium edzés • nőkre hangolva</div>
-
-          <h1>Női edzésprogramok, <br>amiket tényleg lehet tartani.</h1>
-
-          <p class="lead">
-            Nem sablon. Nem kompromisszum. Női edzésterv formához, erőhöz, jobb közérzethez —
-            neked, az időbeosztásodhoz igazítva.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn primary" href="#kapcsolat">Ingyenes konzultáció</a>
-            <a class="btn" href="#csomagok">Csomagok</a>
-            <a class="btn ghost" href="#velemenyek">Írj véleményt</a>
-          </div>
-
-          <div class="meta-row">
-            <div class="meta-pill">📍 [Város / Terem neve]</div>
-            <div class="meta-pill">⏱️ [Időtartamok]</div>
-            <div class="meta-pill">💬 WhatsApp/Instagram: @fitnesslady</div>
-          </div>
-        </div>
-
-        <div></div>
-      </div>
-
-      <!-- Mit kapsz pontosan -->
-      <div class="card" style="margin-top:22px;">
-        <div class="card-inner">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
-            <div style="font-weight:800;">Mit kapsz pontosan?</div>
-            <div class="tag">Próba verzió</div>
-          </div>
-
-          <div class="hero-cards">
-            <div class="card">
-              <div class="card-inner">
-                <h3>Edzés</h3>
-                <p>Heti terv + progresszió. Rövid, tartósan tartható struktúra.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Táplálkozás</h3>
-                <p>Egyszerű rendszer, ami illik a napjaidhoz — nem fordítva.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Kapcsolat</h3>
-                <p>Visszajelzés, finomhangolás, támogatás.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Fókusz</h3>
-                <p>Formásodás • erő • közérzet — célhoz igazítva.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="hero-rating">
-            <div>
-              <span class="stars">★★★★★</span>
-              <span> 4.9</span>
-              <span style="color:var(--muted2);"> és 26 értékelés</span>
-            </div>
-            <a class="btn ghost" style="padding:10px 14px;" href="#velemenyek">💬 Írj véleményt</a>
-          </div>
-        </div>
-      </div>
-
-      <div class="glow-sep" aria-hidden="true"></div>
+  <main id="details" class="section">
+    <div class="card">
+      <h2 style="margin:0 0 8px; color:#fff;">Megjegyzés (Cloudflare / Hostpoint)</h2>
+      <p style="margin:0;">
+        Ha a háttér néha “más” vagy régi: cache. Cloudflare-nél Purge Cache, Hostpointnál is lehet cache.
+        A CSS/asset verziózás (pl. <code>style.css?v=20260205</code>) sokat segít.
+      </p>
     </div>
   </main>
 
-  <!-- CSOMAGOK -->
-  <section id="csomagok">
-    <div class="container">
-      <div class="section-title">Csomagok</div>
-      <p class="section-sub">
-        Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.
-      </p>
-
-      <div class="packages">
-        <div class="pkg">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Start</h4>
-              <span class="tag">Ajánlott: 4 hét</span>
-            </div>
-            <p>Ha kell egy tiszta terv és lendület.</p>
-            <ul class="list">
-              <li><span class="check"></span> Személyre szabott edzésterv</li>
-              <li><span class="check"></span> Alap táplálkozási keretrendszer</li>
-              <li><span class="check"></span> 1× kontroll / módosítás</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Konzultáció</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="pkg" style="border-color: rgba(255,79,216,.26); box-shadow: 0 22px 70px rgba(255,79,216,.14), var(--shadow);">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Balance</h4>
-              <span class="tag hot">Legnépszerűbb</span>
-            </div>
-            <p>Formálódás + erő, folyamatos visszajelzéssel.</p>
-            <ul class="list">
-              <li><span class="check"></span> Edzés + táplálkozás rendszer</li>
-              <li><span class="check"></span> Heti követés / finomhangolás</li>
-              <li><span class="check"></span> Szokások + napi mini célok</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Konzultáció</a>
-            </div>
-          </div>
-        </div>
-
-        <div class="pkg">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Pro</h4>
-              <span class="tag">Ajánlott: 6–8 hét</span>
-            </div>
-            <p>Maximális támogatás, nem túlerőltetés.</p>
-            <ul class="list">
-              <li><span class="check"></span> Teljes személyre szabás</li>
-              <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
-              <li><span class="check"></span> Teljesítmény + forma fókusz</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Konzultáció</a>
-            </div>
-          </div>
-        </div>
-      </div>
+  <!-- Opcionális debug panel: hero-pos + overlay erősség live állítás -->
+  <aside class="debug" aria-label="Hero debug panel">
+    <div class="row">
+      <strong>Finomhangolás</strong>
+      <small>(opcionális)</small>
     </div>
-  </section>
 
-  <!-- HOGYAN MŰKÖDIK -->
-  <section id="hogyan">
-    <div class="container">
-      <div class="section-title">Hogyan működik?</div>
-      <p class="section-sub">Egyszerű, követhető rendszer — a való élethez igazítva.</p>
+    <label>
+      X pozíció: <code id="xVal">50%</code>
+      <input id="x" type="range" min="0" max="100" value="50" />
+    </label>
 
-      <div class="how-grid">
-        <div class="pkg">
-          <div class="pkg-inner">
-            <h4 style="margin:0 0 10px;">Edzés</h4>
-            <ul class="list">
-              <li><span class="check"></span> Gyakorlatok leírással</li>
-              <li><span class="check"></span> Progresszió — mikor lépsz tovább</li>
-              <li><span class="check"></span> Ajánlott ütemezés</li>
-              <li><span class="check"></span> Fenntartható terhelés</li>
-            </ul>
-          </div>
-        </div>
+    <label>
+      Y pozíció: <code id="yVal">35%</code>
+      <input id="y" type="range" min="0" max="100" value="35" />
+    </label>
 
-        <div class="pkg">
-          <div class="pkg-inner">
-            <h4 style="margin:0 0 10px;">Táplálkozás</h4>
-            <ul class="list">
-              <li><span class="check"></span> Egyszerű, tartható rend</li>
-              <li><span class="check"></span> A napirendedhez igazítva</li>
-              <li><span class="check"></span> Rendszeres finomhangolás</li>
-              <li><span class="check"></span> Stabil energiák, jobb közérzet</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
+    <label>
+      Overlay erő (felső): <code id="o1Val">0.55</code>
+      <input id="o1" type="range" min="0" max="0.9" step="0.01" value="0.55" />
+    </label>
 
-  <!-- VÉLEMÉNYEK -->
-  <section id="velemenyek">
-    <div class="container">
-      <div class="section-title">Vélemények <span style="color:var(--muted2); font-size:16px; font-family:inherit;">/ 26 valós visszajelzés</span></div>
-      <p class="section-sub">Itt később jöhet a Giscus / vélemény modul. Most a dizájnt tartjuk.</p>
+    <label>
+      Overlay erő (alsó): <code id="o2Val">0.20</code>
+      <input id="o2" type="range" min="0" max="0.9" step="0.01" value="0.20" />
+    </label>
 
-      <div class="pkg">
-        <div class="pkg-inner" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div style="color:var(--muted); font-size:14px;">
-            💬 Szeretnél véleményt írni? (Giscus később)
-          </div>
-          <a class="btn primary" href="#kapcsolat">Írj véleményt</a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KAPCSOLAT -->
-  <section id="kapcsolat">
-    <div class="container">
-      <div class="section-title">Kapcsolat</div>
-      <p class="section-sub">Ingyenes konzultációhoz írj WhatsAppon vagy Instagramon.</p>
-
-      <div class="pkg">
-        <div class="pkg-inner" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn" href="#" onclick="alert('Itt majd WhatsApp link lesz'); return false;">WhatsApp</a>
-            <a class="btn" href="#" onclick="alert('Itt majd Instagram link lesz'); return false;">Instagram</a>
-          </div>
-          <div style="color:var(--muted); font-size:13px;">
-            📍 [Város / Terem neve] • ⏱️ [Időtartamok] • @fitnesslady
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <footer class="footer-strip">
-    <div class="footer-inner">
-      <div>© <span id="y"></span> Fitness Lady</div>
-      <div>Próba verzió • dizájn egyeztetés</div>
-    </div>
-  </footer>
+    <small>
+      Tipp: desktopon gyakran jó a <b>Y = 25–35%</b>. Ha arc/logó van, húzd feljebb.
+    </small>
+  </aside>
 
   <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
+    // Live finomhangolás (opcionális)
+    const root = document.documentElement;
 
-    // Mobil menü (egyszerű)
-    const menuBtn = document.getElementById("menuBtn");
-    let open = false;
-    menuBtn?.addEventListener("click", () => {
-      open = !open;
-      if(open){
-        const nav = document.createElement("div");
-        nav.id = "mobileNav";
-        nav.style.position = "fixed";
-        nav.style.top = "62px";
-        nav.style.left = "14px";
-        nav.style.right = "14px";
-        nav.style.zIndex = "60";
-        nav.style.background = "rgba(20,12,26,.72)";
-        nav.style.border = "1px solid rgba(255,255,255,.10)";
-        nav.style.borderRadius = "18px";
-        nav.style.backdropFilter = "blur(14px)";
-        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-        nav.style.padding = "12px";
-        nav.innerHTML = `
-          <a href="#csomagok" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Csomagok</a>
-          <a href="#hogyan" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Hogyan működik?</a>
-          <a href="#velemenyek" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Vélemények</a>
-        `;
-        document.body.appendChild(nav);
-      } else {
-        document.getElementById("mobileNav")?.remove();
-      }
-    });
+    const x = document.getElementById('x');
+    const y = document.getElementById('y');
+    const o1 = document.getElementById('o1');
+    const o2 = document.getElementById('o2');
 
-    // Klikk után zárja a mobil menüt
-    document.addEventListener("click", (e) => {
-      const nav = document.getElementById("mobileNav");
-      if(!nav) return;
-      if(e.target === menuBtn) return;
-      if(nav.contains(e.target)) {
-        nav.remove();
-        open = false;
-      }
-    });
+    const xVal = document.getElementById('xVal');
+    const yVal = document.getElementById('yVal');
+    const o1Val = document.getElementById('o1Val');
+    const o2Val = document.getElementById('o2Val');
+
+    function update(){
+      const xv = `${x.value}%`;
+      const yv = `${y.value}%`;
+
+      root.style.setProperty('--hero-pos-x', xv);
+      root.style.setProperty('--hero-pos-y', yv);
+
+      // overlay rgba alpha frissítés
+      root.style.setProperty('--overlay-start', `rgba(10, 10, 10, ${o1.value})`);
+      root.style.setProperty('--overlay-end',   `rgba(10, 10, 10, ${o2.value})`);
+
+      xVal.textContent = xv;
+      yVal.textContent = yv;
+      o1Val.textContent = Number(o1.value).toFixed(2);
+      o2Val.textContent = Number(o2.value).toFixed(2);
+    }
+
+    [x, y, o1, o2].forEach(el => el.addEventListener('input', update));
+    update();
   </script>
+
 </body>
-                    </html>
+</html>
