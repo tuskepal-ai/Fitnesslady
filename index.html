@@ -17,19 +17,18 @@
       --muted2: rgba(255,255,255,.55);
       --pink: #ff4fd8;
       --pink2:#b14cff;
-      --glow: rgba(255, 79, 216, .35);
       --radius: 22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1120px;
 
-      /* HERO finomhangolás */
-      --hero-image: url("hero.png"); /* <- CSERÉLD A SAJÁT KÉPEDRE */
-      --hero-pos-x: 82%;
-      --hero-pos-y: 14%;
+      /* HERO: EREDETI KÉP + FÓKUSZ (éles marad) */
+      --hero-pos-x: 78%;
+      --hero-pos-y: 18%;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+    html{ scroll-behavior:smooth; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -45,14 +44,11 @@
 
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
-    html{ scroll-behavior:smooth; }
 
     /* ---------- Top Bar ---------- */
     .topbar{
       position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
+      top: 0; left: 0; right: 0;
       z-index: 50;
       padding: 14px 14px;
       backdrop-filter: blur(10px);
@@ -123,32 +119,40 @@
       overflow: hidden;
     }
 
+    /* EREDETI hero.png, ÉLES, NINCS BLUR/scale */
     .hero-bg{
-      position:absolute; inset:0;
-      z-index: 0;
-      background-image: var(--hero-image);
-      background-size: cover;
-      background-position: var(--hero-pos-x) var(--hero-pos-y);
-      background-repeat: no-repeat;
+      position:absolute;
+      inset:0;
+      z-index:0;
 
-      /* ÉLES MARAD: nincs blur, nincs "kenés" */
-      filter: none;
-      transform: translateZ(0);
+      background-image: url("hero.png"); /* <-- EREDETI KÉP */
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: var(--hero-pos-x) var(--hero-pos-y);
+
+      filter: none;                /* éles */
+      transform: translateZ(0);     /* stabil render */
       will-change: transform;
     }
 
-    /* prémium overlay: bal oldalt olvashatóság, jobb oldalt a kép látszik */
-    .hero-bg::after{
-      content:"";
-      position:absolute; inset:0;
+    /* Overlay külön rétegként (éles háttér mellett) */
+    .hero-overlay{
+      position:absolute;
+      inset:0;
+      z-index:1;
       pointer-events:none;
+
+      /* Bal oldalt olvasható szöveg, jobb oldalt látszik a kép */
       background:
-        radial-gradient(900px 520px at 22% 32%, rgba(10,7,14,.10), rgba(10,7,14,.50) 62%, rgba(10,7,14,.66) 100%),
         linear-gradient(90deg,
           rgba(10,7,14,.62) 0%,
-          rgba(10,7,14,.40) 42%,
-          rgba(10,7,14,.14) 70%,
-          rgba(10,7,14,0) 100%);
+          rgba(10,7,14,.38) 42%,
+          rgba(10,7,14,.12) 70%,
+          rgba(10,7,14,0) 100%),
+        radial-gradient(900px 520px at 22% 32%,
+          rgba(10,7,14,.10),
+          rgba(10,7,14,.40) 60%,
+          rgba(10,7,14,.55) 100%);
     }
 
     .wrap{
@@ -234,9 +238,7 @@
       box-shadow: 0 18px 46px rgba(255,79,216,.26);
       font-weight: 900;
     }
-    .btn.primary:hover{
-      box-shadow: 0 22px 70px rgba(255,79,216,.22);
-    }
+    .btn.primary:hover{ box-shadow: 0 22px 70px rgba(255,79,216,.22); }
     .btn.ghost{ background: rgba(255,255,255,.06); }
 
     .meta-row{
@@ -279,10 +281,8 @@
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 12px;
     }
-    .card-title{
-      font-weight: 900;
-      letter-spacing: .2px;
-    }
+    .card-title{ font-weight: 900; letter-spacing: .2px; }
+
     .tag{
       font-size: 12px;
       padding: 6px 10px;
@@ -293,7 +293,7 @@
       white-space: nowrap;
     }
 
-    /* Rólam kártya layout */
+    /* Rólam kártya */
     .about-grid{
       display:grid;
       grid-template-columns: 1fr 1.2fr;
@@ -466,6 +466,9 @@
     }
 
     /* ---------- Responsive ---------- */
+    @media (min-width: 1400px){
+      :root{ --hero-pos-x: 82%; --hero-pos-y: 14%; }
+    }
     @media (max-width: 980px){
       :root{ --hero-pos-x: 75%; --hero-pos-y: 10%; }
 
@@ -520,6 +523,7 @@
   <!-- HERO -->
   <main id="top" class="hero">
     <div class="hero-bg" aria-hidden="true"></div>
+    <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="wrap">
       <div class="hero-grid">
@@ -737,7 +741,9 @@
   <!-- VÉLEMÉNYEK -->
   <section id="velemenyek">
     <div class="container">
-      <div class="section-title">Vélemények <span style="color:var(--muted2); font-size:16px; font-family:inherit;">/ 26 valós visszajelzés</span></div>
+      <div class="section-title">
+        Vélemények <span style="color:var(--muted2); font-size:16px; font-family:inherit;">/ 26 valós visszajelzés</span>
+      </div>
       <p class="section-sub">Itt később jöhet a Giscus / vélemény modul. Most a dizájnt tartjuk.</p>
 
       <div class="pkg">
