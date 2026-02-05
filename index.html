@@ -1,256 +1,1126 @@
 <!doctype html>
 <html lang="hu">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Fitness Lady — Női edzésprogramok</title>
+  <meta name="description" content="Nem sablon. Nem kompromisszum. Női edzéstervek és táplálkozási rendszer — a te életedhez igazítva. Online coaching és személyi edzés." />
+  <meta name="theme-color" content="#120018" />
+  <meta name="robots" content="index,follow" />
 
-<title>Fitness Lady – Prémium női edzésprogramok</title>
-<meta name="description" content="Prémium női edzésprogramok, online coaching és személyi edzés. Formásodás, erő, magabiztosság.">
-<link rel="canonical" href="https://fitnesslady.ch/">
+  <!-- Open Graph (megosztás) -->
+  <meta property="og:title" content="Fitness Lady — Női edzésprogramok" />
+  <meta property="og:description" content="Prémium edzés + táplálkozás nőknek. Nem sablon. Nem kompromisszum." />
+  <meta property="og:type" content="website" />
+  <meta property="og:image" content="hero.png" />
 
-<style>
-:root{
-  --bg:#0b0611;
-  --bg2:#140a22;
-  --pink:#ff4fd8;
-  --violet:#8a5bff;
-  --text:#ffffff;
-  --muted:rgba(255,255,255,.75);
-}
+  <style>
+    :root{
+      --bg0:#09010d;
+      --bg1:#120018;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.16);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.68);
+      --muted2: rgba(255,255,255,.52);
+      --brand:#ff4fd8;
+      --brand2:#b84bff;
+      --glow: rgba(255,79,216,.45);
+      --glow2: rgba(184,75,255,.35);
+      --shadow: 0 18px 60px rgba(0,0,0,.45);
+      --radius: 22px;
+      --radius2: 28px;
+      --max: 1120px;
+    }
 
-*{box-sizing:border-box;margin:0;padding:0}
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 800px at 70% 15%, rgba(255,79,216,.10), transparent 60%),
+        radial-gradient(900px 700px at 20% 20%, rgba(184,75,255,.12), transparent 55%),
+        radial-gradient(900px 900px at 60% 80%, rgba(255,79,216,.08), transparent 60%),
+        linear-gradient(180deg, var(--bg1), var(--bg0));
+      overflow-x:hidden;
+    }
 
-body{
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:linear-gradient(180deg,var(--bg),var(--bg2));
-  color:var(--text);
-}
+    a{color:inherit; text-decoration:none}
+    button{font:inherit}
 
-a{text-decoration:none;color:inherit}
-.wrap{max-width:1100px;margin:auto;padding:0 20px}
+    /* Layout */
+    .wrap{max-width:var(--max); margin:0 auto; padding:0 18px}
+    .section{padding:72px 0}
+    .section-tight{padding:52px 0}
+    .divider{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+      margin:0;
+      border:0;
+    }
 
-/* HEADER */
-header{
-  position:sticky;top:0;z-index:10;
-  backdrop-filter:blur(14px);
-  background:rgba(10,5,20,.65);
-  border-bottom:1px solid rgba(255,255,255,.08);
-}
-nav{
-  display:flex;align-items:center;justify-content:space-between;
-  padding:14px 0;
-}
-.brand{
-  display:flex;align-items:center;gap:10px;
-  font-weight:800;font-size:18px;
-}
-.dot{
-  width:12px;height:12px;border-radius:50%;
-  background:linear-gradient(135deg,var(--pink),var(--violet));
-}
-.btn{
-  padding:10px 18px;border-radius:999px;
-  font-weight:800;
-}
-.btn-primary{
-  background:linear-gradient(90deg,var(--pink),var(--violet));
-  color:#0b0611;
-}
-.btn-ghost{
-  border:1px solid rgba(255,255,255,.3);
-}
+    /* Top glow ribbons */
+    .ribbons{
+      pointer-events:none;
+      position:absolute;
+      inset:-40vh -20vw auto -20vw;
+      height:120vh;
+      filter: blur(0px);
+      opacity:.95;
+      z-index:0;
+    }
+    .ribbons:before,
+    .ribbons:after{
+      content:"";
+      position:absolute;
+      inset:auto;
+      width:1400px;
+      height:1400px;
+      border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,79,216,.28), transparent 55%),
+                  radial-gradient(circle at 70% 70%, rgba(184,75,255,.22), transparent 58%);
+      transform: translate(-25%, -20%);
+      filter: blur(22px);
+      animation: floatGlow 10s ease-in-out infinite;
+    }
+    .ribbons:after{
+      width:1100px; height:1100px;
+      transform: translate(20%, 20%);
+      opacity:.85;
+      animation-delay:-4s;
+    }
 
-/* HERO */
-.hero{
-  min-height:90vh;
-  display:flex;
-  align-items:center;
-  position:relative;
-  overflow:hidden;
+    @keyframes floatGlow{
+      0%,100%{transform: translate(-25%, -20%) scale(1)}
+      50%{transform: translate(-20%, -24%) scale(1.04)}
+    }
 
-  /* 🔥 A KÉP ITT VAN */
-  background:
-    linear-gradient(rgba(11,6,17,.55), rgba(11,6,17,.85)),
-    url("hero.png") center / cover no-repeat;
-}
+    /* Navbar */
+    .nav{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      background: linear-gradient(180deg, rgba(10,0,16,.82), rgba(10,0,16,.55));
+      border-bottom: 1px solid rgba(255,255,255,.10);
+    }
+    .nav-inner{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 0;
+      gap:14px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:700;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:11px; height:11px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--brand));
+      box-shadow: 0 0 18px var(--glow);
+    }
+    .nav-links{
+      display:flex; align-items:center; gap:18px;
+      color:var(--muted);
+      font-weight:600;
+      font-size:14px;
+    }
+    .nav-links a{padding:10px 10px; border-radius:999px}
+    .nav-links a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+    .nav-cta{display:flex; gap:10px; align-items:center}
 
-.hero::after{
-  content:"";
-  position:absolute;inset:0;
-  background:
-    radial-gradient(circle at 50% 60%, var(--pink), transparent 65%);
-  opacity:.25;
-  animation:pulse 6s ease-in-out infinite;
-}
+    .btn{
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      padding:12px 16px;
+      border-radius:999px;
+      font-weight:700;
+      box-shadow: 0 10px 30px rgba(0,0,0,.25);
+      transition: transform .18s ease, background .18s ease, border-color .18s ease;
+      cursor:pointer;
+      white-space:nowrap;
+    }
+    .btn:hover{transform: translateY(-1px); background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18)}
+    .btn-primary{
+      border:none;
+      background: linear-gradient(135deg, var(--brand), var(--brand2));
+      box-shadow: 0 14px 40px rgba(255,79,216,.20), 0 10px 30px rgba(0,0,0,.25);
+    }
+    .btn-primary:hover{transform: translateY(-1px) scale(1.01)}
+    .btn-ghost{background: rgba(0,0,0,.18)}
 
-@keyframes pulse{
-  0%,100%{opacity:.18}
-  50%{opacity:.35}
-}
+    /* Mobile nav */
+    .burger{display:none}
+    .mobile-panel{
+      display:none;
+      padding:0 0 14px 0;
+    }
+    .mobile-panel a{
+      display:block;
+      padding:12px 12px;
+      border-radius:14px;
+      color:var(--muted);
+      font-weight:700;
+    }
+    .mobile-panel a:hover{background:rgba(255,255,255,.06); color:var(--text)}
 
-.hero-content{
-  position:relative;
-  z-index:2;
-}
+    /* Hero */
+    .hero{
+      position:relative;
+      overflow:hidden;
+      padding:74px 0 52px;
+    }
 
-.hero h1{
-  font-size:clamp(38px,6vw,64px);
-  line-height:1.05;
-  margin-bottom:16px;
-  opacity:0;
-  transform:translateY(30px);
-  animation:fadeUp 1s ease forwards;
-}
+    /* HERO BACKGROUND IMAGE */
+    .hero-bg{
+      position:absolute;
+      inset:-6% -6% -14% -6%;
+      background:
+        url("hero.png") center top / cover no-repeat;
+      filter: saturate(1.05) contrast(1.06);
+      transform: scale(1.02);
+      z-index:0;
+      animation: heroDrift 14s ease-in-out infinite;
+    }
+    @keyframes heroDrift{
+      0%,100%{transform: scale(1.02) translateY(0px)}
+      50%{transform: scale(1.04) translateY(-10px)}
+    }
 
-.hero p{
-  max-width:620px;
-  font-size:18px;
-  color:var(--muted);
-  opacity:0;
-  transform:translateY(20px);
-  animation:fadeUp 1s ease forwards .3s;
-}
+    /* IMPORTANT: lighter overlay so background is visible */
+    .hero::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(900px 700px at 72% 22%, rgba(255,79,216,.18), transparent 55%),
+        radial-gradient(900px 800px at 20% 30%, rgba(184,75,255,.14), transparent 60%),
+        linear-gradient(180deg, rgba(8,0,14,.38), rgba(8,0,14,.58));
+      z-index:1;
+    }
 
-.actions{
-  margin-top:26px;
-  display:flex;
-  gap:14px;
-  flex-wrap:wrap;
-  opacity:0;
-  transform:translateY(20px);
-  animation:fadeUp 1s ease forwards .6s;
-}
+    /* Bottom neon wave */
+    .hero::after{
+      content:"";
+      position:absolute;
+      left:-10%;
+      right:-10%;
+      bottom:-24px;
+      height:90px;
+      background: radial-gradient(50% 100% at 50% 0%, rgba(255,79,216,.32), transparent 60%);
+      filter: blur(6px);
+      opacity:.95;
+      z-index:2;
+      animation: wavePulse 7.5s ease-in-out infinite;
+    }
+    @keyframes wavePulse{
+      0%,100%{transform: translateY(0) scaleX(1)}
+      50%{transform: translateY(-4px) scaleX(1.02)}
+    }
 
-/* SECTIONS */
-section{padding:80px 0}
-h2{font-size:30px;margin-bottom:12px}
+    .hero-grid{
+      position:relative;
+      z-index:3;
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap:28px;
+      align-items:center;
+    }
 
-.cards{
-  display:grid;
-  gap:20px;
-}
-@media(min-width:900px){
-  .cards{grid-template-columns:repeat(3,1fr)}
-}
+    .kicker{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:var(--muted);
+      font-weight:700;
+      letter-spacing:.2px;
+      margin-bottom:14px;
+    }
+    .kicker .chip{
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      backdrop-filter: blur(10px);
+    }
 
-.card{
-  background:rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.12);
-  border-radius:20px;
-  padding:26px;
-  transition:.35s;
-}
-.card:hover{
-  transform:translateY(-8px);
-  box-shadow:0 30px 80px rgba(0,0,0,.45);
-}
-.card p{color:var(--muted)}
+    h1{
+      margin:0 0 14px 0;
+      font-size: clamp(36px, 5vw, 62px);
+      line-height:1.02;
+      letter-spacing:-.6px;
+      text-shadow: 0 14px 40px rgba(0,0,0,.35);
+    }
+    .lead{
+      margin:0 0 20px 0;
+      color:var(--muted);
+      font-size:16px;
+      line-height:1.55;
+      max-width:52ch;
+    }
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin:18px 0 16px;
+    }
 
-/* SCROLL ANIM */
-.reveal{
-  opacity:0;
-  transform:translateY(30px);
-  transition:1s ease;
-}
-.reveal.active{
-  opacity:1;
-  transform:none;
-}
+    .meta-row{
+      display:flex;
+      gap:14px;
+      flex-wrap:wrap;
+      color:var(--muted2);
+      font-weight:700;
+      font-size:13px;
+      align-items:center;
+    }
+    .meta-row .sep{opacity:.55}
+    .meta-pill{
+      display:flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border-radius:999px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+    }
+    .meta-ico{opacity:.95}
 
-/* FOOTER */
-footer{
-  border-top:1px solid rgba(255,255,255,.1);
-  padding:30px 0;
-  color:var(--muted);
-  font-size:14px;
-}
+    /* Right side: glass preview card */
+    .hero-panel{
+      position:relative;
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.05));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+      min-height: 420px;
+      transform: translateY(0);
+      animation: panelFloat 8s ease-in-out infinite;
+    }
+    @keyframes panelFloat{
+      0%,100%{transform: translateY(0)}
+      50%{transform: translateY(-8px)}
+    }
+    .hero-panel::before{
+      content:"";
+      position:absolute;
+      inset:-40%;
+      background: radial-gradient(circle at 30% 30%, rgba(255,79,216,.18), transparent 55%),
+                  radial-gradient(circle at 70% 70%, rgba(184,75,255,.16), transparent 55%);
+      filter: blur(24px);
+      transform: rotate(18deg);
+      opacity:.9;
+    }
+    .panel-inner{
+      position:relative;
+      padding:18px;
+    }
+    .panel-title{
+      font-weight:900;
+      letter-spacing:.2px;
+      margin:0 0 12px 0;
+      font-size:14px;
+      color:rgba(255,255,255,.86);
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+    }
+    .badge{
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,79,216,.14);
+      border:1px solid rgba(255,79,216,.22);
+      color:rgba(255,255,255,.9);
+      font-weight:900;
+      font-size:12px;
+      box-shadow: 0 10px 30px rgba(255,79,216,.12);
+      white-space:nowrap;
+    }
+    .mini-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+    }
+    .mini-card{
+      border-radius: 18px;
+      padding:14px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      min-height: 110px;
+    }
+    .mini-card h4{
+      margin:0 0 8px 0;
+      font-size:13px;
+      letter-spacing:.2px;
+    }
+    .mini-card p{
+      margin:0;
+      font-size:12.5px;
+      color:var(--muted);
+      line-height:1.45;
+    }
+    .mini-line{
+      height:1px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.18), transparent);
+      margin:12px 0;
+    }
+    .stars{
+      display:flex; align-items:center; gap:8px;
+      color:rgba(255,255,255,.86);
+      font-weight:900;
+      font-size:13px;
+    }
+    .stars span{color:#ffd36a; text-shadow: 0 10px 25px rgba(255,211,106,.10)}
 
-/* KEYFRAMES */
-@keyframes fadeUp{
-  to{opacity:1;transform:none}
-}
-</style>
+    /* Cards / blocks */
+    .h2{
+      margin:0 0 18px 0;
+      font-size: clamp(26px, 3.2vw, 40px);
+      letter-spacing:-.35px;
+    }
+    .sub{
+      margin:0 0 24px 0;
+      color:var(--muted);
+      line-height:1.55;
+      max-width:70ch;
+    }
+
+    .grid3{display:grid; grid-template-columns: repeat(3, 1fr); gap:16px;}
+    .grid2{display:grid; grid-template-columns: 1fr 1fr; gap:16px;}
+
+    .card{
+      position:relative;
+      border-radius: var(--radius);
+      padding:22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.045));
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: 0 14px 50px rgba(0,0,0,.30);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      overflow:hidden;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .card:hover{
+      transform: translateY(-3px);
+      border-color: rgba(255,255,255,.18);
+      background: linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.05));
+    }
+    .card::before{
+      content:"";
+      position:absolute;
+      inset:auto -20% -55% -20%;
+      height:240px;
+      background: radial-gradient(50% 70% at 50% 0%, rgba(255,79,216,.28), transparent 70%);
+      filter: blur(10px);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .card h3{
+      margin:0 0 8px 0;
+      font-size:22px;
+      letter-spacing:-.25px;
+    }
+    .card .desc{margin:0 0 14px 0; color:var(--muted); line-height:1.5}
+    .list{margin:0; padding:0; list-style:none; display:grid; gap:10px}
+    .list li{
+      display:flex; gap:10px; align-items:flex-start;
+      color:rgba(255,255,255,.80);
+      font-weight:650;
+      font-size:14px;
+      line-height:1.35;
+    }
+    .check{
+      width:18px; height:18px; border-radius:6px;
+      background: rgba(255,79,216,.18);
+      border:1px solid rgba(255,79,216,.28);
+      box-shadow: 0 10px 25px rgba(255,79,216,.10);
+      display:inline-flex; align-items:center; justify-content:center;
+      flex:0 0 auto;
+    }
+    .check svg{width:12px; height:12px}
+
+    .card-footer{margin-top:18px; display:flex; gap:10px; align-items:center; justify-content:space-between; flex-wrap:wrap}
+    .pill{
+      padding:8px 10px; border-radius:999px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--muted);
+      font-weight:800;
+      font-size:12px;
+    }
+
+    .featured{
+      border-color: rgba(255,79,216,.26);
+      box-shadow: 0 18px 70px rgba(255,79,216,.10), 0 14px 50px rgba(0,0,0,.32);
+    }
+    .featured .top-tag{
+      position:absolute;
+      top:14px; left:14px;
+      padding:8px 10px;
+      border-radius:999px;
+      background: rgba(255,79,216,.16);
+      border:1px solid rgba(255,79,216,.26);
+      color: rgba(255,255,255,.92);
+      font-weight:950;
+      font-size:12px;
+      box-shadow: 0 14px 40px rgba(255,79,216,.10);
+    }
+
+    /* How section */
+    .how-head{
+      display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      margin-bottom: 16px;
+    }
+    .rating{
+      display:flex; align-items:center; gap:10px;
+      color:rgba(255,255,255,.86);
+      font-weight:950;
+    }
+    .rating .stars-row{color:#ffd36a}
+    .review-cta{
+      display:flex; gap:10px; align-items:center; flex-wrap:wrap;
+    }
+
+    /* Reviews */
+    .review-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:16px;
+      align-items:stretch;
+    }
+    .review-card{
+      border-radius: var(--radius);
+      padding:22px;
+      background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.045));
+      border:1px solid rgba(255,255,255,.13);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 50px rgba(0,0,0,.30);
+      overflow:hidden;
+      position:relative;
+    }
+    .review-card::before{
+      content:"";
+      position:absolute;
+      inset:-30% -30% auto -30%;
+      height:260px;
+      background: radial-gradient(circle at 35% 30%, rgba(184,75,255,.20), transparent 60%),
+                  radial-gradient(circle at 65% 60%, rgba(255,79,216,.18), transparent 62%);
+      filter: blur(22px);
+      opacity:.9;
+      pointer-events:none;
+    }
+    .review-card h3{margin:0 0 10px 0}
+    .review-item{
+      position:relative;
+      padding:14px 14px;
+      border-radius:18px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      margin-top:12px;
+    }
+    .review-item b{display:block; margin-bottom:6px}
+    .review-item p{margin:0; color:var(--muted); line-height:1.5}
+
+    .social{
+      display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;
+    }
+    .social a{
+      display:inline-flex; gap:10px; align-items:center;
+      padding:12px 14px;
+      border-radius:999px;
+      background: rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      font-weight:900;
+      color: rgba(255,255,255,.88);
+    }
+    .social a:hover{border-color: rgba(255,255,255,.16); background: rgba(255,255,255,.06)}
+    .ico{width:18px; height:18px; opacity:.9}
+
+    /* Footer */
+    footer{
+      padding:34px 0 46px;
+      color:var(--muted2);
+      font-weight:650;
+      font-size:13px;
+    }
+    .footer-row{
+      display:flex; justify-content:space-between; gap:16px; flex-wrap:wrap;
+      align-items:center;
+    }
+
+    /* Reveal animations */
+    .reveal{opacity:0; transform: translateY(12px); transition: opacity .5s ease, transform .5s ease}
+    .reveal.on{opacity:1; transform: translateY(0)}
+
+    /* Modal */
+    .modal{
+      position:fixed;
+      inset:0;
+      display:none;
+      place-items:center;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(10px);
+      z-index:100;
+      padding:18px;
+    }
+    .modal.on{display:grid}
+    .modal-box{
+      width:min(720px, 100%);
+      border-radius: 26px;
+      background: linear-gradient(180deg, rgba(22,0,30,.92), rgba(10,0,16,.90));
+      border:1px solid rgba(255,255,255,.14);
+      box-shadow: 0 18px 80px rgba(0,0,0,.55);
+      overflow:hidden;
+      position:relative;
+    }
+    .modal-box::before{
+      content:"";
+      position:absolute;
+      inset:-40% -40% auto -40%;
+      height:360px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,79,216,.22), transparent 60%),
+                  radial-gradient(circle at 70% 60%, rgba(184,75,255,.18), transparent 62%);
+      filter: blur(22px);
+      opacity:.95;
+      pointer-events:none;
+    }
+    .modal-head{
+      position:relative;
+      padding:18px 18px 10px;
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      align-items:center;
+    }
+    .modal-head b{font-size:14px; letter-spacing:.2px}
+    .xbtn{
+      border:none;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.14);
+      color:rgba(255,255,255,.9);
+      border-radius: 12px;
+      padding:10px 12px;
+      cursor:pointer;
+    }
+    .modal-body{
+      position:relative;
+      padding: 10px 18px 18px;
+    }
+    .form{
+      display:grid;
+      gap:12px;
+    }
+    .field label{display:block; font-size:12px; color:var(--muted2); font-weight:900; margin-bottom:6px}
+    .field input, .field textarea, .field select{
+      width:100%;
+      padding:12px 14px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    .field textarea{min-height:120px; resize:vertical}
+    .form-actions{
+      display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:6px;
+    }
+    .hint{color:var(--muted2); font-size:12px; line-height:1.4; margin:0}
+
+    /* Responsive */
+    @media (max-width: 980px){
+      .hero-grid{grid-template-columns: 1fr; gap:18px}
+      .hero-panel{min-height: 320px}
+      .review-grid{grid-template-columns:1fr}
+      .grid3{grid-template-columns:1fr}
+      .grid2{grid-template-columns:1fr}
+      .nav-links{display:none}
+      .burger{display:inline-flex}
+      .mobile-panel{display:block}
+    }
+
+    @media (max-width: 520px){
+      .hero{padding:58px 0 46px}
+      .btn{padding:12px 14px}
+    }
+  </style>
 </head>
 
 <body>
+  <div class="ribbons"></div>
 
-<header>
-  <div class="wrap">
-    <nav>
-      <div class="brand">
-        <div class="dot"></div>
-        Fitness Lady
-      </div>
-      <a href="#kapcsolat" class="btn btn-primary">Ingyenes konzultáció</a>
-    </nav>
-  </div>
-</header>
+  <!-- NAV -->
+  <header class="nav">
+    <div class="wrap">
+      <div class="nav-inner">
+        <a class="brand" href="#top" aria-label="Fitness Lady">
+          <span class="dot" aria-hidden="true"></span>
+          <span>Fitness Lady</span>
+        </a>
 
-<main class="hero">
-  <div class="wrap hero-content">
-    <h1>Női edzésprogramok,<br>amiket tényleg lehet tartani.</h1>
-    <p>
-      Nem sablon. Nem kompromisszum.<br>
-      Prémium edzés és táplálkozás nőknek,
-      akik erősek akarnak lenni – kívül és belül.
-    </p>
-    <div class="actions">
-      <a href="#csomagok" class="btn btn-primary">Csomagok</a>
-      <a href="#velemenyek" class="btn btn-ghost">Vélemények</a>
-    </div>
-  </div>
-</main>
+        <nav class="nav-links" aria-label="Fő navigáció">
+          <a href="#csomagok">Csomagok</a>
+          <a href="#rolam">Rólam</a>
+          <a href="#velemenyek">Vélemények</a>
+        </nav>
 
-<section id="csomagok">
-  <div class="wrap">
-    <h2 class="reveal">Csomagok</h2>
-    <div class="cards">
-      <div class="card reveal">
-        <h3>Start</h3>
-        <p>Alap edzés + irány, ha most vágsz bele.</p>
+        <div class="nav-cta">
+          <button class="btn btn-ghost burger" id="burger" aria-label="Menü megnyitása">☰</button>
+          <a class="btn btn-primary" href="#konzultacio">Ingyenes konzultáció</a>
+        </div>
       </div>
-      <div class="card reveal">
-        <h3>Balance</h3>
-        <p>Formálódás, erő és követés – a legnépszerűbb.</p>
-      </div>
-      <div class="card reveal">
-        <h3>Pro</h3>
-        <p>Maximális támogatás, komoly célokhoz.</p>
+
+      <div class="mobile-panel" id="mobilePanel" style="display:none">
+        <a href="#csomagok">Csomagok</a>
+        <a href="#rolam">Rólam</a>
+        <a href="#velemenyek">Vélemények</a>
       </div>
     </div>
+  </header>
+
+  <!-- HERO -->
+  <main id="top" class="hero">
+    <div class="hero-bg" aria-hidden="true"></div>
+
+    <div class="wrap">
+      <div class="hero-grid">
+        <section class="reveal">
+          <div class="kicker">
+            <span class="dot" aria-hidden="true"></span>
+            <span class="chip">Prémium edzés • nőkre hangolva</span>
+          </div>
+
+          <h1>Női edzésprogramok,<br/>amiket tényleg lehet tartani.</h1>
+          <p class="lead">
+            Nem sablon. Nem kompromisszum.
+            Női edzésterv formához, erőhöz, jobb közérzethez — neked, az időbeosztásodhoz igazítva.
+          </p>
+
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="#konzultacio">Ingyenes konzultáció</a>
+            <a class="btn" href="#csomagok">Csomagok</a>
+            <button class="btn" id="openReviewTop" type="button">Írj véleményt</button>
+          </div>
+
+          <div class="meta-row">
+            <span class="meta-pill"><span class="meta-ico">📍</span> [Város / Terem neve]</span>
+            <span class="meta-pill"><span class="meta-ico">⏱️</span> [Időtartamok]</span>
+            <span class="meta-pill"><span class="meta-ico">💬</span> WhatsApp/Instagram: @fitnesslady</span>
+          </div>
+        </section>
+
+        <aside class="hero-panel reveal" aria-label="Előnézet kártyák">
+          <div class="panel-inner">
+            <div class="panel-title">
+              <span>Mit kapsz pontosan?</span>
+              <span class="badge">Próba verzió</span>
+            </div>
+
+            <div class="mini-grid">
+              <div class="mini-card">
+                <h4>Edzés</h4>
+                <p>Heti terv + progresszió. Rövid, tartósan tartható struktúra.</p>
+              </div>
+              <div class="mini-card">
+                <h4>Táplálkozás</h4>
+                <p>Egyszerű rendszer, ami illik a napjaidhoz — nem fordítva.</p>
+              </div>
+              <div class="mini-card">
+                <h4>Kapcsolat</h4>
+                <p>Visszajelzés, finomhangolás, támogatás.</p>
+              </div>
+              <div class="mini-card">
+                <h4>Fókusz</h4>
+                <p>Formásodás • erő • közérzet — célhoz igazítva.</p>
+              </div>
+            </div>
+
+            <div class="mini-line"></div>
+
+            <div class="stars">
+              <span aria-hidden="true">★★★★★</span>
+              <span>4.9</span>
+              <span style="color: var(--muted); font-weight:800">és 26 értékelés</span>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  </main>
+
+  <hr class="divider"/>
+
+  <!-- PACKAGES -->
+  <section id="csomagok" class="section">
+    <div class="wrap">
+      <div class="reveal">
+        <h2 class="h2">Csomagok</h2>
+        <p class="sub">
+          Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.
+        </p>
+      </div>
+
+      <div class="grid3">
+        <article class="card reveal">
+          <h3>Start</h3>
+          <p class="desc">Ha kell egy tiszta terv és lendület.</p>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span> Személyre szabott edzésterv</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Alap táplálkozási keretrendszer</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              1× kontroll / módosítás</li>
+          </ul>
+          <div class="card-footer">
+            <span class="pill">Ajánlott: 4 hét</span>
+            <a class="btn btn-primary" href="#konzultacio">Konzultáció</a>
+          </div>
+        </article>
+
+        <article class="card featured reveal">
+          <div class="top-tag">Legnépszerűbb</div>
+          <h3>Balance</h3>
+          <p class="desc">Formálódás + erő, folyamatos visszajelzéssel.</p>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Edzés + táplálkozás rendszer</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Heti követés / finomhangolás</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Szokások + napi mini célok</li>
+          </ul>
+          <div class="card-footer">
+            <span class="pill">Ajánlott: 6–8 hét</span>
+            <a class="btn btn-primary" href="#konzultacio">Konzultáció</a>
+          </div>
+        </article>
+
+        <article class="card reveal">
+          <h3>Pro</h3>
+          <p class="desc">Maximális támogatás, nem túlterhelés.</p>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Teljes személyre szabás</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Gyakoribb kontroll + ütemezés</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Teljesítmény + forma fókusz</li>
+          </ul>
+          <div class="card-footer">
+            <span class="pill">Ajánlott: 8+ hét</span>
+            <a class="btn btn-primary" href="#konzultacio">Konzultáció</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- HOW IT WORKS -->
+  <section id="rolam" class="section-tight">
+    <div class="wrap">
+      <div class="how-head reveal">
+        <div>
+          <h2 class="h2" style="margin-bottom:8px">Hogyan működik?</h2>
+          <div class="rating">
+            <span class="stars-row" aria-hidden="true">★★★★★</span>
+            <span>4.9</span>
+            <span style="color:var(--muted); font-weight:850">és 26 értékelés</span>
+          </div>
+        </div>
+        <div class="review-cta">
+          <button class="btn" id="openReview" type="button">💬 Írj véleményt</button>
+          <a class="btn btn-primary" id="konzultacio" href="#konzultacio">Ingyenes konzultáció</a>
+        </div>
+      </div>
+
+      <div class="grid2">
+        <div class="card reveal">
+          <h3>Edzés</h3>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Gyakorlatok leírással • alternatívákkal</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Progresszió — fokozatosan, tarthatóan</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              1× kontroll 1–4 hét között</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Ajánlott: 4 hét</li>
+          </ul>
+        </div>
+
+        <div class="card reveal">
+          <h3>Táplálkozás</h3>
+          <ul class="list">
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Egyszerű, tartható rendszer</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              A napirendedhez igazított ajánlások</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Rendszeres, rugalmas “mini szabályok”</li>
+            <li><span class="check" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 6L9 17l-5-5" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              Fókusz: energia • forma • közérzet</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <!-- REVIEWS -->
+  <section id="velemenyek" class="section">
+    <div class="wrap">
+      <div class="reveal">
+        <h2 class="h2">Vélemények <span style="color:var(--muted); font-weight:900">/ 26 valós visszajelzés</span></h2>
+        <p class="sub">Itt egy próba blokk — később lehet ide Giscus / Google vélemény / saját rendszer.</p>
+      </div>
+
+      <div class="review-grid">
+        <div class="review-card reveal">
+          <h3>Mit mondanak rólad?</h3>
+          <div id="reviewList">
+            <div class="review-item">
+              <b>Anna — “Végre tartható rendszer”</b>
+              <p>Nem volt túl sok, mégis folyamatosan haladtam. A csomagok logikája nagyon jó.</p>
+            </div>
+            <div class="review-item">
+              <b>Eszter — “Formásodás + energia”</b>
+              <p>Az apró finomhangolások hozták a különbséget. Premium érzés, de emberi.</p>
+            </div>
+          </div>
+
+          <div class="social">
+            <a href="#" onclick="return false" aria-label="WhatsApp">
+              <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M20 11.8a8 8 0 0 1-11.9 7L4 20l1.4-3.8A8 8 0 1 1 20 11.8Z" stroke="white" stroke-width="1.8" opacity=".9"/><path d="M8.6 9.2c.2-.5.4-.6.7-.6h.6c.2 0 .4 0 .6.4l.7 1.7c.1.3.1.5 0 .7l-.3.5c-.1.2-.2.3 0 .6.3.6 1.1 1.6 2.5 2.2.3.1.5.1.6 0l.8-.9c.2-.2.4-.2.6-.1l1.9.9c.3.1.5.2.5.4 0 .2 0 1-.6 1.6-.6.6-1.3.6-1.7.5-.4-.1-1.6-.5-3-1.5-1.7-1.1-2.8-2.6-3.1-3.1-.3-.5-.8-1.5-.8-2.3 0-.8.4-1.2.5-1.5Z" fill="white" opacity=".85"/></svg>
+              WhatsApp
+            </a>
+            <a href="#" onclick="return false" aria-label="Instagram">
+              <svg class="ico" viewBox="0 0 24 24" fill="none"><path d="M7 2h10a5 5 0 0 1 5 5v10a5 5 0 0 1-5 5H7a5 5 0 0 1-5-5V7a5 5 0 0 1 5-5Z" stroke="white" stroke-width="1.8" opacity=".9"/><path d="M12 17a5 5 0 1 0 0-10 5 5 0 0 0 0 10Z" stroke="white" stroke-width="1.8" opacity=".9"/><path d="M17.6 6.4h.01" stroke="white" stroke-width="3" stroke-linecap="round"/></svg>
+              @fitnesslady
+            </a>
+          </div>
+        </div>
+
+        <div class="review-card reveal">
+          <h3>Gyors kapcsolat</h3>
+          <p class="sub" style="margin-bottom:14px">
+            Próba verzió: maradjon a 3 adat. Később ide jöhet foglalás (Calendly), e-mail, vagy űrlap.
+          </p>
+
+          <div class="mini-card" style="min-height:auto">
+            <h4>Ingyenes konzultáció</h4>
+            <p>Írj röviden: cél, időbeosztás, edzéshely (otthon/terem).</p>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+              <a class="btn btn-primary" href="#" onclick="openConsult(); return false;">Kérek konzultációt</a>
+              <button class="btn" id="openReviewSide" type="button">Írj véleményt</button>
+            </div>
+            <p class="hint" style="margin-top:12px">A konzultáció gomb most csak demo (popup). Később ráköthető WhatsApp linkre.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <hr class="divider"/>
+
+  <footer>
+    <div class="wrap">
+      <div class="footer-row">
+        <div>© <span id="year"></span> Fitness Lady • Próbaverzió</div>
+        <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap">
+          <a class="btn" href="#top">Ugrás a tetejére</a>
+          <a class="btn btn-ghost" href="#" onclick="return false">Adatkezelés</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- REVIEW MODAL -->
+  <div class="modal" id="modal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Vélemény írás">
+      <div class="modal-head">
+        <b>Írj véleményt</b>
+        <button class="xbtn" id="closeModal" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <form class="form" id="reviewForm">
+          <p class="hint">Ez most egy egyszerű, helyi (localStorage) demo — később cseréljük Giscus-ra / Google-ra.</p>
+          <div class="field">
+            <label for="name">Név</label>
+            <input id="name" name="name" placeholder="Pl.: Anna" required />
+          </div>
+          <div class="field">
+            <label for="rating">Értékelés</label>
+            <select id="rating" name="rating" required>
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="text">Vélemény</label>
+            <textarea id="text" name="text" placeholder="Mit kaptál, mi volt a legjobb, kinek ajánlanád?" required></textarea>
+          </div>
+
+          <div class="form-actions">
+            <button class="btn" type="button" id="cancelModal">Mégse</button>
+            <button class="btn btn-primary" type="submit">Mentés</button>
+          </div>
+        </form>
+      </div>
+    </div>
   </div>
-</section>
 
-<section id="velemenyek">
-  <div class="wrap">
-    <h2 class="reveal">Vélemények</h2>
-    <p class="reveal">Ide kerül majd a vélemény rendszer.</p>
+  <!-- CONSULT MODAL (simple) -->
+  <div class="modal" id="consultModal">
+    <div class="modal-box" role="dialog" aria-modal="true" aria-label="Konzultáció">
+      <div class="modal-head">
+        <b>Ingyenes konzultáció (demo)</b>
+        <button class="xbtn" id="closeConsult" type="button">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="hint">
+          Ide később berakjuk a WhatsApp linket vagy egy foglalót. Most csak egy placeholder.
+        </p>
+        <div class="mini-card" style="min-height:auto; margin-top:12px">
+          <h4>Mit írj?</h4>
+          <p>Célod (forma/erő/fogyás), hány napot tudsz edzeni, otthon/terem.</p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px">
+            <a class="btn btn-primary" href="#" onclick="return false;">WhatsApp (hamarosan)</a>
+            <button class="btn" type="button" onclick="closeConsult()">Oké</button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
-</section>
 
-<section id="kapcsolat">
-  <div class="wrap">
-    <h2 class="reveal">Ingyenes konzultáció</h2>
-    <p class="reveal">Írj, és megnézzük együtt, mi működik neked.</p>
-  </div>
-</section>
+  <script>
+    // Year
+    document.getElementById("year").textContent = new Date().getFullYear();
 
-<footer>
-  <div class="wrap">
-    © <span id="y"></span> Fitness Lady
-  </div>
-</footer>
+    // Smooth scroll (anchors)
+    document.querySelectorAll('a[href^="#"]').forEach(a=>{
+      a.addEventListener("click", (e)=>{
+        const id = a.getAttribute("href");
+        if(!id || id === "#") return;
+        const el = document.querySelector(id);
+        if(el){
+          e.preventDefault();
+          el.scrollIntoView({behavior:"smooth", block:"start"});
+        }
+      });
+    });
 
-<script>
-document.getElementById("y").textContent=new Date().getFullYear();
-const els=document.querySelectorAll(".reveal");
-const io=new IntersectionObserver(e=>{
-  e.forEach(x=>{
-    if(x.isIntersecting) x.target.classList.add("active");
-  })
-},{threshold:.15});
-els.forEach(el=>io.observe(el));
-</script>
+    // Mobile menu
+    const burger = document.getElementById("burger");
+    const mobilePanel = document.getElementById("mobilePanel");
+    burger?.addEventListener("click", ()=>{
+      const on = mobilePanel.style.display !== "none";
+      mobilePanel.style.display = on ? "none" : "block";
+    });
 
+    // Reveal on scroll
+    const io = new IntersectionObserver((entries)=>{
+      entries.forEach(en=>{
+        if(en.isIntersecting) en.target.classList.add("on");
+      });
+    }, {threshold: .12});
+    document.querySelectorAll(".reveal").forEach(el=>io.observe(el));
+
+    // Review modal
+    const modal = document.getElementById("modal");
+    const consultModal = document.getElementById("consultModal");
+    const openBtns = ["openReview","openReviewTop","openReviewSide"].map(id=>document.getElementById(id)).filter(Boolean);
+    const closeModal = document.getElementById("closeModal");
+    const cancelModal = document.getElementById("cancelModal");
+
+    function openModal(){ modal.classList.add("on"); }
+    function closeModalFn(){ modal.classList.remove("on"); }
+
+    openBtns.forEach(b=>b.addEventListener("click", openModal));
+    closeModal?.addEventListener("click", closeModalFn);
+    cancelModal?.addEventListener("click", closeModalFn);
+    modal?.addEventListener("click", (e)=>{ if(e.target === modal) closeModalFn(); });
+
+    // Demo consult
+    window.openConsult = function(){ consultModal.classList.add("on"); }
+    window.closeConsult = function(){ consultModal.classList.remove("on"); }
+    document.getElementById("closeConsult")?.addEventListener("click", closeConsult);
+    consultModal?.addEventListener("click", (e)=>{ if(e.target === consultModal) closeConsult(); });
+
+    // Reviews storage (demo)
+    const KEY = "fitnesslady_reviews_v1";
+    const list = document.getElementById("reviewList");
+    const form = document.getElementById("reviewForm");
+
+    function stars(n){
+      n = Number(n||5);
+      return "★★★★★☆☆☆☆☆".slice(5-n, 10-n); // quick trick
+    }
+
+    function loadReviews(){
+      try{
+        const items = JSON.parse(localStorage.getItem(KEY) || "[]");
+        // append under the two defaults
+        items.forEach(r=>{
+          const div = document.createElement("div");
+          div.className = "review-item";
+          div.innerHTML = `<b>${escapeHtml(r.name)} — “${stars(r.rating)}”</b><p>${escapeHtml(r.text)}</p>`;
+          list.appendChild(div);
+        });
+      }catch(e){}
+    }
+
+    function saveReview(r){
+      const items = JSON.parse(localStorage.getItem(KEY) || "[]");
+      items.unshift(r);
+      localStorage.setItem(KEY, JSON.stringify(items.slice(0, 12)));
+    }
+
+    function escapeHtml(str){
+      return String(str).replace(/[&<>"']/g, m => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[m]));
+    }
+
+    form?.addEventListener("submit", (e)=>{
+      e.preventDefault();
+      const data = new FormData(form);
+      const r = {
+        name: (data.get("name")||"").toString().trim(),
+        rating: (data.get("rating")||"5").toString(),
+        text: (data.get("text")||"").toString().trim()
+      };
+      if(!r.name || !r.text) return;
+
+      saveReview(r);
+
+      const div = document.createElement("div");
+      div.className = "review-item";
+      div.innerHTML = `<b>${escapeHtml(r.name)} — “${stars(r.rating)}”</b><p>${escapeHtml(r.text)}</p>`;
+      // insert at top (after the 2 demo ones)
+      list.insertBefore(div, list.children[2] || null);
+
+      form.reset();
+      closeModalFn();
+    });
+
+    loadReviews();
+  </script>
 </body>
-</html>
+  </html>
