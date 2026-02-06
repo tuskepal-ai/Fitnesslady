@@ -3,562 +3,586 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fitness Lady</title>
+  <title>Fitness Lady – Női edzéstervek</title>
+  <meta name="description" content="Női edzéstervek, táplálkozási rendszer, finomhangolás – prémium, tartós eredmény." />
 
   <style>
     :root{
-      --bg:#07060b;
-      --card:rgba(255,255,255,.06);
-      --card2:rgba(255,255,255,.08);
-      --stroke:rgba(255,255,255,.10);
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-      --pink:#ff43d6;
-      --pink2:#b53cff;
-      --shadow: 0 20px 60px rgba(0,0,0,.55);
-      --radius:22px;
-      --radius2:28px;
-      --max:1120px;
-      --gap:18px;
+      --bg:#07000a;
+      --card: rgba(255,255,255,.06);
+      --card2: rgba(255,255,255,.08);
+      --border: rgba(255,255,255,.10);
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --brand1:#ff4fd8;
+      --brand2:#a84cff;
+      --shadow: 0 18px 45px rgba(0,0,0,.55);
+      --r: 22px;
     }
-
     *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial;
       color:var(--text);
-      background: radial-gradient(1200px 700px at 15% 5%, rgba(255,67,214,.20), transparent 55%),
-                  radial-gradient(900px 600px at 80% 10%, rgba(181,60,255,.18), transparent 60%),
-                  var(--bg);
+      background:
+        radial-gradient(1200px 700px at 65% 10%, rgba(255,79,216,.28), transparent 55%),
+        radial-gradient(900px 600px at 20% 20%, rgba(168,76,255,.22), transparent 50%),
+        radial-gradient(900px 700px at 80% 90%, rgba(255,79,216,.10), transparent 50%),
+        var(--bg);
       overflow-x:hidden;
     }
 
-    a{color:inherit; text-decoration:none}
-    .container{max-width:var(--max); margin:0 auto; padding:0 18px}
-    .nav{
+    a{color:inherit}
+    .container{max-width:1120px;margin:0 auto;padding:0 18px}
+
+    /* TOPBAR */
+    .topbar{
       position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(8,7,12,.72), rgba(8,7,12,.35));
-      border-bottom:1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(14px);
+      background: rgba(7,0,10,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
     }
-    .nav-inner{
+    .topbar-inner{
       display:flex; align-items:center; justify-content:space-between;
       padding:14px 0;
+      gap:14px;
     }
-    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
-    .dot{
-      width:10px; height:10px; border-radius:50%;
-      background: radial-gradient(circle at 30% 30%, #ffd1ff, var(--pink));
-      box-shadow: 0 0 22px rgba(255,67,214,.55);
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:800;
+      letter-spacing:.2px;
     }
-    .menu{display:flex; align-items:center; gap:14px; color:var(--muted)}
-    .menu a{padding:10px 10px; border-radius:14px}
-    .menu a:hover{background:rgba(255,255,255,.06); color:var(--text)}
-    .cta{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:12px 16px;
+    .brand-dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle, #ffd1f6, var(--brand1) 45%, var(--brand2) 100%);
+      box-shadow: 0 0 18px rgba(255,79,216,.55);
+    }
+    nav{
+      display:flex; align-items:center; gap:16px;
+      color: var(--muted);
+      font-weight:600;
+      font-size:14px;
+    }
+    nav a{ text-decoration:none; opacity:.9 }
+    nav a:hover{ opacity:1; color:#fff }
+
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:10px 16px;
       border-radius:999px;
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      box-shadow: 0 12px 30px rgba(255,67,214,.20);
-      font-weight:700;
-      white-space:nowrap;
+      font-weight:800;
+      text-decoration:none;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+    }
+    .pill.primary{
+      border:none;
+      color:#120013;
+      background: linear-gradient(135deg, var(--brand1), var(--brand2));
+      box-shadow: 0 12px 30px rgba(255,79,216,.22);
     }
 
     /* HERO */
     .hero{
-      position:relative;
-      padding:54px 0 18px;
+      padding:40px 0 10px;
     }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap:22px;
+      align-items:stretch;
+    }
+    @media (max-width: 900px){
+      .hero-grid{grid-template-columns:1fr}
+      nav{display:none}
+    }
+
     .hero-card{
       position:relative;
+      border-radius: var(--r);
       overflow:hidden;
-      border-radius:var(--radius2);
-      border:1px solid rgba(255,255,255,.08);
-      box-shadow: var(--shadow);
       background: rgba(255,255,255,.03);
-      min-height: 420px;
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      min-height: 360px;
     }
-    .hero-bg{
+    .hero-card .bg{
       position:absolute; inset:0;
       background:
-        radial-gradient(900px 520px at 20% 15%, rgba(255,67,214,.35), transparent 58%),
-        radial-gradient(760px 520px at 80% 20%, rgba(181,60,255,.28), transparent 60%),
-        linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.55)),
-        url("hero.png");
-      background-size: cover;
+        linear-gradient(180deg, rgba(0,0,0,.20), rgba(0,0,0,.65)),
+        url("../hero.png");
+      background-size:cover;
       background-position:center;
-      filter:saturate(1.05) contrast(1.04);
-      transform: scale(1.02);
+      filter: saturate(1.05) contrast(1.05);
     }
-    .hero-overlay{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(900px 520px at 10% 10%, rgba(0,0,0,.15), transparent 60%),
-        linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.60));
-    }
-    .hero-content{
+    .hero-card .content{
       position:relative;
-      padding:34px 26px 26px;
-      display:flex; flex-direction:column; gap:16px;
+      padding:34px 26px;
     }
-    .h1{
-      margin:0;
-      font-size: clamp(32px, 5vw, 56px);
-      line-height:1.02;
-      letter-spacing:-.7px;
-      text-shadow: 0 18px 45px rgba(0,0,0,.55);
-    }
-    .lead{
-      max-width: 720px;
-      margin:0;
-      color:var(--muted);
-      font-size: 16px;
-      line-height:1.5;
-    }
-    .hero-actions{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin-top:4px;
-    }
-    .pill{
-      display:inline-flex; align-items:center; gap:10px;
-      padding:10px 14px;
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
       border-radius:999px;
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
-      color:var(--text);
-      font-weight:650;
-    }
-    .pill:hover{background:rgba(255,255,255,.11)}
-    .subpills{
-      display:flex; flex-wrap:wrap; gap:10px;
-      margin-top:6px;
-      color:var(--muted2);
+      color: rgba(255,255,255,.80);
+      font-weight:700;
       font-size:13px;
     }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding:8px 12px;
-      border-radius:999px;
-      background: rgba(0,0,0,.22);
+    h1{
+      margin:16px 0 10px;
+      font-size:52px;
+      line-height:1.02;
+      letter-spacing:-.8px;
+    }
+    @media (max-width: 520px){
+      h1{font-size:40px}
+    }
+    .sub{
+      color: rgba(255,255,255,.78);
+      font-size:16px;
+      max-width: 58ch;
+      line-height:1.55;
+    }
+    .hero-actions{
+      display:flex;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:18px;
+    }
+
+    .side-card{
+      border-radius: var(--r);
+      background: linear-gradient(145deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      padding:22px;
+      min-height: 360px;
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+    }
+    .mini-title{
+      font-weight:900;
+      font-size:16px;
+      letter-spacing:.2px;
+    }
+    .mini-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:12px;
+      margin-top:6px;
+    }
+    .mini{
+      border-radius: 16px;
+      padding:14px;
+      background: rgba(0,0,0,.25);
       border:1px solid rgba(255,255,255,.08);
     }
+    .mini b{display:block;margin-bottom:6px}
+    .mini span{color:var(--muted); font-size:13px; line-height:1.35}
 
     /* SECTIONS */
-    section{padding:30px 0}
-    .section-title{
-      font-size: clamp(26px, 3.6vw, 40px);
-      letter-spacing:-.4px;
-      margin:0 0 12px;
-    }
-    .section-lead{margin:0 0 18px; color:var(--muted); line-height:1.5}
-    .grid{
+    .section{padding:42px 0}
+    .section h2{margin:0 0 8px; font-size:34px; letter-spacing:-.4px}
+    .section p.lead{margin:0 0 18px; color:var(--muted); max-width:70ch; line-height:1.55}
+
+    /* PACKAGES */
+    .cards{
       display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: var(--gap);
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
     }
+    @media (max-width: 980px){ .cards{grid-template-columns:1fr 1fr} }
+    @media (max-width: 640px){ .cards{grid-template-columns:1fr} }
+
     .card{
-      border-radius:var(--radius);
+      border-radius: var(--r);
+      padding:18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.07), rgba(255,255,255,.03));
       border:1px solid rgba(255,255,255,.08);
-      background: rgba(255,255,255,.05);
-      box-shadow: 0 18px 50px rgba(0,0,0,.40);
-      overflow:hidden;
+      box-shadow: 0 14px 34px rgba(0,0,0,.42);
     }
-    .card-pad{padding:18px}
-    .muted{color:var(--muted)}
-    .kicker{
-      font-size:12px; letter-spacing:.16em; text-transform:uppercase;
-      color: rgba(255,255,255,.62);
+    .card .badge{
+      display:inline-flex;
+      padding:6px 10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      border:1px solid rgba(255,255,255,.10);
+      color: rgba(255,255,255,.85);
+      font-size:12px;
+      font-weight:800;
+      margin-bottom:12px;
+    }
+    .card h3{margin:0 0 8px; font-size:22px}
+    .card ul{margin:10px 0 0; padding:0 0 0 18px; color:var(--muted); line-height:1.55}
+    .card .price{
+      margin-top:14px;
+      display:flex;
+      align-items:baseline;
+      gap:8px;
+      font-weight:900;
+    }
+    .card .price small{color:var(--muted); font-weight:700}
+    .card .btn{
+      margin-top:14px;
+      width:100%;
+      display:inline-flex;
+      justify-content:center;
+      text-decoration:none;
+      padding:12px 14px;
+      border-radius:999px;
+      font-weight:900;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
     }
 
-    /* Reviews */
-    .reviews-wrap{grid-column: 1 / -1}
+    /* REVIEWS */
+    .reviews-wrap{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
     .reviews-head{
-      display:flex; align-items:flex-start; justify-content:space-between;
-      gap:12px; flex-wrap:wrap;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:14px;
+      flex-wrap:wrap;
     }
-    .reviews-actions{display:flex; gap:10px; flex-wrap:wrap}
-    .btn{
-      display:inline-flex; align-items:center; justify-content:center;
-      gap:10px;
-      border-radius:999px;
-      padding:12px 16px;
-      border:1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.07);
-      color:var(--text);
-      font-weight:750;
-      cursor:pointer;
+    .reviews-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
     }
-    .btn:hover{background: rgba(255,255,255,.10)}
-    .btn-primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      border:none;
-      box-shadow: 0 14px 35px rgba(255,67,214,.18);
-    }
-    .btn-primary:hover{filter:brightness(1.04)}
     .reviews-list{
       display:grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 14px;
-      margin-top: 16px;
+      grid-template-columns: repeat(3, 1fr);
+      gap:16px;
     }
+    @media (max-width: 980px){ .reviews-list{grid-template-columns:1fr 1fr} }
+    @media (max-width: 640px){ .reviews-list{grid-template-columns:1fr} }
+
     .review{
-      grid-column: span 6;
-      border-radius: 20px;
+      border-radius: var(--r);
+      padding:18px;
+      background: linear-gradient(145deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 34px rgba(0,0,0,.42);
+    }
+    .stars{color:#ffb4f1; font-size:18px; letter-spacing:1px}
+    .review .txt{margin-top:10px; color:rgba(255,255,255,.92); line-height:1.55; white-space:pre-wrap}
+    .review .meta{margin-top:12px; color:var(--muted); font-size:12px}
+
+    /* CONTACT */
+    .contact{
+      border-radius: var(--r);
+      padding:22px;
+      background: rgba(255,255,255,.05);
       border:1px solid rgba(255,255,255,.08);
-      background: rgba(0,0,0,.18);
-      padding:16px;
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-    }
-    .review-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
-    .review-name{font-weight:800}
-    .stars{letter-spacing:1px; white-space:nowrap}
-    .review-text{margin:10px 0 0; color: rgba(255,255,255,.80); line-height:1.55}
-    .review-meta{margin-top:12px; font-size:12px; color: rgba(255,255,255,.55)}
-    .reviews-empty{
-      margin-top:14px;
-      padding:14px 16px;
-      border-radius:16px;
-      border:1px dashed rgba(255,255,255,.18);
-      color: rgba(255,255,255,.70);
-      background: rgba(255,255,255,.04);
     }
 
-    footer{padding:34px 0 44px; color:rgba(255,255,255,.55)}
-    .sep{height:1px; background:rgba(255,255,255,.08); margin:16px 0}
-
-    @media (max-width: 860px){
-      .menu{display:none}
-      .review{grid-column: span 12;}
-      .hero-card{min-height: 460px;}
+    footer{
+      padding:26px 0 40px;
+      color: rgba(255,255,255,.55);
+      font-size:13px;
+      border-top:1px solid rgba(255,255,255,.06);
+      margin-top:30px;
     }
   </style>
 </head>
 
 <body>
-  <!-- NAV -->
-  <div class="nav">
-    <div class="container">
-      <div class="nav-inner">
-        <div class="brand">
-          <span class="dot"></span>
-          <span>Fitness Lady</span>
-        </div>
-
-        <div class="menu">
-          <a href="#csomagok">Csomagok</a>
-          <a href="#hogyan">Hogyan működik?</a>
-          <a href="#velemenyek">Vélemények</a>
-          <a href="#kapcsolat">Kapcsolat</a>
-        </div>
-
-        <a class="cta" href="#kapcsolat">Ingyenes konzultáció</a>
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div class="container topbar-inner">
+      <div class="brand">
+        <span class="brand-dot"></span>
+        <span>Fitness Lady</span>
       </div>
+
+      <nav>
+        <a href="#csomagok">Csomagok</a>
+        <a href="#hogyan">Hogyan működik?</a>
+        <a href="#velemenyek">Vélemények</a>
+        <a href="#kontakt">Kapcsolat</a>
+      </nav>
+
+      <a class="pill primary" href="#kontakt">Ingyenes konzultáció</a>
     </div>
   </div>
 
   <!-- HERO -->
-  <header class="hero">
-    <div class="container">
+  <div class="hero">
+    <div class="container hero-grid">
       <div class="hero-card">
-        <div class="hero-bg"></div>
-        <div class="hero-overlay"></div>
-
-        <div class="hero-content">
-          <h1 class="h1">Női edzésterv, amit tényleg lehet tartani.</h1>
-          <p class="lead">Nem sablon. Nem kompromisszum. Női edzésterv formához, erőhöz, jobb közérzethez — neked, az időbeosztásodhoz igazítva.</p>
-
-          <div class="hero-actions">
-            <a class="pill" href="#kapcsolat">Ingyenes konzultáció</a>
-            <a class="pill" href="#csomagok">Csomagok</a>
-            <a class="pill" href="#velemenyek">Vélemények</a>
+        <div class="bg" aria-hidden="true"></div>
+        <div class="content">
+          <div class="kicker">Nem sablon. Nem kompromisszum.</div>
+          <h1>Edzéstervek nőknek, amiket tényleg lehet tartani.</h1>
+          <div class="sub">
+            Női edzésterv formához, erőhöz, jobb közérzethez — neked, az időbeosztásodhoz igazítva.
           </div>
 
-          <div class="subpills">
-            <span class="chip">📍 Város / Terem neve</span>
-            <span class="chip">⏱️ Időtartamok</span>
-            <span class="chip">💬 WhatsApp/Instagram: @fitnesslady</span>
+          <div class="hero-actions">
+            <a class="pill primary" href="#csomagok">Csomagok</a>
+            <a class="pill" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
           </div>
         </div>
       </div>
+
+      <div class="side-card">
+        <div class="mini-title">Mit kapsz pontosan?</div>
+        <div class="mini-grid">
+          <div class="mini">
+            <b>Edzés</b>
+            <span>Heti terv + progresszió. Rövid, tartósan tartható struktúra.</span>
+          </div>
+          <div class="mini">
+            <b>Táplálkozás</b>
+            <span>Egyszerű rendszer, ami illik a napjaidhoz — nem fordítva.</span>
+          </div>
+          <div class="mini">
+            <b>Kapcsolat</b>
+            <span>Visszajelzés, finomhangolás, támogatás.</span>
+          </div>
+          <div class="mini">
+            <b>Fókusz</b>
+            <span>Formálódás + erő + közérzet — célhoz igazítva.</span>
+          </div>
+        </div>
+
+        <a class="pill primary" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+        <a class="pill" href="#velemenyek">Nézd meg a véleményeket</a>
+      </div>
     </div>
-  </header>
+  </div>
 
-  <!-- CSOMAGOK (placeholder) -->
-  <section id="csomagok">
+  <!-- CSOMAGOK -->
+  <section id="csomagok" class="section">
     <div class="container">
-      <h2 class="section-title">Csomagok</h2>
-      <p class="section-lead">Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.</p>
+      <h2>Csomagok</h2>
+      <p class="lead">Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.</p>
 
-      <div class="grid">
-        <div class="card card-pad" style="grid-column: span 4;">
-          <div class="kicker">Start</div>
-          <div class="sep"></div>
-          <div class="muted">Belépő csomag, letisztult alapok.</div>
+      <div class="cards">
+        <div class="card">
+          <div class="badge">Start</div>
+          <h3>Alap csomag</h3>
+          <ul>
+            <li>Személyre szabott edzésterv</li>
+            <li>Alap progresszió és útmutató</li>
+            <li>Egyszerű, tartható struktúra</li>
+          </ul>
+          <div class="price">CHF — <small>(árat később írjuk be)</small></div>
+          <a class="btn" href="#kontakt">Érdekel</a>
         </div>
-        <div class="card card-pad" style="grid-column: span 4;">
-          <div class="kicker">Balance</div>
-          <div class="sep"></div>
-          <div class="muted">Formálódás + erő, folyamatos visszajelzéssel.</div>
+
+        <div class="card">
+          <div class="badge">Balance • Legnépszerűbb</div>
+          <h3>Edzés + táplálkozás</h3>
+          <ul>
+            <li>Edzésterv + táplálkozási rendszer</li>
+            <li>Rendszeres finomhangolás</li>
+            <li>Stabil energiák, jobb közérzet</li>
+          </ul>
+          <div class="price">CHF — <small>(árat később írjuk be)</small></div>
+          <a class="btn" href="#kontakt">Érdekel</a>
         </div>
-        <div class="card card-pad" style="grid-column: span 4;">
-          <div class="kicker">Pro</div>
-          <div class="sep"></div>
-          <div class="muted">Maximális támogatás, teljes személyre szabás.</div>
+
+        <div class="card">
+          <div class="badge">Pro</div>
+          <h3>Maximális támogatás</h3>
+          <ul>
+            <li>Teljes személyre szabás</li>
+            <li>Gyakori visszajelzés / követés</li>
+            <li>Formálódás + erő fókusz</li>
+          </ul>
+          <div class="price">CHF — <small>(árat később írjuk be)</small></div>
+          <a class="btn" href="#kontakt">Érdekel</a>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- HOGYAN (placeholder) -->
-  <section id="hogyan">
+  <!-- HOGYAN -->
+  <section id="hogyan" class="section">
     <div class="container">
-      <h2 class="section-title">Hogyan működik?</h2>
-      <p class="section-lead">Röviden: konzultáció → terv → követés → finomhangolás. (Ezt később kibővítjük.)</p>
+      <h2>Hogyan működik?</h2>
+      <p class="lead">
+        1) Konzultáció → 2) Terv → 3) Követés és finomhangolás.  
+        Nem túlterhelés, hanem tartható rendszer.
+      </p>
+      <div class="cards">
+        <div class="card">
+          <h3>1. Cél + állapot</h3>
+          <ul>
+            <li>Kiindulópont felmérés</li>
+            <li>Időbeosztás és preferenciák</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>2. Terv</h3>
+          <ul>
+            <li>Heti edzésstruktúra</li>
+            <li>Progresszió lépésről-lépésre</li>
+          </ul>
+        </div>
+        <div class="card">
+          <h3>3. Finomhangolás</h3>
+          <ul>
+            <li>Visszajelzés</li>
+            <li>Terhelés, regeneráció, ritmus</li>
+          </ul>
+        </div>
+      </div>
     </div>
   </section>
 
   <!-- VÉLEMÉNYEK -->
-  <section id="velemenyek">
-    <div class="container">
-      <div class="card reviews-wrap">
-        <div class="card-pad">
-          <div class="reviews-head">
-            <div>
-              <h2 class="section-title" style="margin:0 0 8px;">Vélemények</h2>
-              <p class="section-lead" style="margin:0;">
-                Véleményt írni itt tudsz (Tally). A jóváhagyott („igen”) vélemények automatikusan megjelennek.
-              </p>
-            </div>
-            <div class="reviews-actions">
-              <a class="btn btn-primary" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
-              <button class="btn" id="refreshBtn" type="button">Frissítés</button>
-            </div>
-          </div>
-
-          <div id="reviewsSummary" class="reviews-empty" style="display:none;"></div>
-
-          <div id="reviewsList" class="reviews-list"></div>
-
-          <div id="reviewsEmpty" class="reviews-empty">
-            Betöltés…
-          </div>
+  <section id="velemenyek" class="section">
+    <div class="container reviews-wrap">
+      <div class="reviews-head">
+        <div>
+          <h2>Vélemények</h2>
+          <p class="lead">
+            Véleményt írni itt tudsz (Tally). Csak a jóváhagyott („igen”) vélemények jelennek meg automatikusan.
+          </p>
         </div>
+        <div class="reviews-actions">
+          <a class="pill primary" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+          <button class="pill" id="refreshBtn" type="button">Frissítés</button>
+        </div>
+      </div>
+
+      <div id="reviewsList" class="reviews-list"></div>
+    </div>
+  </section>
+
+  <!-- KAPCSOLAT -->
+  <section id="kontakt" class="section">
+    <div class="container">
+      <h2>Kapcsolat</h2>
+      <p class="lead">Ide jöhet a kapcsolat form / időpontfoglalás / WhatsApp gomb.</p>
+
+      <div class="contact">
+        <b>Ingyenes konzultáció</b>
+        <p style="margin:8px 0 0; color: var(--muted);">
+          Írj üzenetet és megbeszéljük a célokat, a kereteket, és hogy melyik csomag illik hozzád.
+        </p>
       </div>
     </div>
   </section>
 
-  <!-- KAPCSOLAT (placeholder) -->
-  <section id="kapcsolat">
-    <div class="container">
-      <h2 class="section-title">Kapcsolat</h2>
-      <p class="section-lead">Ide jöhet a kapcsolat form / időpontfoglalás / WhatsApp gomb.</p>
-    </div>
-  </section>
-
   <footer>
-    <div class="container">
-      <div class="sep"></div>
-      © <span id="y"></span> Fitness Lady
-    </div>
+    <div class="container">© 2026 Fitness Lady</div>
   </footer>
 
-<script>
-  document.getElementById("y").textContent = new Date().getFullYear();
+  <script>
+    // ✅ A TE PUBLIKUS CSV LINKED (Publish to web -> CSV)
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDuOlI4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
 
-  // 1) IDE illeszd be a "Publish to web" CSV linkedet (amit mutattál a képen)
-  //    Példa forma:
-  //    https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv
-  const SHEET_CSV_URL = "IDE_JON_A_CSV_LINKED";
+    const reviewsList = document.getElementById("reviewsList");
+    const refreshBtn = document.getElementById("refreshBtn");
 
-  // 2) Ezek a te táblád oszlopnevei (a screenshot alapján)
-  //    Ha nálad picit más a fejlécek szövege, itt igazítjuk.
-  const COLS = {
-    name: "Respondent",        // vagy ha van "Név" oszlopod, akkor azt írd be
-    rating: "Mennyire v",      // a screenshoton "Mennyire v..." (értékelés)
-    text: "Véleményed",        // szöveg
-    approved: "Megjelenhet?",  // igen/nem
-    date: "Submitted at"       // dátum
-  };
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
 
-  // --- CSV parser (egyszerű, de kezeli az idézőjeles mezőket) ---
-  function parseCSV(csvText){
-    const rows = [];
-    let row = [];
-    let cur = "";
-    let inQuotes = false;
+    // egyszerű CSV parser (idézőjeles mezők is)
+    function parseCSV(text) {
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
 
-    for (let i=0; i<csvText.length; i++){
-      const ch = csvText[i];
-      const next = csvText[i+1];
+      for (let i = 0; i < text.length; i++) {
+        const c = text[i];
+        const n = text[i + 1];
 
-      if (ch === '"' ){
-        if (inQuotes && next === '"'){ // escaped quote
-          cur += '"';
-          i++;
-        } else {
-          inQuotes = !inQuotes;
+        if (c === '"' && inQuotes && n === '"') { cur += '"'; i++; continue; }
+        if (c === '"') { inQuotes = !inQuotes; continue; }
+
+        if (c === "," && !inQuotes) { row.push(cur); cur = ""; continue; }
+        if ((c === "\n" || c === "\r") && !inQuotes) {
+          if (c === "\r" && n === "\n") i++;
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = "";
+          continue;
         }
-      } else if (ch === ',' && !inQuotes){
-        row.push(cur);
-        cur = "";
-      } else if ((ch === '\n' || ch === '\r') && !inQuotes){
-        if (ch === '\r' && next === '\n') i++;
-        row.push(cur);
-        cur = "";
-        // csak akkor push, ha nem teljesen üres sor
-        if (row.some(v => (v ?? "").trim() !== "")) rows.push(row);
-        row = [];
-      } else {
-        cur += ch;
+        cur += c;
       }
-    }
-    // last
-    row.push(cur);
-    if (row.some(v => (v ?? "").trim() !== "")) rows.push(row);
-
-    return rows;
-  }
-
-  function normalizeHeader(h){
-    return (h || "").trim().toLowerCase();
-  }
-
-  function findHeaderIndex(headers, wanted){
-    const w = normalizeHeader(wanted);
-    // direkt egyezés
-    let idx = headers.findIndex(h => normalizeHeader(h) === w);
-    if (idx !== -1) return idx;
-
-    // "contains" fallback (pl. "Mennyire v..." miatt)
-    idx = headers.findIndex(h => normalizeHeader(h).includes(w));
-    if (idx !== -1) return idx;
-
-    // fordítva: wanted benne van headerben vagy header benne van wantedben
-    idx = headers.findIndex(h => w.includes(normalizeHeader(h)));
-    return idx;
-  }
-
-  function starsFromRating(val){
-    const n = Math.max(0, Math.min(5, Number(val) || 0));
-    const full = "★★★★★".slice(0, n);
-    const empty = "☆☆☆☆☆".slice(0, 5-n);
-    return full + empty;
-  }
-
-  function formatDate(iso){
-    if (!iso) return "";
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return String(iso);
-    return d.toLocaleString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
-  }
-
-  async function loadReviews(){
-    const listEl = document.getElementById("reviewsList");
-    const emptyEl = document.getElementById("reviewsEmpty");
-    const summaryEl = document.getElementById("reviewsSummary");
-
-    listEl.innerHTML = "";
-    summaryEl.style.display = "none";
-
-    if (!SHEET_CSV_URL || SHEET_CSV_URL.includes("IDE_JON_A_CSV_LINKED")){
-      emptyEl.textContent = "Hiányzik a Google Sheets CSV link. Illeszd be a kódban a SHEET_CSV_URL helyére.";
-      return;
+      if (cur.length || row.length) { row.push(cur); rows.push(row); }
+      return rows;
     }
 
-    emptyEl.textContent = "Betöltés…";
+    function stars(n) {
+      const r = Math.max(1, Math.min(5, Number(n) || 5));
+      return "★".repeat(r) + "☆".repeat(5 - r);
+    }
 
-    try{
-      // cache-buster, hogy frissüljön
-      const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("HTTP " + res.status);
+    function findIndex(headers, name) {
+      const target = name.trim().toLowerCase();
+      return headers.findIndex(h => String(h).trim().toLowerCase() === target);
+    }
+
+    async function loadReviews() {
+      reviewsList.innerHTML = "";
+
+      const res = await fetch(SHEET_CSV_URL, { cache: "no-store" });
       const csv = await res.text();
+      const data = parseCSV(csv);
 
-      const table = parseCSV(csv);
-      if (!table.length){
-        emptyEl.textContent = "A CSV üres.";
-        return;
-      }
+      if (!data.length) return;
 
-      const headers = table[0];
-      const dataRows = table.slice(1);
+      const headers = data.shift();
 
-      const idxName = findHeaderIndex(headers, COLS.name);
-      const idxRating = findHeaderIndex(headers, COLS.rating);
-      const idxText = findHeaderIndex(headers, COLS.text);
-      const idxApproved = findHeaderIndex(headers, COLS.approved);
-      const idxDate = findHeaderIndex(headers, COLS.date);
+      // A te sheeted oszlopai alapján:
+      const idxText = findIndex(headers, "Véleményed");
+      const idxRating = findIndex(headers, "Mennyire v");
+      const idxApprove = findIndex(headers, "Megjelenhet?");
+      const idxDate = findIndex(headers, "Submitted at");
 
-      // szűrés: Megjelenhet? = igen
-      const approved = dataRows
+      const approved = data
+        .filter(r => {
+          const v = String(r[idxApprove] ?? "").trim().toLowerCase();
+          return v === "igen";
+        })
         .map(r => ({
-          name: (idxName >= 0 ? r[idxName] : "") || "Névtelen",
-          rating: (idxRating >= 0 ? r[idxRating] : "") || "",
-          text: (idxText >= 0 ? r[idxText] : "") || "",
-          approved: (idxApproved >= 0 ? r[idxApproved] : "") || "",
-          date: (idxDate >= 0 ? r[idxDate] : "") || ""
+          text: String(r[idxText] ?? "").trim(),
+          rating: Number(String(r[idxRating] ?? "5").trim()) || 5,
+          date: String(r[idxDate] ?? "").trim()
         }))
-        .filter(x => String(x.approved).trim().toLowerCase() === "igen")
-        .filter(x => String(x.text).trim().length > 0);
+        .filter(x => x.text.length > 0)
+        .slice(-30) // utolsó 30
+        .reverse();
 
-      if (!approved.length){
-        emptyEl.textContent = "Még nincs jóváhagyott vélemény (Megjelenhet? = igen).";
-        return;
-      }
-
-      // rendezés: legújabb elöl (ha van dátum)
-      approved.sort((a,b) => {
-        const da = new Date(a.date).getTime();
-        const db = new Date(b.date).getTime();
-        if (Number.isNaN(da) || Number.isNaN(db)) return 0;
-        return db - da;
-      });
-
-      // összegzés (átlag)
-      const ratings = approved.map(x => Number(x.rating) || 0).filter(n => n>0);
-      if (ratings.length){
-        const avg = ratings.reduce((s,n)=>s+n,0)/ratings.length;
-        summaryEl.style.display = "block";
-        summaryEl.textContent = `Átlag: ${avg.toFixed(1)} / 5  •  Jóváhagyott vélemények: ${approved.length}`;
-      }
-
-      // render
       approved.forEach(item => {
-        const div = document.createElement("div");
-        div.className = "review";
-        div.innerHTML = `
-          <div class="review-top">
-            <div class="review-name">${escapeHtml(item.name)}</div>
-            <div class="stars">${escapeHtml(starsFromRating(item.rating))}</div>
-          </div>
-          <p class="review-text">${escapeHtml(item.text)}</p>
-          <div class="review-meta">${escapeHtml(formatDate(item.date))}</div>
+        const card = document.createElement("div");
+        card.className = "review";
+        card.innerHTML = `
+          <div class="stars">${stars(item.rating)}</div>
+          <div class="txt">${escapeHtml(item.text)}</div>
+          ${item.date ? `<div class="meta">${escapeHtml(item.date)}</div>` : ""}
         `;
-        listEl.appendChild(div);
+        reviewsList.appendChild(card);
       });
 
-      emptyEl.style.display = "none";
-    }catch(err){
-      emptyEl.style.display = "block";
-      emptyEl.textContent = "Hiba a vélemények betöltésekor: " + (err?.message || String(err));
+      // ha nincs még jóváhagyott, akkor egyszerűen üresen marad (nincs üzenet!)
     }
-  }
 
-  function escapeHtml(str){
-    return String(str ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
+    refreshBtn.addEventListener("click", loadReviews);
 
-  document.getElementById("refreshBtn").addEventListener("click", loadReviews);
-
-  // auto load
-  loadReviews();
-</script>
-
+    // automatikus betöltés
+    loadReviews();
+  </script>
 </body>
 </html>
