@@ -2,857 +2,563 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fitness Lady — Női edzésprogramok</title>
-  <meta name="description" content="Női edzésprogramok, amiket tényleg lehet tartani. Személyre szabott edzés és táplálkozás — a te életedhez igazítva." />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fitness Lady</title>
 
   <style>
     :root{
-      --bg: #07060b;
-      --panel: rgba(20, 12, 26, .52);
-      --panel2: rgba(20, 12, 26, .42);
-      --stroke: rgba(255,255,255,.10);
-      --text: rgba(255,255,255,.92);
-      --muted: rgba(255,255,255,.70);
-      --muted2: rgba(255,255,255,.55);
-      --pink: #ff4fd8;
-      --pink2:#b14cff;
-      --radius: 22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1120px;
-      --gold: rgba(255,211,107,.55);
-      --gold2: rgba(255,211,107,.25);
+      --bg:#07060b;
+      --card:rgba(255,255,255,.06);
+      --card2:rgba(255,255,255,.08);
+      --stroke:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+      --pink:#ff43d6;
+      --pink2:#b53cff;
+      --shadow: 0 20px 60px rgba(0,0,0,.55);
+      --radius:22px;
+      --radius2:28px;
+      --max:1120px;
+      --gap:18px;
     }
 
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    html{ scroll-behavior:smooth; }
-
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      background:
-        radial-gradient(1200px 600px at 30% 10%, rgba(255,79,216,.14), transparent 60%),
-        radial-gradient(900px 500px at 75% 20%, rgba(177,76,255,.12), transparent 60%),
-        var(--bg);
       color:var(--text);
+      background: radial-gradient(1200px 700px at 15% 5%, rgba(255,67,214,.20), transparent 55%),
+                  radial-gradient(900px 600px at 80% 10%, rgba(181,60,255,.18), transparent 60%),
+                  var(--bg);
       overflow-x:hidden;
     }
 
-    a{ color:inherit; text-decoration:none; }
-    button{ font:inherit; }
-
-    /* ---------- Top Bar ---------- */
-    .topbar{
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 50;
-      padding: 14px 14px;
-      backdrop-filter: blur(10px);
-      background: rgba(10, 8, 14, .55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-    .topbar-inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: .2px;
-      white-space: nowrap;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:99px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex:0 0 auto;
-    }
+    a{color:inherit; text-decoration:none}
+    .container{max-width:var(--max); margin:0 auto; padding:0 18px}
     .nav{
-      display:flex; align-items:center; gap: 18px;
-      color: var(--muted);
-      font-size: 14px;
-      white-space: nowrap;
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(10px);
+      background: linear-gradient(to bottom, rgba(8,7,12,.72), rgba(8,7,12,.35));
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
-    .nav a{ opacity:.92; }
-    .nav a:hover{ opacity:1; color: var(--text); }
-
-    .cta-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
+    .nav-inner{
+      display:flex; align-items:center; justify-content:space-between;
+      padding:14px 0;
+    }
+    .brand{display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.2px}
+    .dot{
+      width:10px; height:10px; border-radius:50%;
+      background: radial-gradient(circle at 30% 30%, #ffd1ff, var(--pink));
+      box-shadow: 0 0 22px rgba(255,67,214,.55);
+    }
+    .menu{display:flex; align-items:center; gap:14px; color:var(--muted)}
+    .menu a{padding:10px 10px; border-radius:14px}
+    .menu a:hover{background:rgba(255,255,255,.06); color:var(--text)}
+    .cta{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:12px 16px;
+      border-radius:999px;
       background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#120613;
-      font-weight: 800;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 30px rgba(255,79,216,.22);
-      white-space: nowrap;
+      box-shadow: 0 12px 30px rgba(255,67,214,.20);
+      font-weight:700;
+      white-space:nowrap;
     }
 
-    .menu-btn{
-      width: 40px; height: 40px; border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      display:none;
-      align-items:center; justify-content:center;
-      cursor:pointer;
-    }
-
-    /* ---------- Hero ---------- */
+    /* HERO */
     .hero{
-      position: relative;
-      padding-top: 80px; /* topbar */
-      min-height: 88vh;
-      display:flex;
-      align-items: stretch;
-      justify-content:center;
+      position:relative;
+      padding:54px 0 18px;
     }
-
+    .hero-card{
+      position:relative;
+      overflow:hidden;
+      border-radius:var(--radius2);
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow: var(--shadow);
+      background: rgba(255,255,255,.03);
+      min-height: 420px;
+    }
     .hero-bg{
       position:absolute; inset:0;
-      background-image: url("/hero.png"); /* hero.png a gyökérben */
+      background:
+        radial-gradient(900px 520px at 20% 15%, rgba(255,67,214,.35), transparent 58%),
+        radial-gradient(760px 520px at 80% 20%, rgba(181,60,255,.28), transparent 60%),
+        linear-gradient(to bottom, rgba(0,0,0,.0), rgba(0,0,0,.55)),
+        url("hero.png");
       background-size: cover;
-      background-position: center right;
-      background-repeat: no-repeat;
+      background-position:center;
+      filter:saturate(1.05) contrast(1.04);
       transform: scale(1.02);
-      filter: none;
     }
-
     .hero-overlay{
       position:absolute; inset:0;
       background:
-        radial-gradient(1100px 650px at 22% 35%, rgba(10,7,14,.14), rgba(10,7,14,.46) 62%, rgba(10,7,14,.62) 100%),
-        linear-gradient(to bottom, rgba(10,7,14,.18), rgba(10,7,14,.44));
-      pointer-events:none;
+        radial-gradient(900px 520px at 10% 10%, rgba(0,0,0,.15), transparent 60%),
+        linear-gradient(to bottom, rgba(0,0,0,.05), rgba(0,0,0,.60));
     }
-
-    .wrap{
-      position: relative;
-      width: 100%;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 34px 14px 50px;
+    .hero-content{
+      position:relative;
+      padding:34px 26px 26px;
+      display:flex; flex-direction:column; gap:16px;
     }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 26px;
-      align-items: start;
+    .h1{
+      margin:0;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height:1.02;
+      letter-spacing:-.7px;
+      text-shadow: 0 18px 45px rgba(0,0,0,.55);
     }
-
-    .badge{
+    .lead{
+      max-width: 720px;
+      margin:0;
+      color:var(--muted);
+      font-size: 16px;
+      line-height:1.5;
+    }
+    .hero-actions{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:4px;
+    }
+    .pill{
       display:inline-flex; align-items:center; gap:10px;
-      padding: 8px 12px;
-      border-radius: 999px;
+      padding:10px 14px;
+      border-radius:999px;
       background: rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 13px;
-      width: fit-content;
-      backdrop-filter: blur(10px);
+      color:var(--text);
+      font-weight:650;
     }
-
-    h1{
-      margin: 14px 0 12px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-weight: 700;
-      line-height: 1.05;
-      font-size: clamp(34px, 4.3vw, 62px);
-      letter-spacing: -0.8px;
-      text-shadow: 0 10px 40px rgba(0,0,0,.55);
+    .pill:hover{background:rgba(255,255,255,.11)}
+    .subpills{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top:6px;
+      color:var(--muted2);
+      font-size:13px;
     }
-
-    .lead{
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 15.5px;
-      line-height: 1.65;
-      max-width: 56ch;
-      text-shadow: 0 10px 30px rgba(0,0,0,.45);
-    }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 12px;
-      margin: 14px 0 10px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      cursor:pointer;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      white-space: nowrap;
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
-    .btn.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 800;
-    }
-    .btn.ghost{ background: rgba(255,255,255,.06); }
-
-    .meta-row{
-      display:flex; flex-wrap:wrap;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted2);
-      font-size: 13px;
-    }
-    .meta-pill{
+    .chip{
       display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
+      padding:8px 12px;
+      border-radius:999px;
+      background: rgba(0,0,0,.22);
+      border:1px solid rgba(255,255,255,.08);
     }
 
-    /* ---------- Cards ---------- */
-    .hero-cards{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-
-    .card{
-      background: var(--panel);
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      overflow:hidden;
-      position: relative;
-      transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-    }
-
-    .card:hover{
-      transform: translateY(-2px);
-      border-color: var(--gold);
-      box-shadow: 0 18px 60px rgba(0,0,0,.55), 0 0 0 1px var(--gold2);
-    }
-    .card::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(700px 220px at 10% 0%, rgba(255,79,216,.18), transparent 55%),
-        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.14), transparent 60%);
-      opacity:.85;
-      pointer-events:none;
-    }
-    .card-inner{ position:relative; padding: 16px; }
-    .card h3{ margin:0 0 8px; font-size: 14px; letter-spacing: .2px; }
-    .card p{ margin:0; color: var(--muted); font-size: 12.8px; line-height: 1.5; }
-
-    /* ---------- Section base ---------- */
-    section{
-      position: relative;
-      padding: 52px 0;
-    }
-    .container{
-      max-width: var(--max);
-      padding: 0 14px;
-      margin: 0 auto;
-    }
+    /* SECTIONS */
+    section{padding:30px 0}
     .section-title{
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 34px;
-      letter-spacing: -.3px;
-      margin: 0 0 14px;
+      font-size: clamp(26px, 3.6vw, 40px);
+      letter-spacing:-.4px;
+      margin:0 0 12px;
     }
-    .section-sub{
-      color: var(--muted);
-      margin: 0 0 24px;
-      max-width: 70ch;
-      line-height: 1.6;
-    }
-
-    /* ---------- Packages ---------- */
-    .packages{
+    .section-lead{margin:0 0 18px; color:var(--muted); line-height:1.5}
+    .grid{
       display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      grid-template-columns: repeat(12, 1fr);
+      gap: var(--gap);
     }
-    .pkg{
-      background: var(--panel2);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      padding: 18px;
-      position: relative;
+    .card{
+      border-radius:var(--radius);
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.05);
+      box-shadow: 0 18px 50px rgba(0,0,0,.40);
       overflow:hidden;
-      transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
     }
-    .pkg:hover{
-      transform: translateY(-2px);
-      border-color: var(--gold);
-      box-shadow: 0 18px 60px rgba(0,0,0,.55), 0 0 0 1px var(--gold2);
+    .card-pad{padding:18px}
+    .muted{color:var(--muted)}
+    .kicker{
+      font-size:12px; letter-spacing:.16em; text-transform:uppercase;
+      color: rgba(255,255,255,.62);
     }
-    .pkg::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.14), transparent 55%),
-        radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.12), transparent 60%);
-      opacity:.9;
-      pointer-events:none;
+
+    /* Reviews */
+    .reviews-wrap{grid-column: 1 / -1}
+    .reviews-head{
+      display:flex; align-items:flex-start; justify-content:space-between;
+      gap:12px; flex-wrap:wrap;
     }
-    .pkg-inner{ position:relative; }
-    .pkg-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 10px;
-    }
-    .pkg h4{ margin:0; font-size: 22px; font-family: ui-serif, Georgia, serif; }
-    .tag{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
+    .reviews-actions{display:flex; gap:10px; flex-wrap:wrap}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      gap:10px;
+      border-radius:999px;
+      padding:12px 16px;
+      border:1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.07);
-      color: var(--muted);
-      white-space: nowrap;
+      color:var(--text);
+      font-weight:750;
+      cursor:pointer;
     }
-    .tag.hot{
-      color:#1b0717;
-      background: linear-gradient(135deg, #ffd8a8, #ff88e6);
-      border-color: rgba(255,255,255,.25);
-      box-shadow: 0 12px 30px rgba(255,136,230,.18);
-      font-weight: 800;
+    .btn:hover{background: rgba(255,255,255,.10)}
+    .btn-primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      border:none;
+      box-shadow: 0 14px 35px rgba(255,67,214,.18);
     }
-    .pkg p{ margin: 0 0 12px; color: var(--muted); line-height: 1.6; font-size: 13.5px; }
-    .list{ margin: 0; padding: 0; list-style:none; display:grid; gap:8px; }
-    .list li{
-      display:flex; align-items:flex-start; gap:10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .check{
-      width: 18px; height: 18px; border-radius: 6px;
-      background: rgba(255,79,216,.18);
-      border: 1px solid rgba(255,79,216,.30);
-      box-shadow: 0 0 22px rgba(255,79,216,.16);
-      flex: 0 0 auto;
-      margin-top: 1px;
-      position:relative;
-    }
-    .check:after{
-      content:"";
-      position:absolute;
-      left: 5px; top: 4px;
-      width: 6px; height: 9px;
-      border-right: 2px solid rgba(255,255,255,.85);
-      border-bottom: 2px solid rgba(255,255,255,.85);
-      transform: rotate(40deg);
-    }
-
-    .pkg-actions{
-      display:flex; justify-content:flex-end;
-      margin-top: 14px;
-    }
-
-    /* ---------- How it works ---------- */
-    .how-grid{
+    .btn-primary:hover{filter:brightness(1.04)}
+    .reviews-list{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    /* ---------- Reviews list (megjelenítés) ---------- */
-    .reviews-grid{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(12, 1fr);
       gap: 14px;
       margin-top: 16px;
     }
-    @media (max-width: 980px){
-      .hero-grid{ grid-template-columns: 1fr; }
-      .hero-bg{ background-position: center right; }
-      .hero-cards{ grid-template-columns: repeat(2, 1fr); }
-      .packages{ grid-template-columns: 1fr; }
-      .how-grid{ grid-template-columns: 1fr; }
-      .reviews-grid{ grid-template-columns: 1fr; }
-      .nav{ display:none; }
-      .menu-btn{ display:inline-flex; }
+    .review{
+      grid-column: span 6;
+      border-radius: 20px;
+      border:1px solid rgba(255,255,255,.08);
+      background: rgba(0,0,0,.18);
+      padding:16px;
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
     }
-    @media (max-width: 520px){
-      .hero-cards{ grid-template-columns: 1fr; }
-    }
-
-    .review-card{
-      background: var(--panel2);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(14px);
-      padding: 16px;
-      position:relative;
-      overflow:hidden;
-      transition: border-color .18s ease, transform .18s ease, box-shadow .18s ease;
-    }
-    .review-card:hover{
-      transform: translateY(-2px);
-      border-color: var(--gold);
-      box-shadow: 0 18px 60px rgba(0,0,0,.55), 0 0 0 1px var(--gold2);
-    }
-    .review-top{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-      margin-bottom: 8px;
-    }
-    .review-name{ font-weight: 900; }
-    .review-rating{ color: rgba(255,255,255,.88); font-weight: 800; }
-    .review-text{ margin:0 0 10px; color: var(--muted); line-height:1.55; }
-    .review-date{ color: var(--muted2); font-size: 12px; }
-
-    .review-skeleton{
-      color: var(--muted);
-      padding: 8px 2px;
+    .review-top{display:flex; align-items:flex-start; justify-content:space-between; gap:10px}
+    .review-name{font-weight:800}
+    .stars{letter-spacing:1px; white-space:nowrap}
+    .review-text{margin:10px 0 0; color: rgba(255,255,255,.80); line-height:1.55}
+    .review-meta{margin-top:12px; font-size:12px; color: rgba(255,255,255,.55)}
+    .reviews-empty{
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px dashed rgba(255,255,255,.18);
+      color: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.04);
     }
 
-    /* ---------- Footer strip ---------- */
-    .footer-strip{
-      padding: 18px 0 52px;
-      border-top: 1px solid rgba(255,255,255,.08);
-      background: rgba(10,8,14,.55);
-      backdrop-filter: blur(10px);
-    }
-    .footer-inner{
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 0 14px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 13px;
-      flex-wrap: wrap;
-    }
+    footer{padding:34px 0 44px; color:rgba(255,255,255,.55)}
+    .sep{height:1px; background:rgba(255,255,255,.08); margin:16px 0}
 
-    .glow-sep{
-      position:absolute;
-      left: 0; right: 0;
-      bottom: -2px;
-      height: 90px;
-      pointer-events:none;
-      background: radial-gradient(900px 70px at 50% 0%, rgba(255,79,216,.18), transparent 65%);
-      opacity: .9;
+    @media (max-width: 860px){
+      .menu{display:none}
+      .review{grid-column: span 12;}
+      .hero-card{min-height: 460px;}
     }
   </style>
 </head>
 
 <body>
-  <!-- TOP BAR -->
-  <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="#top" aria-label="Fitness Lady">
-        <span class="dot"></span>
-        <span>Fitness Lady</span>
-      </a>
+  <!-- NAV -->
+  <div class="nav">
+    <div class="container">
+      <div class="nav-inner">
+        <div class="brand">
+          <span class="dot"></span>
+          <span>Fitness Lady</span>
+        </div>
 
-      <nav class="nav" aria-label="Főmenü">
-        <a href="#csomagok">Csomagok</a>
-        <a href="#hogyan">Hogyan működik?</a>
-        <a href="#velemenyek">Vélemények</a>
-        <a href="/de/">AFSZ</a>
-      </nav>
+        <div class="menu">
+          <a href="#csomagok">Csomagok</a>
+          <a href="#hogyan">Hogyan működik?</a>
+          <a href="#velemenyek">Vélemények</a>
+          <a href="#kapcsolat">Kapcsolat</a>
+        </div>
 
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
-        <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
+        <a class="cta" href="#kapcsolat">Ingyenes konzultáció</a>
+      </div>
+    </div>
+  </div>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="container">
+      <div class="hero-card">
+        <div class="hero-bg"></div>
+        <div class="hero-overlay"></div>
+
+        <div class="hero-content">
+          <h1 class="h1">Női edzésterv, amit tényleg lehet tartani.</h1>
+          <p class="lead">Nem sablon. Nem kompromisszum. Női edzésterv formához, erőhöz, jobb közérzethez — neked, az időbeosztásodhoz igazítva.</p>
+
+          <div class="hero-actions">
+            <a class="pill" href="#kapcsolat">Ingyenes konzultáció</a>
+            <a class="pill" href="#csomagok">Csomagok</a>
+            <a class="pill" href="#velemenyek">Vélemények</a>
+          </div>
+
+          <div class="subpills">
+            <span class="chip">📍 Város / Terem neve</span>
+            <span class="chip">⏱️ Időtartamok</span>
+            <span class="chip">💬 WhatsApp/Instagram: @fitnesslady</span>
+          </div>
+        </div>
       </div>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main id="top" class="hero">
-    <div class="hero-bg" aria-hidden="true"></div>
-    <div class="hero-overlay" aria-hidden="true"></div>
-
-    <div class="wrap">
-      <div class="hero-grid">
-        <div>
-          <div class="badge">✨ Prémium edzés • nőkre hangolva</div>
-
-          <h1>Női edzésprogramok, <br>amiket tényleg lehet tartani.</h1>
-
-          <p class="lead">
-            Nem sablon. Nem kompromisszum. Női edzésterv formához, erőhöz, jobb közérzethez —
-            neked, az időbeosztásodhoz igazítva.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn primary" href="#kapcsolat">Ingyenes konzultáció</a>
-            <a class="btn" href="#csomagok">Csomagok</a>
-
-            <a class="btn ghost"
-               href="https://tally.so/r/LZpRXG"
-               target="_blank"
-               rel="noopener noreferrer">
-              Írj véleményt
-            </a>
-          </div>
-
-          <div class="meta-row">
-            <div class="meta-pill">📍 [Város / Terem neve]</div>
-            <div class="meta-pill">⏱️ [Időtartamok]</div>
-            <div class="meta-pill">💬 WhatsApp/Instagram: @fitnesslady</div>
-          </div>
-        </div>
-
-        <div></div>
-      </div>
-
-      <!-- Mit kapsz pontosan -->
-      <div class="card" style="margin-top:22px;">
-        <div class="card-inner">
-          <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:10px;">
-            <div style="font-weight:800;">Mit kapsz pontosan?</div>
-
-            <a class="btn ghost"
-               href="https://tally.so/r/LZpRXG"
-               target="_blank"
-               rel="noopener noreferrer"
-               style="padding:10px 14px;">
-              Írj véleményt
-            </a>
-          </div>
-
-          <div class="hero-cards">
-            <div class="card">
-              <div class="card-inner">
-                <h3>Edzés</h3>
-                <p>Heti terv + progresszió. Rövid, tartósan tartható struktúra.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Táplálkozás</h3>
-                <p>Egyszerű rendszer, ami illik a napjaidhoz — nem fordítva.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Kapcsolat</h3>
-                <p>Visszajelzés, finomhangolás, támogatás.</p>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-inner">
-                <h3>Fókusz</h3>
-                <p>Formásodás • erő • közérzet — célhoz igazítva.</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- CSILLAG / 4.9 / 26 értékelés BLOKK NINCS -->
-        </div>
-      </div>
-
-      <div class="glow-sep" aria-hidden="true"></div>
-    </div>
-  </main>
-
-  <!-- CSOMAGOK -->
+  <!-- CSOMAGOK (placeholder) -->
   <section id="csomagok">
     <div class="container">
-      <div class="section-title">Csomagok</div>
-      <p class="section-sub">
-        Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.
-      </p>
+      <h2 class="section-title">Csomagok</h2>
+      <p class="section-lead">Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.</p>
 
-      <div class="packages">
-        <div class="pkg">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Start</h4>
-              <span class="tag">Ajánlott: 4 hét</span>
-            </div>
-            <p>Ha kell egy tiszta terv és lendület.</p>
-            <ul class="list">
-              <li><span class="check"></span> Személyre szabott edzésterv</li>
-              <li><span class="check"></span> Alap táplálkozási keretrendszer</li>
-              <li><span class="check"></span> 1× kontroll / módosítás</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Érdekel</a>
-            </div>
-          </div>
+      <div class="grid">
+        <div class="card card-pad" style="grid-column: span 4;">
+          <div class="kicker">Start</div>
+          <div class="sep"></div>
+          <div class="muted">Belépő csomag, letisztult alapok.</div>
         </div>
-
-        <div class="pkg" style="border-color: rgba(255,79,216,.26); box-shadow: 0 22px 70px rgba(255,79,216,.14), var(--shadow);">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Balance</h4>
-              <span class="tag hot">Legnépszerűbb</span>
-            </div>
-            <p>Formálódás + erő, folyamatos visszajelzéssel.</p>
-            <ul class="list">
-              <li><span class="check"></span> Edzés + táplálkozás rendszer</li>
-              <li><span class="check"></span> Heti követés / finomhangolás</li>
-              <li><span class="check"></span> Szokások + napi mini célok</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Érdekel</a>
-            </div>
-          </div>
+        <div class="card card-pad" style="grid-column: span 4;">
+          <div class="kicker">Balance</div>
+          <div class="sep"></div>
+          <div class="muted">Formálódás + erő, folyamatos visszajelzéssel.</div>
         </div>
-
-        <div class="pkg">
-          <div class="pkg-inner">
-            <div class="pkg-top">
-              <h4>Pro</h4>
-              <span class="tag">Ajánlott: 6–8 hét</span>
-            </div>
-            <p>Maximális támogatás, nem túlerőltetés.</p>
-            <ul class="list">
-              <li><span class="check"></span> Teljes személyre szabás</li>
-              <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
-              <li><span class="check"></span> Teljesítmény + forma fókusz</li>
-            </ul>
-
-            <div class="pkg-actions">
-              <a class="btn primary" href="#kapcsolat" style="padding:10px 14px;">Érdekel</a>
-            </div>
-          </div>
+        <div class="card card-pad" style="grid-column: span 4;">
+          <div class="kicker">Pro</div>
+          <div class="sep"></div>
+          <div class="muted">Maximális támogatás, teljes személyre szabás.</div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- HOGYAN MŰKÖDIK -->
+  <!-- HOGYAN (placeholder) -->
   <section id="hogyan">
     <div class="container">
-      <div class="section-title">Hogyan működik?</div>
-      <p class="section-sub">Egyszerű, követhető rendszer — a való élethez igazítva.</p>
-
-      <div class="how-grid">
-        <div class="pkg">
-          <div class="pkg-inner">
-            <h4 style="margin:0 0 10px;">Edzés</h4>
-            <ul class="list">
-              <li><span class="check"></span> Gyakorlatok leírással</li>
-              <li><span class="check"></span> Progresszió — mikor lépsz tovább</li>
-              <li><span class="check"></span> Ajánlott ütemezés</li>
-              <li><span class="check"></span> Fenntartható terhelés</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="pkg">
-          <div class="pkg-inner">
-            <h4 style="margin:0 0 10px;">Táplálkozás</h4>
-            <ul class="list">
-              <li><span class="check"></span> Egyszerű, tartható rend</li>
-              <li><span class="check"></span> A napirendedhez igazítva</li>
-              <li><span class="check"></span> Rendszeres finomhangolás</li>
-              <li><span class="check"></span> Stabil energiák, jobb közérzet</li>
-            </ul>
-          </div>
-        </div>
-      </div>
+      <h2 class="section-title">Hogyan működik?</h2>
+      <p class="section-lead">Röviden: konzultáció → terv → követés → finomhangolás. (Ezt később kibővítjük.)</p>
     </div>
   </section>
 
   <!-- VÉLEMÉNYEK -->
   <section id="velemenyek">
     <div class="container">
-      <div class="section-title">Vélemények</div>
-      <p class="section-sub">
-        Csak a jóváhagyott vélemények jelennek meg (Megjelenhet? = igen).
-      </p>
-
-      <!-- ✅ Itt fognak megjelenni a vélemények -->
-      <div id="reviews" class="reviews-grid">
-        <div class="review-skeleton">Vélemények betöltése…</div>
-      </div>
-
-      <div class="pkg" style="margin-top:16px;">
-        <div class="pkg-inner" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div style="color:var(--muted); font-size:14px;">
-            💬 Szeretnél véleményt írni?
+      <div class="card reviews-wrap">
+        <div class="card-pad">
+          <div class="reviews-head">
+            <div>
+              <h2 class="section-title" style="margin:0 0 8px;">Vélemények</h2>
+              <p class="section-lead" style="margin:0;">
+                Véleményt írni itt tudsz (Tally). A jóváhagyott („igen”) vélemények automatikusan megjelennek.
+              </p>
+            </div>
+            <div class="reviews-actions">
+              <a class="btn btn-primary" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+              <button class="btn" id="refreshBtn" type="button">Frissítés</button>
+            </div>
           </div>
-          <a class="btn primary"
-             href="https://tally.so/r/LZpRXG"
-             target="_blank"
-             rel="noopener noreferrer">
-            Írj véleményt
-          </a>
+
+          <div id="reviewsSummary" class="reviews-empty" style="display:none;"></div>
+
+          <div id="reviewsList" class="reviews-list"></div>
+
+          <div id="reviewsEmpty" class="reviews-empty">
+            Betöltés…
+          </div>
         </div>
       </div>
     </div>
   </section>
 
-  <!-- KAPCSOLAT -->
+  <!-- KAPCSOLAT (placeholder) -->
   <section id="kapcsolat">
     <div class="container">
-      <div class="section-title">Kapcsolat</div>
-      <p class="section-sub">Ingyenes konzultációhoz írj WhatsAppon vagy Instagramon.</p>
-
-      <div class="pkg">
-        <div class="pkg-inner" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-          <div style="display:flex; gap:10px; flex-wrap:wrap;">
-            <a class="btn" href="#" onclick="alert('Itt majd WhatsApp link lesz'); return false;">WhatsApp</a>
-            <a class="btn" href="#" onclick="alert('Itt majd Instagram link lesz'); return false;">Instagram</a>
-
-            <a class="btn ghost"
-               href="https://tally.so/r/LZpRXG"
-               target="_blank"
-               rel="noopener noreferrer">
-              Írj véleményt
-            </a>
-          </div>
-          <div style="color:var(--muted); font-size:13px;">
-            📍 [Város / Terem neve] • ⏱️ [Időtartamok] • @fitnesslady
-          </div>
-        </div>
-      </div>
+      <h2 class="section-title">Kapcsolat</h2>
+      <p class="section-lead">Ide jöhet a kapcsolat form / időpontfoglalás / WhatsApp gomb.</p>
     </div>
   </section>
 
-  <footer class="footer-strip">
-    <div class="footer-inner">
-      <div>© <span id="y"></span> Fitness Lady</div>
-      <div>HU • Vélemények: Sheets CSV</div>
+  <footer>
+    <div class="container">
+      <div class="sep"></div>
+      © <span id="y"></span> Fitness Lady
     </div>
   </footer>
 
-  <!-- ✅ PapaParse: stabil CSV feldolgozás (vessző/sortörés esetén is) -->
-  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+  document.getElementById("y").textContent = new Date().getFullYear();
 
-  <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
+  // 1) IDE illeszd be a "Publish to web" CSV linkedet (amit mutattál a képen)
+  //    Példa forma:
+  //    https://docs.google.com/spreadsheets/d/e/2PACX-.../pub?gid=0&single=true&output=csv
+  const SHEET_CSV_URL = "IDE_JON_A_CSV_LINKED";
 
-    // Mobil menü
-    const menuBtn = document.getElementById("menuBtn");
-    let open = false;
-    menuBtn?.addEventListener("click", () => {
-      open = !open;
-      if(open){
-        const nav = document.createElement("div");
-        nav.id = "mobileNav";
-        nav.style.position = "fixed";
-        nav.style.top = "62px";
-        nav.style.left = "14px";
-        nav.style.right = "14px";
-        nav.style.zIndex = "60";
-        nav.style.background = "rgba(20,12,26,.72)";
-        nav.style.border = "1px solid rgba(255,255,255,.10)";
-        nav.style.borderRadius = "18px";
-        nav.style.backdropFilter = "blur(14px)";
-        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-        nav.style.padding = "12px";
-        nav.innerHTML = `
-          <a href="#csomagok" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Csomagok</a>
-          <a href="#hogyan" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Hogyan működik?</a>
-          <a href="#velemenyek" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Vélemények</a>
-          <a href="/de/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">AFSZ</a>
-        `;
-        document.body.appendChild(nav);
+  // 2) Ezek a te táblád oszlopnevei (a screenshot alapján)
+  //    Ha nálad picit más a fejlécek szövege, itt igazítjuk.
+  const COLS = {
+    name: "Respondent",        // vagy ha van "Név" oszlopod, akkor azt írd be
+    rating: "Mennyire v",      // a screenshoton "Mennyire v..." (értékelés)
+    text: "Véleményed",        // szöveg
+    approved: "Megjelenhet?",  // igen/nem
+    date: "Submitted at"       // dátum
+  };
+
+  // --- CSV parser (egyszerű, de kezeli az idézőjeles mezőket) ---
+  function parseCSV(csvText){
+    const rows = [];
+    let row = [];
+    let cur = "";
+    let inQuotes = false;
+
+    for (let i=0; i<csvText.length; i++){
+      const ch = csvText[i];
+      const next = csvText[i+1];
+
+      if (ch === '"' ){
+        if (inQuotes && next === '"'){ // escaped quote
+          cur += '"';
+          i++;
+        } else {
+          inQuotes = !inQuotes;
+        }
+      } else if (ch === ',' && !inQuotes){
+        row.push(cur);
+        cur = "";
+      } else if ((ch === '\n' || ch === '\r') && !inQuotes){
+        if (ch === '\r' && next === '\n') i++;
+        row.push(cur);
+        cur = "";
+        // csak akkor push, ha nem teljesen üres sor
+        if (row.some(v => (v ?? "").trim() !== "")) rows.push(row);
+        row = [];
       } else {
-        document.getElementById("mobileNav")?.remove();
+        cur += ch;
       }
-    });
+    }
+    // last
+    row.push(cur);
+    if (row.some(v => (v ?? "").trim() !== "")) rows.push(row);
 
-    document.addEventListener("click", (e) => {
-      const nav = document.getElementById("mobileNav");
-      if(!nav) return;
-      if(e.target === menuBtn) return;
-      if(nav.contains(e.target)) {
-        nav.remove();
-        open = false;
-      }
-    });
+    return rows;
+  }
 
-    // ---------- Reviews from Google Sheets CSV ----------
-    const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSIH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDu0I1I4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
+  function normalizeHeader(h){
+    return (h || "").trim().toLowerCase();
+  }
 
-    function escapeHtml(s){
-      return String(s ?? "").replace(/[&<>"']/g, m => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
-      }[m]));
+  function findHeaderIndex(headers, wanted){
+    const w = normalizeHeader(wanted);
+    // direkt egyezés
+    let idx = headers.findIndex(h => normalizeHeader(h) === w);
+    if (idx !== -1) return idx;
+
+    // "contains" fallback (pl. "Mennyire v..." miatt)
+    idx = headers.findIndex(h => normalizeHeader(h).includes(w));
+    if (idx !== -1) return idx;
+
+    // fordítva: wanted benne van headerben vagy header benne van wantedben
+    idx = headers.findIndex(h => w.includes(normalizeHeader(h)));
+    return idx;
+  }
+
+  function starsFromRating(val){
+    const n = Math.max(0, Math.min(5, Number(val) || 0));
+    const full = "★★★★★".slice(0, n);
+    const empty = "☆☆☆☆☆".slice(0, 5-n);
+    return full + empty;
+  }
+
+  function formatDate(iso){
+    if (!iso) return "";
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return String(iso);
+    return d.toLocaleString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit", hour:"2-digit", minute:"2-digit" });
+  }
+
+  async function loadReviews(){
+    const listEl = document.getElementById("reviewsList");
+    const emptyEl = document.getElementById("reviewsEmpty");
+    const summaryEl = document.getElementById("reviewsSummary");
+
+    listEl.innerHTML = "";
+    summaryEl.style.display = "none";
+
+    if (!SHEET_CSV_URL || SHEET_CSV_URL.includes("IDE_JON_A_CSV_LINKED")){
+      emptyEl.textContent = "Hiányzik a Google Sheets CSV link. Illeszd be a kódban a SHEET_CSV_URL helyére.";
+      return;
     }
 
-    function yesIgen(v){
-      return String(v ?? "").trim().toLowerCase() === "igen";
-    }
+    emptyEl.textContent = "Betöltés…";
 
-    async function loadReviews(){
-      const container = document.getElementById("reviews");
-      if(!container) return;
+    try{
+      // cache-buster, hogy frissüljön
+      const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes("?") ? "&" : "?") + "t=" + Date.now();
+      const res = await fetch(url);
+      if (!res.ok) throw new Error("HTTP " + res.status);
+      const csv = await res.text();
 
-      container.innerHTML = `<div class="review-skeleton">Vélemények betöltése…</div>`;
-
-      const res = await fetch(CSV_URL, { cache: "no-store" });
-      if(!res.ok){
-        container.innerHTML = `<div class="review-skeleton">Nem sikerült betölteni a véleményeket.</div>`;
+      const table = parseCSV(csv);
+      if (!table.length){
+        emptyEl.textContent = "A CSV üres.";
         return;
       }
 
-      const csvText = await res.text();
-      const parsed = Papa.parse(csvText, { header: true, skipEmptyLines: true });
-      const rows = Array.isArray(parsed.data) ? parsed.data : [];
+      const headers = table[0];
+      const dataRows = table.slice(1);
 
-      // Csak jóváhagyottak
-      const approved = rows.filter(r => yesIgen(r["Megjelenhet?"]));
+      const idxName = findHeaderIndex(headers, COLS.name);
+      const idxRating = findHeaderIndex(headers, COLS.rating);
+      const idxText = findHeaderIndex(headers, COLS.text);
+      const idxApproved = findHeaderIndex(headers, COLS.approved);
+      const idxDate = findHeaderIndex(headers, COLS.date);
 
-      if(approved.length === 0){
-        container.innerHTML = `<div class="review-skeleton">Még nincs jóváhagyott vélemény.</div>`;
+      // szűrés: Megjelenhet? = igen
+      const approved = dataRows
+        .map(r => ({
+          name: (idxName >= 0 ? r[idxName] : "") || "Névtelen",
+          rating: (idxRating >= 0 ? r[idxRating] : "") || "",
+          text: (idxText >= 0 ? r[idxText] : "") || "",
+          approved: (idxApproved >= 0 ? r[idxApproved] : "") || "",
+          date: (idxDate >= 0 ? r[idxDate] : "") || ""
+        }))
+        .filter(x => String(x.approved).trim().toLowerCase() === "igen")
+        .filter(x => String(x.text).trim().length > 0);
+
+      if (!approved.length){
+        emptyEl.textContent = "Még nincs jóváhagyott vélemény (Megjelenhet? = igen).";
         return;
       }
 
-      container.innerHTML = approved.map(r => {
-        const rating = escapeHtml(r["Mennyire v"] || r["Mennyire v?"] || "");
-        const text   = escapeHtml(r["Véleményed"] || "");
-        const name   = escapeHtml(r["Név"] || r["Name"] || "Vendég");
-        const date   = escapeHtml(r["Submitted at"] || r["Dátum"] || "");
+      // rendezés: legújabb elöl (ha van dátum)
+      approved.sort((a,b) => {
+        const da = new Date(a.date).getTime();
+        const db = new Date(b.date).getTime();
+        if (Number.isNaN(da) || Number.isNaN(db)) return 0;
+        return db - da;
+      });
 
-        if(!text) return "";
+      // összegzés (átlag)
+      const ratings = approved.map(x => Number(x.rating) || 0).filter(n => n>0);
+      if (ratings.length){
+        const avg = ratings.reduce((s,n)=>s+n,0)/ratings.length;
+        summaryEl.style.display = "block";
+        summaryEl.textContent = `Átlag: ${avg.toFixed(1)} / 5  •  Jóváhagyott vélemények: ${approved.length}`;
+      }
 
-        return `
-          <article class="review-card">
-            <header class="review-top">
-              <div class="review-name">${name}</div>
-              ${rating ? `<div class="review-rating">⭐ ${rating}/5</div>` : ``}
-            </header>
-            <p class="review-text">${text}</p>
-            ${date ? `<div class="review-date">${date}</div>` : ``}
-          </article>
+      // render
+      approved.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "review";
+        div.innerHTML = `
+          <div class="review-top">
+            <div class="review-name">${escapeHtml(item.name)}</div>
+            <div class="stars">${escapeHtml(starsFromRating(item.rating))}</div>
+          </div>
+          <p class="review-text">${escapeHtml(item.text)}</p>
+          <div class="review-meta">${escapeHtml(formatDate(item.date))}</div>
         `;
-      }).join("");
-    }
+        listEl.appendChild(div);
+      });
 
-    loadReviews();
-    // Ha akarod: automatikus frissítés
-    // setInterval(loadReviews, 60000);
-  </script>
+      emptyEl.style.display = "none";
+    }catch(err){
+      emptyEl.style.display = "block";
+      emptyEl.textContent = "Hiba a vélemények betöltésekor: " + (err?.message || String(err));
+    }
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
+
+  document.getElementById("refreshBtn").addEventListener("click", loadReviews);
+
+  // auto load
+  loadReviews();
+</script>
+
 </body>
 </html>
