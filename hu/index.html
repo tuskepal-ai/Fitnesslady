@@ -18,7 +18,6 @@
       --pink2:#b14cff;
 
       --gold:#ffd38a;
-      --gold2:#ffb65c;
 
       --radius:22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
@@ -41,6 +40,19 @@
       overflow-x:hidden;
     }
 
+    /* ===== FULL-PAGE BACKGROUND: hero.png végig az egész oldalon ===== */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: url("/hero.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: translateZ(0);
+    }
+
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
 
@@ -51,6 +63,8 @@
     }
     .section{
       padding: clamp(44px, 6vw, 76px) 0;
+      background: rgba(7,6,11,.72); /* olvashatóság a full-page bg felett */
+      border-top: 1px solid rgba(255,255,255,.06);
     }
     .section-title{
       margin:0 0 10px;
@@ -66,24 +80,16 @@
       font-size: 15px;
     }
 
-    /* ========= Topbar (scroll-safe blur) ========= */
+    /* ========= Topbar ========= */
     .topbar{
       position: fixed;
       top:0; left:0; right:0;
       z-index: 50;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
-    /* blur csak desktopon + csak ha támogatott */
-    @supports (backdrop-filter: blur(12px)){
-      @media (min-width: 1024px){
-        .topbar{
-          backdrop-filter: blur(12px);
-          -webkit-backdrop-filter: blur(12px);
-        }
-      }
-    }
-
     .topbar-inner{
       height: 64px;
       display:flex;
@@ -163,46 +169,31 @@
       align-items:center; justify-content:center;
     }
 
-    /* ========= Hero: full-screen background (FIX: full height + layers + content left) ========= */
+    /* ========= Hero ========= */
     .hero{
       position: relative;
       min-height: 100vh;
-      min-height: 100svh;
       min-height: 100dvh;
-      padding-top: 64px;  /* topbar */
+      padding-top: 64px;
       display:flex;
       align-items:center;
-      overflow: hidden;   /* bg scale ne lógjon ki */
+      overflow: hidden;
     }
 
-    .hero-bg{
-      position:absolute; inset:0;
-      z-index: 0;
-      background-image: url("/hero.png");
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: scale(1.02);
-      filter: none; /* keep sharp */
-    }
-
-    /* overlay to keep text readable but not too dark on right */
+    /* overlay a hero felett (olvashatóság) */
     .hero-overlay{
       position:absolute; inset:0;
-      z-index: 1;
       background:
-        radial-gradient(1100px 700px at 22% 42%, rgba(10,7,14,.18), rgba(10,7,14,.56) 62%, rgba(10,7,14,.68) 100%),
-        linear-gradient(to right, rgba(10,7,14,.40), rgba(10,7,14,.26) 48%, rgba(10,7,14,.22));
+        radial-gradient(1100px 700px at 22% 42%, rgba(10,7,14,.18), rgba(10,7,14,.56) 62%, rgba(10,7,14,.72) 100%),
+        linear-gradient(to right, rgba(10,7,14,.48), rgba(10,7,14,.30) 48%, rgba(10,7,14,.22));
       pointer-events:none;
     }
 
     .hero-wrap{
       position: relative;
-      z-index: 2;
-
       width: min(var(--max), 92vw);
 
-      /* ✅ content balra (nem background) */
+      /* ✅ TARTALOM BALRA (nem a háttér) */
       margin-left: clamp(14px, 4vw, 64px);
       margin-right: auto;
 
@@ -302,7 +293,7 @@
       -webkit-backdrop-filter: blur(10px);
     }
 
-    /* ========= Glass cards + hover/tap gold sweep + neon glow ========= */
+    /* ========= Glass cards + hover/tap neon glow (GOLD SWEEP NINCS) ========= */
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.10);
@@ -319,7 +310,7 @@
       will-change: transform;
     }
 
-    /* neon glow layer (hidden until hover/tap) */
+    /* neon glow layer (hover/tap) */
     .interactive::before{
       content:"";
       position:absolute; inset:-3px;
@@ -328,25 +319,8 @@
         radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
         radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
       opacity: 0;
-      filter: blur(10px);
+      filter: blur(6px);
       transition: opacity .30s ease;
-      pointer-events:none;
-    }
-
-    /* gold sweep (hidden until hover/tap) */
-    .interactive::after{
-      content:"";
-      position:absolute;
-      top:-60%; left:-70%;
-      width: 65%;
-      height: 220%;
-      transform: rotate(20deg) translateX(-30%);
-      background: linear-gradient(120deg,
-        rgba(255,215,140,0),
-        rgba(255,215,140,.22),
-        rgba(255,215,140,0)
-      );
-      opacity: 0;
       pointer-events:none;
     }
 
@@ -362,29 +336,15 @@
     .interactive.is-active::before{
       opacity: 1;
     }
-    .interactive:hover::after,
-    .interactive:focus-visible::after,
-    .interactive.is-active::after{
-      opacity: 1;
-      animation: goldSweep .85s cubic-bezier(.2,.8,.2,1) forwards;
-    }
 
-    @keyframes goldSweep{
-      0%   { transform: rotate(20deg) translateX(-30%); opacity:0; }
-      20%  { opacity:1; }
-      100% { transform: rotate(20deg) translateX(220%); opacity:0; }
-    }
-
-    /* ========= “Rólam” + “Mit kapsz pontosan?” cards ========= */
+    /* ========= “Rólam” + “Mit kapsz pontosan?” ========= */
     .hero-stack{
       display:grid;
       gap: 14px;
       align-content: start;
     }
 
-    .about-card, .what-card{
-      padding: 18px;
-    }
+    .about-card, .what-card{ padding: 18px; }
     .about-head{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom:10px;
@@ -436,10 +396,7 @@
     @media (max-width: 980px){
       .packages{ grid-template-columns: 1fr; }
     }
-    .pkg{
-      padding: 18px;
-      position: relative;
-    }
+    .pkg{ padding: 18px; position: relative; }
     .pkg-top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 10px;
@@ -486,7 +443,6 @@
       gap: 10px;
       margin-top: 14px;
     }
-
     .buy-btn{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
@@ -501,7 +457,7 @@
       font-weight: 850;
     }
 
-    /* ========= Reviews: header rating + carousel ========= */
+    /* ========= Reviews ========= */
     .reviews-head{
       display:flex;
       align-items:flex-end;
@@ -553,9 +509,7 @@
       100% { transform: translateY(0) scale(1.00); }
     }
 
-    .review-carousel{
-      border-radius: var(--radius);
-    }
+    .review-carousel{ border-radius: var(--radius); }
     .review-track{
       display:flex;
       gap:14px;
@@ -620,7 +574,7 @@
       transform: scale(1.35);
     }
 
-    /* ========= Scroll reveal (FIX: no blur filter to reduce scroll jank) ========= */
+    /* ========= Scroll reveal (smooth: opacity + transform only) ========= */
     .reveal{
       opacity: 0;
       transform: translateY(16px) scale(.995);
@@ -636,13 +590,32 @@
     .reveal[data-delay="2"]{ transition-delay: 160ms; }
     .reveal[data-delay="3"]{ transition-delay: 240ms; }
 
+    /* ========= PERFORMANCE: görgetés közben automatikus “light mode” ========= */
+    body.is-scrolling .glass,
+    body.is-scrolling .btn,
+    body.is-scrolling .badge,
+    body.is-scrolling .meta-pill,
+    body.is-scrolling .rating{
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    body.is-scrolling .glass,
+    body.is-scrolling .review-card{
+      box-shadow: 0 10px 30px rgba(0,0,0,.38) !important;
+    }
+    body.is-scrolling .interactive::before{
+      opacity: 0 !important;
+    }
+    body.is-scrolling .interactive{
+      transition: none !important;
+    }
+
     @media (prefers-reduced-motion: reduce){
       html{ scroll-behavior:auto; }
       .reveal{ opacity:1; transform:none; transition:none; }
       .review-track{ scroll-behavior:auto; }
       .rating .star{ transition:none; animation:none !important; }
       .interactive, .btn{ transition:none; }
-      .interactive::after{ animation:none !important; }
     }
 
     /* ========= Responsive ========= */
@@ -651,12 +624,7 @@
       .menu-btn{ display:inline-flex; }
       .nav{ display:none; }
       .what-grid{ grid-template-columns: 1fr; }
-
-      /* mobilon vissza középre (ne túl balra) */
-      .hero-wrap{
-        margin-left: auto;
-        margin-right: auto;
-      }
+      .hero-wrap{ margin-left: auto; margin-right: auto; }
     }
   </style>
 </head>
@@ -686,7 +654,6 @@
 
   <!-- HERO -->
   <main id="top" class="hero">
-    <div class="hero-bg" aria-hidden="true"></div>
     <div class="hero-overlay" aria-hidden="true"></div>
 
     <div class="hero-wrap">
@@ -722,7 +689,7 @@
               <div class="tag">Coach</div>
             </div>
             <p class="about-text">
-              Rövid bemutatkozó: ki vagy, miben segítesz, mi a módszered (2–3 mondat).  
+              Rövid bemutatkozó: ki vagy, miben segítesz, mi a módszered (2–3 mondat).
               Cél: prémium, bizalomkeltő, “kézben van” érzés.
             </p>
           </div>
@@ -780,13 +747,12 @@
             <li><span class="check"></span> 1× kontroll / módosítás</li>
           </ul>
           <div class="pkg-actions">
-            <!-- TODO: ide később Stripe/Payrexx link -->
             <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
 
-        <!-- Balance (Legnépszerűbb) -->
+        <!-- Balance -->
         <article class="glass interactive pkg reveal" data-delay="2" style="border-color: rgba(255,79,216,.22);">
           <div class="pkg-top">
             <h3>Balance</h3>
@@ -868,7 +834,6 @@
         <div>
           <div class="section-title" style="margin-bottom:6px;">Vélemények</div>
           <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <!-- animated rating pill -->
             <div class="rating" id="avgRating" title="Kattints az animációhoz" aria-label="Átlag értékelés">
               <span class="star" style="--i:1">★</span>
               <span class="star" style="--i:2">★</span>
@@ -889,7 +854,6 @@
 
       <div class="glass interactive review-carousel reveal" data-delay="1" id="reviewCarousel">
         <div class="review-track" id="reviewTrack" aria-label="Vélemények carousel">
-          <!-- placeholder (will be replaced) -->
           <article class="review-card">
             <div class="top">
               <span>Betöltés…</span>
@@ -944,15 +908,30 @@
     </div>
   </section>
 
-  <footer style="padding: 18px 0 60px; border-top:1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.35); backdrop-filter: blur(10px);">
-    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:var(--muted); font-size:13px;">
+  <footer style="padding: 18px 0 60px; border-top:1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.55); backdrop-filter: blur(10px);">
+    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:rgba(255,255,255,.70); font-size:13px;">
       <div>© <span id="y"></span> Fitness Lady</div>
-      <div>Prémium dizájn • HU oldal • Tüske web design</div>
+      <div>Tüske web design</div>
     </div>
   </footer>
 
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
+
+    /* ===== Scroll performance: blur/shadow OFF scroll közben ===== */
+    (() => {
+      let t = null;
+      const onScroll = () => {
+        if(!document.body.classList.contains('is-scrolling')) {
+          document.body.classList.add('is-scrolling');
+        }
+        window.clearTimeout(t);
+        t = window.setTimeout(() => {
+          document.body.classList.remove('is-scrolling');
+        }, 140);
+      };
+      window.addEventListener('scroll', onScroll, { passive: true });
+    })();
 
     /* ========= Mobile menu ========= */
     const menuBtn = document.getElementById("menuBtn");
@@ -1052,7 +1031,7 @@
       if(!r) return;
       const kick = () => {
         r.classList.remove('is-anim');
-        void r.offsetWidth; // reflow
+        void r.offsetWidth;
         r.classList.add('is-anim');
       };
       r.addEventListener('click', kick);
@@ -1077,10 +1056,8 @@
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
-
     function normalize(s){ return String(s ?? "").trim().toLowerCase(); }
 
-    // CSV parser (handles quoted fields)
     function parseCSV(text){
       const rows = [];
       let row = [];
@@ -1134,7 +1111,6 @@
     function initCarousel(){
       const cards = Array.from(reviewTrack.querySelectorAll('.review-card'));
       reviewDots.innerHTML = "";
-
       if(!cards.length) return;
 
       const dots = cards.map((_, i) => {
@@ -1204,7 +1180,6 @@
 
     function renderReviews(items){
       destroyCarousel();
-
       reviewTrack.innerHTML = "";
 
       if(!items.length){
@@ -1251,13 +1226,10 @@
 
         const headers = rows.shift();
 
-        // tolerant header mapping
         const idxText = findHeaderIndex(headers, h => h === 'véleményed' || h === 'vélemény' || h.includes('vélemény'));
         const idxApprove = findHeaderIndex(headers, h => h === 'megjelenhet?' || h.includes('megjelenhet'));
         const idxRating = findHeaderIndex(headers, h => h === 'mennyire' || h === 'mennyire v' || h.startsWith('mennyire'));
         const idxDate = findHeaderIndex(headers, h => h === 'submitted at' || h.includes('submitted'));
-
-        // optional name columns
         const idxName = findHeaderIndex(headers, h => h === 'név' || h === 'name' || h.includes('név'));
 
         if(idxText === -1 || idxApprove === -1){
@@ -1293,10 +1265,8 @@
           items.push({ text, stars: starsStr, date, name });
         }
 
-        // newest first if date exists
         items.sort((a,b)=> (b.date || "").localeCompare(a.date || ""));
 
-        // update avg rating
         if(ratingCount > 0){
           const avg = Math.round((ratingSum / ratingCount) * 10) / 10;
           avgText.textContent = `${avg} • ${ratingCount} értékelés`;
@@ -1305,8 +1275,7 @@
         }
 
         reviewsMeta.textContent = items.length ? `${items.length} jóváhagyott vélemény` : "Nincs még jóváhagyott vélemény";
-
-        renderReviews(items.slice(0, 12)); // show first 12 in carousel
+        renderReviews(items.slice(0, 12));
       }catch(err){
         console.error(err);
         avgText.textContent = "—";
