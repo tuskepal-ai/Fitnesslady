@@ -1,0 +1,26 @@
+(() => {
+  const el = document.getElementById("aboutText");
+  if (!el) return;
+
+  el.innerHTML = `
+    <b>Nem csak formát építek – nevet, bizalmat és jövőt.</b><br><br>
+
+    Edina vagyok, a Fitnesz Lady megálmodója.<br>
+    Abban hiszek, hogy a test egy erőforrás, amely megfelelő iránnyal, tudatossággal és rendszerrel látványos és tartós eredményeket hoz.<br><br>
+
+    A Fitnesz Lady egy olyan szemléletet képvisel, ahol az edzés nem elszigetelt tevékenység, hanem egy összetett rendszer része: életmód, mentális egyensúly és következetesség együttese.<br><br>
+
+    Programjaim és tartalmaim azoknak szólnak,<br>
+    • akik fejlődni szeretnének,<br>
+    • akik értékelik a struktúrát és az átgondolt felépítést,<br>
+    • akik hosszú távon is működő megoldásokat keresnek.<br><br>
+
+    A Fitnesz Lady mögött tapasztalat, következetes munka és emberközpontú hozzáállás áll.<br>
+    Itt nem sablonok mentén dolgozunk, hanem személyre szabott irányt adunk.<br><br>
+
+    Ha olyan támogatást keresel, amely egyszerre hatékony, motiváló és fenntartható, jó helyen vagy.<br><br>
+
+    <b>Edina</b><br>
+    Fitnesz Lady
+  `.trim();
+})();
