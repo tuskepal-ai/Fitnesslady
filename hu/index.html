@@ -50,7 +50,11 @@
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      transform: translateZ(0);
+
+      /* Desktop/mobil stabilizálás */
+      will-change: transform;
+      transform: translate3d(0,0,0);
+      backface-visibility: hidden;
     }
 
     a{ color:inherit; text-decoration:none; }
@@ -158,6 +162,15 @@
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 14px 30px rgba(255,79,216,.22);
       white-space: nowrap;
+    }
+
+    /* Secondary pill (Saját oldalam) — dizájnhoz nem nyúlunk, csak finom) */
+    .cta-pill.secondary{
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: none;
+      font-weight: 900;
     }
 
     .menu-btn{
@@ -602,6 +615,12 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.38) !important;
     }
 
+    /* scroll közben a topbar blur OFF (simább desktopon is) */
+    body.is-scrolling .topbar{
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
     @media (prefers-reduced-motion: reduce){
       html{ scroll-behavior:auto; }
       .reveal{ opacity:1; transform:none; transition:none; }
@@ -617,6 +636,19 @@
       .nav{ display:none; }
       .what-grid{ grid-template-columns: 1fr; }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
+    }
+
+    /* ========= Desktop scroll fix: topbar blur OFF (mobilon marad) ========= */
+    @media (min-width: 980px){
+      .topbar{
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(8,6,12,.80);
+      }
+      body::before{
+        transform: none;
+        will-change: auto;
+      }
     }
 
     /* ========= AFSZ MODAL (only shows on click) ========= */
@@ -715,6 +747,10 @@
 
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
+
+        <!-- ÚJ: vevő belépés a meglévő hu/app mappába -->
+        <a class="cta-pill secondary" href="/hu/app/">Saját oldalam</a>
+
         <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
       </div>
     </div>
@@ -940,10 +976,14 @@
   <section id="faq" class="section">
     <div class="container">
       <div class="section-title reveal">AFSZ</div>
+      <p class="section-sub reveal" data-delay="1">
+        Az Általános Szerződési Feltételek kattintásra nyílnak meg egy prémium modalban (nem fixen az oldalon).
+      </p>
 
       <div class="glass interactive pkg reveal" data-delay="2">
         <div class="pkg-top">
           <h3>Általános Szerződési Feltételek</h3>
+          <span class="tag">Modal</span>
         </div>
         <p>
           A részletek megtekintéséhez kattints az alábbi gombra.
@@ -992,91 +1032,78 @@
         <p><b>Deviza:</b> HUF és CHF</p>
         <p><b>Fizetési módok:</b> nemzetközi utalás, TWINT, Payrexx</p>
 
-        <h3>1. Bevezetés</h3>
-        <p>
-          Jelen Általános Szerződési Feltételek (a továbbiakban: <b>ÁFSZ</b>) a FitnessLady (Szolgáltató) által
-          nyújtott szolgáltatások és digitális tartalmak (pl. edzéstervek, útmutatók, programok) igénybevételének
-          feltételeit rögzítik. A szolgáltatás igénybevételével a Vásárló/Felhasználó elfogadja az ÁFSZ rendelkezéseit.
-        </p>
+        <h3>1. Fogalmak</h3>
+        <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady), aki a szolgáltatást nyújtja.<br>
+           <b>Felhasználó / Vásárló:</b> aki a weboldalon szolgáltatást igénybe vesz vagy vásárol.<br>
+           <b>Szolgáltatás:</b> online edzésanyagok, programok, csomagok, digitális tartalmak a weboldalon leírtak szerint.<br>
+           <b>Digitális tartalom:</b> online elérhető vagy letölthető anyag (pl. videó, program, útmutató).</p>
 
-        <h3>2. Fogalmak</h3>
-        <p>
-          <b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady), a szolgáltatások nyújtója.<br>
-          <b>Felhasználó/Vásárló:</b> természetes személy, aki a weboldalon szolgáltatást igénybe vesz vagy vásárol.<br>
-          <b>Szolgáltatás:</b> online edzés- és életmód jellegű szolgáltatások, csomagok, konzultációk és kapcsolódó tartalmak.<br>
-          <b>Digitális tartalom:</b> online elérhető vagy elektronikus úton átadott anyag (pl. videó, edzésterv, PDF, útmutató).
-        </p>
-
-        <h3>3. A szolgáltatás tárgya és működése</h3>
+        <h3>2. A szolgáltatás leírása</h3>
         <ul class="list">
-          <li><span class="check"></span> A csomagok pontos tartalmát, időtartamát és feltételeit a csomagleírások tartalmazzák.</li>
-          <li><span class="check"></span> A szolgáltatás tipikusan online formában érhető el (digitális hozzáférés / elektronikus átadás).</li>
-          <li><span class="check"></span> A Szolgáltató jogosult a tartalmak ésszerű frissítésére, a megvásárolt csomag lényegi értékének csorbítása nélkül.</li>
+          <li><span class="check"></span> A csomagok tartalmát és időtartamát a csomagleírás tartalmazza.</li>
+          <li><span class="check"></span> A szolgáltatás online formában érhető el, hozzáférést vásárlás után biztosítunk.</li>
+          <li><span class="check"></span> A tartalmak frissíthetők, a megvásárolt csomag lényegi értékének csorbítása nélkül.</li>
         </ul>
 
-        <h3>4. Megrendelés és szerződés létrejötte</h3>
+        <h3>3. Megrendelés és szerződéskötés</h3>
         <ul class="list">
-          <li><span class="check"></span> A szerződés a szolgáltatás megrendelésével és a sikeres fizetéssel jön létre.</li>
-          <li><span class="check"></span> A Vásárló köteles valós adatokat megadni. Hibás adatokból eredő károkért a Szolgáltató nem felel.</li>
-          <li><span class="check"></span> A Szolgáltató jogosult a megrendelést visszautasítani indokolt esetben (pl. visszaélés gyanúja).</li>
+          <li><span class="check"></span> Vásárlás: csomag kiválasztása + fizetés.</li>
+          <li><span class="check"></span> Szerződés: sikeres fizetéssel és/vagy visszaigazolással jön létre.</li>
+          <li><span class="check"></span> Valós adatok megadása kötelező.</li>
         </ul>
 
-        <h3>5. Díjazás és fizetés</h3>
+        <h3>4. Díjazás és fizetés</h3>
         <ul class="list">
-          <li><span class="check"></span> A feltüntetett árak a weboldalon megadott devizában értendők: <b>HUF</b> és <b>CHF</b>.</li>
-          <li><span class="check"></span> Fizetési módok: <b>nemzetközi utalás</b>, <b>TWINT</b>, <b>Payrexx</b>.</li>
-          <li><span class="check"></span> Sikeres fizetés után a hozzáférést / átadást a Szolgáltató a csomagleírás szerinti módon biztosítja.</li>
+          <li><span class="check"></span> Deviza: HUF és CHF.</li>
+          <li><span class="check"></span> Fizetés: nemzetközi utalás, TWINT, Payrexx.</li>
+          <li><span class="check"></span> Sikeres fizetés után hozzáférést biztosítunk.</li>
         </ul>
 
-        <h3>6. Hozzáférés, technikai feltételek</h3>
+        <h3>5. Hozzáférés, technikai feltételek</h3>
         <ul class="list">
-          <li><span class="check"></span> A digitális tartalom használatához internetkapcsolat és kompatibilis eszköz szükséges.</li>
-          <li><span class="check"></span> Karbantartás vagy külső szolgáltatói hiba miatt átmeneti elérhetetlenség előfordulhat.</li>
-          <li><span class="check"></span> A hozzáférési adatok védelme a Felhasználó felelőssége; jogosulatlan megosztás tilos.</li>
+          <li><span class="check"></span> Internet és kompatibilis eszköz szükséges.</li>
+          <li><span class="check"></span> Átmeneti kiesés előfordulhat (karbantartás/külső hiba).</li>
+          <li><span class="check"></span> Hozzáférési adatok védelme a vásárló felelőssége.</li>
         </ul>
 
-        <h3>7. Elállás, lemondás, visszatérítés</h3>
-        <p>
-          A digitális tartalmak és online szolgáltatások sajátosságaira tekintettel a visszatérítés lehetősége
-          a teljesítés megkezdésétől (pl. hozzáférés átadása, tartalom megnyitása/letöltése, szolgáltatás megkezdése)
-          függhet. A konkrét feltételek a csomagleírásban és egyedi megállapodásban rögzíthetők.
-        </p>
+        <h3>6. Lemondás, elállás, visszatérítés</h3>
         <ul class="list">
-          <li><span class="check"></span> Megkezdés előtt, hozzáférés-átadás nélkül: egyedi elbírálás lehetséges.</li>
-          <li><span class="check"></span> Megkezdés után: részleges vagy teljes visszatérítés nem automatikus, egyedi mérlegelés alapján történhet.</li>
-          <li><span class="check"></span> Igény bejelentése írásban: <b>fitnesslady92@gmail.com</b>, a megrendelés azonosító adatával.</li>
+          <li><span class="check"></span> Digitális tartalomnál a hozzáférés megkezdése után a visszatérítés korlátozott lehet.</li>
+          <li><span class="check"></span> Megkezdés előtt, hozzáférés-átadás nélkül: egyedi elbírálás.</li>
+          <li><span class="check"></span> Tartós elérhetetlenségnél arányos jóváírás/visszatérítés lehetséges.</li>
+          <li><span class="check"></span> Igény: írásban, rendelés azonosítóval.</li>
         </ul>
 
-        <h3>8. Egészségügyi nyilatkozat és felelősség</h3>
+        <h3>7. Felelősségkizárás és egészségügyi nyilatkozat</h3>
         <ul class="list">
-          <li><span class="check"></span> A programok nem minősülnek orvosi tanácsadásnak; a használat saját felelősségre történik.</li>
-          <li><span class="check"></span> Egészségügyi probléma, várandósság, sérülés esetén a program megkezdése előtt orvosi konzultáció javasolt.</li>
-          <li><span class="check"></span> A Szolgáltató nem vállal felelősséget a nem rendeltetésszerű használatból eredő károkért.</li>
+          <li><span class="check"></span> A programok információs célúak, használat saját felelősségre történik.</li>
+          <li><span class="check"></span> Egészségi alkalmasság esetén végezhető, szükség esetén orvosi egyeztetéssel.</li>
+          <li><span class="check"></span> Nem rendeltetésszerű használatból eredő károkért felelősség nem vállalható.</li>
         </ul>
 
-        <h3>9. Szerzői jog és felhasználási feltételek</h3>
+        <h3>8. Szerzői jog, felhasználási feltételek</h3>
         <ul class="list">
-          <li><span class="check"></span> A tartalmak a Szolgáltató szellemi tulajdonát képezik.</li>
-          <li><span class="check"></span> Másolás, nyilvános közzététel, megosztás, továbbértékesítés engedély nélkül tilos.</li>
-          <li><span class="check"></span> Jogosulatlan megosztás esetén a hozzáférés felfüggeszthető vagy megszüntethető.</li>
+          <li><span class="check"></span> Anyagok a Szolgáltató szellemi tulajdonát képezik.</li>
+          <li><span class="check"></span> Másolás/megosztás/továbbértékesítés engedély nélkül tilos.</li>
+          <li><span class="check"></span> Jogosulatlan megosztás esetén hozzáférés megszüntethető.</li>
         </ul>
 
-        <h3>10. Adatkezelés</h3>
-        <p>
-          A Szolgáltató a megrendelés teljesítéséhez és a kapcsolattartáshoz szükséges adatokat kezeli.
-          További részletek az adatkezelési tájékoztatóban kerülhetnek rögzítésre (ha elérhető).
-        </p>
-
-        <h3>11. Panaszkezelés, vitarendezés</h3>
+        <h3>9. Adatkezelés (rövid)</h3>
         <ul class="list">
-          <li><span class="check"></span> Panasz bejelentése: <b>fitnesslady92@gmail.com</b></li>
+          <li><span class="check"></span> A megrendelés teljesítéséhez szükséges adatokat kezeljük.</li>
+          <li><span class="check"></span> Részletek az adatkezelési tájékoztatóban (amennyiben elérhető).</li>
+        </ul>
+
+        <h3>10. Panaszkezelés, vitarendezés</h3>
+        <ul class="list">
+          <li><span class="check"></span> Panasz: fitnesslady92@gmail.com</li>
           <li><span class="check"></span> Irányadó jog: svájci jog. Illetékesség: Svájc, Valais/VS (Visp).</li>
         </ul>
 
-        <h3>12. Záró rendelkezések</h3>
+        <h3>11. Záró rendelkezések</h3>
         <ul class="list">
-          <li><span class="check"></span> A Szolgáltató jogosult az ÁFSZ módosítására; a közzététellel válik hatályossá.</li>
-          <li><span class="check"></span> A már megvásárolt szolgáltatásokra főszabály szerint a vásárláskor hatályos ÁFSZ irányadó (kivéve kötelező jogszabályi eltérés).</li>
+          <li><span class="check"></span> Az ÁFSZ módosítható, közzététellel hatályos.</li>
+          <li><span class="check"></span> A már megvásárolt szolgáltatásokra a vásárláskor hatályos ÁFSZ irányadó (kivéve jogszabály).</li>
         </ul>
 
         <p style="margin-top:14px; color:var(--muted2); font-size:12.8px;">
@@ -1096,19 +1123,22 @@
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
 
-    /* ===== Scroll performance: glow/hover anim OFF scroll közben (AZ ÜVEG MARAD) ===== */
+    /* ===== Scroll performance: glow/hover anim OFF scroll közben (AZ ÜVEG MARAD) =====
+       + Desktop boost: wheel listener is.
+    */
     (() => {
       let t = null;
-      const onScroll = () => {
+      const mark = () => {
         if(!document.body.classList.contains('is-scrolling')) {
           document.body.classList.add('is-scrolling');
         }
         window.clearTimeout(t);
         t = window.setTimeout(() => {
           document.body.classList.remove('is-scrolling');
-        }, 140);
+        }, 180);
       };
-      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('scroll', mark, { passive: true });
+      window.addEventListener('wheel', mark, { passive: true }); // ✅ desktop simítás
     })();
 
     /* ========= Mobile menu ========= */
@@ -1132,6 +1162,7 @@
         nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
         nav.style.padding = "12px";
         nav.innerHTML = `
+          <a href="/hu/app/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Saját oldalam</a>
           <a href="#csomagok" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Csomagok</a>
           <a href="#hogyan" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Hogyan működik?</a>
           <a href="#velemenyek" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Vélemények</a>
@@ -1241,11 +1272,9 @@
       };
 
       openBtn.addEventListener('click', openModal);
-
       closeBtn.addEventListener('click', closeModal);
 
       overlay.addEventListener('click', (e) => {
-        // close only if clicked on overlay background, not inside modal content
         if(e.target === overlay) closeModal();
       });
 
