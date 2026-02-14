@@ -3,111 +3,1462 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fitness Lady — Saját programom (Demo)</title>
-  <link rel="stylesheet" href="./assets/app.css" />
-</head>
-<body>
-  <div class="app">
-    <aside class="glass sidebar">
-      <div class="profile">
-        <div class="avatar" aria-hidden="true"></div>
-        <div>
-          <b id="custName">Betöltés…</b>
-          <span id="custPkg">—</span>
-        </div>
-      </div>
+  <title>Fitness Lady — Saját oldalam</title>
+  <meta name="description" content="Saját programom, check-in, célok, motiváció, étrend és videók — prémium vevő felület (teszt)." />
 
-      <nav class="nav" aria-label="Oldal menü">
-        <a href="#program" class="is-active"><span class="ico">🏠</span>Főoldal</a>
-        <a href="#program"><span class="ico">👤</span>Saját programom</a>
-        <a href="#etrend"><span class="ico">🥗</span>Étrend</a>
-        <a href="#checkin"><span class="ico">🎯</span>Check-in / Célom</a>
-        <a href="#tech"><span class="ico">🎥</span>Tippek & technika</a>
-        <a href="#fiok"><span class="ico">⚙️</span>Fiókom</a>
+  <style>
+    :root{
+      --bg:#07060b;
+      --panel: rgba(12,10,18,.62);
+      --panel2: rgba(255,255,255,.06);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
+      --muted2: rgba(255,255,255,.55);
+
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --gold:#ffd38a;
+
+      --radius: 22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 1180px;
+    }
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      color: var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1100px 700px at 80% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(900px 650px at 70% 90%, rgba(255,211,138,.07), transparent 55%),
+        var(--bg);
+      overflow-x:hidden;
+    }
+
+    /* optional full-page image background (same vibe as main site) */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: url("/hero.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity: .55;
+      will-change: transform;
+      transform: translate3d(0,0,0);
+      backface-visibility: hidden;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    button{ font:inherit; }
+    .container{ width:min(var(--max), 92vw); margin:0 auto; }
+
+    /* ========= Topbar ========= */
+    .topbar{
+      position: fixed;
+      top:0; left:0; right:0;
+      z-index: 50;
+      background: rgba(8,6,12,.62);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 900;
+      letter-spacing:.2px;
+      white-space: nowrap;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap: 16px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 750;
+    }
+    .nav a{
+      position:relative;
+      padding: 10px 6px;
+      opacity:.92;
+    }
+    .nav a:hover{ opacity:1; color: var(--text); }
+    .nav a::after{
+      content:"";
+      position:absolute;
+      left: 8px; right: 8px; bottom: 6px;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
+      transform: scaleX(0);
+      transform-origin: left;
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease;
+    }
+    .nav a:hover::after,
+    .nav a.is-active::after{ transform: scaleX(1); opacity:1; }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--text);
+      font-weight: 900;
+      white-space: nowrap;
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      border-color: rgba(255,255,255,.18);
+      color:#140813;
+      box-shadow: 0 18px 46px rgba(255,79,216,.20);
+    }
+
+    .menu-btn{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+    }
+
+    /* ========= Layout ========= */
+    .page{
+      padding-top: 64px;
+      min-height: 100vh;
+    }
+
+    .hero{
+      padding: clamp(22px, 4.8vw, 44px) 0 18px;
+      position: relative;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 16px;
+      align-items:start;
+    }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .card{
+      padding: 18px;
+      position: relative;
+      overflow:hidden;
+    }
+
+    .interactive{
+      position: relative;
+      overflow: hidden;
+      transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
+      will-change: transform;
+    }
+    .interactive::before{
+      content:"";
+      position:absolute; inset:-3px;
+      border-radius: inherit;
+      background:
+        radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
+        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
+      opacity: 0;
+      filter: blur(6px);
+      transition: opacity .30s ease;
+      pointer-events:none;
+    }
+    .interactive:hover,
+    .interactive:focus-visible,
+    .interactive.is-active{
+      transform: translateY(-6px);
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    .interactive:hover::before,
+    .interactive:focus-visible::before,
+    .interactive.is-active::before{ opacity:1; }
+
+    .kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: var(--muted);
+      font-weight: 800;
+      font-size: 13px;
+      width: fit-content;
+    }
+    .h1{
+      margin: 14px 0 10px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-weight: 750;
+      line-height: 1.06;
+      letter-spacing: -.7px;
+      font-size: clamp(28px, 3.4vw, 44px);
+      text-shadow: 0 10px 40px rgba(0,0,0,.55);
+    }
+    .lead{
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.65;
+      font-size: 15px;
+      max-width: 70ch;
+      text-shadow: 0 10px 30px rgba(0,0,0,.45);
+    }
+
+    .meta-row{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .meta-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .title-row{
+      display:flex;
+      align-items:flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .title{
+      margin:0;
+      font-size: 16px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+    .tag{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      white-space: nowrap;
+      font-weight: 850;
+    }
+    .small{
+      margin:0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .grid-2{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 12px;
+    }
+    .mini{
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .mini b{ display:block; margin-bottom:6px; font-size: 13px; }
+    .mini span{ display:block; color:var(--muted); font-size: 12.8px; line-height:1.45; }
+
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    /* ========= Sections ========= */
+    .section{
+      padding: clamp(18px, 4.5vw, 38px) 0;
+    }
+    .section-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .section-title{
+      margin:0;
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(22px, 2.6vw, 32px);
+      letter-spacing: -.4px;
+    }
+    .section-sub{
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 14px;
+      max-width: 82ch;
+    }
+
+    .cards{
+      display:grid;
+      grid-template-columns: 1.25fr .75fr;
+      gap: 16px;
+      align-items:start;
+    }
+
+    .program-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .list{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+    }
+    .list li{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .check{
+      width: 18px; height: 18px;
+      border-radius: 6px;
+      background: rgba(255,79,216,.18);
+      border: 1px solid rgba(255,79,216,.30);
+      box-shadow: 0 0 22px rgba(255,79,216,.16);
+      flex: 0 0 auto;
+      margin-top: 1px;
+      position:relative;
+    }
+    .check:after{
+      content:"";
+      position:absolute;
+      left: 5px; top: 4px;
+      width: 6px; height: 9px;
+      border-right: 2px solid rgba(255,255,255,.85);
+      border-bottom: 2px solid rgba(255,255,255,.85);
+      transform: rotate(40deg);
+    }
+
+    /* ========= Video list ========= */
+    .video-item{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .video-left{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      min-width: 0;
+    }
+    .thumb{
+      width: 46px; height: 46px;
+      border-radius: 14px;
+      background:
+        radial-gradient(24px 20px at 30% 30%, rgba(255,79,216,.35), transparent 65%),
+        radial-gradient(26px 22px at 70% 30%, rgba(177,76,255,.30), transparent 70%),
+        rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.10);
+      flex: 0 0 auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color: rgba(255,255,255,.85);
+      font-weight: 950;
+    }
+    .video-meta{
+      min-width: 0;
+    }
+    .video-title{
+      margin:0;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing:.1px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .video-sub{
+      margin:3px 0 0;
+      color: var(--muted2);
+      font-size: 12.6px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ========= Nutrition ========= */
+    .nutrition-grid{
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .meal{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .meal strong{
+      display:block;
+      font-size: 13.5px;
+      letter-spacing:.1px;
+    }
+    .meal span{
+      display:block;
+      color: var(--muted);
+      margin-top: 3px;
+      font-size: 12.8px;
+      line-height: 1.45;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    /* ========= Modal ========= */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 90;
+      background: rgba(0,0,0,.60);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding: 18px;
+    }
+    .modal-overlay.is-open{ display:flex; }
+    .modal{
+      width: min(980px, 94vw);
+      max-height: min(82vh, 760px);
+      border-radius: var(--radius);
+      overflow:hidden;
+      position: relative;
+    }
+    .modal-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+    }
+    .modal-title{
+      margin:0;
+      font-family: ui-serif, Georgia, serif;
+      font-size: 18px;
+      letter-spacing: -.2px;
+    }
+    .modal-close{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor:pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-body{
+      padding: 16px;
+      overflow:auto;
+      background: rgba(7,6,11,.40);
+    }
+    .modal-body h3{
+      margin: 16px 0 8px;
+      font-size: 15px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+    .modal-body p{
+      margin: 0 0 10px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13.5px;
+    }
+    body.modal-lock{
+      overflow:hidden;
+      touch-action:none;
+    }
+
+    /* ========= Reveal ========= */
+    .reveal{
+      opacity:0;
+      transform: translateY(16px) scale(.995);
+      transition: opacity .75s ease, transform .75s cubic-bezier(.2,.8,.2,1);
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible{
+      opacity:1;
+      transform: translateY(0) scale(1);
+    }
+    .reveal[data-delay="1"]{ transition-delay: 80ms; }
+    .reveal[data-delay="2"]{ transition-delay: 160ms; }
+    .reveal[data-delay="3"]{ transition-delay: 240ms; }
+
+    /* ========= Performance ========= */
+    body.is-scrolling .interactive::before{ opacity:0 !important; }
+    body.is-scrolling .interactive{ transition:none !important; }
+    body.is-scrolling .glass{ box-shadow: 0 10px 30px rgba(0,0,0,.38) !important; }
+    body.is-scrolling .topbar{
+      backdrop-filter:none !important;
+      -webkit-backdrop-filter:none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .reveal{ opacity:1; transform:none; transition:none; }
+      .interactive, .pill{ transition:none; }
+    }
+
+    /* ========= Responsive ========= */
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .cards{ grid-template-columns: 1fr; }
+      .grid-2{ grid-template-columns: 1fr; }
+      .menu-btn{ display:inline-flex; }
+      .nav{ display:none; }
+    }
+
+    /* Desktop: blur off for smoothness */
+    @media (min-width: 980px){
+      .topbar{
+        backdrop-filter:none;
+        -webkit-backdrop-filter:none;
+        background: rgba(8,6,12,.80);
+      }
+      body::before{
+        transform:none;
+        will-change:auto;
+      }
+    }
+
+    footer{
+      padding: 18px 0 60px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .footer-row{
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: rgba(255,255,255,.70);
+      font-size: 13px;
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/hu/" aria-label="Vissza a főoldalra">
+        <span class="dot"></span>
+        <span>Fitness Lady</span>
+      </a>
+
+      <nav class="nav" aria-label="Saját oldalam menü">
+        <a href="#program">Saját programom</a>
+        <a href="#etrend">Étrend</a>
+        <a href="#checkin">Check-in</a>
+        <a href="#technika">Örök technika</a>
+        <a href="#help">Segítség</a>
       </nav>
 
-      <small>Demo oldal: nincs valódi login/fizetés. Később Payrexx + védett videó.</small>
-    </aside>
-
-    <main class="glass main" id="program">
-      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap">
-        <div>
-          <h1>Saját programom</h1>
-          <p class="sub">Heti edzésterved + 3 személyre szabás slot. (Demo adatból betöltve.)</p>
-        </div>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <button class="btn ghost interactive" id="btnHelp" type="button">ℹ️ Súgó</button>
-          <button class="btn primary interactive" id="btnRenewTop" type="button">Megújítás</button>
-        </div>
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
+        <a class="pill" href="/hu/">Főoldal</a>
+        <button class="pill primary" id="openLoginBtn" type="button">Belépés</button>
       </div>
+    </div>
+  </header>
 
-      <section class="hero">
-        <div>
-          <h2>Program</h2>
-          <div class="kv">
-            <div><b>Aktív:</b> <span id="range">—</span></div>
-            <div><b>Célod:</b> <span id="goal">—</span></div>
-            <div style="color:var(--muted2)"><b>Státusz:</b> Demo</div>
+  <div class="page">
+    <!-- HERO -->
+    <section class="hero">
+      <div class="container">
+        <div class="hero-grid">
+          <div class="reveal">
+            <div class="kicker">✨ Saját oldalam • prémium hozzáférés</div>
+            <h1 class="h1">A programod itt van egy helyen — <br>tiszta, motiváló, követhető.</h1>
+            <p class="lead">
+              Ez egy <b>teszt verzió</b> (demo). Később itt lesz a valós belépés, a csomagod szerinti videók,
+              és a személyre szabott “slot” cserék is.
+            </p>
+
+            <div class="actions">
+              <a class="pill primary" href="#program">Ugrás a programra</a>
+              <a class="pill" href="#checkin">Check-in / Célom</a>
+              <a class="pill" href="#etrend">Étrend</a>
+            </div>
+
+            <div class="meta-row">
+              <div class="meta-pill">📦 Csomag: <b id="metaPackage">Balance (6 hét)</b></div>
+              <div class="meta-pill">🗓️ Lejárat: <b id="metaExpiry">—</b></div>
+              <div class="meta-pill">🎯 Slotok: <b id="metaSlots">3 személyre szabás</b></div>
+            </div>
+          </div>
+
+          <div class="glass card interactive reveal" data-delay="1">
+            <div class="title-row">
+              <h2 class="title">Állapotod</h2>
+              <span class="tag" id="statusTag">DEMO</span>
+            </div>
+            <p class="small" style="margin-bottom:10px;">
+              Itt a gyors összkép: hol tartasz, mi a következő lépés, és mi a heti fókusz.
+            </p>
+
+            <div class="grid-2">
+              <div class="mini">
+                <b>Heti fókusz</b>
+                <span id="weeklyFocus">Tökéletes alapok: technika + stabil tempó.</span>
+              </div>
+              <div class="mini">
+                <b>Következő edzés</b>
+                <span id="nextWorkout">2. edzés — alsótest (25–35 perc)</span>
+              </div>
+              <div class="mini">
+                <b>Motiváció</b>
+                <span id="motivationLine">Kis lépések. Nagy változás. Ma csak jelenj meg.</span>
+              </div>
+              <div class="mini">
+                <b>Kapcsolat</b>
+                <span>Ha kérdés van: <b>WhatsApp / Insta</b> (később link).</span>
+              </div>
+            </div>
+
+            <div class="actions" style="margin-top:14px;">
+              <button class="pill primary" type="button" id="openPlanBtn">Program részletek</button>
+              <button class="pill" type="button" id="openUpgradeBtn">Csomag upgrade</button>
+            </div>
           </div>
         </div>
-        <div class="heroArt" aria-hidden="true"></div>
-      </section>
+      </div>
+    </section>
 
-      <div class="tabs" id="tabs" role="tablist" aria-label="Hetek"></div>
+    <!-- SAJÁT PROGRAMOM -->
+    <section id="program" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2 class="section-title">Saját programom</h2>
+            <p class="section-sub">
+              A csomagod szerinti heti videók. A <b>3 személyre szabás slot</b> azt jelenti, hogy bizonyos gyakorlatokat cserélhetünk
+              a célod és a haladásod alapján — a többi tartalom nem látható, csak ami a programod része.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="pill" id="refreshBtn" type="button">Frissítés</button>
+            <button class="pill primary" id="openVideoHelpBtn" type="button">Hogyan használd?</button>
+          </div>
+        </div>
 
-      <div class="sectionHead">
-        <h3>Heti edzésterved</h3>
-        <div class="actions">
-          <button class="btn primary interactive" id="btnRenew" type="button">Megújítás</button>
-          <button class="btn interactive" id="btnUpgrade" type="button">Upgrade</button>
+        <div class="cards">
+          <div class="glass card interactive reveal" data-delay="1">
+            <div class="title-row">
+              <h3 class="title">Heti videók</h3>
+              <span class="tag" id="videosTag">Heti 4 videó</span>
+            </div>
+
+            <div class="program-grid" id="videoList">
+              <!-- JS tölti -->
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" type="button" id="playDemoBtn">Lejátszás (demo)</button>
+              <button class="pill" type="button" id="openSlotsBtn">Személyre szabás slotok</button>
+            </div>
+
+            <p class="small" style="margin-top:10px;">
+              Megjegyzés: a végleges verzióban a videók <b>védett</b> lejátszók lesznek (nem megosztható link).
+            </p>
+          </div>
+
+          <div class="glass card interactive reveal" data-delay="2">
+            <div class="title-row">
+              <h3 class="title">Program állapot</h3>
+              <span class="tag">Összefoglaló</span>
+            </div>
+
+            <ul class="list">
+              <li><span class="check"></span> Csomag: <b id="sumPackage">Balance</b></li>
+              <li><span class="check"></span> Időtartam: <b id="sumDuration">6 hét</b></li>
+              <li><span class="check"></span> Heti videók: <b id="sumWeekly">4</b></li>
+              <li><span class="check"></span> Személyre szabás: <b>3 slot</b> (csere a konzultáció alapján)</li>
+            </ul>
+
+            <div class="actions" style="margin-top:14px;">
+              <button class="pill primary" type="button" id="openCheckinBtn">Check-in megnyitása</button>
+              <a class="pill" href="#etrend">Étrend</a>
+            </div>
+          </div>
         </div>
       </div>
+    </section>
 
-      <div class="grid3" id="weeklyGrid"></div>
+    <!-- ÉTREND -->
+    <section id="etrend" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2 class="section-title">Étrend</h2>
+            <p class="section-sub">
+              Itt az <b>alap étrend keret</b> és a napi struktúra. Később ezt közösen finomítjuk (cél, preferencia, terhelés alapján).
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <span class="chip">📌 Heti terv</span>
+            <span class="chip">🥗 Egyszerű rendszer</span>
+          </div>
+        </div>
 
-      <div class="sectionHead" style="margin-top:16px">
-        <h3>Személyre szabás (3 slot)</h3>
+        <div class="cards">
+          <div class="glass card interactive reveal" data-delay="1">
+            <div class="title-row">
+              <h3 class="title">Napi keret (minta)</h3>
+              <span class="tag">Szerkeszthető</span>
+            </div>
+
+            <div class="nutrition-grid" id="nutritionList">
+              <!-- JS tölti -->
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" type="button" id="openNutritionBtn">Étrend részletek</button>
+              <button class="pill" type="button" id="openShoppingBtn">Bevásárlólista</button>
+            </div>
+
+            <p class="small" style="margin-top:10px;">
+              Később lehet: képes receptkártyák / csak szöveg / vegyes. (Most demo minta.)
+            </p>
+          </div>
+
+          <div class="glass card interactive reveal" data-delay="2">
+            <div class="title-row">
+              <h3 class="title">Szabályok (tiszta, tartható)</h3>
+              <span class="tag">Gyors</span>
+            </div>
+            <ul class="list">
+              <li><span class="check"></span> 80/20 elv: következetesség > tökéletesség.</li>
+              <li><span class="check"></span> Fehérje minden fő étkezésben (egyszerűen).</li>
+              <li><span class="check"></span> Víz + napi ritmus — stabil energia.</li>
+              <li><span class="check"></span> Konzultáció után finomítjuk a cél szerint.</li>
+            </ul>
+
+            <div class="actions" style="margin-top:14px;">
+              <a class="pill primary" href="#checkin">Célom / Check-in</a>
+              <button class="pill" type="button" id="openFAQBtn">GYIK</button>
+            </div>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="grid2" id="slotsGrid"></div>
-    </main>
+    <!-- CHECK-IN / CÉLOM + MOTIVÁCIÓ -->
+    <section id="checkin" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2 class="section-title">Check-in / Célom + motiváció</h2>
+            <p class="section-sub">
+              Ez lesz a “kapcsoló” rész: célok, heti állapot, visszajelzés. Most demo form (később itt lesz a valódi beküldés).
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <span class="chip">🎯 Célom</span>
+            <span class="chip">✅ Check-in</span>
+            <span class="chip">✨ Motiváció</span>
+          </div>
+        </div>
 
-    <aside class="right">
-      <div class="glass rightBox interactive" id="tech">
-        <h3>Technika tár</h3>
-        <p>Örökre megmarad: technikai tippek és videók (később bővítjük).</p>
-        <button class="btn primary interactive" id="btnTech" type="button">Megnyitás</button>
+        <div class="cards">
+          <div class="glass card interactive reveal" data-delay="1">
+            <div class="title-row">
+              <h3 class="title">Gyors check-in</h3>
+              <span class="tag">DEMO</span>
+            </div>
+
+            <form id="checkinForm" style="display:grid; gap:10px; margin-top:10px;">
+              <label style="display:grid; gap:6px;">
+                <span style="color:var(--muted); font-size:13px; font-weight:850;">Célom most</span>
+                <input id="goalInput" type="text" placeholder="Pl. formásodás + erő, heti 4 edzés" style="padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:var(--text);outline:none;">
+              </label>
+
+              <label style="display:grid; gap:6px;">
+                <span style="color:var(--muted); font-size:13px; font-weight:850;">Heti állapot (1–10)</span>
+                <input id="stateInput" type="range" min="1" max="10" value="7">
+                <div style="display:flex; justify-content:space-between; color:var(--muted2); font-size:12.5px;">
+                  <span>1</span><span id="stateValue">7</span><span>10</span>
+                </div>
+              </label>
+
+              <label style="display:grid; gap:6px;">
+                <span style="color:var(--muted); font-size:13px; font-weight:850;">Megjegyzés</span>
+                <textarea id="noteInput" rows="4" placeholder="Mi ment könnyen? Mi volt nehéz? Mit szeretnél cserélni?" style="padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:var(--text);outline:none;resize:vertical;"></textarea>
+              </label>
+
+              <div class="actions">
+                <button class="pill primary" type="submit">Check-in mentése (demo)</button>
+                <button class="pill" type="button" id="openMotivationBtn">Mai motiváció</button>
+              </div>
+            </form>
+
+            <p class="small" style="margin-top:10px;">
+              A végleges verzióban ez a check-in automatikusan “slot” javaslatokat is tud adni (admin oldalon te hagyod jóvá).
+            </p>
+          </div>
+
+          <div class="glass card interactive reveal" data-delay="2">
+            <div class="title-row">
+              <h3 class="title">Motivációs blokk</h3>
+              <span class="tag">Napi</span>
+            </div>
+            <p class="small" style="margin-bottom:10px;">
+              Rövid, erős, “személyes” üzenet — hogy a vevő érezze: ez róla szól.
+            </p>
+
+            <div class="mini">
+              <b id="motivationTitle">Ma a jelenlét számít.</b>
+              <span id="motivationText">Nem kell tökéletesnek lenned. Csak tartsd a ritmust. A rendszer dolgozik helyetted.</span>
+            </div>
+
+            <div class="actions" style="margin-top:14px;">
+              <button class="pill primary" type="button" id="newMotivationBtn">Új üzenet</button>
+              <a class="pill" href="#program">Vissza a programhoz</a>
+            </div>
+          </div>
+        </div>
       </div>
+    </section>
 
-      <div class="glass rightBox interactive" id="etrend">
-        <h3>Étrend</h3>
-        <p>Most: demo. Később: sablon + személyes megjegyzés, képes receptek.</p>
-        <button class="btn interactive" id="btnDiet" type="button">Megnyitás</button>
-      </div>
+    <!-- ÖRÖK TECHNIKA -->
+    <section id="technika" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2 class="section-title">Örök technika</h2>
+            <p class="section-sub">
+              Ezek az anyagok <b>örökre megmaradnak</b> — függetlenül attól, hogy a csomagod épp aktív-e.
+              (Technika, alapok, biztonságos kivitelezés, “leggyakoribb hibák”.)
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <span class="chip">🔒 Örök hozzáférés</span>
+            <span class="chip">🧠 Alapok</span>
+          </div>
+        </div>
 
-      <div class="glass rightBox interactive" id="checkin">
-        <h3>Check-in / Célom</h3>
-        <p>Heti mini visszajelzés + motiváció (demo).</p>
-        <button class="btn interactive" id="btnCheckin" type="button">Megnyitás</button>
-      </div>
+        <div class="cards">
+          <div class="glass card interactive reveal" data-delay="1">
+            <div class="title-row">
+              <h3 class="title">Technika modulok</h3>
+              <span class="tag">Core</span>
+            </div>
+            <ul class="list">
+              <li><span class="check"></span> Guggolás / csípő / térd pozíció (alap)</li>
+              <li><span class="check"></span> Feszítés — hol dolgozzon az izom</li>
+              <li><span class="check"></span> Légzés és törzs stabilitás</li>
+              <li><span class="check"></span> Progresszió: mikor nehezíts</li>
+            </ul>
 
-      <div class="glass rightBox interactive" id="fiok">
-        <h3>Fiókom</h3>
-        <p>Demo: később jelszócsere, adatkezelés, belépés.</p>
+            <div class="actions" style="margin-top:14px;">
+              <button class="pill primary" type="button" id="openTechniqueBtn">Technika megnyitása</button>
+              <button class="pill" type="button" id="openSafetyBtn">Biztonság</button>
+            </div>
+          </div>
+
+          <div class="glass card interactive reveal" data-delay="2">
+            <div class="title-row">
+              <h3 class="title">Megújítás / Upgrade</h3>
+              <span class="tag">Rendszer</span>
+            </div>
+            <p class="small">
+              A csomag lejárat után a “heti videók” leállnak, de az <b>örök technika</b> megmarad.
+              Megújításkor új ciklust kapsz + friss slot cseréket.
+            </p>
+            <div class="actions" style="margin-top:14px;">
+              <button class="pill primary" type="button" id="openRenewBtn">Megújítás</button>
+              <button class="pill" type="button" id="openUpgradeBtn2">Upgrade</button>
+            </div>
+          </div>
+        </div>
       </div>
-    </aside>
+    </section>
+
+    <!-- SEGÍTSÉG -->
+    <section id="help" class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <h2 class="section-title">Segítség</h2>
+            <p class="section-sub">
+              Ha valami nem világos: lejátszás, technika, hozzáférés — itt van a rövid útmutató.
+            </p>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="pill" href="/hu/">Vissza a főoldalra</a>
+            <button class="pill primary" type="button" id="openSupportBtn">Kapcsolat</button>
+          </div>
+        </div>
+
+        <div class="glass card interactive reveal" data-delay="1">
+          <div class="title-row">
+            <h3 class="title">Gyors válaszok</h3>
+            <span class="tag">FAQ</span>
+          </div>
+          <ul class="list">
+            <li><span class="check"></span> A videók védettek lesznek (nem megosztható link).</li>
+            <li><span class="check"></span> A programod csak a csomagodhoz rendelt videókat mutatja.</li>
+            <li><span class="check"></span> A 3 személyre szabás slotot a konzultáció alapján cseréljük.</li>
+            <li><span class="check"></span> Megújításkor új ciklust kapsz + friss finomhangolást.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container footer-row">
+        <div>© <span id="y"></span> Fitness Lady</div>
+        <div>Tüske web design</div>
+      </div>
+    </footer>
   </div>
 
-  <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
-    <div class="glass modal">
-      <div class="modalHead">
-        <h4 id="modalTitle">Ablak</h4>
-        <button class="x interactive" id="close" type="button" aria-label="Bezárás">✕</button>
+  <!-- LOGIN MODAL (DEMO) -->
+  <div class="modal-overlay" id="loginOverlay" role="dialog" aria-modal="true" aria-labelledby="loginTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="loginTitle">Belépés (demo)</h2>
+        <button class="modal-close interactive" id="closeLoginBtn" type="button" aria-label="Bezárás">✕</button>
       </div>
-      <div class="modalBody" id="modalBody"></div>
+      <div class="modal-body">
+        <p><b>Ez most teszt.</b> A valódi verzióban email + jelszó alapján csak a saját csomagod videóit látod.</p>
+
+        <div style="display:grid; gap:10px; margin-top:10px;">
+          <label style="display:grid; gap:6px;">
+            <span style="color:var(--muted); font-size:13px; font-weight:850;">E-mail</span>
+            <input id="loginEmail" type="email" placeholder="name@email.com" style="padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:var(--text);outline:none;">
+          </label>
+          <label style="display:grid; gap:6px;">
+            <span style="color:var(--muted); font-size:13px; font-weight:850;">Jelszó</span>
+            <input id="loginPass" type="password" placeholder="••••••••" style="padding:12px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.22);color:var(--text);outline:none;">
+          </label>
+
+          <div class="actions">
+            <button class="pill primary" type="button" id="doLoginBtn">Belépek</button>
+            <button class="pill" type="button" id="forgotBtn">Elfelejtett jelszó</button>
+          </div>
+
+          <p class="small" style="margin-top:6px;">
+            Demo belépés: bármivel működik, csak a felületet mutatja.
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 
-  <script type="module" src="./assets/app.js"></script>
+  <!-- GENERIC MODAL -->
+  <div class="modal-overlay" id="genericOverlay" role="dialog" aria-modal="true" aria-labelledby="genericTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="genericTitle">Információ</h2>
+        <button class="modal-close interactive" id="genericCloseBtn" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body" id="genericBody">
+        <!-- JS tölti -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Year
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    // Scroll perf (desktop wheel included)
+    (() => {
+      let t = null;
+      const mark = () => {
+        if(!document.body.classList.contains('is-scrolling')) document.body.classList.add('is-scrolling');
+        clearTimeout(t);
+        t = setTimeout(() => document.body.classList.remove('is-scrolling'), 180);
+      };
+      window.addEventListener('scroll', mark, { passive: true });
+      window.addEventListener('wheel', mark, { passive: true });
+    })();
+
+    // Reveal
+    (() => {
+      const els = document.querySelectorAll('.reveal');
+      if(!els.length) return;
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+      els.forEach(el=>io.observe(el));
+    })();
+
+    // Active nav underline
+    (() => {
+      const links = Array.from(document.querySelectorAll('.nav a'))
+        .filter(a => a.getAttribute('href')?.startsWith('#'));
+      const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+      if(!sections.length) return;
+
+      const setActive = (id) => {
+        links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
+      };
+
+      const io = new IntersectionObserver((entries)=>{
+        const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+        if(visible?.target?.id) setActive(visible.target.id);
+      }, { threshold: [0.2, 0.35, 0.5] });
+
+      sections.forEach(s=>io.observe(s));
+    })();
+
+    // Mobile menu
+    const menuBtn = document.getElementById("menuBtn");
+    let open = false;
+    menuBtn?.addEventListener("click", () => {
+      open = !open;
+      if(open){
+        const nav = document.createElement("div");
+        nav.id = "mobileNav";
+        nav.style.position = "fixed";
+        nav.style.top = "64px";
+        nav.style.left = "14px";
+        nav.style.right = "14px";
+        nav.style.zIndex = "60";
+        nav.style.background = "rgba(20,12,26,.72)";
+        nav.style.border = "1px solid rgba(255,255,255,.10)";
+        nav.style.borderRadius = "18px";
+        nav.style.backdropFilter = "blur(14px)";
+        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
+        nav.style.padding = "12px";
+        nav.innerHTML = `
+          <a href="#program" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Saját programom</a>
+          <a href="#etrend" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Étrend</a>
+          <a href="#checkin" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Check-in / Célom</a>
+          <a href="#technika" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Örök technika</a>
+          <a href="#help" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Segítség</a>
+          <a href="/hu/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Főoldal</a>
+        `;
+        document.body.appendChild(nav);
+      } else {
+        document.getElementById("mobileNav")?.remove();
+      }
+    });
+    document.addEventListener("click", (e) => {
+      const nav = document.getElementById("mobileNav");
+      if(!nav) return;
+      if(e.target === menuBtn) return;
+      if(nav.contains(e.target)) {
+        nav.remove();
+        open = false;
+      }
+    });
+
+    // Touch glow
+    function enableTapGlow(selector=".interactive"){
+      document.querySelectorAll(selector).forEach(el=>{
+        el.addEventListener("touchstart", ()=>{
+          el.classList.add("is-active");
+          clearTimeout(el.__t);
+          el.__t = setTimeout(()=>el.classList.remove("is-active"), 650);
+        }, {passive:true});
+      });
+    }
+    enableTapGlow();
+
+    // Demo data (later can be loaded from /hu/app/data/user.json)
+    const demoUser = {
+      package: "Balance",
+      durationWeeks: 6,
+      weeklyVideos: 4,
+      expiryISO: (() => { const d = new Date(); d.setDate(d.getDate() + 21); return d.toISOString(); })(),
+      weeklyFocus: "Tökéletes alapok: technika + stabil tempó.",
+      nextWorkout: "2. edzés — alsótest (25–35 perc)",
+      motivation: "Kis lépések. Nagy változás. Ma csak jelenj meg.",
+      videos: [
+        { title:"Edzés 1 — Teljes test (alap)", sub:"30–40 perc • tempó + technika", level:"A" },
+        { title:"Edzés 2 — Alsótest (formálás)", sub:"25–35 perc • farizom fókusz", level:"B" },
+        { title:"Edzés 3 — Felsőtest (tartás)", sub:"20–30 perc • váll + hát", level:"A" },
+        { title:"Edzés 4 — Core + mobilitás", sub:"15–20 perc • stabilitás", level:"C" }
+      ],
+      nutrition: [
+        { name:"Reggeli", text:"Fehérje + rost (pl. tojás/Skyr + gyümölcs + magok)", tag:"stabil energia" },
+        { name:"Ebéd", text:"Tányérmodell: fehérje + zöldség + lassú szénhidrát", tag:"tartható" },
+        { name:"Vacsora", text:"Könnyebb fehérje + zöldség, egyszerű fűszerezés", tag:"regeneráció" },
+        { name:"Snack", text:"Ha kell: protein/joghurt/gyümölcs — tudatosan", tag:"kontroll" }
+      ],
+      motivations: [
+        { t:"Ma a jelenlét számít.", p:"Nem kell tökéletesnek lenned. Csak tartsd a ritmust. A rendszer dolgozik helyetted." },
+        { t:"A fegyelem szabadság.", p:"A döntéseid ma építik a holnapodat. Egy edzés is számít." },
+        { t:"Erő + forma = következetesség.", p:"Nem a nagy ugrás, hanem a stabil szokás hozza a látványt." }
+      ]
+    };
+
+    // Fill meta
+    const fmtDate = (iso) => {
+      const d = new Date(iso);
+      if(Number.isNaN(d.getTime())) return "—";
+      return d.toLocaleDateString('hu-HU', { year:'numeric', month:'short', day:'numeric' });
+    };
+
+    function applyUser(u){
+      document.getElementById('metaPackage').textContent = `${u.package} (${u.durationWeeks} hét)`;
+      document.getElementById('metaExpiry').textContent = fmtDate(u.expiryISO);
+      document.getElementById('weeklyFocus').textContent = u.weeklyFocus;
+      document.getElementById('nextWorkout').textContent = u.nextWorkout;
+      document.getElementById('motivationLine').textContent = u.motivation;
+
+      document.getElementById('videosTag').textContent = `Heti ${u.weeklyVideos} videó`;
+      document.getElementById('sumPackage').textContent = u.package;
+      document.getElementById('sumDuration').textContent = `${u.durationWeeks} hét`;
+      document.getElementById('sumWeekly').textContent = String(u.weeklyVideos);
+
+      const list = document.getElementById('videoList');
+      list.innerHTML = "";
+      u.videos.slice(0, u.weeklyVideos).forEach((v, idx) => {
+        const el = document.createElement('div');
+        el.className = "video-item interactive";
+        el.innerHTML = `
+          <div class="video-left">
+            <div class="thumb">${v.level || (idx+1)}</div>
+            <div class="video-meta">
+              <p class="video-title">${escapeHtml(v.title)}</p>
+              <p class="video-sub">${escapeHtml(v.sub)}</p>
+            </div>
+          </div>
+          <button class="pill primary" type="button" data-action="play" data-idx="${idx}">Megnyitás</button>
+        `;
+        list.appendChild(el);
+      });
+      enableTapGlow('#videoList .interactive');
+
+      const nl = document.getElementById('nutritionList');
+      nl.innerHTML = "";
+      u.nutrition.forEach(m => {
+        const el = document.createElement('div');
+        el.className = "meal";
+        el.innerHTML = `
+          <div>
+            <strong>${escapeHtml(m.name)}</strong>
+            <span>${escapeHtml(m.text)}</span>
+          </div>
+          <span class="chip">✨ ${escapeHtml(m.tag)}</span>
+        `;
+        nl.appendChild(el);
+      });
+
+      // motivation block
+      document.getElementById('motivationTitle').textContent = u.motivations[0].t;
+      document.getElementById('motivationText').textContent = u.motivations[0].p;
+    }
+
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    applyUser(demoUser);
+
+    // Modal helpers
+    const genOverlay = document.getElementById('genericOverlay');
+    const genClose = document.getElementById('genericCloseBtn');
+    const genTitle = document.getElementById('genericTitle');
+    const genBody  = document.getElementById('genericBody');
+
+    function openGeneric(title, html){
+      genTitle.textContent = title;
+      genBody.innerHTML = html;
+      genOverlay.classList.add('is-open');
+      genOverlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-lock');
+      genClose.focus({preventScroll:true});
+    }
+    function closeGeneric(){
+      genOverlay.classList.remove('is-open');
+      genOverlay.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-lock');
+    }
+    genClose.addEventListener('click', closeGeneric);
+    genOverlay.addEventListener('click', (e)=>{ if(e.target===genOverlay) closeGeneric(); });
+    document.addEventListener('keydown', (e)=>{ if(genOverlay.classList.contains('is-open') && e.key==='Escape') closeGeneric(); });
+
+    // Login modal
+    const loginOverlay = document.getElementById('loginOverlay');
+    const openLoginBtn = document.getElementById('openLoginBtn');
+    const closeLoginBtn= document.getElementById('closeLoginBtn');
+    const doLoginBtn   = document.getElementById('doLoginBtn');
+
+    function openLogin(){
+      loginOverlay.classList.add('is-open');
+      loginOverlay.setAttribute('aria-hidden','false');
+      document.body.classList.add('modal-lock');
+      document.getElementById('loginEmail')?.focus({preventScroll:true});
+    }
+    function closeLogin(){
+      loginOverlay.classList.remove('is-open');
+      loginOverlay.setAttribute('aria-hidden','true');
+      document.body.classList.remove('modal-lock');
+    }
+    openLoginBtn.addEventListener('click', openLogin);
+    closeLoginBtn.addEventListener('click', closeLogin);
+    loginOverlay.addEventListener('click', (e)=>{ if(e.target===loginOverlay) closeLogin(); });
+    document.addEventListener('keydown', (e)=>{ if(loginOverlay.classList.contains('is-open') && e.key==='Escape') closeLogin(); });
+
+    doLoginBtn.addEventListener('click', () => {
+      closeLogin();
+      document.getElementById('statusTag').textContent = "BELÉPVE (DEMO)";
+      openGeneric("Sikeres belépés (demo)", `
+        <p><b>Oké.</b> A végleges verzióban itt session + jogosultság lesz.</p>
+        <p>Most csak a dizájn és a működés tesztelése megy.</p>
+      `);
+    });
+
+    // Buttons
+    document.getElementById('refreshBtn').addEventListener('click', () => {
+      applyUser(demoUser);
+      openGeneric("Frissítve", `<p>A demo adatok újra betöltve.</p>`);
+    });
+
+    document.getElementById('playDemoBtn').addEventListener('click', () => {
+      openGeneric("Lejátszás (demo)", `
+        <p>Ez egy demo lejátszás. Élesben itt <b>védett</b> videólejátszó lesz (nem megosztható).</p>
+        <p><span class="chip">Következő:</span> Integráció Vimeo/Mux/Cloudflare Stream “signed” lejátszással.</p>
+      `);
+    });
+
+    document.getElementById('openPlanBtn').addEventListener('click', () => {
+      openGeneric("Program részletek", `
+        <p><b>${escapeHtml(demoUser.package)}</b> csomag • <b>${demoUser.durationWeeks} hét</b> • heti <b>${demoUser.weeklyVideos}</b> videó.</p>
+        <h3>Hogyan működik a 3 slot?</h3>
+        <p>A konzultáció + check-in alapján 1–3 gyakorlatot tudunk cserélni (progresszió / cél / terhelhetőség). A többi tartalom zárt.</p>
+        <h3>Megújítás</h3>
+        <p>Lejárat után a “heti videók” leállnak, de az <b>örök technika</b> megmarad. Megújításkor új ciklus + friss finomhangolás.</p>
+      `);
+    });
+
+    document.getElementById('openUpgradeBtn').addEventListener('click', () => {
+      openGeneric("Csomag upgrade (demo)", `
+        <p>Upgrade logika (később): Start → Balance → Pro.</p>
+        <p><b>Payrexx fizetés</b> után automatikus aktiválás (webhook), és a vevő csak az új csomag tartalmát látja.</p>
+      `);
+    });
+    document.getElementById('openUpgradeBtn2').addEventListener('click', () => {
+      document.getElementById('openUpgradeBtn').click();
+    });
+
+    document.getElementById('openSlotsBtn').addEventListener('click', () => {
+      openGeneric("Személyre szabás slotok (3)", `
+        <p><b>Slot 1:</b> Gyakorlat csere a célodhoz (pl. farizom fókusz)</p>
+        <p><b>Slot 2:</b> Terhelés módosítás (könnyebb/erősebb verzió)</p>
+        <p><b>Slot 3:</b> Mobilitás / core kiegészítés</p>
+        <p style="color:rgba(255,255,255,.65); font-size:13px;">Élesben ezt az admin oldalon te állítod, a vevő csak az eredményt látja.</p>
+      `);
+    });
+
+    document.getElementById('openCheckinBtn').addEventListener('click', () => {
+      location.hash = "#checkin";
+      setTimeout(()=>document.getElementById('goalInput')?.focus({preventScroll:true}), 250);
+    });
+
+    document.getElementById('openNutritionBtn').addEventListener('click', () => {
+      openGeneric("Étrend részletek (demo)", `
+        <p><b>Most:</b> egyszerű keret + napi struktúra.</p>
+        <p><b>Később:</b> képes receptkártyák vagy vegyes megoldás, a te admin döntésed alapján.</p>
+        <h3>Javaslat</h3>
+        <p>Kezdésnek elég a <b>szöveges</b> keret + opciók. Képet csak a “prémium” receptekhez adjunk, így gyorsabb a karbantartás.</p>
+      `);
+    });
+
+    document.getElementById('openShoppingBtn').addEventListener('click', () => {
+      openGeneric("Bevásárlólista (demo)", `
+        <p><b>Alap:</b> fehérje (csirke/hal/tojás/Skyr), zöldség, rizs/burgonya/zab, olívaolaj, fűszerek.</p>
+        <p><span class="chip">Tip:</span> később 1 kattintásos PDF vagy “heti lista” export.</p>
+      `);
+    });
+
+    document.getElementById('openFAQBtn').addEventListener('click', () => {
+      openGeneric("Étrend GYIK", `
+        <h3>Kell kép az ételekhez?</h3>
+        <p><b>Nem kötelező.</b> A legjobb: szöveg + opciók. Kép csak a “signature” recepteknél.</p>
+        <h3>Mit kap örökre?</h3>
+        <p>Technika + alapok + biztonságos kivitelezés. A heti videók csomagfüggők.</p>
+      `);
+    });
+
+    document.getElementById('openVideoHelpBtn').addEventListener('click', () => {
+      openGeneric("Hogyan használd a videókat?", `
+        <p><b>1)</b> Nézd meg a technika alapot.</p>
+        <p><b>2)</b> Heti videók: tartsd a ritmust, ne a maxot hajszold.</p>
+        <p><b>3)</b> Check-in: írd le mi ment nehezen → ebből lesz slot csere.</p>
+      `);
+    });
+
+    document.getElementById('openTechniqueBtn').addEventListener('click', () => {
+      openGeneric("Örök technika (demo)", `
+        <p>Itt lesznek a technikai videók/modulok (örök hozzáférés).</p>
+        <p><span class="chip">Védett lejátszás</span> • <span class="chip">Progresszió</span> • <span class="chip">Hibák</span></p>
+      `);
+    });
+
+    document.getElementById('openSafetyBtn').addEventListener('click', () => {
+      openGeneric("Biztonság", `
+        <p><b>Fájdalom</b> esetén állj meg. Technikát javítunk, nem “átküzdünk”.</p>
+        <p>Ha bármilyen egészségügyi kérdés: orvosi egyeztetés.</p>
+      `);
+    });
+
+    document.getElementById('openRenewBtn').addEventListener('click', () => {
+      openGeneric("Megújítás (demo)", `
+        <p>Megújításkor új ciklust kapsz + friss videóválogatás.</p>
+        <p><b>Örök technika</b> mindig megmarad.</p>
+      `);
+    });
+
+    document.getElementById('openSupportBtn').addEventListener('click', () => {
+      openGeneric("Kapcsolat", `
+        <p>Később ide kerül: WhatsApp + Instagram link.</p>
+        <p><b>Most:</b> használd a főoldali kapcsolat részt.</p>
+      `);
+    });
+
+    // Video "Megnyitás" buttons delegated
+    document.getElementById('videoList').addEventListener('click', (e) => {
+      const btn = e.target?.closest('button[data-action="play"]');
+      if(!btn) return;
+      const idx = Number(btn.getAttribute('data-idx'));
+      const v = demoUser.videos[idx];
+      openGeneric("Videó megnyitása (demo)", `
+        <p><b>${escapeHtml(v?.title || "Videó")}</b></p>
+        <p>${escapeHtml(v?.sub || "")}</p>
+        <p>Élesben itt védett lejátszó lesz. Most csak a felület teszt.</p>
+      `);
+    });
+
+    // Check-in form
+    const stateInput = document.getElementById('stateInput');
+    const stateValue = document.getElementById('stateValue');
+    stateInput.addEventListener('input', ()=> stateValue.textContent = stateInput.value);
+
+    document.getElementById('checkinForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const goal = document.getElementById('goalInput').value.trim() || "—";
+      const state = stateInput.value;
+      const note = document.getElementById('noteInput').value.trim() || "—";
+      openGeneric("Check-in mentve (demo)", `
+        <p><b>Célom:</b> ${escapeHtml(goal)}</p>
+        <p><b>Heti állapot:</b> ${escapeHtml(state)}/10</p>
+        <p><b>Megjegyzés:</b><br>${escapeHtml(note).replaceAll("\n","<br>")}</p>
+        <p style="color:rgba(255,255,255,.65); font-size:13px;">Élesben ez bekerül az admin felületre (te látod, te döntesz a slot cserékről).</p>
+      `);
+    });
+
+    // Motivation
+    function pickMotivation(){
+      const m = demoUser.motivations[Math.floor(Math.random() * demoUser.motivations.length)];
+      document.getElementById('motivationTitle').textContent = m.t;
+      document.getElementById('motivationText').textContent = m.p;
+    }
+    document.getElementById('newMotivationBtn').addEventListener('click', pickMotivation);
+    document.getElementById('openMotivationBtn').addEventListener('click', () => {
+      openGeneric("Mai motiváció", `
+        <p><b>${escapeHtml(document.getElementById('motivationTitle').textContent)}</b></p>
+        <p>${escapeHtml(document.getElementById('motivationText').textContent)}</p>
+      `);
+    });
+
+    // Forgot
+    document.getElementById('forgotBtn').addEventListener('click', () => {
+      openGeneric("Elfelejtett jelszó (később)", `
+        <p>Később itt email alapú jelszó visszaállítás lesz.</p>
+      `);
+    });
+  </script>
 </body>
 </html>
