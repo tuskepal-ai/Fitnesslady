@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fitness Lady — Admin (Demo v1)</title>
+  <link rel="stylesheet" href="./assets/app.css" />
+</head>
+<body>
+  <div class="app" style="grid-template-columns: var(--side) 1fr;">
+    <aside class="glass sidebar">
+      <div class="profile">
+        <div class="avatar" aria-hidden="true"></div>
+        <div>
+          <b>Admin</b>
+          <span>Demo v1</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Admin menü">
+        <a href="#dash" class="is-active"><span class="ico">📊</span>Dashboard</a>
+        <a href="#customers"><span class="ico">👥</span>Vevők</a>
+        <a href="#library"><span class="ico">🎞️</span>Videó-könyvtár</a>
+        <a href="#templates"><span class="ico">🧩</span>Template</a>
+        <a href="./index.html"><span class="ico">↩️</span>Vevő oldal (demo)</a>
+      </nav>
+      <small>Admin funkciók következő körben (Autofill + Publish).</small>
+    </aside>
+
+    <main class="glass main" id="dash">
+      <h1>Admin — Demo v1</h1>
+      <p class="sub">Következő lépés: vevő lista + vevő szerkesztő (template + track + 3 slot) + publikálás.</p>
+
+      <div class="grid3">
+        <div class="card interactive">
+          <b>Aktív vevők</b>
+          <div class="meta">Demo</div>
+        </div>
+        <div class="card interactive">
+          <b>Lejár 7 napon belül</b>
+          <div class="meta">Demo</div>
+        </div>
+        <div class="card interactive">
+          <b>Új vásárlások</b>
+          <div class="meta">Demo</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</body>
+</html>
