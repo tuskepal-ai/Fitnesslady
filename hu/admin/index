@@ -18,7 +18,7 @@
     <h2>Admin – Regisztrációs link generálás</h2>
 
     <!-- FONTOS: ide az Apps Script /exec URL -->
-    <form method="POST" action="IDE_A_SCRIPT_EXEC_URL">
+    <form method="POST" action="https://script.google.com/macros/s/AKfycbydWUiWCwkYa4uMyrLN9DLYkrAR-Vx91-6N-oE9YB89WD1Qk0bpgf3yx39wEtrtyD7y/exec">
       <input type="hidden" name="action" value="adminCreateInvite" />
       <label>Admin kulcs</label>
       <input name="admin_key" placeholder="ADMIN_KEY" required />
