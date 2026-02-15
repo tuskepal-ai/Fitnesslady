@@ -1,52 +1,22 @@
-<!doctype html><html lang="hu"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FitnessLady – Belépés</title>
-<style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c12;color:#fff;font-family:system-ui}
-.card{width:min(520px,92vw);padding:22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
-input,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:#fff}
-button{border:0;margin-top:12px;background:#22c55e;font-weight:700;cursor:pointer}
-.msg{margin-top:10px;min-height:18px}
-.err{color:#FF6B6B}
-</style></head><body>
-<div class="card">
-  <h2>Belépés</h2>
-  <input id="email" type="email" placeholder="Email" autocomplete="username">
-  <input id="pass" type="password" placeholder="Jelszó" autocomplete="current-password" style="margin-top:10px">
-  <button id="btn">Belépés</button>
-  <div id="msg" class="msg"></div>
-</div>
+const API_URL = "IDE_A_SCRIPT_URL";
 
-<script>
-const API_URL = "PASTE_YOUR_EXEC_URL_HERE"; // <-- ide a /exec
-const msg = (t)=>document.getElementById("msg").textContent=t||"";
+async function login(email, password) {
 
-document.getElementById("btn").onclick = async () => {
-  msg("");
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const password = document.getElementById("pass").value;
-  if(!email || !password) return msg("Email és jelszó kötelező.");
+  const res = await fetch(API_URL, {
+    method: "POST",
+    body: JSON.stringify({
+      action: "authLogin",
+      email: email,
+      password: password
+    })
+  });
 
-  const btn = document.getElementById("btn");
-  btn.disabled = true;
+  const data = await res.json();
 
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({ action:"authLogin", email, password })
-    });
-    const data = await res.json();
-    if(!data.ok) return msg("Hiba: "+(data.error||"UNKNOWN"));
-
-    localStorage.setItem("fl_session_token", data.session_token);
-    localStorage.setItem("fl_session_expires", String(data.session_expires||""));
-    location.href = "/hu/app/";
-  }catch(e){
-    msg("Hálózati hiba: "+e.message);
-  }finally{
-    btn.disabled = false;
+  if (data.ok) {
+    localStorage.setItem("session_token", data.session_token);
+    window.location.href = "/hu/dashboard/";
+  } else {
+    alert(data.error);
   }
-};
-</script>
-</body></html>
+}
