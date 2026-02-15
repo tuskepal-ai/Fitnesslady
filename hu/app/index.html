@@ -3,25 +3,306 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady – Saját oldal</title>
-  <link rel="stylesheet" href="./style.css" />
+  <title>FitnessLady – Saját oldalam</title>
+  <meta name="robots" content="noindex" />
+  <style>
+    :root{
+      --bg1:#070814;
+      --bg2:#0b0f2a;
+      --card:#0f1438cc;
+      --stroke:#ffffff1a;
+      --text:#e9ecff;
+      --muted:#b9c0ff;
+      --accent:#ff2bd6;
+      --accent2:#7a5cff;
+      --ok:#3cff8f;
+      --err:#ff4d4d;
+      --shadow: 0 24px 70px #00000070;
+      --radius: 22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1000px 520px at 18% 20%, #7a5cff35, transparent 60%),
+        radial-gradient(900px 460px at 85% 25%, #ff2bd635, transparent 60%),
+        linear-gradient(180deg,var(--bg1),var(--bg2));
+    }
+
+    .wrap{max-width:1100px;margin:0 auto;padding:18px 14px 42px}
+    .topbar{
+      position:sticky; top:0; z-index:5;
+      backdrop-filter: blur(12px);
+      background: linear-gradient(180deg, #0b0f2ae6, #0b0f2a80);
+      border-bottom:1px solid var(--stroke);
+    }
+    .topbar .inner{max-width:1100px;margin:0 auto;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+    .brand{
+      display:flex;align-items:center;gap:10px;min-width:0
+    }
+    .dot{
+      width:12px;height:12px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--accent));
+      box-shadow: 0 0 24px #ff2bd655;
+    }
+    .brand h1{margin:0;font-size:16px;letter-spacing:.2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .brand .sub{margin:0;color:var(--muted);font-size:12px}
+
+    .actions{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+    .pill{
+      display:inline-flex;align-items:center;gap:8px;
+      height:38px;padding:0 12px;border-radius:999px;
+      border:1px solid var(--stroke);
+      background:#0b1030;
+      color:var(--text);
+      cursor:pointer;
+      text-decoration:none;
+      font-weight:700;
+      font-size:13px;
+    }
+    .pill:hover{border-color:#ffffff33}
+    .pill.primary{
+      border:none;
+      background: linear-gradient(90deg, var(--accent2), var(--accent));
+      box-shadow: 0 14px 34px #ff2bd61f;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap:14px;
+      margin-top:16px;
+    }
+    @media (max-width: 920px){
+      .grid{grid-template-columns:1fr}
+    }
+
+    .card{
+      border:1px solid var(--stroke);
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .card .hd{
+      padding:16px 16px 12px;
+      border-bottom:1px solid var(--stroke);
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+    }
+    .card .hd h2{margin:0;font-size:16px}
+    .card .hd p{margin:6px 0 0;color:var(--muted);font-size:12px}
+    .card .bd{padding:14px 16px}
+
+    .kv{display:grid;grid-template-columns: 130px 1fr;gap:10px;font-size:13px}
+    .k{color:var(--muted)}
+    .v{color:var(--text);word-break:break-word}
+
+    .badge{
+      display:inline-flex;align-items:center;gap:8px;
+      height:28px;padding:0 10px;border-radius:999px;
+      border:1px solid var(--stroke);
+      background:#0b1030;
+      font-size:12px;font-weight:800;
+    }
+    .badge.ok{border-color:#3cff8f40}
+    .badge.err{border-color:#ff4d4d40}
+
+    .sectionTitle{margin:0 0 10px;font-size:14px}
+    .list{display:grid;gap:10px}
+    .item{
+      padding:12px;border-radius:16px;
+      border:1px solid var(--stroke);
+      background:#0b1030;
+      display:flex;align-items:flex-start;justify-content:space-between;gap:12px;
+    }
+    .item b{font-size:13px}
+    .item .meta{color:var(--muted);font-size:12px;margin-top:4px}
+    .item .tag{
+      height:26px;display:inline-flex;align-items:center;padding:0 10px;border-radius:999px;
+      border:1px solid #ffffff1a;background:#0a0f2a;font-size:12px;font-weight:800;color:#dfe3ff
+    }
+
+    .notice{
+      border:1px dashed #ffffff2a;
+      background: #0b1030;
+      border-radius:16px;
+      padding:12px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+    }
+
+    .footer{
+      margin-top:14px;
+      color: #ffffff80;
+      font-size:12px;
+      text-align:center;
+    }
+    .link{color:#d6dcff;text-decoration:none}
+    .link:hover{text-decoration:underline}
+  </style>
 </head>
+
 <body>
-  <main class="wrap">
-    <section class="card">
-      <div class="top">
-        <h1>Saját oldal</h1>
-        <button id="logout" class="ghost">Kijelentkezés</button>
+  <header class="topbar">
+    <div class="inner">
+      <div class="brand">
+        <div class="dot"></div>
+        <div style="min-width:0">
+          <h1>Saját oldalam</h1>
+          <p class="sub" id="whoSub">Betöltés…</p>
+        </div>
       </div>
 
-      <div id="content"></div>
+      <div class="actions">
+        <a class="pill" href="/hu/">Vissza a főoldalra</a>
+        <a class="pill" id="btnLogin" href="/hu/login/" style="display:none">Belépés</a>
+        <button class="pill primary" id="btnLogout" style="display:none">Kilépés</button>
+      </div>
+    </div>
+  </header>
 
-      <p class="small">
-        Nincs fiókod? <a href="../register/">Regisztráció</a>
-      </p>
-    </section>
+  <main class="wrap">
+    <div class="grid">
+      <section class="card">
+        <div class="hd">
+          <div>
+            <h2>Fiók adatok</h2>
+            <p>Ez most a fizetés nélküli éles frontend verzió. Sheets kötés a következő lépés.</p>
+          </div>
+          <div id="statusBadge" class="badge">…</div>
+        </div>
+        <div class="bd">
+          <div class="kv" id="kv"></div>
+          <div style="height:12px"></div>
+          <div class="notice">
+            Ha most léptél be regisztráció után: itt látod a profilod.  
+            Később ezt a részt a Google Sheets-ből fogjuk betölteni (név, csomag, videók).
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="hd">
+          <div>
+            <h2>Program / Videók</h2>
+            <p>Placeholder lista — később Sheets alapján.</p>
+          </div>
+        </div>
+        <div class="bd">
+          <h3 class="sectionTitle">Heti tartalom</h3>
+          <div class="list" id="list"></div>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">
+      <span>FitnessLady • </span>
+      <span class="link">Tüske web design</span>
+    </div>
   </main>
 
-  <script src="./app.js"></script>
+  <script>
+    // ======== AUTH (frontend-only, Sheets előtt) ========
+    // Várjuk a localStorage-ben ezeket:
+    // fl_session: { token, email, expiresAt }
+    // fl_user: { email, name, plan, createdAt }
+    function safeParse(s){ try { return JSON.parse(s); } catch { return null; } }
+
+    const whoSub = document.getElementById("whoSub");
+    const kv = document.getElementById("kv");
+    const list = document.getElementById("list");
+    const statusBadge = document.getElementById("statusBadge");
+    const btnLogout = document.getElementById("btnLogout");
+    const btnLogin = document.getElementById("btnLogin");
+
+    const session = safeParse(localStorage.getItem("fl_session"));
+    const user = safeParse(localStorage.getItem("fl_user"));
+
+    const loggedIn =
+      session && user &&
+      session.email && user.email &&
+      String(session.email).toLowerCase() === String(user.email).toLowerCase() &&
+      session.expiresAt && Date.now() < Number(session.expiresAt);
+
+    function renderLoggedOut(){
+      whoSub.textContent = "Nincs aktív belépés";
+      statusBadge.textContent = "NINCS BELÉPÉS";
+      statusBadge.className = "badge err";
+      btnLogin.style.display = "inline-flex";
+      btnLogout.style.display = "none";
+
+      kv.innerHTML = `
+        <div class="k">Állapot</div><div class="v">Kérlek lépj be.</div>
+        <div class="k">Belépés</div><div class="v"><a class="link" href="/hu/login/">/hu/login/</a></div>
+        <div class="k">Regisztráció</div><div class="v"><a class="link" href="/hu/register/">/hu/register/</a></div>
+      `;
+
+      list.innerHTML = `
+        <div class="notice">Belépés után itt megjelenik a programod.</div>
+      `;
+
+      // Ha nálad nincs /hu/login még, akkor később csináljuk.
+    }
+
+    function renderLoggedIn(){
+      btnLogin.style.display = "none";
+      btnLogout.style.display = "inline-flex";
+
+      statusBadge.textContent = "AKTÍV";
+      statusBadge.className = "badge ok";
+
+      whoSub.textContent = (user.plan ? (user.plan + " • ") : "") + user.email;
+
+      const created = user.createdAt ? new Date(user.createdAt).toLocaleString("hu-HU") : "—";
+      const expires = session.expiresAt ? new Date(session.expiresAt).toLocaleString("hu-HU") : "—";
+
+      kv.innerHTML = `
+        <div class="k">Email</div><div class="v">${escapeHtml(user.email)}</div>
+        <div class="k">Név</div><div class="v">${escapeHtml(user.name || "—")}</div>
+        <div class="k">Csomag</div><div class="v">${escapeHtml(user.plan || "—")}</div>
+        <div class="k">Létrehozva</div><div class="v">${escapeHtml(created)}</div>
+        <div class="k">Session lejár</div><div class="v">${escapeHtml(expires)}</div>
+      `;
+
+      // Placeholder “heti program”
+      const items = [
+        { title:"Hét 1 • Alap edzés A", meta:"30–40 perc • teljes test", tag:"START" },
+        { title:"Hét 1 • Alap edzés B", meta:"30–40 perc • erősítés", tag:"START" },
+        { title:"Mobilitás + nyújtás", meta:"15 perc • regeneráció", tag:"BONUSZ" }
+      ];
+
+      list.innerHTML = items.map(x => `
+        <div class="item">
+          <div>
+            <b>${escapeHtml(x.title)}</b>
+            <div class="meta">${escapeHtml(x.meta)}</div>
+          </div>
+          <div class="tag">${escapeHtml(x.tag)}</div>
+        </div>
+      `).join("");
+    }
+
+    function escapeHtml(s){
+      return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    btnLogout.addEventListener("click", () => {
+      localStorage.removeItem("fl_session");
+      // fl_user-t bent hagyjuk (később login flow-nál hasznos)
+      location.href = "/hu/login/";
+    });
+
+    if (!loggedIn) {
+      // Élesben azt akarod, hogy ne is lássa: automatikusan loginra dobjuk
+      // De most hagyjuk információs képernyőn, hogy tudd tesztelni.
+      renderLoggedOut();
+    } else {
+      renderLoggedIn();
+    }
+  </script>
 </body>
 </html>
