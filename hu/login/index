@@ -1,4 +1,4 @@
-const API_URL = "IDE_A_SCRIPT_URL";
+const API_URL = "https://script.google.com/macros/s/AKfycbwjO9J7HStZjUyZZMv2_gq3CMKgcYwoEbzl0cX6MqhoUzHtv1BVHqpocCiwUZCgrmeLGA/exec";
 
 async function login(email, password) {
 
