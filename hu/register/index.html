@@ -1,87 +1,87 @@
 <!doctype html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FitnessLady – Fiók aktiválása</title>
-  <style>
-    body{font-family:system-ui;background:#070915;color:#fff;margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
-    .card{width:min(720px,100%);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:22px}
-    h1{margin:0 0 6px}
-    .sub{opacity:.75;margin:0 0 16px}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-    @media(max-width:680px){.row{grid-template-columns:1fr}}
-    label{display:block;margin:10px 0 6px;opacity:.9}
-    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:#fff}
-    button{margin-top:14px;width:100%;padding:14px;border-radius:16px;border:0;background:linear-gradient(90deg,#ff3fb4,#7c4dff);color:#fff;font-weight:800;cursor:pointer}
-    .msg{margin-top:12px;min-height:22px;font-weight:700}
-    .err{color:#ff5b5b}
-    .ok{color:#65ffb2}
-    a{color:#9fb6ff}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady – Regisztráció</title>
+  <link rel="stylesheet" href="/hu/assets/style.css" />
 </head>
 <body>
-  <div class="card">
-    <h1>Fiók aktiválása</h1>
-    <p class="sub">Állíts be jelszót (min. 8 karakter), és beléphetsz a saját oldaladra.</p>
+  <main class="auth-wrap">
+    <h1>Fiók létrehozása</h1>
 
-    <!-- FONTOS: ez TOP-LEVEL POST, nincs CORS -->
-    <form id="regForm" method="POST" action="https://script.google.com/macros/s/AKfycbydWUiWCwkYa4uMyrLN9DLYkrAR-Vx91-6N-oE9YB89WD1Qk0bpgf3yx39wEtrtyD7y/exec">
-      <input type="hidden" name="action" value="authSetPassword"/>
-      <input type="hidden" name="reg_token" id="reg_token"/>
-      <input type="hidden" name="redirect_url" value="https://www.fitnesslady.ch/hu/app/"/>
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="email" placeholder="email@..." />
 
-      <div class="row">
-        <div>
-          <label>Email</label>
-          <input name="email" id="email" placeholder="(opcionális)" />
-        </div>
-        <div>
-          <label>Név</label>
-          <input name="full_name" id="full_name" placeholder="(opcionális)" />
-        </div>
-      </div>
+    <label>Név</label>
+    <input id="full_name" type="text" autocomplete="name" placeholder="Teljes név" />
 
-      <label>Csomag</label>
-      <select name="plan" id="plan">
-        <option>START</option>
-        <option>BALANCE</option>
-        <option>PRO</option>
-      </select>
+    <label>Csomag</label>
+    <select id="plan">
+      <option value="START">START</option>
+      <option value="BALANCE">BALANCE</option>
+      <option value="PRO">PRO</option>
+    </select>
 
-      <label>Új jelszó (min. 8 karakter)</label>
-      <input type="password" id="pw1" name="new_password" required minlength="8"/>
+    <label>Jelszó (min. 8 karakter)</label>
+    <input id="p1" type="password" autocomplete="new-password" />
 
-      <label>Jelszó ismét</label>
-      <input type="password" id="pw2" required minlength="8"/>
+    <label>Jelszó ismét</label>
+    <input id="p2" type="password" autocomplete="new-password" />
 
-      <button type="submit">Jelszó beállítása</button>
-      <div class="msg" id="msg"></div>
+    <button id="btn">Fiók létrehozása</button>
 
-      <p style="margin-top:10px;opacity:.85">Már van fiókod? <a href="/hu/login/">Belépés</a></p>
-    </form>
-  </div>
+    <p id="msg" class="msg"></p>
 
-<script>
-  const t = new URL(location.href).searchParams.get('t') || '';
-  const msg = document.getElementById('msg');
-  document.getElementById('reg_token').value = t;
+    <p>Már van fiókod? <a href="/hu/login/">Belépés</a></p>
+  </main>
 
-  if(!t){
-    msg.textContent = "Hiányzik a token az URL-ből (?t=...)";
-    msg.className = "msg err";
-    document.querySelector('button').disabled = true;
-  }
+  <script src="/hu/assets/api.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
 
-  document.getElementById('regForm').addEventListener('submit', (ev)=>{
-    const p1 = document.getElementById('pw1').value;
-    const p2 = document.getElementById('pw2').value;
-    if(p1.length < 8){ ev.preventDefault(); msg.textContent="Min. 8 karakter!"; msg.className="msg err"; return; }
-    if(p1 !== p2){ ev.preventDefault(); msg.textContent="A két jelszó nem egyezik."; msg.className="msg err"; return; }
-    msg.textContent = "Mentés...";
-    msg.className = "msg ok";
-    // NINCS fetch, a form elküldi a scriptnek, az visszairányít /hu/app/-ra
-  });
-</script>
+    $("btn").addEventListener("click", async () => {
+      $("msg").textContent = "";
+
+      const email = $("email").value.trim();
+      const full_name = $("full_name").value.trim();
+      const plan = $("plan").value;
+      const p1 = $("p1").value;
+      const p2 = $("p2").value;
+
+      if (!email || !full_name) return $("msg").textContent = "Email és név kötelező.";
+      if (p1.length < 8) return $("msg").textContent = "A jelszó minimum 8 karakter.";
+      if (p1 !== p2) return $("msg").textContent = "A két jelszó nem egyezik.";
+
+      $("btn").disabled = true;
+      $("btn").textContent = "Mentés...";
+
+      const r = await apiPost({
+        action: "registerCreate",
+        email,
+        full_name,
+        plan,
+        password: p1
+      });
+
+      $("btn").disabled = false;
+      $("btn").textContent = "Fiók létrehozása";
+
+      if (!r.ok) {
+        $("msg").textContent = "Hiba: " + (r.error || "UNKNOWN");
+        return;
+      }
+
+      // automatikus belépés reg után
+      const login = await apiPost({ action: "authLogin", email, password: p1 });
+      if (!login.ok) {
+        $("msg").textContent = "Sikeres regisztráció, de belépés hiba: " + (login.error || "");
+        return;
+      }
+
+      saveSession(login.session_token);
+      location.href = "/hu/app/";
+    });
+  </script>
 </body>
 </html>
