@@ -1,90 +1,151 @@
-<script type="module">
-  // Firebase SDK (Web, module)
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady – Bejelentkezés</title>
+  <style>
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#0b0b0f;color:#fff}
+    .wrap{max-width:520px;margin:0 auto;padding:22px}
+    .card{background:#141420;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:18px}
+    h1{font-size:22px;margin:0 0 12px}
+    label{display:block;font-size:13px;opacity:.85;margin:10px 0 6px}
+    input{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f0f18;color:#fff;outline:none}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{flex:1;min-width:140px;padding:12px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:700}
+    .primary{background:#ff7a18;color:#0b0b0f}
+    .ghost{background:rgba(255,255,255,.08);color:#fff}
+    .small{font-size:12px;opacity:.75;margin-top:10px;line-height:1.4}
+    .log{margin-top:14px;white-space:pre-wrap;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+         background:#0f0f18;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;min-height:64px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Bejelentkezés / Regisztráció</h1>
 
-  // --- Firebase config (a tiéd) ---
-  const firebaseConfig = {
-    apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
-    authDomain: "fitneady-15fd0.firebaseapp.com",
-    projectId: "fitneady-15fd0",
-    storageBucket: "fitneady-15fd0.firebasestorage.app",
-    messagingSenderId: "480597492603",
-    appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
-    measurementId: "G-MH1YK9C2YF"
-  };
+      <label>Email</label>
+      <input id="email" type="email" placeholder="pl. teszt@fitnesslady.ch" autocomplete="email">
 
-  // Init
-  const app = initializeApp(firebaseConfig);
+      <label>Jelszó</label>
+      <input id="pass" type="password" placeholder="min. 6 karakter" autocomplete="current-password">
 
-  // Analytics (ha nem kell, nyugodtan törölheted)
-  try { getAnalytics(app); } catch (e) {}
+      <div class="row">
+        <button class="primary" id="btnLogin">Belépés</button>
+        <button class="ghost" id="btnRegister">Regisztráció</button>
+      </div>
 
-  const auth = getAuth(app);
-  const db = getFirestore(app);
+      <div class="row">
+        <button class="ghost" id="btnMe">Profil lekérés</button>
+        <button class="ghost" id="btnLogout">Kilépés</button>
+      </div>
 
-  // ----------------------------
-  // PUBLIC API (ablakra rakjuk, hogy HTML gombból is hívd)
-  // ----------------------------
+      <div class="small">
+        Ha fehér volt az oldal: azért, mert eddig nem volt HTML tartalom. Most lesz UI + log.
+      </div>
 
-  // Regisztráció
-  window.register = async (email, password) => {
-    const cred = await createUserWithEmailAndPassword(auth, email, password);
+      <div class="log" id="log">Log: betöltés…</div>
+    </div>
+  </div>
 
-    // User profil mentése Firestore-ba UID alá
-    await setDoc(doc(db, "users", cred.user.uid), {
-      email: cred.user.email,
-      package: "Start",
-      goal: "Formálás",
-      level: 1,
-      active: true,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+  <script type="module">
+    // Firebase SDK (Web, module)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    import {
+      getAuth,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
+      signOut,
+      onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    return cred.user;
-  };
+    // ✅ A te configod – az ID-k JÓK a képed alapján (projectId/appId/mSenderId/measurementId stimmel)
+    const firebaseConfig = {
+      apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
+      authDomain: "fitneady-15fd0.firebaseapp.com",
+      projectId: "fitneady-15fd0",
+      storageBucket: "fitneady-15fd0.firebasestorage.app",
+      messagingSenderId: "480597492603",
+      appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
+      measurementId: "G-MH1YK9C2YF"
+    };
 
-  // Belépés
-  window.login = async (email, password) => {
-    const cred = await signInWithEmailAndPassword(auth, email, password);
-    return cred.user;
-  };
+    const app = initializeApp(firebaseConfig);
+    try { getAnalytics(app); } catch (e) {} // analytics nem kötelező
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
-  // Kilépés
-  window.logout = async () => {
-    await signOut(auth);
-  };
+    const $ = (id) => document.getElementById(id);
+    const log = (msg) => { $("log").textContent = "Log: " + msg; console.log(msg); };
 
-  // Saját profil betöltése Firestore-ból
-  window.loadMyProfile = async () => {
-    const user = auth.currentUser;
-    if (!user) throw new Error("Nincs bejelentkezve user.");
-
-    const snap = await getDoc(doc(db, "users", user.uid));
-    return snap.exists() ? snap.data() : null;
-  };
-
-  // Auth állapot figyelés (debug)
-  onAuthStateChanged(auth, async (user) => {
-    console.log("Auth state:", user ? `LOGGED IN: ${user.email}` : "LOGGED OUT");
-    if (user) {
-      // opcionális: frissítsük updatedAt-et
-      await setDoc(doc(db, "users", user.uid), { updatedAt: serverTimestamp() }, { merge: true });
+    function getInputs() {
+      const email = $("email").value.trim();
+      const password = $("pass").value;
+      return { email, password };
     }
-  });
-</script>
+
+    // Regisztráció
+    async function doRegister() {
+      const { email, password } = getInputs();
+      if (!email || password.length < 6) return log("Hiba: email kell + jelszó min. 6 karakter.");
+      log("Regisztráció indul…");
+      const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+      // User doc mentése (ehhez Firestore Rules kell, lásd lent!)
+      await setDoc(doc(db, "users", cred.user.uid), {
+        email: cred.user.email,
+        package: "Start",
+        goal: "Formálás",
+        level: 2,
+        active: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      log("Sikeres regisztráció + Firestore mentés ✅ UID: " + cred.user.uid);
+    }
+
+    // Belépés
+    async function doLogin() {
+      const { email, password } = getInputs();
+      if (!email || !password) return log("Hiba: add meg az emailt és jelszót.");
+      log("Belépés…");
+      const cred = await signInWithEmailAndPassword(auth, email, password);
+      log("Belépve ✅ " + cred.user.email);
+    }
+
+    // Kilépés
+    async function doLogout() {
+      await signOut(auth);
+      log("Kijelentkezve.");
+    }
+
+    // Profil lekérés
+    async function doMe() {
+      const user = auth.currentUser;
+      if (!user) return log("Nincs belépve user.");
+      const snap = await getDoc(doc(db, "users", user.uid));
+      log("Profil: " + (snap.exists() ? JSON.stringify(snap.data(), null, 2) : "nincs users/" + user.uid));
+    }
+
+    $("btnRegister").addEventListener("click", () => doRegister().catch(e => log("Reg hiba: " + e.message)));
+    $("btnLogin").addEventListener("click", () => doLogin().catch(e => log("Login hiba: " + e.message)));
+    $("btnLogout").addEventListener("click", () => doLogout().catch(e => log("Logout hiba: " + e.message)));
+    $("btnMe").addEventListener("click", () => doMe().catch(e => log("Me hiba: " + e.message)));
+
+    onAuthStateChanged(auth, (user) => {
+      if (user) log("Auth state: LOGGED IN → " + user.email);
+      else log("Auth state: LOGGED OUT");
+    });
+  </script>
+</body>
+</html>
