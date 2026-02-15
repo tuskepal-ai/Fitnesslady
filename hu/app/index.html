@@ -1,67 +1,27 @@
 <!doctype html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>FitnessLady – Saját oldalam</title>
-  <style>
-    body{font-family:system-ui;background:#070915;color:#fff;margin:0;min-height:100vh;padding:24px}
-    .wrap{max-width:920px;margin:0 auto}
-    .card{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:20px;padding:18px;margin-top:16px}
-    .muted{opacity:.75}
-    button{padding:10px 14px;border-radius:14px;border:0;background:linear-gradient(90deg,#ff3fb4,#7c4dff);color:#fff;font-weight:800;cursor:pointer}
-    code{background:rgba(0,0,0,.35);padding:2px 6px;border-radius:8px}
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady – Saját oldal</title>
+  <link rel="stylesheet" href="./style.css" />
 </head>
 <body>
-  <div class="wrap">
-    <h1>Saját oldalam</h1>
-    <p class="muted">Itt fogjuk megjeleníteni a csomagod videóit (v1: csak belépés + session).</p>
-
-    <div class="card">
-      <div id="state" class="muted">Session ellenőrzés...</div>
-      <div style="margin-top:10px;display:flex;gap:10px;flex-wrap:wrap">
-        <button id="logout">Kilépés</button>
-        <a href="/hu/login/" class="muted">Belépés oldal</a>
+  <main class="wrap">
+    <section class="card">
+      <div class="top">
+        <h1>Saját oldal</h1>
+        <button id="logout" class="ghost">Kijelentkezés</button>
       </div>
-    </div>
 
-    <div class="card">
-      <h3>Debug (v1)</h3>
-      <div class="muted">Session token: <code id="tok">-</code></div>
-      <div class="muted">Email: <code id="em">-</code></div>
-    </div>
-  </div>
+      <div id="content"></div>
 
-<script>
-  // 1) token átvétele hash-ből
-  const hash = new URLSearchParams(location.hash.replace(/^#/, ''));
-  const st = hash.get('st');
-  const email = hash.get('email');
+      <p class="small">
+        Nincs fiókod? <a href="../register/">Regisztráció</a>
+      </p>
+    </section>
+  </main>
 
-  if(st){
-    localStorage.setItem('fl_session_token', st);
-    if(email) localStorage.setItem('fl_email', email);
-    // takarítsuk az URL-t (ne látszódjon)
-    history.replaceState(null, '', location.pathname);
-  }
-
-  const tok = localStorage.getItem('fl_session_token') || '';
-  const em = localStorage.getItem('fl_email') || '';
-
-  document.getElementById('tok').textContent = tok ? tok.slice(0,10) + '...' : '-';
-  document.getElementById('em').textContent = em || '-';
-
-  document.getElementById('logout').onclick = ()=>{
-    localStorage.removeItem('fl_session_token');
-    localStorage.removeItem('fl_email');
-    location.href = '/hu/login/';
-  };
-
-  // v1-ben itt csak megmutatjuk hogy van-e token.
-  // Ha akarod: authVerify-hoz lehet Hoppscotch vagy később proxy, de most CORS nélkül maradunk.
-  document.getElementById('state').textContent =
-    tok ? 'Belépve (session token eltárolva). Következő lépés: videók megjelenítése a plan_items alapján.' : 'Nincs session. Lépj be: /hu/login/';
-</script>
+  <script src="./app.js"></script>
 </body>
 </html>
