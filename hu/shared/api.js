@@ -1,6 +1,6 @@
 // hu/shared/api.js
 // CORS preflight-mentes: text/plain
-const API_URL = "PASTE_YOUR_APPS_SCRIPT_EXEC_URL_HERE";
+const API_URL = "https://script.google.com/macros/s/AKfycbwKG1LVPgSRUfX_tk2gbujMw_mxSV6ks0Pn5CwKzGNgv9RRBlD1wPqWfP5__oD-qFG89w/exec";
 
 async function apiCall(payload) {
   const res = await fetch(API_URL, {
