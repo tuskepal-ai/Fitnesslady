@@ -1,91 +1,47 @@
-<!doctype html><html lang="hu"><head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>FitnessLady – Admin</title>
-<style>
-body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c12;color:#fff;font-family:system-ui}
-.card{width:min(640px,94vw);padding:22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
-input,select,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:#fff}
-button{border:0;margin-top:12px;background:#3b82f6;font-weight:800;cursor:pointer}
-.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.msg{margin-top:10px;min-height:18px}
-.ok{color:#7CFFB2}.err{color:#FF6B6B}
-small{opacity:.8}
-</style></head><body>
-<div class="card">
-  <h2>Admin – Meghívó küldés</h2>
-  <small>Ez létrehoz/frissít klient a Sheets-ben, generál tokent, és opcionálisan emailt küld.</small>
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady – Admin Invite</title>
+  <style>
+    body{font-family:system-ui;background:#070915;color:#fff;margin:0;padding:24px}
+    .card{max-width:680px;margin:0 auto;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:16px;padding:20px}
+    label{display:block;margin:12px 0 6px;opacity:.9}
+    input,select{width:100%;padding:12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:#fff}
+    button{margin-top:14px;width:100%;padding:12px;border-radius:14px;border:0;background:linear-gradient(90deg,#ff3fb4,#7c4dff);color:#fff;font-weight:700;cursor:pointer}
+    .hint{opacity:.75;font-size:13px;margin-top:10px}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h2>Admin – Regisztrációs link generálás</h2>
 
-  <div style="margin-top:12px">
-    <input id="adminpass" type="password" placeholder="Admin jelszó (Script Properties: ADMIN_PASSWORD)">
+    <!-- FONTOS: ide az Apps Script /exec URL -->
+    <form method="POST" action="IDE_A_SCRIPT_EXEC_URL">
+      <input type="hidden" name="action" value="adminCreateInvite" />
+      <label>Admin kulcs</label>
+      <input name="admin_key" placeholder="ADMIN_KEY" required />
+
+      <label>Email</label>
+      <input name="email" type="email" required />
+
+      <label>Név</label>
+      <input name="full_name" required />
+
+      <label>Csomag</label>
+      <select name="plan">
+        <option>START</option>
+        <option>BALANCE</option>
+        <option>PRO</option>
+      </select>
+
+      <label>Register base URL</label>
+      <input name="register_base_url" value="https://www.fitnesslady.ch/hu/register/" required />
+
+      <button type="submit">Reg link generálás</button>
+      <div class="hint">A beküldés után a script egy oldalon kiírja a tokenes linket.</div>
+    </form>
   </div>
-
-  <div class="row" style="margin-top:10px">
-    <input id="email" type="email" placeholder="Vevő email">
-    <input id="name" type="text" placeholder="Név (opcionális)">
-  </div>
-
-  <div class="row" style="margin-top:10px">
-    <select id="plan">
-      <option value="START">START</option>
-      <option value="BALANCE">BALANCE</option>
-      <option value="PRO">PRO</option>
-    </select>
-    <select id="send_email">
-      <option value="true">Email küldés: IGEN</option>
-      <option value="false">Email küldés: NEM</option>
-    </select>
-  </div>
-
-  <button id="btn">Meghívó generálás</button>
-  <div id="msg" class="msg"></div>
-  <div id="out" style="margin-top:10px;word-break:break-all"></div>
-</div>
-
-<script>
-const API_URL = "PASTE_YOUR_EXEC_URL_HERE"; // <-- ide a /exec
-
-const msgEl = document.getElementById("msg");
-const outEl = document.getElementById("out");
-const msg = (t,c)=>{msgEl.className="msg "+(c||""); msgEl.textContent=t||"";};
-
-document.getElementById("btn").onclick = async () => {
-  msg(""); outEl.textContent="";
-  const admin_password = document.getElementById("adminpass").value;
-  const email = document.getElementById("email").value.trim().toLowerCase();
-  const full_name = document.getElementById("name").value.trim();
-  const plan = document.getElementById("plan").value;
-  const send_email = document.getElementById("send_email").value === "true";
-
-  if(!admin_password) return msg("Admin jelszó kell.", "err");
-  if(!email) return msg("Email kötelező.", "err");
-
-  const btn = document.getElementById("btn");
-  btn.disabled = true;
-
-  try{
-    const res = await fetch(API_URL, {
-      method:"POST",
-      headers:{ "Content-Type":"text/plain;charset=utf-8" },
-      body: JSON.stringify({
-        action: "adminInvite",
-        admin_password,
-        email,
-        full_name,
-        plan,
-        send_email,
-        register_base_url: "https://www.fitnesslady.ch/hu/register/"
-      })
-    });
-    const data = await res.json();
-    if(!data.ok) return msg("Hiba: "+(data.error||"UNKNOWN"), "err");
-
-    msg("Kész! Meghívó létrejött.", "ok");
-    outEl.innerHTML = `<b>Register link:</b><br><a style="color:#9ad1ff" href="${data.register_link}" target="_blank">${data.register_link}</a>`;
-  }catch(e){
-    msg("Hálózati hiba: "+e.message, "err");
-  }finally{
-    btn.disabled = false;
-  }
-};
-</script>
-</body></html>
+</body>
+</html>
