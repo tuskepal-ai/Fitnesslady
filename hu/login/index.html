@@ -1,32 +1,90 @@
 <script type="module">
-
+  // Firebase SDK (Web, module)
   import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
-    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-  import { getFirestore, doc, setDoc, getDoc } 
-    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+  import {
+    getAuth,
+    createUserWithEmailAndPassword,
+    signInWithEmailAndPassword,
+    signOut,
+    onAuthStateChanged
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import {
+    getFirestore,
+    doc,
+    setDoc,
+    getDoc,
+    serverTimestamp
+  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
+  // --- Firebase config (a tiéd) ---
   const firebaseConfig = {
     apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
     authDomain: "fitneady-15fd0.firebaseapp.com",
     projectId: "fitneady-15fd0",
     storageBucket: "fitneady-15fd0.firebasestorage.app",
     messagingSenderId: "480597492603",
-    appId: "1:480597492603:web:2ba6c266c662b4c79e33de"
+    appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
+    measurementId: "G-MH1YK9C2YF"
   };
 
+  // Init
   const app = initializeApp(firebaseConfig);
+
+  // Analytics (ha nem kell, nyugodtan törölheted)
+  try { getAnalytics(app); } catch (e) {}
+
   const auth = getAuth(app);
   const db = getFirestore(app);
 
-  // GLOBÁLISAN elérhetővé tesszük
-  window.auth = auth;
-  window.db = db;
-  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
-  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
-  window.signOut = signOut;
-  window.doc = doc;
-  window.setDoc = setDoc;
-  window.getDoc = getDoc;
+  // ----------------------------
+  // PUBLIC API (ablakra rakjuk, hogy HTML gombból is hívd)
+  // ----------------------------
 
+  // Regisztráció
+  window.register = async (email, password) => {
+    const cred = await createUserWithEmailAndPassword(auth, email, password);
+
+    // User profil mentése Firestore-ba UID alá
+    await setDoc(doc(db, "users", cred.user.uid), {
+      email: cred.user.email,
+      package: "Start",
+      goal: "Formálás",
+      level: 1,
+      active: true,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+
+    return cred.user;
+  };
+
+  // Belépés
+  window.login = async (email, password) => {
+    const cred = await signInWithEmailAndPassword(auth, email, password);
+    return cred.user;
+  };
+
+  // Kilépés
+  window.logout = async () => {
+    await signOut(auth);
+  };
+
+  // Saját profil betöltése Firestore-ból
+  window.loadMyProfile = async () => {
+    const user = auth.currentUser;
+    if (!user) throw new Error("Nincs bejelentkezve user.");
+
+    const snap = await getDoc(doc(db, "users", user.uid));
+    return snap.exists() ? snap.data() : null;
+  };
+
+  // Auth állapot figyelés (debug)
+  onAuthStateChanged(auth, async (user) => {
+    console.log("Auth state:", user ? `LOGGED IN: ${user.email}` : "LOGGED OUT");
+    if (user) {
+      // opcionális: frissítsük updatedAt-et
+      await setDoc(doc(db, "users", user.uid), { updatedAt: serverTimestamp() }, { merge: true });
+    }
+  });
 </script>
