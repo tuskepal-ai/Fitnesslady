@@ -1,55 +1,32 @@
-<!doctype html>
-<html lang="hu">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady – Belépés</title>
-  <link rel="stylesheet" href="/hu/assets/style.css" />
-</head>
-<body>
-  <main class="auth-wrap">
-    <h1>Belépés</h1>
+<script type="module">
 
-    <label>Email</label>
-    <input id="email" type="email" autocomplete="email" />
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } 
+    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+  import { getFirestore, doc, setDoc, getDoc } 
+    from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-    <label>Jelszó</label>
-    <input id="password" type="password" autocomplete="current-password" />
+  const firebaseConfig = {
+    apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
+    authDomain: "fitneady-15fd0.firebaseapp.com",
+    projectId: "fitneady-15fd0",
+    storageBucket: "fitneady-15fd0.firebasestorage.app",
+    messagingSenderId: "480597492603",
+    appId: "1:480597492603:web:2ba6c266c662b4c79e33de"
+  };
 
-    <button id="btn">Belépés</button>
-    <p id="msg" class="msg"></p>
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
 
-    <p>Nincs fiókod? <a href="/hu/register/">Regisztráció</a></p>
-  </main>
+  // GLOBÁLISAN elérhetővé tesszük
+  window.auth = auth;
+  window.db = db;
+  window.createUserWithEmailAndPassword = createUserWithEmailAndPassword;
+  window.signInWithEmailAndPassword = signInWithEmailAndPassword;
+  window.signOut = signOut;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  window.getDoc = getDoc;
 
-  <script src="/hu/assets/api.js"></script>
-  <script>
-    const $ = (id) => document.getElementById(id);
-
-    $("btn").addEventListener("click", async () => {
-      $("msg").textContent = "";
-
-      const email = $("email").value.trim();
-      const password = $("password").value;
-
-      if (!email || !password) return $("msg").textContent = "Add meg az emailt és a jelszót.";
-
-      $("btn").disabled = true;
-      $("btn").textContent = "Belépek...";
-
-      const r = await apiPost({ action: "authLogin", email, password });
-
-      $("btn").disabled = false;
-      $("btn").textContent = "Belépés";
-
-      if (!r.ok) {
-        $("msg").textContent = "Hiba: " + (r.error || "UNKNOWN");
-        return;
-      }
-
-      saveSession(r.session_token);
-      location.href = "/hu/app/";
-    });
-  </script>
-</body>
-</html>
+</script>
