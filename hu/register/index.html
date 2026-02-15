@@ -18,6 +18,7 @@
     .ok{color:#7CFFB2}
     .small{font-size:12px;opacity:.75;margin-top:10px}
     a{color:#9AE6FF}
+    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
   </style>
 </head>
 <body>
@@ -26,7 +27,10 @@
     <p>Állíts be egy jelszót, és utána be tudsz lépni a saját oldaladra.</p>
 
     <div id="noToken" style="display:none">
-      <p class="error"><b>Érvénytelen vagy hiányzó token.</b><br>Nyisd meg újra az emailben kapott regisztrációs linket.</p>
+      <p class="error">
+        <b>Érvénytelen vagy hiányzó token.</b><br>
+        Nyisd meg újra az emailben kapott regisztrációs linket.
+      </p>
       <p class="small"><a href="/hu/">Vissza a főoldalra</a></p>
     </div>
 
@@ -35,14 +39,14 @@
       <input id="p1" type="password" placeholder="••••••••" autocomplete="new-password" />
       <label>Jelszó ismét</label>
       <input id="p2" type="password" placeholder="••••••••" autocomplete="new-password" />
-      <button id="btn" onclick="setPassword()">Jelszó beállítása</button>
+      <button id="btn" type="button" onclick="setPassword()">Jelszó beállítása</button>
       <div id="msg" class="msg"></div>
       <div class="small">Ha kész: <a href="/hu/login/">Belépés</a></div>
     </div>
   </div>
 
 <script>
-  // TODO: ide tedd a Web App /exec URL-t
+  // ✅ IDE tedd a SAJÁT Apps Script Web App /exec URL-t (a legutóbbi deployból)
   const API_URL = "https://script.google.com/macros/s/AKfycbzZwptOoxkyYDEXs24HR7VoxcI7lEG5YP6O8sV5nvzAq1NR35nf0w-TafRt5u4U6z_wdg/exec";
 
   function qs(name){
@@ -80,9 +84,10 @@
     btn.textContent = "Mentés...";
 
     try{
+      // ✅ CORS workaround: text/plain -> NINCS preflight (OPTIONS)
       const res = await fetch(API_URL, {
         method: "POST",
-        headers: {"Content-Type":"application/json"},
+        headers: {"Content-Type":"text/plain;charset=utf-8"},
         body: JSON.stringify({
           action: "authSetPassword",
           reg_token: token,
