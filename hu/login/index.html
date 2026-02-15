@@ -1,45 +1,67 @@
 <!doctype html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
   <title>FitnessLady – Belépés</title>
   <style>
-    body{font-family:system-ui;background:#0b0b12;color:#fff;display:flex;min-height:100vh;align-items:center;justify-content:center;margin:0}
-    .card{width:min(520px,92vw);background:#121225;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px}
-    input,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0e0e1c;color:#fff;margin-top:10px}
-    button{background:linear-gradient(90deg,#a855f7,#ec4899);border:none;font-weight:700;cursor:pointer}
-    .msg{margin-top:12px;color:#ff6b6b;white-space:pre-wrap}
+    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0b12;color:#fff;font-family:system-ui}
+    .card{width:min(520px,92vw);padding:22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+    input,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f0f1c;color:#fff;margin-top:10px}
+    button{border:0;margin-top:14px;background:linear-gradient(90deg,#22c55e,#06b6d4);font-weight:800;cursor:pointer}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .msg{margin-top:12px;min-height:18px;color:#ff6b6b;white-space:pre-wrap}
     .ok{color:#7CFFB2}
+    a{color:#9ad1ff}
   </style>
 </head>
 <body>
   <div class="card">
-    <h2>Belépés</h2>
-    <input id="email" placeholder="Email" />
-    <input id="pw" type="password" placeholder="Jelszó" />
+    <h2 style="margin:0 0 10px">Belépés</h2>
+    <input id="email" type="email" autocomplete="username" placeholder="Email">
+    <input id="pw" type="password" autocomplete="current-password" placeholder="Jelszó">
     <button id="btn">Belépés</button>
-    <p style="margin-top:12px"><a href="/hu/register/" style="color:#9ae6ff">Regisztráció</a></p>
     <div id="msg" class="msg"></div>
+    <div style="margin-top:10px;opacity:.85">
+      Nincs fiókod? <a href="/hu/register/">Regisztráció</a>
+    </div>
   </div>
 
   <script src="/hu/shared/api.js"></script>
   <script>
-    const msg = document.getElementById('msg');
-    function setMsg(t, ok=false){ msg.textContent=t||''; msg.className = ok?'msg ok':'msg'; }
-
-    document.getElementById('btn').onclick = async () => {
-      setMsg('');
-      const email = document.getElementById('email').value.trim();
-      const password = document.getElementById('pw').value;
-
-      const res = await apiCall({ action:'authLogin', email, password });
-      if (!res.ok) return setMsg('Hiba: ' + (res.error || 'ismeretlen'));
-
-      localStorage.setItem('fl_session', res.session_token);
-      setMsg('Siker! Átirányítás…', true);
-      setTimeout(()=> location.href='/hu/app/', 500);
+    const msgEl = document.getElementById("msg");
+    const btn = document.getElementById("btn");
+    const setMsg = (t, ok=false) => {
+      msgEl.textContent = t || "";
+      msgEl.className = "msg" + (ok ? " ok" : "");
     };
+
+    btn.addEventListener("click", async () => {
+      setMsg("");
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("pw").value;
+
+      if (!email || !password) return setMsg("Email és jelszó kötelező.");
+
+      btn.disabled = true;
+      btn.textContent = "Belépés...";
+
+      try {
+        const r = await apiCall({ action:"login", email, password });
+        if (!r.ok) {
+          setMsg("Hiba: " + (r.error || "UNKNOWN"));
+          return;
+        }
+        localStorage.setItem("fl_session", r.session_token);
+        setMsg("Siker! Átirányítás...", true);
+        setTimeout(() => location.href="/hu/app/", 500);
+      } catch (e) {
+        setMsg("Hálózati hiba: " + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = "Belépés";
+      }
+    });
   </script>
 </body>
 </html>
