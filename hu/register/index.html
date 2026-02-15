@@ -1,98 +1,57 @@
-<!doctype html>
-<html lang="hu">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fiók aktiválása</title>
-  <style>
-    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#0b0b12;color:#fff}
-    .wrap{max-width:520px;margin:40px auto;padding:24px}
-    .card{background:#151526;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px}
-    label{display:block;margin:14px 0 6px;opacity:.9}
-    input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f0f1c;color:#fff}
-    button{width:100%;margin-top:16px;padding:12px 14px;border:0;border-radius:14px;background:linear-gradient(90deg,#ff4fd8,#6d5bff);color:#fff;font-weight:700;cursor:pointer}
-    .msg{margin-top:12px;color:#ff7b7b;min-height:20px}
-    .ok{color:#7bffb0}
-    a{color:#9ad1ff}
-  </style>
-</head>
-<body>
-  <div class="wrap">
-    <div class="card">
-      <h2>Fiók aktiválása</h2>
-      <p>Állíts be egy jelszót, és utána be tudsz lépni.</p>
-
-      <label>Új jelszó (min. 8 karakter)</label>
-      <input id="p1" type="password" minlength="8" />
-
-      <label>Jelszó ismét</label>
-      <input id="p2" type="password" minlength="8" />
-
-      <button id="btn">Jelszó beállítása</button>
-      <div id="msg" class="msg"></div>
-      <div style="margin-top:10px;opacity:.9">
-        Ha kész: <a href="/hu/login/">Belépés</a>
-      </div>
-    </div>
-  </div>
+<!doctype html><html lang="hu"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FitnessLady – Regisztráció</title>
+<style>
+body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0c12;color:#fff;font-family:system-ui}
+.card{width:min(520px,92vw);padding:22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
+input,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.16);background:rgba(0,0,0,.25);color:#fff}
+button{border:0;margin-top:12px;background:#7c3aed;font-weight:700;cursor:pointer}
+.msg{margin-top:10px;min-height:18px}
+.ok{color:#7CFFB2}.err{color:#FF6B6B}
+</style></head><body>
+<div class="card">
+  <h2>Fiók aktiválása</h2>
+  <p>Állíts be jelszót (min. 8 karakter).</p>
+  <input id="p1" type="password" placeholder="Új jelszó">
+  <input id="p2" type="password" placeholder="Jelszó ismét" style="margin-top:10px">
+  <button id="btn">Jelszó beállítása</button>
+  <div id="msg" class="msg"></div>
+  <div style="margin-top:10px;opacity:.85"><a href="/hu/login/" style="color:#9ad1ff">Belépés</a></div>
+</div>
 
 <script>
-  // ✅ IDE tedd be a saját Apps Script Web App /exec URL-ed:
-  const API_URL = "PASTE_YOUR_SCRIPT_EXEC_URL_HERE";
+const API_URL = "https://script.google.com/macros/s/AKfycbx2SHjREtP-FkNwzm3mKdEgV5Gqlg_LMgZw6aW-lm1Fh7rIeIcgCCPUhi61Iv7B9p2F/exec"; // <-- ide a /exec
 
-  const qs = new URLSearchParams(location.search);
-  const token = qs.get("t"); // register_link .../hu/register/?t=XXXX
+const token = new URLSearchParams(location.search).get("t");
+const msg = (t,c)=>{const el=document.getElementById("msg"); el.className="msg "+(c||""); el.textContent=t||"";};
 
-  const msgEl = document.getElementById("msg");
+document.getElementById("btn").onclick = async () => {
+  msg("");
+  if(!token) return msg("Hiányzó token (t=...)", "err");
+
+  const p1 = document.getElementById("p1").value;
+  const p2 = document.getElementById("p2").value;
+  if(p1.length < 8) return msg("Min. 8 karakter kell.", "err");
+  if(p1 !== p2) return msg("A két jelszó nem egyezik.", "err");
+
   const btn = document.getElementById("btn");
+  btn.disabled = true;
 
-  function setMsg(text, ok=false){
-    msgEl.textContent = text || "";
-    msgEl.className = "msg" + (ok ? " ok" : "");
+  try{
+    const res = await fetch(API_URL, {
+      method:"POST",
+      headers:{ "Content-Type":"text/plain;charset=utf-8" },
+      body: JSON.stringify({ action:"authSetPassword", reg_token: token, new_password: p1 })
+    });
+    const data = await res.json();
+    if(!data.ok) return msg("Hiba: "+(data.error||"UNKNOWN"), "err");
+    msg("Sikeres! Most már be tudsz lépni.", "ok");
+    setTimeout(()=>location.href="/hu/login/", 800);
+  }catch(e){
+    msg("Hálózati hiba: "+e.message, "err");
+  }finally{
+    btn.disabled = false;
   }
-
-  btn.addEventListener("click", async () => {
-    setMsg("");
-
-    if(!token){ setMsg("Hiányzik a token a linkből (t=...)."); return; }
-
-    const p1 = document.getElementById("p1").value;
-    const p2 = document.getElementById("p2").value;
-
-    if(p1.length < 8){ setMsg("A jelszó legyen legalább 8 karakter."); return; }
-    if(p1 !== p2){ setMsg("A két jelszó nem egyezik."); return; }
-
-    btn.disabled = true;
-    btn.textContent = "Mentés...";
-
-    try{
-      // ✅ CORS workaround: text/plain + JSON string body
-      const res = await fetch(API_URL, {
-        method: "POST",
-        headers: {"Content-Type":"text/plain;charset=utf-8"},
-        body: JSON.stringify({
-          action: "authSetPassword",
-          reg_token: token,
-          new_password: p1
-        })
-      });
-
-      const data = await res.json();
-
-      if(!data.ok){
-        setMsg("Hiba: " + (data.error || "UNKNOWN"));
-      }else{
-        setMsg("Kész! Jelszó beállítva. Mehetsz belépni.", true);
-        // opcionális: automatikus átdobás
-        // location.href = "/hu/login/";
-      }
-    }catch(e){
-      setMsg("Hálózati hiba: " + e.message);
-    }finally{
-      btn.disabled = false;
-      btn.textContent = "Jelszó beállítása";
-    }
-  });
+};
 </script>
-</body>
-</html>
+</body></html>
