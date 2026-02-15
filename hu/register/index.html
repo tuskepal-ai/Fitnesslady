@@ -3,88 +3,70 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady – Regisztráció</title>
+  <title>Fiók aktiválása</title>
   <style>
-    body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;background:#070A10;color:#EAF0FF;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    .card{width:min(520px,92vw);background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:18px;padding:22px 20px;box-shadow:0 10px 40px rgba(0,0,0,.35)}
-    h1{font-size:20px;margin:0 0 8px}
-    p{opacity:.85;margin:0 0 16px;line-height:1.45}
-    label{display:block;font-size:12px;opacity:.8;margin:10px 0 6px}
-    input{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.18);background:rgba(0,0,0,.25);color:#fff;outline:none}
-    button{width:100%;margin-top:14px;padding:12px 12px;border-radius:12px;border:0;background:#7C3AED;color:#fff;font-weight:700;cursor:pointer}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .msg{margin-top:12px;font-size:13px;opacity:.9}
-    .error{color:#FF6B6B}
-    .ok{color:#7CFFB2}
-    .small{font-size:12px;opacity:.75;margin-top:10px}
-    a{color:#9AE6FF}
-    code{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace}
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:#0b0b12;color:#fff}
+    .wrap{max-width:520px;margin:40px auto;padding:24px}
+    .card{background:#151526;border:1px solid rgba(255,255,255,.08);border-radius:18px;padding:22px}
+    label{display:block;margin:14px 0 6px;opacity:.9}
+    input{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f0f1c;color:#fff}
+    button{width:100%;margin-top:16px;padding:12px 14px;border:0;border-radius:14px;background:linear-gradient(90deg,#ff4fd8,#6d5bff);color:#fff;font-weight:700;cursor:pointer}
+    .msg{margin-top:12px;color:#ff7b7b;min-height:20px}
+    .ok{color:#7bffb0}
+    a{color:#9ad1ff}
   </style>
 </head>
 <body>
-  <div class="card">
-    <h1>Fiók aktiválása</h1>
-    <p>Állíts be egy jelszót, és utána be tudsz lépni a saját oldaladra.</p>
+  <div class="wrap">
+    <div class="card">
+      <h2>Fiók aktiválása</h2>
+      <p>Állíts be egy jelszót, és utána be tudsz lépni.</p>
 
-    <div id="noToken" style="display:none">
-      <p class="error">
-        <b>Érvénytelen vagy hiányzó token.</b><br>
-        Nyisd meg újra az emailben kapott regisztrációs linket.
-      </p>
-      <p class="small"><a href="/hu/">Vissza a főoldalra</a></p>
-    </div>
-
-    <div id="formWrap" style="display:none">
       <label>Új jelszó (min. 8 karakter)</label>
-      <input id="p1" type="password" placeholder="••••••••" autocomplete="new-password" />
+      <input id="p1" type="password" minlength="8" />
+
       <label>Jelszó ismét</label>
-      <input id="p2" type="password" placeholder="••••••••" autocomplete="new-password" />
-      <button id="btn" type="button" onclick="setPassword()">Jelszó beállítása</button>
+      <input id="p2" type="password" minlength="8" />
+
+      <button id="btn">Jelszó beállítása</button>
       <div id="msg" class="msg"></div>
-      <div class="small">Ha kész: <a href="/hu/login/">Belépés</a></div>
+      <div style="margin-top:10px;opacity:.9">
+        Ha kész: <a href="/hu/login/">Belépés</a>
+      </div>
     </div>
   </div>
 
 <script>
-  // ✅ IDE tedd a SAJÁT Apps Script Web App /exec URL-t (a legutóbbi deployból)
-  const API_URL = "https://script.google.com/macros/s/AKfycbzZwptOoxkyYDEXs24HR7VoxcI7lEG5YP6O8sV5nvzAq1NR35nf0w-TafRt5u4U6z_wdg/exec";
+  // ✅ IDE tedd be a saját Apps Script Web App /exec URL-ed:
+  const API_URL = "PASTE_YOUR_SCRIPT_EXEC_URL_HERE";
 
-  function qs(name){
-    const p = new URLSearchParams(location.search);
-    return p.get(name);
+  const qs = new URLSearchParams(location.search);
+  const token = qs.get("t"); // register_link .../hu/register/?t=XXXX
+
+  const msgEl = document.getElementById("msg");
+  const btn = document.getElementById("btn");
+
+  function setMsg(text, ok=false){
+    msgEl.textContent = text || "";
+    msgEl.className = "msg" + (ok ? " ok" : "");
   }
 
-  const token = qs("t");
-  const noToken = document.getElementById("noToken");
-  const formWrap = document.getElementById("formWrap");
+  btn.addEventListener("click", async () => {
+    setMsg("");
 
-  if(!token){
-    noToken.style.display = "block";
-  } else {
-    formWrap.style.display = "block";
-  }
+    if(!token){ setMsg("Hiányzik a token a linkből (t=...)."); return; }
 
-  function setMsg(text, cls){
-    const el = document.getElementById("msg");
-    el.className = "msg " + (cls || "");
-    el.textContent = text || "";
-  }
-
-  async function setPassword(){
-    const btn = document.getElementById("btn");
     const p1 = document.getElementById("p1").value;
     const p2 = document.getElementById("p2").value;
 
-    setMsg("");
-
-    if(p1.length < 8) return setMsg("A jelszó legyen legalább 8 karakter.", "error");
-    if(p1 !== p2) return setMsg("A két jelszó nem egyezik.", "error");
+    if(p1.length < 8){ setMsg("A jelszó legyen legalább 8 karakter."); return; }
+    if(p1 !== p2){ setMsg("A két jelszó nem egyezik."); return; }
 
     btn.disabled = true;
     btn.textContent = "Mentés...";
 
     try{
-      // ✅ CORS workaround: text/plain -> NINCS preflight (OPTIONS)
+      // ✅ CORS workaround: text/plain + JSON string body
       const res = await fetch(API_URL, {
         method: "POST",
         headers: {"Content-Type":"text/plain;charset=utf-8"},
@@ -97,19 +79,20 @@
 
       const data = await res.json();
 
-      if(data.ok){
-        setMsg("Sikeres! Átirányítás belépésre…", "ok");
-        setTimeout(() => location.href = "/hu/login/", 900);
-      } else {
-        setMsg("Hiba: " + (data.error || "UNKNOWN"), "error");
+      if(!data.ok){
+        setMsg("Hiba: " + (data.error || "UNKNOWN"));
+      }else{
+        setMsg("Kész! Jelszó beállítva. Mehetsz belépni.", true);
+        // opcionális: automatikus átdobás
+        // location.href = "/hu/login/";
       }
-    } catch(err){
-      setMsg("Hálózati hiba: " + err, "error");
-    } finally {
+    }catch(e){
+      setMsg("Hálózati hiba: " + e.message);
+    }finally{
       btn.disabled = false;
       btn.textContent = "Jelszó beállítása";
     }
-  }
+  });
 </script>
 </body>
 </html>
