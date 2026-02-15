@@ -1,66 +1,54 @@
 <!doctype html>
 <html lang="hu">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady – Belépés</title>
-  <style>
-    body{margin:0;min-height:100vh;display:grid;place-items:center;background:#0b0b12;color:#fff;font-family:system-ui}
-    .card{width:min(520px,92vw);padding:22px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12)}
-    input,button{width:100%;padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.14);background:#0f0f1c;color:#fff;margin-top:10px}
-    button{border:0;margin-top:14px;background:linear-gradient(90deg,#22c55e,#06b6d4);font-weight:800;cursor:pointer}
-    button:disabled{opacity:.6;cursor:not-allowed}
-    .msg{margin-top:12px;min-height:18px;color:#ff6b6b;white-space:pre-wrap}
-    .ok{color:#7CFFB2}
-    a{color:#9ad1ff}
-  </style>
+  <link rel="stylesheet" href="/hu/assets/style.css" />
 </head>
 <body>
-  <div class="card">
-    <h2 style="margin:0 0 10px">Belépés</h2>
-    <input id="email" type="email" autocomplete="username" placeholder="Email">
-    <input id="pw" type="password" autocomplete="current-password" placeholder="Jelszó">
+  <main class="auth-wrap">
+    <h1>Belépés</h1>
+
+    <label>Email</label>
+    <input id="email" type="email" autocomplete="email" />
+
+    <label>Jelszó</label>
+    <input id="password" type="password" autocomplete="current-password" />
+
     <button id="btn">Belépés</button>
-    <div id="msg" class="msg"></div>
-    <div style="margin-top:10px;opacity:.85">
-      Nincs fiókod? <a href="/hu/register/">Regisztráció</a>
-    </div>
-  </div>
+    <p id="msg" class="msg"></p>
 
-  <script src="/hu/shared/api.js"></script>
+    <p>Nincs fiókod? <a href="/hu/register/">Regisztráció</a></p>
+  </main>
+
+  <script src="/hu/assets/api.js"></script>
   <script>
-    const msgEl = document.getElementById("msg");
-    const btn = document.getElementById("btn");
-    const setMsg = (t, ok=false) => {
-      msgEl.textContent = t || "";
-      msgEl.className = "msg" + (ok ? " ok" : "");
-    };
+    const $ = (id) => document.getElementById(id);
 
-    btn.addEventListener("click", async () => {
-      setMsg("");
-      const email = document.getElementById("email").value.trim();
-      const password = document.getElementById("pw").value;
+    $("btn").addEventListener("click", async () => {
+      $("msg").textContent = "";
 
-      if (!email || !password) return setMsg("Email és jelszó kötelező.");
+      const email = $("email").value.trim();
+      const password = $("password").value;
 
-      btn.disabled = true;
-      btn.textContent = "Belépés...";
+      if (!email || !password) return $("msg").textContent = "Add meg az emailt és a jelszót.";
 
-      try {
-        const r = await apiCall({ action:"login", email, password });
-        if (!r.ok) {
-          setMsg("Hiba: " + (r.error || "UNKNOWN"));
-          return;
-        }
-        localStorage.setItem("fl_session", r.session_token);
-        setMsg("Siker! Átirányítás...", true);
-        setTimeout(() => location.href="/hu/app/", 500);
-      } catch (e) {
-        setMsg("Hálózati hiba: " + e.message);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = "Belépés";
+      $("btn").disabled = true;
+      $("btn").textContent = "Belépek...";
+
+      const r = await apiPost({ action: "authLogin", email, password });
+
+      $("btn").disabled = false;
+      $("btn").textContent = "Belépés";
+
+      if (!r.ok) {
+        $("msg").textContent = "Hiba: " + (r.error || "UNKNOWN");
+        return;
       }
+
+      saveSession(r.session_token);
+      location.href = "/hu/app/";
     });
   </script>
 </body>
