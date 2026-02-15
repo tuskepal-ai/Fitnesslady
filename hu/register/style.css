@@ -1,0 +1,11 @@
+/* hu/register/style.css */
+body { font-family: system-ui, Arial; background:#0b1020; color:#fff; margin:0; }
+.wrap { max-width: 720px; margin: 60px auto; padding: 24px; }
+.card { background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:24px; }
+.row { display:flex; gap:12px; flex-wrap:wrap; }
+.row > div { flex: 1 1 220px; }
+label { display:block; font-size:12px; opacity:.85; margin:12px 0 6px; }
+input, select { width:100%; padding:12px 12px; border-radius:12px; border:1px solid rgba(255,255,255,.18); background:rgba(0,0,0,.25); color:#fff; }
+button { width:100%; padding:14px; border-radius:14px; border:0; cursor:pointer; font-weight:700; background: linear-gradient(90deg,#ff2bd6,#7b5cff); color:#fff; margin-top:16px; }
+.err { margin-top:12px; color:#ff6b6b; font-weight:700; }
+a { color:#9bd2ff; }
