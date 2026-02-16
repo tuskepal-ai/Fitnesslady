@@ -350,8 +350,382 @@
       opacity: 1;
     }
 
-    /* ========= … a CSS többi része változatlan … ========= */
-    /* (a teljes CSS a te kódodban marad, itt nem módosítottam) */
+    /* ========= “Rólam” + “Mit kapsz pontosan?” ========= */
+    .hero-stack{
+      display:grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .about-card, .what-card{ padding: 18px; }
+    .about-head{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom:10px;
+    }
+    .tag{
+      font-size: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      white-space: nowrap;
+      font-weight: 800;
+    }
+    .about-title{
+      margin:0;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing:.2px;
+    }
+    .about-text{
+      margin:0;
+      color: var(--muted);
+      font-size: 13.5px;
+      line-height: 1.6;
+    }
+
+    .what-grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+      margin-top: 10px;
+    }
+    .mini{
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .mini b{ display:block; margin-bottom:6px; font-size: 13px; }
+    .mini span{ display:block; color:var(--muted); font-size: 12.8px; line-height:1.45; }
+
+    /* ========= Packages ========= */
+    .packages{
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    @media (max-width: 980px){
+      .packages{ grid-template-columns: 1fr; }
+    }
+    .pkg{ padding: 18px; position: relative; }
+    .pkg-top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      margin-bottom: 10px;
+    }
+    .pkg h3{
+      margin:0;
+      font-size: 22px;
+      font-family: ui-serif, Georgia, serif;
+    }
+    .pkg p{
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13.5px;
+    }
+    .list{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
+    .list li{
+      display:flex; align-items:flex-start; gap:10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .check{
+      width: 18px; height: 18px; border-radius: 6px;
+      background: rgba(255,79,216,.18);
+      border: 1px solid rgba(255,79,216,.30);
+      box-shadow: 0 0 22px rgba(255,79,216,.16);
+      flex: 0 0 auto;
+      margin-top: 1px;
+      position:relative;
+    }
+    .check:after{
+      content:"";
+      position:absolute;
+      left: 5px; top: 4px;
+      width: 6px; height: 9px;
+      border-right: 2px solid rgba(255,255,255,.85);
+      border-bottom: 2px solid rgba(255,255,255,.85);
+      transform: rotate(40deg);
+    }
+
+    .pkg-actions{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-top: 14px;
+    }
+    .buy-btn{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border:none;
+      box-shadow: 0 18px 46px rgba(255,79,216,.20);
+      font-weight: 900;
+    }
+    .info-btn{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.12);
+      color: var(--text);
+      font-weight: 850;
+    }
+
+    /* ========= Reviews ========= */
+    .reviews-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .reviews-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .rating{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .rating .star{
+      font-size:16px;
+      line-height:1;
+      color: rgba(255,255,255,.25);
+      transform: translateY(0) scale(1);
+      transition: transform .25s ease, filter .25s ease, color .25s ease;
+      transition-delay: calc(var(--i) * 18ms);
+    }
+    .rating .rating-text{
+      font-size: 13px;
+      opacity: .78;
+      font-weight: 850;
+      letter-spacing: .2px;
+    }
+    .rating.is-anim .star,
+    .rating:hover .star{
+      color: rgba(255, 215, 130, .95);
+      filter: drop-shadow(0 0 10px rgba(255, 200, 120, .35));
+    }
+    .rating.is-anim .star{
+      animation: starPop .55s cubic-bezier(.2,.8,.2,1) both;
+      animation-delay: calc(var(--i) * 40ms);
+    }
+    @keyframes starPop{
+      0%   { transform: translateY(2px) scale(.92); filter: none; }
+      45%  { transform: translateY(-2px) scale(1.10); }
+      100% { transform: translateY(0) scale(1.00); }
+    }
+
+    .review-carousel{ border-radius: var(--radius); }
+    .review-track{
+      display:flex;
+      gap:14px;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+      overflow-x:auto;
+      scroll-behavior:smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .review-track::-webkit-scrollbar{ display:none; }
+
+    .review-card{
+      min-width: min(440px, 86vw);
+      scroll-snap-align: start;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      padding: 16px;
+      position: relative;
+      overflow:hidden;
+    }
+    .review-card .top{
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items:center;
+      color: var(--muted2);
+      font-size: 12px;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+    .review-card .text{
+      margin: 0 0 12px;
+      color: rgba(255,255,255,.92);
+      line-height: 1.55;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .review-card .stars{
+      color: rgba(255,255,255,.86);
+      letter-spacing: 1px;
+      font-size: 13px;
+    }
+
+    .review-dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      padding: 8px 0 2px;
+    }
+    .review-dot{
+      width:7px; height:7px;
+      border-radius:999px;
+      background: rgba(255,255,255,.18);
+      transition: transform .2s ease, background .2s ease;
+    }
+    .review-dot.is-active{
+      background: rgba(255, 215, 130, .9);
+      transform: scale(1.35);
+    }
+
+    /* ========= Scroll reveal (smooth: opacity + transform only) ========= */
+    .reveal{
+      opacity: 0;
+      transform: translateY(16px) scale(.995);
+      transition: opacity .75s ease,
+                  transform .75s cubic-bezier(.2,.8,.2,1);
+      will-change: opacity, transform;
+    }
+    .reveal.is-visible{
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .reveal[data-delay="1"]{ transition-delay: 80ms; }
+    .reveal[data-delay="2"]{ transition-delay: 160ms; }
+    .reveal[data-delay="3"]{ transition-delay: 240ms; }
+
+    /* ========= PERFORMANCE: scroll közben marad az üveg, csak glow/transition pihen ========= */
+    body.is-scrolling .interactive::before{
+      opacity: 0 !important;
+    }
+    body.is-scrolling .interactive{
+      transition: none !important;
+    }
+    body.is-scrolling .glass,
+    body.is-scrolling .review-card{
+      box-shadow: 0 10px 30px rgba(0,0,0,.38) !important;
+    }
+
+    /* scroll közben a topbar blur OFF (simább desktopon is) */
+    body.is-scrolling .topbar{
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .reveal{ opacity:1; transform:none; transition:none; }
+      .review-track{ scroll-behavior:auto; }
+      .rating .star{ transition:none; animation:none !important; }
+      .interactive, .btn{ transition:none; }
+    }
+
+    /* ========= Responsive ========= */
+    @media (max-width: 980px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .menu-btn{ display:inline-flex; }
+      .nav{ display:none; }
+      .what-grid{ grid-template-columns: 1fr; }
+      .hero-wrap{ margin-left: auto; margin-right: auto; }
+    }
+
+    /* ========= Desktop scroll fix: topbar blur OFF (mobilon marad) ========= */
+    @media (min-width: 980px){
+      .topbar{
+        backdrop-filter: none;
+        -webkit-backdrop-filter: none;
+        background: rgba(8,6,12,.80);
+      }
+      body::before{
+        transform: none;
+        will-change: auto;
+      }
+    }
+
+    /* ========= AFSZ MODAL (only shows on click) ========= */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-overlay.is-open{ display: flex; }
+
+    .modal{
+      width: min(980px, 94vw);
+      max-height: min(78vh, 720px);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+
+    .modal-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.45);
+    }
+    .modal-title{
+      margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+    .modal-close{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-body{
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(min(78vh, 720px) - 64px);
+      background: rgba(7,6,11,.38);
+    }
+
+    /* modal typography consistent with site */
+    .modal-body h3{
+      margin: 16px 0 8px;
+      font-size: 16px;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .modal-body p{
+      margin: 0 0 10px;
+      color: var(--muted);
+      line-height: 1.6;
+      font-size: 13.5px;
+    }
+
+    /* prevent background scroll when modal open */
+    body.modal-lock{
+      overflow: hidden;
+      touch-action: none;
+    }
   </style>
 </head>
 
@@ -374,7 +748,7 @@
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
 
-        <!-- ✅ JAVÍTVA: ide a login oldal -->
+        <!-- ✅ JAVÍTVA: bejelentkezés oldal -->
         <a class="cta-pill secondary" href="/hu/login/">Saját oldalam</a>
 
         <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
@@ -455,7 +829,296 @@
     </div>
   </main>
 
-  <!-- ... A TE TELJES OLDALAD TARTALMA VÁLTOZATLAN ... -->
+  <!-- CSOMAGOK -->
+  <section id="csomagok" class="section">
+    <div class="container">
+      <div class="section-title reveal">Csomagok</div>
+      <p class="section-sub reveal" data-delay="1">
+        Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.
+      </p>
+
+      <div class="packages">
+        <!-- Start -->
+        <article class="glass interactive pkg reveal" data-delay="1">
+          <div class="pkg-top">
+            <h3>Start</h3>
+            <span class="tag">Ajánlott: 4 hét</span>
+          </div>
+          <p>Ha kell egy tiszta terv és lendület.</p>
+          <ul class="list">
+            <li><span class="check"></span> Személyre szabott edzésterv</li>
+            <li><span class="check"></span> Alap táplálkozási keretrendszer</li>
+            <li><span class="check"></span> 1× kontroll / módosítás</li>
+          </ul>
+          <div class="pkg-actions">
+            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
+            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
+          </div>
+        </article>
+
+        <!-- Balance -->
+        <article class="glass interactive pkg reveal" data-delay="2" style="border-color: rgba(255,79,216,.22);">
+          <div class="pkg-top">
+            <h3>Balance</h3>
+            <span class="tag" style="color:#1b0717;background:linear-gradient(135deg,#ffd8a8,#ff88e6);border-color:rgba(255,255,255,.25);">Legnépszerűbb</span>
+          </div>
+          <p>Formálódás + erő, folyamatos visszajelzéssel.</p>
+          <ul class="list">
+            <li><span class="check"></span> Edzés + táplálkozás rendszer</li>
+            <li><span class="check"></span> Heti követés / finomhangolás</li>
+            <li><span class="check"></span> Szokások + napi mini célok</li>
+          </ul>
+          <div class="pkg-actions">
+            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
+            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
+          </div>
+        </article>
+
+        <!-- Pro -->
+        <article class="glass interactive pkg reveal" data-delay="3">
+          <div class="pkg-top">
+            <h3>Pro</h3>
+            <span class="tag">Ajánlott: 6–8 hét</span>
+          </div>
+          <p>Maximális támogatás, nem túlerőltetés.</p>
+          <ul class="list">
+            <li><span class="check"></span> Teljes személyre szabás</li>
+            <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
+            <li><span class="check"></span> Teljesítmény + forma fókusz</li>
+          </ul>
+          <div class="pkg-actions">
+            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
+            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOGYAN MŰKÖDIK -->
+  <section id="hogyan" class="section">
+    <div class="container">
+      <div class="section-title reveal">Hogyan működik?</div>
+      <p class="section-sub reveal" data-delay="1">Egyszerű, követhető rendszer — a való élethez igazítva.</p>
+
+      <div class="packages" style="grid-template-columns: 1fr 1fr;">
+        <article class="glass interactive pkg reveal" data-delay="1">
+          <div class="pkg-top">
+            <h3>Edzés</h3>
+            <span class="tag">Struktúra</span>
+          </div>
+          <ul class="list">
+            <li><span class="check"></span> Gyakorlatok leírással</li>
+            <li><span class="check"></span> Progresszió — mikor lépsz tovább</li>
+            <li><span class="check"></span> Ajánlott ütemezés</li>
+            <li><span class="check"></span> Fenntartható terhelés</li>
+          </ul>
+        </article>
+
+        <article class="glass interactive pkg reveal" data-delay="2">
+          <div class="pkg-top">
+            <h3>Táplálkozás</h3>
+            <span class="tag">Tartható</span>
+          </div>
+          <ul class="list">
+            <li><span class="check"></span> Egyszerű, tartható rend</li>
+            <li><span class="check"></span> A napirendedhez igazítva</li>
+            <li><span class="check"></span> Rendszeres finomhangolás</li>
+            <li><span class="check"></span> Stabil energiák</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- VÉLEMÉNYEK -->
+  <section id="velemenyek" class="section">
+    <div class="container">
+      <div class="reviews-head reveal">
+        <div>
+          <div class="section-title" style="margin-bottom:6px;">Vélemények</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <div class="rating" id="avgRating" title="Kattints az animációhoz" aria-label="Átlag értékelés">
+              <span class="star" style="--i:1">★</span>
+              <span class="star" style="--i:2">★</span>
+              <span class="star" style="--i:3">★</span>
+              <span class="star" style="--i:4">★</span>
+              <span class="star" style="--i:5">★</span>
+              <span class="rating-text" id="avgText">—</span>
+            </div>
+            <span style="color:var(--muted2); font-size:13px;" id="reviewsMeta">Betöltés…</span>
+          </div>
+        </div>
+
+        <div class="reviews-actions">
+          <a class="btn primary interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+          <button class="btn interactive" id="refreshBtn" type="button">Frissítés</button>
+        </div>
+      </div>
+
+      <div class="glass interactive review-carousel reveal" data-delay="1" id="reviewCarousel">
+        <div class="review-track" id="reviewTrack" aria-label="Vélemények carousel">
+          <article class="review-card">
+            <div class="top">
+              <span>Betöltés…</span>
+              <span> </span>
+            </div>
+            <p class="text">A vélemények hamarosan megjelennek.</p>
+            <div class="stars">★★★★★</div>
+          </article>
+        </div>
+        <div class="review-dots" id="reviewDots" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ / AFSZ -->
+  <section id="faq" class="section">
+    <div class="container">
+      <div class="section-title reveal">AFSZ</div>
+      <p class="section-sub reveal" data-delay="1">
+        Az Általános Szerződési Feltételek kattintásra nyílnak meg egy prémium modalban (nem fixen az oldalon).
+      </p>
+
+      <div class="glass interactive pkg reveal" data-delay="2">
+        <div class="pkg-top">
+          <h3>Általános Szerződési Feltételek</h3>
+          <span class="tag">Modal</span>
+        </div>
+        <p>
+          A részletek megtekintéséhez kattints az alábbi gombra.
+        </p>
+        <div class="pkg-actions" style="grid-template-columns: 1fr;">
+          <button class="btn primary interactive" id="openAfszBtn" type="button" aria-haspopup="dialog" aria-controls="afszModalOverlay">
+            ÁFSZ megnyitása
+          </button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- KAPCSOLAT -->
+  <section id="kapcsolat" class="section">
+    <div class="container">
+      <div class="section-title reveal">Kapcsolat</div>
+      <p class="section-sub reveal" data-delay="1">Ingyenes konzultációhoz írj WhatsAppon vagy Instagramon.</p>
+
+      <div class="glass interactive pkg reveal" data-delay="2" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <a class="btn interactive" href="#" onclick="alert('Itt majd WhatsApp link lesz'); return false;">WhatsApp</a>
+          <a class="btn interactive" href="#" onclick="alert('Itt majd Instagram link lesz'); return false;">Instagram</a>
+        </div>
+        <div style="color:var(--muted); font-size:13px;">
+          📍 [Város / Terem neve] • ⏱️ [Időtartamok] • @fitnesslady
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AFSZ MODAL (hidden until click) -->
+  <div class="modal-overlay" id="afszModalOverlay" role="dialog" aria-modal="true" aria-labelledby="afszModalTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="afszModalTitle">Általános Szerződési Feltételek (ÁFSZ)</h2>
+        <button class="modal-close interactive" id="closeAfszBtn" type="button" aria-label="Bezárás">✕</button>
+      </div>
+
+      <div class="modal-body" id="afszModalBody">
+        <p><b>Hatályos:</b> 2026-02-10</p>
+        <p><b>Weboldal / Márka:</b> FitnessLady</p>
+        <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady)</p>
+        <p><b>Székhely:</b> 3930 Visp, Mondstrasse 6, Svájc</p>
+        <p><b>E-mail:</b> fitnesslady92@gmail.com</p>
+        <p><b>Deviza:</b> HUF és CHF</p>
+        <p><b>Fizetési módok:</b> nemzetközi utalás, TWINT, Payrexx</p>
+
+        <h3>1. Fogalmak</h3>
+        <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady), aki a szolgáltatást nyújtja.<br>
+           <b>Felhasználó / Vásárló:</b> aki a weboldalon szolgáltatást igénybe vesz vagy vásárol.<br>
+           <b>Szolgáltatás:</b> online edzésanyagok, programok, csomagok, digitális tartalmak a weboldalon leírtak szerint.<br>
+           <b>Digitális tartalom:</b> online elérhető vagy letölthető anyag (pl. videó, program, útmutató).</p>
+
+        <h3>2. A szolgáltatás leírása</h3>
+        <ul class="list">
+          <li><span class="check"></span> A csomagok tartalmát és időtartamát a csomagleírás tartalmazza.</li>
+          <li><span class="check"></span> A szolgáltatás online formában érhető el, hozzáférést vásárlás után biztosítunk.</li>
+          <li><span class="check"></span> A tartalmak frissíthetők, a megvásárolt csomag lényegi értékének csorbítása nélkül.</li>
+        </ul>
+
+        <h3>3. Megrendelés és szerződéskötés</h3>
+        <ul class="list">
+          <li><span class="check"></span> Vásárlás: csomag kiválasztása + fizetés.</li>
+          <li><span class="check"></span> Szerződés: sikeres fizetéssel és/vagy visszaigazolással jön létre.</li>
+          <li><span class="check"></span> Valós adatok megadása kötelező.</li>
+        </ul>
+
+        <h3>4. Díjazás és fizetés</h3>
+        <ul class="list">
+          <li><span class="check"></span> Deviza: HUF és CHF.</li>
+          <li><span class="check"></span> Fizetés: nemzetközi utalás, TWINT, Payrexx.</li>
+          <li><span class="check"></span> Sikeres fizetés után hozzáférést biztosítunk.</li>
+        </ul>
+
+        <h3>5. Hozzáférés, technikai feltételek</h3>
+        <ul class="list">
+          <li><span class="check"></span> Internet és kompatibilis eszköz szükséges.</li>
+          <li><span class="check"></span> Átmeneti kiesés előfordulhat (karbantartás/külső hiba).</li>
+          <li><span class="check"></span> Hozzáférési adatok védelme a vásárló felelőssége.</li>
+        </ul>
+
+        <h3>6. Lemondás, elállás, visszatérítés</h3>
+        <ul class="list">
+          <li><span class="check"></span> Digitális tartalomnál a hozzáférés megkezdése után a visszatérítés korlátozott lehet.</li>
+          <li><span class="check"></span> Megkezdés előtt, hozzáférés-átadás nélkül: egyedi elbírálás.</li>
+          <li><span class="check"></span> Tartós elérhetetlenségnél arányos jóváírás/visszatérítés lehetséges.</li>
+          <li><span class="check"></span> Igény: írásban, rendelés azonosítóval.</li>
+        </ul>
+
+        <h3>7. Felelősségkizárás és egészségügyi nyilatkozat</h3>
+        <ul class="list">
+          <li><span class="check"></span> A programok információs célúak, használat saját felelősségre történik.</li>
+          <li><span class="check"></span> Egészségi alkalmasság esetén végezhető, szükség esetén orvosi egyeztetéssel.</li>
+          <li><span class="check"></span> Nem rendeltetésszerű használatból eredő károkért felelősség nem vállalható.</li>
+        </ul>
+
+        <h3>8. Szerzői jog, felhasználási feltételek</h3>
+        <ul class="list">
+          <li><span class="check"></span> Anyagok a Szolgáltató szellemi tulajdonát képezik.</li>
+          <li><span class="check"></span> Másolás/megosztás/továbbértékesítés engedély nélkül tilos.</li>
+          <li><span class="check"></span> Jogosulatlan megosztás esetén hozzáférés megszüntethető.</li>
+        </ul>
+
+        <h3>9. Adatkezelés (rövid)</h3>
+        <ul class="list">
+          <li><span class="check"></span> A megrendelés teljesítéséhez szükséges adatokat kezeljük.</li>
+          <li><span class="check"></span> Részletek az adatkezelési tájékoztatóban (amennyiben elérhető).</li>
+        </ul>
+
+        <h3>10. Panaszkezelés, vitarendezés</h3>
+        <ul class="list">
+          <li><span class="check"></span> Panasz: fitnesslady92@gmail.com</li>
+          <li><span class="check"></span> Irányadó jog: svájci jog. Illetékesség: Svájc, Valais/VS (Visp).</li>
+        </ul>
+
+        <h3>11. Záró rendelkezések</h3>
+        <ul class="list">
+          <li><span class="check"></span> Az ÁFSZ módosítható, közzététellel hatályos.</li>
+          <li><span class="check"></span> A már megvásárolt szolgáltatásokra a vásárláskor hatályos ÁFSZ irányadó (kivéve jogszabály).</li>
+        </ul>
+
+        <p style="margin-top:14px; color:var(--muted2); font-size:12.8px;">
+          Tüske web design
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <footer style="padding: 18px 0 60px; border-top:1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.55); backdrop-filter: blur(10px);">
+    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:rgba(255,255,255,.70); font-size:13px;">
+      <div>© <span id="y"></span> Fitness Lady</div>
+      <div>Tüske web design</div>
+    </div>
+  </footer>
 
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
@@ -499,7 +1162,7 @@
         nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
         nav.style.padding = "12px";
         nav.innerHTML = `
-          <!-- ✅ JAVÍTVA: ide a login oldal -->
+          <!-- ✅ JAVÍTVA: bejelentkezés oldal -->
           <a href="/hu/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Saját oldalam</a>
           <a href="#csomagok" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Csomagok</a>
           <a href="#hogyan" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Hogyan működik?</a>
@@ -535,7 +1198,340 @@
     }
     enableTapGlow();
 
-    /* ... a te JS-ed többi része változatlanul jön ... */
+    /* ========= Scroll reveal ========= */
+    (() => {
+      const els = document.querySelectorAll('.reveal');
+      if(!els.length) return;
+      const io = new IntersectionObserver((entries)=>{
+        entries.forEach(e=>{
+          if(e.isIntersecting){
+            e.target.classList.add('is-visible');
+            io.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
+      els.forEach(el=>io.observe(el));
+    })();
+
+    /* ========= Active nav underline based on scroll ========= */
+    (() => {
+      const links = Array.from(document.querySelectorAll('.nav a'))
+        .filter(a=>a.getAttribute('href')?.startsWith('#'));
+      const sections = links
+        .map(a => document.querySelector(a.getAttribute('href')))
+        .filter(Boolean);
+
+      if(!sections.length) return;
+
+      const setActive = (id) => {
+        links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
+      };
+
+      const io = new IntersectionObserver((entries)=>{
+        const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+        if(visible?.target?.id) setActive(visible.target.id);
+      }, { threshold: [0.2, 0.35, 0.5] });
+
+      sections.forEach(s=>io.observe(s));
+    })();
+
+    /* ========= Rating animation (tap/click) ========= */
+    (() => {
+      const r = document.getElementById('avgRating');
+      if(!r) return;
+      const kick = () => {
+        r.classList.remove('is-anim');
+        void r.offsetWidth;
+        r.classList.add('is-anim');
+      };
+      r.addEventListener('click', kick);
+      r.addEventListener('touchstart', kick, {passive:true});
+    })();
+
+    /* ========= AFSZ MODAL LOGIC ========= */
+    (() => {
+      const openBtn = document.getElementById('openAfszBtn');
+      const overlay = document.getElementById('afszModalOverlay');
+      const closeBtn = document.getElementById('closeAfszBtn');
+      let lastFocus = null;
+
+      if(!openBtn || !overlay || !closeBtn) return;
+
+      const openModal = () => {
+        lastFocus = document.activeElement;
+        overlay.classList.add('is-open');
+        overlay.setAttribute('aria-hidden', 'false');
+        document.body.classList.add('modal-lock');
+        closeBtn.focus({ preventScroll: true });
+      };
+
+      const closeModal = () => {
+        overlay.classList.remove('is-open');
+        overlay.setAttribute('aria-hidden', 'true');
+        document.body.classList.remove('modal-lock');
+        if(lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus({ preventScroll: true });
+      };
+
+      openBtn.addEventListener('click', openModal);
+      closeBtn.addEventListener('click', closeModal);
+
+      overlay.addEventListener('click', (e) => {
+        if(e.target === overlay) closeModal();
+      });
+
+      document.addEventListener('keydown', (e) => {
+        if(overlay.classList.contains('is-open') && e.key === 'Escape') closeModal();
+      });
+    })();
+
+    /* ========= Reviews: load from Google Sheets CSV + auto-slide carousel ========= */
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSlH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDu0l1I4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
+
+    const reviewTrack = document.getElementById('reviewTrack');
+    const reviewDots  = document.getElementById('reviewDots');
+    const refreshBtn  = document.getElementById('refreshBtn');
+    const avgText     = document.getElementById('avgText');
+    const reviewsMeta = document.getElementById('reviewsMeta');
+
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function normalize(s){ return String(s ?? "").trim().toLowerCase(); }
+
+    function parseCSV(text){
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      for(let i=0;i<text.length;i++){
+        const c = text[i];
+        const n = text[i+1];
+
+        if(c === '"' && inQuotes && n === '"'){ cur += '"'; i++; continue; }
+        if(c === '"'){ inQuotes = !inQuotes; continue; }
+
+        if(c === ',' && !inQuotes){ row.push(cur); cur=""; continue; }
+        if((c === '\n' || c === '\r') && !inQuotes){
+          if(c === '\r' && n === '\n') i++;
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = "";
+          continue;
+        }
+        cur += c;
+      }
+      if(cur.length || row.length){ row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    function findHeaderIndex(headers, predicate){
+      for(let i=0;i<headers.length;i++){
+        if(predicate(normalize(headers[i]))) return i;
+      }
+      return -1;
+    }
+
+    function stars(n){
+      const num = Number(n);
+      if(!Number.isFinite(num)) return "★★★★★";
+      const r = Math.max(1, Math.min(5, Math.round(num)));
+      return "★★★★★".slice(0, r) + "☆☆☆☆☆".slice(0, 5-r);
+    }
+
+    let carouselController = null;
+
+    function destroyCarousel(){
+      if(carouselController?.destroy) carouselController.destroy();
+      carouselController = null;
+      reviewDots.innerHTML = "";
+    }
+
+    function initCarousel(){
+      const cards = Array.from(reviewTrack.querySelectorAll('.review-card'));
+      reviewDots.innerHTML = "";
+      if(!cards.length) return;
+
+      const dots = cards.map((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'review-dot';
+        d.addEventListener('click', () => scrollToIndex(i));
+        reviewDots.appendChild(d);
+        return d;
+      });
+
+      let idx = 0;
+      let timer = null;
+      let paused = false;
+      let scrollTick = null;
+
+      function updateDots(){
+        dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+      }
+
+      function scrollToIndex(i){
+        idx = (i + cards.length) % cards.length;
+        reviewTrack.scrollTo({
+          left: cards[idx].offsetLeft - reviewTrack.offsetLeft,
+          behavior: 'smooth'
+        });
+        updateDots();
+      }
+
+      reviewTrack.addEventListener('scroll', () => {
+        clearTimeout(scrollTick);
+        scrollTick = setTimeout(() => {
+          const center = reviewTrack.scrollLeft + reviewTrack.clientWidth * 0.2;
+          let nearest = 0, best = Infinity;
+          cards.forEach((c,i)=>{
+            const dist = Math.abs((c.offsetLeft - reviewTrack.offsetLeft) - center);
+            if(dist < best){ best = dist; nearest = i; }
+          });
+          idx = nearest;
+          updateDots();
+        }, 80);
+      }, {passive:true});
+
+      function start(){
+        if(timer) clearInterval(timer);
+        timer = setInterval(()=>{
+          if(paused) return;
+          scrollToIndex(idx + 1);
+        }, 7000);
+      }
+
+      const carousel = document.getElementById('reviewCarousel');
+      carousel.addEventListener('mouseenter', ()=>paused=true);
+      carousel.addEventListener('mouseleave', ()=>paused=false);
+      carousel.addEventListener('touchstart', ()=>paused=true, {passive:true});
+      carousel.addEventListener('touchend', ()=>paused=false, {passive:true});
+
+      updateDots();
+      start();
+
+      carouselController = {
+        destroy(){
+          if(timer) clearInterval(timer);
+          timer = null;
+        }
+      };
+    }
+
+    function renderReviews(items){
+      destroyCarousel();
+      reviewTrack.innerHTML = "";
+
+      if(!items.length){
+        reviewTrack.innerHTML = `
+          <article class="review-card">
+            <div class="top"><span>Hamarosan</span><span></span></div>
+            <p class="text">Még nincs jóváhagyott vélemény.</p>
+            <div class="stars">★★★★★</div>
+          </article>
+        `;
+        initCarousel();
+        return;
+      }
+
+      for(const it of items){
+        const date = it.date ? escapeHtml(it.date) : "";
+        reviewTrack.insertAdjacentHTML('beforeend', `
+          <article class="review-card interactive">
+            <div class="top">
+              <span>${escapeHtml(it.name)}</span>
+              <span>${date}</span>
+            </div>
+            <p class="text">${escapeHtml(it.text)}</p>
+            <div class="stars">${escapeHtml(it.stars)}</div>
+          </article>
+        `);
+      }
+
+      enableTapGlow('.review-card.interactive');
+      initCarousel();
+    }
+
+    async function loadReviews(){
+      try{
+        reviewsMeta.textContent = "Betöltés…";
+
+        const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(url, { cache: 'no-store' });
+        if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
+
+        const csvText = await res.text();
+        const rows = parseCSV(csvText);
+        if(rows.length < 2) throw new Error("Empty CSV");
+
+        const headers = rows.shift();
+
+        const idxText = findHeaderIndex(headers, h => h === 'véleményed' || h === 'vélemény' || h.includes('vélemény'));
+        const idxApprove = findHeaderIndex(headers, h => h === 'megjelenhet?' || h.includes('megjelenhet'));
+        const idxRating = findHeaderIndex(headers, h => h === 'mennyire' || h === 'mennyire v' || h.startsWith('mennyire'));
+        const idxDate = findHeaderIndex(headers, h => h === 'submitted at' || h.includes('submitted'));
+        const idxName = findHeaderIndex(headers, h => h === 'név' || h === 'name' || h.includes('név'));
+
+        if(idxText === -1 || idxApprove === -1){
+          throw new Error("Missing required columns (Vélemény / Megjelenhet?)");
+        }
+
+        const items = [];
+        let ratingSum = 0;
+        let ratingCount = 0;
+
+        for(const r of rows){
+          const approved = normalize(r[idxApprove]);
+          if(approved !== 'igen') continue;
+
+          const text = String(r[idxText] ?? "").trim();
+          if(!text) continue;
+
+          const ratingRaw = idxRating !== -1 ? String(r[idxRating] ?? "").trim() : "";
+          const ratingNum = Number(ratingRaw);
+          const starsStr = stars(ratingNum);
+
+          if(Number.isFinite(ratingNum)){
+            ratingSum += Math.max(1, Math.min(5, ratingNum));
+            ratingCount += 1;
+          }
+
+          const dateRaw = idxDate !== -1 ? String(r[idxDate] ?? "").trim() : "";
+          const date = dateRaw ? dateRaw.replace("T"," ").replace("Z","") : "";
+
+          const nameRaw = idxName !== -1 ? String(r[idxName] ?? "").trim() : "";
+          const name = nameRaw || "Vendég";
+
+          items.push({ text, stars: starsStr, date, name });
+        }
+
+        items.sort((a,b)=> (b.date || "").localeCompare(a.date || ""));
+
+        if(ratingCount > 0){
+          const avg = Math.round((ratingSum / ratingCount) * 10) / 10;
+          avgText.textContent = `${avg} • ${ratingCount} értékelés`;
+        } else {
+          avgText.textContent = `${items.length} vélemény`;
+        }
+
+        reviewsMeta.textContent = items.length ? `${items.length} jóváhagyott vélemény` : "Nincs még jóváhagyott vélemény";
+        renderReviews(items.slice(0, 12));
+      }catch(err){
+        console.error(err);
+        avgText.textContent = "—";
+        reviewsMeta.textContent = "Nem sikerült betölteni";
+        renderReviews([]);
+      }
+    }
+
+    refreshBtn?.addEventListener('click', loadReviews);
+    loadReviews();
   </script>
 </body>
 </html>
