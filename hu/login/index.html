@@ -4,211 +4,65 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady – Bejelentkezés</title>
-  <meta name="description" content="FitnessLady – Bejelentkezés / Regisztráció" />
-
   <style>
-    :root{
-      --bg:#07060b;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --pink:#ff4fd8;
-      --pink2:#b14cff;
-      --radius:22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 980px;
-    }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    body{
-      margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
-        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
-        var(--bg);
-      color:var(--text);
-      overflow-x:hidden;
-    }
-
-    /* full bg: hero.png */
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image: var(--hero-url);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity:.92;
-      transform: translateZ(0);
-    }
-
-    a{ color:inherit; text-decoration:none; }
-    .container{ width:min(var(--max), 92vw); margin:0 auto; }
-    .topbar{
-      position: sticky; top:0;
-      z-index: 50;
-      background: rgba(8,6,12,.80);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      padding: 14px 0;
-    }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:900; letter-spacing:.2px;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
-    }
-
-    .wrap{
-      min-height: calc(100vh - 64px);
-      display:flex;
-      align-items:center;
-      padding: 26px 0 56px;
-    }
-
-    .glass{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-    }
-
-    .card{ padding: 18px; width: min(520px, 100%); margin: 0 auto; }
-    h1{
-      margin:0 0 8px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 26px;
-      letter-spacing:-.3px;
-    }
-    .sub{ margin:0 0 14px; color: var(--muted); line-height:1.55; font-size: 13.5px; }
-
-    label{ display:block; font-size:12.8px; color:rgba(255,255,255,.72); font-weight:850; margin:10px 0 6px; }
-    input{
-      width:100%;
-      padding:12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.92);
-      outline:none;
-    }
-    input:focus{ border-color: rgba(255,255,255,.22); }
-
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
-    button{
-      flex:1; min-width: 160px;
-      padding: 12px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.92);
-      font-weight: 900;
-      cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease;
-    }
-    button:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
-    .primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.22);
-    }
-
-    .log{
-      margin-top: 14px;
-      white-space: pre-wrap;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 12px;
-      min-height: 72px;
-      color: rgba(255,255,255,.86);
-    }
-    .hint{ margin-top:10px; color:rgba(255,255,255,.60); font-size:12.5px; line-height:1.55; }
+    :root{ --bg:#0b0b0f; --card:#141420; --stroke:rgba(255,255,255,.10); --muted:rgba(255,255,255,.72); --accent:#ff4fd8; }
+    body{font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;margin:0;background:var(--bg);color:#fff}
+    .wrap{max-width:560px;margin:0 auto;padding:22px}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+          border:1px solid var(--stroke);border-radius:18px;padding:18px;backdrop-filter:blur(14px)}
+    h1{font-size:22px;margin:0 0 12px}
+    label{display:block;font-size:13px;opacity:.85;margin:10px 0 6px}
+    input{width:100%;padding:12px 12px;border-radius:12px;border:1px solid rgba(255,255,255,.12);background:#0f0f18;color:#fff;outline:none}
+    .row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+    button{flex:1;min-width:160px;padding:12px 14px;border-radius:12px;border:0;cursor:pointer;font-weight:800}
+    .primary{background:linear-gradient(135deg, var(--accent), #b14cff);color:#120812}
+    .ghost{background:rgba(255,255,255,.08);color:#fff}
+    .small{font-size:12px;opacity:.75;margin-top:10px;line-height:1.4}
+    .log{margin-top:14px;white-space:pre-wrap;font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+         background:#0f0f18;border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px;min-height:64px}
+    .badge{display:inline-flex;gap:8px;align-items:center;padding:8px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+           background:rgba(255,255,255,.06);color:var(--muted);font-size:12px;font-weight:800}
   </style>
 </head>
-
 <body>
-  <header class="topbar">
-    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-      <a class="brand" id="homeLink" href="/hu/" aria-label="FitnessLady főoldal">
-        <span class="dot"></span><span>Fitness Lady</span>
-      </a>
-      <a href="/hu/" style="color:rgba(255,255,255,.80); font-weight:800;">← Vissza a főoldalra</a>
-    </div>
-  </header>
+  <div class="wrap">
+    <div class="card">
+      <div class="badge">🔐 Éles belépés (Firebase)</div>
+      <h1>Bejelentkezés / Regisztráció</h1>
 
-  <main class="wrap">
-    <div class="container">
-      <div class="glass card">
-        <h1>Bejelentkezés / Regisztráció</h1>
-        <p class="sub">Belépés után automatikusan a <b>„Saját programom”</b> oldalra visz.</p>
+      <label>Email</label>
+      <input id="email" type="email" placeholder="pl. teszt@fitnesslady.ch" autocomplete="email">
 
-        <label>Email</label>
-        <input id="email" type="email" placeholder="pl. teszt@fitnesslady.ch" autocomplete="email">
+      <label>Jelszó</label>
+      <input id="pass" type="password" placeholder="min. 6 karakter" autocomplete="current-password">
 
-        <label>Jelszó</label>
-        <input id="pass" type="password" placeholder="min. 6 karakter" autocomplete="current-password">
-
-        <div class="row">
-          <button class="primary" id="btnLogin" type="button">Belépés</button>
-          <button id="btnRegister" type="button">Regisztráció</button>
-        </div>
-
-        <div class="row">
-          <button id="btnMe" type="button">Profil lekérés</button>
-          <button id="btnLogout" type="button">Kilépés</button>
-        </div>
-
-        <div class="log" id="log">Log: betöltés…</div>
-        <div class="hint">
-          Tipp: ha fehér oldal lenne, nyisd meg DevTools → Console és másold ide a hibát.
-        </div>
+      <div class="row">
+        <button class="primary" id="btnLogin">Belépés</button>
+        <button class="ghost" id="btnRegister">Regisztráció</button>
       </div>
+
+      <div class="row">
+        <button class="ghost" id="btnMe">Profil (users/{uid})</button>
+        <button class="ghost" id="btnLogout">Kilépés</button>
+      </div>
+
+      <div class="small">
+        Belépés után: <b>admin → /hu/admin/</b>, user → <b>/hu/app/</b>.
+      </div>
+
+      <div class="log" id="log">Log: betöltés…</div>
     </div>
-  </main>
+  </div>
 
   <script type="module">
-    // =========================
-    // Base prefix (GitHub Pages vs custom domain)
-    // =========================
-    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
-
-    const homeLink = document.getElementById("homeLink");
-    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
-
-    const next = new URLSearchParams(location.search).get("next") || `${BASE_PREFIX}/hu/app/`;
-    const goApp = () => location.assign(next);
-
-    // =========================
-    // Firebase SDK (Web module)
-    // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-    import {
-      getAuth,
-      createUserWithEmailAndPassword,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import {
-      getFirestore,
-      doc,
-      setDoc,
-      getDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from
+      "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from
+      "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    // GitHub Pages prefix támogatás
+    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
 
     const firebaseConfig = {
       apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
@@ -221,61 +75,57 @@
     };
 
     const app = initializeApp(firebaseConfig);
-    try { getAnalytics(app); } catch (e) {}
-
     const auth = getAuth(app);
     const db = getFirestore(app);
 
     const $ = (id) => document.getElementById(id);
     const log = (msg) => { $("log").textContent = "Log: " + msg; console.log(msg); };
 
+    const adminUrl = `${BASE_PREFIX}/hu/admin/`;
+    const appUrl   = `${BASE_PREFIX}/hu/app/`;
+
     function getInputs() {
-      const email = $("email").value.trim().toLowerCase();
-      const password = $("pass").value;
-      return { email, password };
+      return { email: $("email").value.trim().toLowerCase(), password: $("pass").value };
     }
 
-    async function ensureUserDoc(user){
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
-      if (snap.exists()) return;
+    async function routeByRole(user){
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const data = snap.exists() ? snap.data() : {};
+      const role = String(data.role || "").toLowerCase();
 
-      // első ügyfélként: kapsz alap profilt
-      await setDoc(ref, {
-        email: user.email,
-        package: "Start",
-        goal: "Formálás",
-        level: 2,
-        active: true,
-        cycleStart: "2026-02-10",
-        cycleEnd: "2026-03-10",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      if (role === "admin") location.replace(adminUrl);
+      else location.replace(appUrl);
     }
 
     async function doRegister() {
       const { email, password } = getInputs();
       if (!email || password.length < 6) return log("Hiba: email kell + jelszó min. 6 karakter.");
-      log("Regisztráció indul…");
-
+      log("Regisztráció…");
       const cred = await createUserWithEmailAndPassword(auth, email, password);
-      await ensureUserDoc(cred.user);
 
-      log("Sikeres regisztráció ✅ Átirányítás /hu/app/ …");
-      goApp();
+      // Alap user doc (admin role-t TE állítod be a saját UID-dnál)
+      await setDoc(doc(db, "users", cred.user.uid), {
+        email: cred.user.email,
+        role: "user",
+        package: "Start",
+        goal: "Formálás",
+        level: 2,
+        active: true,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+
+      log("Sikeres reg ✅ Átirányítás role alapján…");
+      await routeByRole(cred.user);
     }
 
     async function doLogin() {
       const { email, password } = getInputs();
       if (!email || !password) return log("Hiba: add meg az emailt és jelszót.");
       log("Belépés…");
-
       const cred = await signInWithEmailAndPassword(auth, email, password);
-      await ensureUserDoc(cred.user);
-
-      log("Belépve ✅ Átirányítás /hu/app/ …");
-      goApp();
+      log("Belépve ✅ Átirányítás role alapján…");
+      await routeByRole(cred.user);
     }
 
     async function doLogout() {
@@ -287,7 +137,7 @@
       const user = auth.currentUser;
       if (!user) return log("Nincs belépve user.");
       const snap = await getDoc(doc(db, "users", user.uid));
-      log("Profil: " + (snap.exists() ? JSON.stringify(snap.data(), null, 2) : "nincs users/" + user.uid));
+      log(snap.exists() ? JSON.stringify(snap.data(), null, 2) : "Nincs users/" + user.uid);
     }
 
     $("btnRegister").addEventListener("click", () => doRegister().catch(e => log("Reg hiba: " + e.message)));
@@ -296,13 +146,8 @@
     $("btnMe").addEventListener("click", () => doMe().catch(e => log("Me hiba: " + e.message)));
 
     onAuthStateChanged(auth, (user) => {
-      if (user) {
-        // ha már be van lépve → automatikusan app
-        log("Auth: belépve → " + user.email + " • redirect…");
-        goApp();
-      } else {
-        log("Auth: kijelentkezve");
-      }
+      if (user) log("Auth: LOGGED IN → " + user.email + " (átirányítás gombbal vagy automatikusan belépéskor)");
+      else log("Auth: LOGGED OUT");
     });
   </script>
 </body>
