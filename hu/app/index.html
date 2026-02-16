@@ -25,13 +25,12 @@
       --glassB: rgba(255,255,255,.02);
       --stroke: rgba(255,255,255,.10);
       --stroke2: rgba(255,255,255,.14);
-      --hero-url: url("/hero.png");
-    }
 
+      --hero-url: none;
+    }
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     html{ scroll-behavior:smooth; }
-
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -43,7 +42,6 @@
       color:var(--text);
       overflow-x:hidden;
     }
-
     body::before{
       content:"";
       position: fixed;
@@ -59,12 +57,11 @@
 
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
-
     .container{ width: min(var(--max), 92vw); margin: 0 auto; }
 
+    /* Topbar */
     .topbar{
-      position: fixed;
-      top:0; left:0; right:0;
+      position: fixed; top:0; left:0; right:0;
       z-index: 50;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
@@ -79,12 +76,8 @@
       gap: 12px;
     }
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.2px;
-      white-space: nowrap;
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px; white-space: nowrap;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
@@ -92,43 +85,27 @@
       box-shadow: 0 0 18px rgba(255,79,216,.7);
       flex: 0 0 auto;
     }
-
     .nav{
-      display:flex;
-      align-items:center;
-      gap: 14px;
-      color: var(--muted);
-      font-size: 13.5px;
-      font-weight: 700;
+      display:flex; align-items:center; gap: 14px;
+      color: var(--muted); font-size: 13.5px; font-weight: 700;
     }
-    .nav a{
-      position: relative;
-      padding: 10px 6px;
-      opacity:.92;
-    }
+    .nav a{ position: relative; padding: 10px 6px; opacity:.92; }
     .nav a:hover{ opacity:1; color: var(--text); }
     .nav a::after{
       content:"";
       position:absolute;
       left: 8px; right: 8px; bottom: 6px;
-      height: 2px;
-      border-radius: 99px;
+      height: 2px; border-radius: 99px;
       background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
       transform: scaleX(0);
       transform-origin: left;
       opacity: 0;
       transition: transform .28s ease, opacity .28s ease;
     }
-    .nav a:hover::after,
-    .nav a.is-active::after{
-      transform: scaleX(1);
-      opacity: 1;
-    }
+    .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
 
     .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
+      display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
@@ -168,10 +145,10 @@
     .page{ padding: 18px 0 64px; }
 
     .glass{
-      background: linear-gradient(180deg, var(--glassA), var(--glassB));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
@@ -204,7 +181,12 @@
     .interactive:focus-visible::before,
     .interactive.is-active::before{ opacity: 1; }
 
-    .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items:start; }
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
     @media (max-width: 980px){
       .grid{ grid-template-columns: 1fr; }
       .nav{ display:none; }
@@ -219,9 +201,9 @@
     }
     .card h2{ font-size: 22px; }
     .card h3{ font-size: 18px; }
-    .sub{ margin:0 0 12px; color: var(--muted); line-height: 1.55; font-size: 13.5px; }
+    .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
 
-    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: var(--muted2); font-size: 12.8px; }
+    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
     .meta-pill{
       display:inline-flex; align-items:center; gap:8px;
       padding: 9px 12px;
@@ -253,7 +235,7 @@
       justify-content: space-between;
       gap: 10px;
       font-size: 12.5px;
-      color: var(--muted2);
+      color: rgba(255,255,255,.55);
       margin: 10px 0 8px;
     }
 
@@ -287,19 +269,17 @@
       border: 1px solid rgba(255,255,255,.10);
     }
     .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
-    .row .desc{ color: var(--muted); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+    .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
     .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
     .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
 
     .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
+      display:inline-flex; align-items:center; gap:8px;
       padding: 6px 10px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.07);
-      color: var(--muted);
+      color: rgba(255,255,255,.70);
       white-space: nowrap;
       font-weight: 850;
       font-size: 12px;
@@ -307,10 +287,9 @@
 
     section{ scroll-margin-top: 82px; }
 
+    /* Modal */
     .modal-overlay{
-      position: fixed;
-      inset: 0;
-      z-index: 80;
+      position: fixed; inset: 0; z-index: 80;
       background: rgba(0,0,0,.58);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -323,15 +302,12 @@
     .modal{
       width: min(980px, 94vw);
       max-height: min(82vh, 760px);
-      border-radius: var(--radius);
+      border-radius: 22px;
       overflow: hidden;
       position: relative;
     }
     .modal-header{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
       padding: 14px 16px;
       border-bottom: 1px solid rgba(255,255,255,.08);
       background: rgba(10,8,14,.45);
@@ -359,21 +335,7 @@
       max-height: calc(min(82vh, 760px) - 64px);
       background: rgba(7,6,11,.38);
     }
-    .modal-body h4{ margin: 12px 0 8px; font-size: 15px; font-weight: 950; letter-spacing: .1px; }
-    .modal-body p{ margin: 0 0 10px; color: var(--muted); line-height: 1.6; font-size: 13.5px; }
-    .field{ display:grid; gap: 8px; margin: 10px 0 12px; }
-    label{ font-size: 12.5px; color: var(--muted2); font-weight: 850; }
-    input{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.92);
-      outline: none;
-    }
-    input:focus{ border-color: rgba(255,255,255,.22); }
-    .note{ color: var(--muted2); font-size: 12.6px; line-height: 1.55; }
+    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
 
     footer{
       padding: 18px 0 46px;
@@ -382,26 +344,28 @@
       backdrop-filter: blur(10px);
     }
     .footer-inner{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      color:rgba(255,255,255,.70);
-      font-size:13px;
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    .banner{
-      display:none;
-      margin: 0 0 14px;
-      padding: 12px 14px;
-      border-radius: 18px;
+    /* Debug strip */
+    .debug{
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 90;
+      background: rgba(0,0,0,.45);
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
+      border-radius: 14px;
+      padding: 10px 12px;
       color: rgba(255,255,255,.85);
-      line-height: 1.5;
-      font-size: 13px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      display:none;
+      backdrop-filter: blur(10px);
     }
-    .banner.is-show{ display:block; }
+    .debug.is-on{ display:block; }
 
     @media (prefers-reduced-motion: reduce){
       html{ scroll-behavior:auto; }
@@ -412,12 +376,10 @@
 </head>
 
 <body>
-  <!-- TOPBAR -->
   <header class="topbar">
     <div class="container topbar-inner">
-      <a class="brand" id="homeLink" href="/hu/" aria-label="Vissza a főoldalra">
-        <span class="dot"></span>
-        <span>Fitness Lady</span>
+      <a class="brand" id="homeLink" href="#" aria-label="Vissza a főoldalra">
+        <span class="dot"></span><span>Fitness Lady</span>
       </a>
 
       <nav class="nav" aria-label="Vevő menü">
@@ -436,45 +398,38 @@
 
   <main>
     <div class="container page">
-
-      <div class="banner" id="banner"></div>
-
-      <!-- HERO / STATUS -->
       <section id="top" class="glass interactive card" style="margin-bottom:14px;">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
           <div>
             <div class="chip" id="chipPackage">Csomag: —</div>
-            <h2 style="margin-top:10px;">Saját programom</h2>
+            <h2 style="margin-top:10px;" id="titleProgram">Saját programom</h2>
             <p class="sub" id="subStatus">Betöltés…</p>
           </div>
 
           <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-            <button class="pill primary" id="btnRenew" type="button">Megújítás</button>
-            <button class="pill ghost" id="btnUpgrade" type="button">Upgrade</button>
             <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
           </div>
         </div>
 
         <div class="progress-label">
           <span id="lblWeek">Hét: —</span>
-          <span id="lblDays">Hátralévő napok: —</span>
+          <span id="lblDays">Státusz: —</span>
         </div>
-        <div class="progress" aria-label="Ciklus haladás">
+        <div class="progress" aria-label="Haladás">
           <span id="barCycle"></span>
         </div>
 
         <div class="meta-row">
           <div class="meta-pill" id="pillGoal">🎯 Cél: —</div>
           <div class="meta-pill" id="pillIntensity">⚡ Szint: —</div>
-          <div class="meta-pill" id="pillUpdated">✨ Utolsó frissítés: —</div>
+          <div class="meta-pill" id="pillUpdated">✨ Frissítés: —</div>
         </div>
       </section>
 
       <div class="grid">
-        <!-- LEFT: Program -->
         <section id="program" class="glass interactive card">
-          <h3>Heti edzések</h3>
-          <p class="sub">Heti bontásban látod az edzéseidet. A “Személyre szabás” slotokat Edina hetente 1–2 alkalommal frissíti.</p>
+          <h3 id="hWorkouts">Heti edzések</h3>
+          <p class="sub" id="pWorkouts">Heti bontásban látod az edzéseidet. A személyre szabás slotokat Edina frissíti.</p>
 
           <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
 
@@ -488,42 +443,41 @@
 
           <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
 
-          <h3>Személyre szabás</h3>
-          <p class="sub">A slotok csak a te programodhoz tartozó videókat mutatják. Más csomag tartalma nem látható.</p>
+          <h3 id="hSlots">Személyre szabás</h3>
+          <p class="sub" id="pSlots">A slotok csak a te programodhoz tartozó videókat mutatják.</p>
           <ul class="list" id="slotList"></ul>
         </section>
 
-        <!-- RIGHT: Diet + Check-in -->
         <div style="display:grid; gap:14px;">
           <section id="etrend" class="glass interactive card">
             <h3>Étrend</h3>
-            <p class="sub">Ez a rész most alap. Később finomítjuk (napi bontás, sablonok, képek).</p>
+            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend az adminból állítható lesz (következő lépés).</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:8px;">
               <div>
                 <div class="title">Mai keret</div>
-                <div class="desc">Pipáld ki, ami megvan — motiváció és ritmus.</div>
+                <div class="desc">Pipáld ki, ami megvan — ritmus és következetesség.</div>
               </div>
               <div style="display:grid; gap:8px;">
                 <div style="display:flex; gap:8px; flex-wrap:wrap;">
                   <button class="pill ghost tiny" data-toggle="diet_water" type="button">💧 2L víz</button>
-                  <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje</button>
+                  <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje megvolt</button>
                   <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
-                  <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás</button>
+                  <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
                 </div>
-                <div class="note" id="dietNote">Később ide jön a napi étkezés-sablon.</div>
+                <div class="note" id="dietNote">A részletes étrend (napokra bontva) a következő körben jön, adminból szerkeszthetően.</div>
               </div>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-              <button class="pill primary tiny" id="btnDietPlan" type="button">Napi étkezés</button>
+              <button class="pill ghost tiny" id="btnDietPlan" type="button">Napi terv</button>
               <button class="pill ghost tiny" id="btnDietPrefs" type="button">Preferenciák</button>
             </div>
           </section>
 
           <section id="checkin" class="glass interactive card">
             <h3>Célom & Check-in</h3>
-            <p class="sub">Cél + heti check-in állapot + motiváció.</p>
+            <p class="sub">A check-in státusz elmentődik neked. Később admin is látni fogja.</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:10px;">
               <div>
@@ -539,7 +493,7 @@
                 <div class="progress"><span id="barCheckin"></span></div>
 
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
-                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in</button>
+                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kész</button>
                   <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
                 </div>
 
@@ -553,8 +507,8 @@
       <section id="technika" class="glass interactive card" style="margin-top:14px;">
         <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
           <div>
-            <h3>Technika Vault (örök)</h3>
-            <p class="sub">Ez a rész akkor is elérhető marad, ha a csomagod lejár.</p>
+            <h3>Technika Vault</h3>
+            <p class="sub">Technika videók kategóriákban. (Sablonból jön, admin kezeli.)</p>
           </div>
           <button class="pill ghost tiny" id="btnAddTechDone" type="button">✅ Technikák kipipálása</button>
         </div>
@@ -567,12 +521,12 @@
 
   <footer>
     <div class="container footer-inner">
-      <div>© <span id="y"></span> Fitness Lady — Vevő oldal</div>
+      <div>© <span id="y"></span> Fitness Lady</div>
       <div>Tüske web design</div>
     </div>
   </footer>
 
-  <!-- SETTINGS MODAL -->
+  <!-- SETTINGS MODAL (csak saját UI, élesben: user goal/level/lang) -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -580,12 +534,7 @@
         <button class="modal-close interactive" id="settingsClose" type="button" aria-label="Bezárás">✕</button>
       </div>
       <div class="modal-body">
-        <p class="note">Élesben ezt később adminból állítod majd. Most technikai okból itt is lehet menteni Firestore-ba.</p>
-
-        <div class="field">
-          <label for="setPackage">Csomag</label>
-          <input id="setPackage" type="text" placeholder="Start / Balance / Pro" />
-        </div>
+        <p class="note">Itt csak a saját cél/szint/nyelv módosítható. Csomagot és személyre szabást admin állít.</p>
 
         <div class="field">
           <label for="setGoal">Cél</label>
@@ -598,18 +547,17 @@
         </div>
 
         <div class="field">
-          <label for="setStart">Ciklus kezdete (YYYY-MM-DD)</label>
-          <input id="setStart" type="text" placeholder="2026-02-10" />
-        </div>
-
-        <div class="field">
-          <label for="setEnd">Ciklus vége (YYYY-MM-DD)</label>
-          <input id="setEnd" type="text" placeholder="2026-03-10" />
+          <label for="setLang">Nyelv (hu / de)</label>
+          <input id="setLang" type="text" placeholder="hu" />
         </div>
 
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="pill primary" id="btnSaveSettings" type="button">Mentés</button>
         </div>
+
+        <p class="note" style="margin-top:10px;">
+          Ha admin vagy és mégis mindent állítani akarsz: az admin oldalon csinálod.
+        </p>
       </div>
     </div>
   </div>
@@ -625,71 +573,23 @@
     </div>
   </div>
 
-  <script type="module">
-    // =========================
-    // Base prefix (GitHub Pages vs custom domain)
-    // =========================
-    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+  <div class="debug" id="debugBox">debug</div>
 
+  <script type="module">
+    import {
+      BASE_PREFIX, auth, db, fs,
+      onAuth, logout, toLogin,
+      escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
+    } from "../shared/firebase.js";
+
+    // ========== HERO + home link ==========
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
 
-    const LOGIN_URL = `${BASE_PREFIX}/hu/login/?next=${encodeURIComponent(location.pathname)}`;
-
-    // =========================
-    // Firebase SDK
-    // =========================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-      apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
-      authDomain: "fitneady-15fd0.firebaseapp.com",
-      projectId: "fitneady-15fd0",
-      storageBucket: "fitneady-15fd0.firebasestorage.app",
-      messagingSenderId: "480597492603",
-      appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
-      measurementId: "G-MH1YK9C2YF"
-    };
-
-    const fbApp = initializeApp(firebaseConfig);
-    try { getAnalytics(fbApp); } catch(e) {}
-    const auth = getAuth(fbApp);
-    const db = getFirestore(fbApp);
-
-    // =========================
-    // Helpers
-    // =========================
+    // ========== UI helpers ==========
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
-
-    const todayISO = () => new Date().toISOString().slice(0,10);
-    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-    const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
-    const fmtDate = (iso)=>{
-      if(!iso) return "—";
-      const d = new Date(iso+"T00:00:00");
-      const dd = String(d.getDate()).padStart(2,"0");
-      const mm = String(d.getMonth()+1).padStart(2,"0");
-      const yy = d.getFullYear();
-      return `${yy}.${mm}.${dd}`;
-    };
-    const escapeHtml = (s)=>String(s??"")
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-
-    function showBanner(msg){
-      const b = $("#banner");
-      b.textContent = msg;
-      b.classList.add("is-show");
-    }
-    function hideBanner(){
-      $("#banner").classList.remove("is-show");
-      $("#banner").textContent = "";
-    }
 
     function enableTapGlow(selector=".interactive"){
       $$(selector).forEach(el=>{
@@ -702,89 +602,17 @@
     }
     enableTapGlow();
 
-    // =========================
-    // Demo plans (a renderhez) – később ezt fogjuk Firestore/JSON-ra cserélni
-    // =========================
-    const DEMO = {
-      packages: {
-        Start: { weeks: 4, workoutsPerWeek: 3, slotsPerWeek: 1 },
-        Balance: { weeks: 6, workoutsPerWeek: 4, slotsPerWeek: 2 },
-        Pro: { weeks: 8, workoutsPerWeek: 4, slotsPerWeek: 2 }
-      },
-      plans: {
-        Start: [
-          { week: 1, workouts: [
-            { id:"W1-A", title:"Edzés A — Full body (alap)", desc:"Technika + ritmus. 35–45 perc.", video:"https://player.vimeo.com/video/000000001" },
-            { id:"W1-B", title:"Edzés B — Alsótest fókusz", desc:"Farizom + comb, kontrollált tempó.", video:"https://player.vimeo.com/video/000000002" },
-            { id:"W1-C", title:"Edzés C — Core + formálás", desc:"Törzs stabilitás + finisher.", video:"https://player.vimeo.com/video/000000003" }
-          ], slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina hetente 1 alkalommal frissíti.", video:"https://player.vimeo.com/video/000000010", note:"Most: glute fókusz (kímélő)." }
-          ]},
-          { week: 2, workouts: [
-            { id:"W2-A", title:"Edzés A — Full body (progresszió)", desc:"Kicsit több intenzitás.", video:"https://player.vimeo.com/video/000000004" },
-            { id:"W2-B", title:"Edzés B — Alsótest + core", desc:"Farizom + core.", video:"https://player.vimeo.com/video/000000005" },
-            { id:"W2-C", title:"Edzés C — Formásodás", desc:"Stabil terhelés.", video:"https://player.vimeo.com/video/000000006" }
-          ], slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Haladás alapján módosítva.", video:"https://player.vimeo.com/video/000000011", note:"Most: core stabilitás (szint 2)." }
-          ]},
-          { week: 3, workouts: [
-            { id:"W3-A", title:"Edzés A — Full body (erősebb)", desc:"Rövidebb pihenő.", video:"https://player.vimeo.com/video/000000007" },
-            { id:"W3-B", title:"Edzés B — Alsótest (progresszió)", desc:"Térdbarát opciókkal.", video:"https://player.vimeo.com/video/000000008" },
-            { id:"W3-C", title:"Edzés C — Core + cardio light", desc:"Low impact finisher.", video:"https://player.vimeo.com/video/000000009" }
-          ], slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina frissítette.", video:"https://player.vimeo.com/video/000000012", note:"Most: glute builder (szint 2)." }
-          ]},
-          { week: 4, workouts: [
-            { id:"W4-A", title:"Edzés A — Deload / finomítás", desc:"Technika, minőség.", video:"https://player.vimeo.com/video/000000013" },
-            { id:"W4-B", title:"Edzés B — Forma-hét", desc:"Feszesítés + kontroll.", video:"https://player.vimeo.com/video/000000014" },
-            { id:"W4-C", title:"Edzés C — Teszt & zárás", desc:"Érzés, ismétlés.", video:"https://player.vimeo.com/video/000000015" }
-          ], slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Záró hét finomhangolás.", video:"https://player.vimeo.com/video/000000016", note:"Most: mobilitás + core reset." }
-          ]}
-        ]
-      },
-      tech: {
-        categories: [
-          { id:"tech_squat", name:"Guggolás" },
-          { id:"tech_hinge", name:"Csípő-hajlítás" },
-          { id:"tech_core", name:"Core" },
-          { id:"tech_posture", name:"Tartás" }
-        ],
-        items: {
-          tech_squat: [
-            { id:"T-SQ-1", title:"Guggolás — alap beállítás", desc:"Lábfej, térd, törzs.", video:"https://player.vimeo.com/video/000000101" },
-            { id:"T-SQ-2", title:"Guggolás — hibák", desc:"Térd befelé, túl mély.", video:"https://player.vimeo.com/video/000000102" }
-          ],
-          tech_hinge: [
-            { id:"T-HI-1", title:"RDL — alap", desc:"Csípő hátra, semleges gerinc.", video:"https://player.vimeo.com/video/000000103" },
-            { id:"T-HI-2", title:"Hinge — derék védelem", desc:"Mitől fáj, hogyan javítsd.", video:"https://player.vimeo.com/video/000000104" }
-          ],
-          tech_core: [
-            { id:"T-CO-1", title:"Plank — helyes tartás", desc:"Lapocka, medence, légzés.", video:"https://player.vimeo.com/video/000000105" },
-            { id:"T-CO-2", title:"Dead bug — kontroll", desc:"Derék leszorít, lassú tempó.", video:"https://player.vimeo.com/video/000000106" },
-            { id:"T-CO-3", title:"Légzés — core aktiválás", desc:"Rövid drill edzés előtt.", video:"https://player.vimeo.com/video/000000107" }
-          ],
-          tech_posture: [
-            { id:"T-PO-1", title:"Tartás — váll/nyak", desc:"1–2 perces gyors fix.", video:"https://player.vimeo.com/video/000000108" },
-            { id:"T-PO-2", title:"Mobilitás — csípő", desc:"Rövid mobilitás blokk.", video:"https://player.vimeo.com/video/000000109" }
-          ]
-        }
-      }
+    // Debug toggle: add ?debug=1
+    const debugOn = new URLSearchParams(location.search).get("debug") === "1";
+    const debugBox = $("#debugBox");
+    if(debugOn) debugBox.classList.add("is-on");
+    const debug = (msg) => {
+      if(!debugOn) return;
+      debugBox.textContent = msg;
+      console.log("[APP]", msg);
     };
 
-    // =========================
-    // User-scoped localStorage
-    // =========================
-    const k = (uid, key) => `fl_${uid}_${key}_v1`;
-    const lsGet = (uid, key, fallback) => {
-      try { const v = localStorage.getItem(k(uid,key)); return v ? JSON.parse(v) : fallback; }
-      catch { return fallback; }
-    };
-    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
-
-    // =========================
     // Modals
-    // =========================
     const settingsOverlay = $("#settingsOverlay");
     const infoOverlay = $("#infoOverlay");
     const infoBody = $("#infoBody");
@@ -808,24 +636,22 @@
     $("#infoClose").addEventListener("click", ()=>closeOverlay(infoOverlay));
     settingsOverlay.addEventListener("click",(e)=>{ if(e.target===settingsOverlay) closeOverlay(settingsOverlay); });
     infoOverlay.addEventListener("click",(e)=>{ if(e.target===infoOverlay) closeOverlay(infoOverlay); });
-    document.addEventListener("keydown",(e)=>{ if(e.key==="Escape"){ [settingsOverlay, infoOverlay].forEach(ov=>ov.classList.contains("is-open") && closeOverlay(ov)); }});
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape"){
+        [settingsOverlay, infoOverlay].forEach(ov=>{
+          if(ov.classList.contains("is-open")) closeOverlay(ov);
+        });
+      }
+    });
 
-    // =========================
-    // Mobile menu + active nav
-    // =========================
+    // Mobile menu
     const menuBtn = $("#menuBtn");
     let menuOpen = false;
-
-    function closeMobileNav(){
-      $("#mobileNav")?.remove();
-      menuOpen = false;
-    }
-
+    function closeMobileNav(){ $("#mobileNav")?.remove(); menuOpen = false; }
     menuBtn?.addEventListener("click", ()=>{
       if(menuOpen){ closeMobileNav(); return; }
       closeMobileNav();
       menuOpen = true;
-
       const nav = document.createElement("div");
       nav.id = "mobileNav";
       nav.style.position = "fixed";
@@ -847,7 +673,6 @@
       `;
       document.body.appendChild(nav);
     });
-
     document.addEventListener("click",(e)=>{
       const nav = $("#mobileNav");
       if(!nav) return;
@@ -856,6 +681,7 @@
       closeMobileNav();
     });
 
+    // Active nav underline
     (()=> {
       const links = $$('[data-nav]');
       const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
@@ -867,98 +693,174 @@
       sections.forEach(s=>io.observe(s));
     })();
 
-    // =========================
-    // Firestore profile
-    // =========================
-    async function ensureUserProfile(user){
-      const ref = doc(db, "users", user.uid);
-      const snap = await getDoc(ref);
+    // ========== user-scoped localStorage (done/diet/checkin) ==========
+    const k = (uid, key) => `fl_${uid}_${key}_v1`;
+    const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
+    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
-      if (snap.exists()) return snap.data();
-
-      // ha valamiért nincs user doc, létrehozzuk
-      const initial = {
-        email: user.email,
-        package: "Start",
-        goal: "Formálás",
-        level: 2,
-        active: true,
-        cycleStart: "2026-02-10",
-        cycleEnd: "2026-03-10",
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      };
-      await setDoc(ref, initial, { merge: true });
-      return initial;
+    // ========== Firestore loaders ==========
+    async function loadUserProfile(uid){
+      const ref = fs.doc(db, "users", uid);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        // első belépésnél minimál user doc (role nélkül)
+        const initial = {
+          email: auth.currentUser?.email || "",
+          displayName: "",
+          lang: "hu",
+          role: "user",
+          status: "active",
+          planId: "start_v1",
+          goal: "Formálás",
+          level: 2,
+          lifetimeAccess: true,
+          cycleStart: null,
+          cycleEnd: null,
+          createdAt: fs.serverTimestamp(),
+          updatedAt: fs.serverTimestamp()
+        };
+        await fs.setDoc(ref, initial, { merge: true });
+        return initial;
+      }
+      return snap.data();
     }
 
-    // =========================
-    // App state + render
-    // =========================
-    let uid = null;
-    let state = null;
+    async function loadPlanMeta(planId){
+      const ref = fs.doc(db, "planTemplates", planId);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        throw new Error(`Nincs ilyen planTemplates/${planId}. Hozd létre adminban vagy Firestore-ban!`);
+      }
+      return snap.data();
+    }
 
-    function calcWeekIndex(profile){
-      const start = profile.cycleStart;
-      const end = profile.cycleEnd;
-      const totalDays = Math.max(1, daysBetween(start,end));
-      const passedDays = clamp(daysBetween(start, todayISO()), 0, totalDays);
-      const weeks = DEMO.packages[profile.package]?.weeks ?? 4;
+    async function loadPlanWeek(planId, weekNo){
+      const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        throw new Error(`Hiányzik: planTemplates/${planId}/weeks/${weekNo}`);
+      }
+      return snap.data();
+    }
+
+    async function loadOverridesWeek(uid, weekNo){
+      const ref = fs.doc(db, "users", uid, "overrides", "weeks", String(weekNo));
+      const snap = await fs.getDoc(ref);
+      return snap.exists() ? snap.data() : null;
+    }
+
+    // Merge helpers (HU/DE mezők)
+    function pickLang(obj, lang, fallback="—"){
+      if(!obj) return fallback;
+      if(typeof obj === "string") return obj;
+      if(obj[lang]) return obj[lang];
+      if(obj["hu"]) return obj["hu"];
+      if(obj["de"]) return obj["de"];
+      return fallback;
+    }
+
+    function mergeWorkout(templateW, ovW, lang){
+      // ovW lehet undefined
+      const w = { ...templateW };
+      if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
+
+      // title/desc lehet részleges nyelv
+      const tTitle = pickLang(templateW.title, lang, "");
+      const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
+      w._title = oTitle || tTitle || "—";
+
+      const tDesc = pickLang(templateW.desc, lang, "");
+      const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
+      w._desc = oDesc || tDesc || "";
+
+      return w;
+    }
+
+    function mergeSlot(templateS, ovS, lang){
+      const s = { ...templateS };
+      s.vimeoId = (ovS?.vimeoId) ? ovS.vimeoId : (templateS.defaultVimeoId || "");
+      const tTitle = pickLang(templateS.title, lang, "");
+      s._title = tTitle || "—";
+      const tDesc = pickLang(templateS.desc, lang, "");
+      s._desc = tDesc || "";
+      const tNote = pickLang(templateS.defaultNote, lang, "—");
+      const oNote = ovS?.note ? pickLang(ovS.note, lang, "") : "";
+      s._note = oNote || tNote || "—";
+      return s;
+    }
+
+    // ========== App state ==========
+    let UID = null;
+    let profile = null;
+    let planMeta = null;
+
+    // week cache for fast tab switching
+    const weekCache = new Map(); // key: weekNo -> { templateWeek, overridesWeek, merged }
+
+    const state = {
+      weekIdx: 0,
+      techCat: null,
+      done: {},
+      diet: {},
+      checkin: null,
+      lang: "hu"
+    };
+
+    function calcWeekIndex(p){
+      // ÉLES: ha lifetimeAccess true vagy nincs cycleStart/cycleEnd, akkor mindig az 1. hét legyen default,
+      // de a user tudjon tabot váltani. (Admin állíthat ciklust később.)
+      if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
+
+      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
+      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+      const weeks = planMeta?.weeks ?? 4;
       const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
       return week - 1;
     }
 
-    function renderHeader(){
-      const p = state.profile;
-      const pack = DEMO.packages[p.package] ? p.package : "Start";
-      p.package = pack;
+    function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
+    function techKey(cat, id){ return `t_${cat}_${id}`; }
 
-      $("#chipPackage").textContent = `Csomag: ${p.package}`;
+    // ========== Render header ==========
+    function renderHeader(){
+      const p = profile;
+      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
-      $("#pillUpdated").textContent = `✨ Utolsó frissítés: ${p.updatedAtHuman || "—"}`;
+      $("#pillUpdated").textContent = `✨ Frissítés: ${p.updatedAt ? "—" : "—"}`;
 
-      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
-      const leftDays = clamp(totalDays - passedDays, 0, totalDays);
+      // ÉLES: nincs lejárat nálad → lifetimeAccess true esetén fix üzenet
+      if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
+        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta.weeks || 4}`;
+        $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
+        $("#barCycle").style.width = `100%`;
+        $("#subStatus").textContent = `Üdv, ${p.email || "!"} • A programod aktív. A heti edzéseket a füleken választod.`;
+      }else{
+        const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
+        const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+        const leftDays = clamp(totalDays - passedDays, 0, totalDays);
+        const week = clamp(Math.floor((passedDays / totalDays) * (planMeta.weeks||4)) + 1, 1, (planMeta.weeks||4));
 
-      const weeks = DEMO.packages[p.package]?.weeks ?? 4;
-      const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
-
-      $("#lblWeek").textContent = `Hét: ${week}/${weeks}`;
-      $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
-
-      const pct = Math.round((passedDays / totalDays) * 100);
-      $("#barCycle").style.width = `${pct}%`;
-
-      $("#subStatus").textContent =
-        leftDays === 0
-          ? `A csomagod lejárt (${fmtDate(p.cycleEnd)}). A Technika Vault továbbra is elérhető.`
-          : `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)} • Következő lépés: tartsd a ritmust és pipáld a heti edzéseket.`;
+        $("#lblWeek").textContent = `Hét: ${week}/${planMeta.weeks||4}`;
+        $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
+        const pct = Math.round((passedDays / totalDays) * 100);
+        $("#barCycle").style.width = `${pct}%`;
+        $("#subStatus").textContent = `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)}`;
+      }
 
       $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#goalDesc").textContent = p.goal
-        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket és az étrendet.`
+        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket.`
         : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`;
 
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
-
-      const expired = leftDays === 0;
-      $("#program").style.opacity = expired ? .55 : 1;
-      $("#program").style.pointerEvents = expired ? "none" : "auto";
-      if(expired){
-        $("#motivationBox").textContent = "A Technika Vault örök. A teljes programhoz újíts meg vagy válts csomagot.";
-      }
     }
 
+    // ========== Week tabs ==========
     function renderWeekTabs(){
-      const p = state.profile;
-      const weeks = DEMO.packages[p.package]?.weeks ?? 4;
-      const cur = calcWeekIndex(p);
-      state.weekIdx = clamp(state.weekIdx ?? cur, 0, weeks-1);
-
+      const weeks = planMeta.weeks || 4;
       const tabs = $("#weekTabs");
       tabs.innerHTML = "";
       for(let i=0;i<weeks;i++){
@@ -966,39 +868,66 @@
         b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
         b.type = "button";
         b.textContent = `Hét ${i+1}`;
-        b.addEventListener("click", ()=>{
+        b.addEventListener("click", async ()=>{
           state.weekIdx = i;
+          await ensureWeekLoaded(i+1);
           renderProgram();
+          renderHeader();
         });
         tabs.appendChild(b);
       }
     }
 
-    function workoutKey(week, id){ return `w${week}_${id}`; }
-    function techKey(cat, id){ return `t_${cat}_${id}`; }
+    // ========== Load & merge week ==========
+    async function ensureWeekLoaded(weekNo){
+      if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
+      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      const overridesWeek = await loadOverridesWeek(UID, weekNo);
+
+      const ovWorkouts = overridesWeek?.workouts || {};
+      const ovSlots = overridesWeek?.slots || {};
+
+      const merged = {
+        weekNo,
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+      };
+
+      const pack = { templateWeek, overridesWeek, merged };
+      weekCache.set(weekNo, pack);
+      return pack;
+    }
+
+    // ========== Render Program ==========
     function renderProgram(){
       renderWeekTabs();
 
-      const p = state.profile;
-      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-      const weekObj = packPlan[state.weekIdx] || packPlan[0];
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack){
+        $("#workoutList").innerHTML = `<li class="row"><div><div class="title">Betöltés…</div><div class="desc">Kérlek várj.</div></div></li>`;
+        $("#slotList").innerHTML = "";
+        return;
+      }
+
+      const { merged } = pack;
 
       const ul = $("#workoutList");
       ul.innerHTML = "";
-      weekObj.workouts.forEach(w=>{
-        const key = workoutKey(weekObj.week, w.id);
+      merged.workouts.forEach(w=>{
+        const key = workoutKey(weekNo, w.id);
         const done = !!state.done[key];
 
         const li = document.createElement("li");
         li.className = "row";
         li.innerHTML = `
           <div>
-            <div class="title">${escapeHtml(w.title)} ${done ? ' <span class="chip" style="margin-left:6px;">✅ kész</span>' : ''}</div>
-            <div class="desc">${escapeHtml(w.desc)}</div>
+            <div class="title">${escapeHtml(w._title)} ${done ? ' <span class="chip" style="margin-left:6px;">✅ kész</span>' : ''}</div>
+            <div class="desc">${escapeHtml(w._desc || "")}</div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(w.video)}">▶ Lejátszás</button>
+            <button class="pill ghost tiny" data-play="${escapeHtml(w.vimeoId || "")}">▶ Lejátszás</button>
             <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
           </div>
         `;
@@ -1007,31 +936,41 @@
 
       const sl = $("#slotList");
       sl.innerHTML = "";
-      weekObj.slots.forEach((s, idx)=>{
-        const key = `slot_w${weekObj.week}_${idx}`;
+      merged.slots.forEach((s)=>{
         const li = document.createElement("li");
         li.className = "row";
         li.innerHTML = `
           <div>
-            <div class="title">${escapeHtml(s.slot)} — ${escapeHtml(s.title)}</div>
-            <div class="desc">${escapeHtml(s.desc)}<br><span style="color:rgba(255,255,255,.72); font-size:12.6px;">Megjegyzés: ${escapeHtml(s.note||"—")}</span></div>
+            <div class="title">${escapeHtml(s._title)}</div>
+            <div class="desc">${escapeHtml(s._desc)}<br><span style="color:rgba(255,255,255,.72); font-size:12.6px;">Megjegyzés: ${escapeHtml(s._note)}</span></div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(s.video)}">▶ Lejátszás</button>
-            <button class="pill ghost tiny" data-request-swap="${escapeHtml(key)}">🔁 Csere kérése</button>
+            <button class="pill ghost tiny" data-play="${escapeHtml(s.vimeoId || "")}">▶ Lejátszás</button>
           </div>
         `;
         sl.appendChild(li);
       });
 
+      // play buttons (Vimeo embed)
       $$("[data-play]").forEach(b=>{
         b.addEventListener("click", ()=>{
-          const url = b.getAttribute("data-play");
-          openInfo("Lejátszás (teszt link)", `
-            <p class="note">Most még teszt Vimeo embed URL. Élesben itt domain-lockolt lejátszó lesz.</p>
-            <div class="row" style="grid-template-columns: 1fr;">
-              <div class="title">Vimeo embed URL</div>
-              <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
+          const vimeoId = b.getAttribute("data-play");
+          if(!vimeoId){
+            openInfo("Lejátszás", `<p class="note">Ehhez még nincs Vimeo ID beállítva (admin).</p>`);
+            return;
+          }
+          const src = `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
+          openInfo("Lejátszás", `
+            <p class="note">Ha a videó nem indul: Vimeo domain-lock beállítás ellenőrzés (fitnesslady.ch + github.io fejlesztéshez ideiglenesen engedélyezni kell).</p>
+            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
+              <iframe
+                src="${escapeHtml(src)}"
+                width="100%" height="480"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                style="display:block">
+              </iframe>
             </div>
           `);
         });
@@ -1041,85 +980,32 @@
         b.addEventListener("click", ()=>{
           const key = b.getAttribute("data-toggle-done");
           state.done[key] = !state.done[key];
-          lsSet(uid, "done", state.done);
+          lsSet(UID, "done", state.done);
           renderProgram();
-        });
-      });
-
-      $$("[data-request-swap]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          openInfo("Csere kérése", `
-            <p>Élesben ez admin “to-do” vagy WhatsApp/Email Edinának.</p>
-            <div class="row" style="grid-template-columns: 1fr;">
-              <div class="title">Üzenet minta</div>
-              <div class="desc">
-                <code style="white-space:pre-wrap; word-break:break-word;">
-Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj.week}).
-Úgy érzem: [túl könnyű / túl nehéz / fáj a térdem / több glute fókusz]. Köszi! 😊
-                </code>
-              </div>
-            </div>
-          `);
         });
       });
     }
 
+    // ========== Technika vault (v1: sablon később bővül adminból) ==========
+    // Minimál: planTemplates/{planId} docban tárolhatunk technikaRef-et később.
+    // Most üresen, de nem törik el.
     function renderTechnika(){
       const tabs = $("#techTabs");
-      tabs.innerHTML = "";
-      DEMO.tech.categories.forEach(c=>{
-        const b = document.createElement("button");
-        b.className = "tab" + (c.id===state.techCat ? " is-active" : "");
-        b.type = "button";
-        b.textContent = c.name;
-        b.addEventListener("click", ()=>{
-          state.techCat = c.id;
-          renderTechnika();
-        });
-        tabs.appendChild(b);
-      });
-
       const list = $("#techList");
-      list.innerHTML = "";
-      const items = DEMO.tech.items[state.techCat] || [];
-      items.forEach(it=>{
-        const key = techKey(state.techCat, it.id);
-        const done = !!state.done[key];
-
-        const li = document.createElement("li");
-        li.className = "row";
-        li.innerHTML = `
+      tabs.innerHTML = "";
+      list.innerHTML = `
+        <li class="row">
           <div>
-            <div class="title">${escapeHtml(it.title)} ${done ? ' <span class="chip" style="margin-left:6px;">✅ megvolt</span>' : ''}</div>
-            <div class="desc">${escapeHtml(it.desc)}</div>
+            <div class="title">Technika Vault</div>
+            <div class="desc">A technika videók sablonból jönnek. Következő lépés: technika kategóriák + videók admin szerkesztéssel.</div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(it.video)}">▶ Lejátszás</button>
-            <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-tech="${escapeHtml(key)}">${done ? 'Visszavon' : 'Megvolt'}</button>
+            <button class="pill ghost tiny" type="button" id="btnTechInfo">ℹ️</button>
           </div>
-        `;
-        list.appendChild(li);
-      });
-
-      $$("[data-toggle-tech]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const key = b.getAttribute("data-toggle-tech");
-          state.done[key] = !state.done[key];
-          lsSet(uid, "done", state.done);
-          renderTechnika();
-        });
-      });
-
-      $$("[data-play]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const url = b.getAttribute("data-play");
-          openInfo("Lejátszás (teszt link)", `
-            <div class="row" style="grid-template-columns: 1fr;">
-              <div class="title">Vimeo embed URL</div>
-              <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
-            </div>
-          `);
-        });
+        </li>
+      `;
+      $("#btnTechInfo")?.addEventListener("click", ()=>{
+        openInfo("Technika Vault", `<p class="note">Következő kör: planTemplates/techTemplates szerkezet + app render.</p>`);
       });
     }
 
@@ -1141,41 +1027,57 @@ Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj
       enableTapGlow();
     }
 
-    // =========================
-    // UI buttons
-    // =========================
+    // ========== Buttons ==========
+    $("#btnLogout").addEventListener("click", async ()=>{
+      await logout();
+      toLogin(state.lang || "hu");
+    });
+
     $("#btnMarkAll").addEventListener("click", ()=>{
-      const p = state.profile;
-      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-      const weekObj = packPlan[state.weekIdx] || packPlan[0];
-      weekObj.workouts.forEach(w=> state.done[workoutKey(weekObj.week, w.id)] = true);
-      lsSet(uid, "done", state.done);
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack) return;
+      pack.merged.workouts.forEach(w => state.done[workoutKey(weekNo, w.id)] = true);
+      lsSet(UID, "done", state.done);
       renderProgram();
     });
 
     $("#btnResetWeek").addEventListener("click", ()=>{
-      const p = state.profile;
-      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-      const weekObj = packPlan[state.weekIdx] || packPlan[0];
-      weekObj.workouts.forEach(w=> delete state.done[workoutKey(weekObj.week, w.id)]);
-      lsSet(uid, "done", state.done);
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack) return;
+      pack.merged.workouts.forEach(w => delete state.done[workoutKey(weekNo, w.id)]);
+      lsSet(UID, "done", state.done);
       renderProgram();
     });
 
-    $("#btnAddTechDone").addEventListener("click", ()=>{
-      const items = DEMO.tech.items[state.techCat] || [];
-      items.forEach(it=> state.done[techKey(state.techCat, it.id)] = true);
-      lsSet(uid, "done", state.done);
-      renderTechnika();
+    $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
+      openInfo("Vimeo beágyazás (éles)", `
+        <p class="note"><b>Éles</b> beállítás: Vimeo videók legyenek Private/Hide, és Embed csak a te domainjeiden.</p>
+        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
+          <li>Vimeo: Hide from Vimeo / Private</li>
+          <li>Embed whitelist: fitnesslady.ch</li>
+          <li>Fejlesztéshez ideiglenesen: tuskepal-ai.github.io (ha kell)</li>
+          <li>Download: OFF</li>
+        </ul>
+      `);
     });
 
+    // diet toggles
     $$("[data-toggle]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const key = btn.getAttribute("data-toggle");
         state.diet[key] = !state.diet[key];
-        lsSet(uid, "diet", state.diet);
+        lsSet(UID, "diet", state.diet);
         refreshDietButtons();
       });
+    });
+
+    $("#btnDietPlan").addEventListener("click", ()=>{
+      openInfo("Napi terv", `<p class="note">A részletes étrendet a következő körben Firestore-ból hozzuk (adminból állítható).</p>`);
+    });
+    $("#btnDietPrefs").addEventListener("click", ()=>{
+      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, kedvencek, étkezésszám, edzésnap/pihenőnap sablon.</p>`);
     });
 
     const MOTS = [
@@ -1189,116 +1091,88 @@ Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj
     });
 
     $("#btnDoCheckin").addEventListener("click", ()=>{
-      openInfo("Check-in", `
-        <p class="note">Következő lépés: ezt Tally/Typeform linkre, vagy saját Firestore formra kötjük.</p>
-        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-          <button class="pill primary tiny" id="btnConfirmCheckin" type="button">✅ Check-in kész</button>
-        </div>
-      `);
-      setTimeout(()=>{
-        $("#btnConfirmCheckin")?.addEventListener("click", ()=>{
-          state.checkin = { done: true, at: new Date().toISOString() };
-          lsSet(uid, "checkin", state.checkin);
-          closeOverlay(infoOverlay);
-          renderHeader();
-        });
-      }, 0);
+      state.checkin = { done: true, at: new Date().toISOString() };
+      lsSet(UID, "checkin", state.checkin);
+      renderHeader();
+      openInfo("Check-in", `<p class="note">Kész ✅ (elmentve neked). Következő körben: admin is látja / check-in űrlap.</p>`);
     });
 
-    $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
-      openInfo("Lejátszás", `
-        <p><b>Most</b>: teszt Vimeo embed URL.</p>
-        <p><b>Éles</b>: Vimeo domain-lock + letöltés OFF.</p>
-        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
-          <li>Vimeo: <b>Hide from Vimeo</b></li>
-          <li>Embed: <b>Only on fitnesslady.ch</b></li>
-          <li>Download: <b>OFF</b></li>
-        </ul>
-      `);
-    });
-
-    $("#btnRenew").addEventListener("click", ()=> openInfo("Megújítás", `<p class="note">Következő lépés: Payrexx/Stripe checkout.</p>`));
-    $("#btnUpgrade").addEventListener("click", ()=> openInfo("Upgrade", `<p class="note">Következő lépés: csomag váltás fizetéssel.</p>`));
-
+    // Settings
     $("#btnOpenSettings").addEventListener("click", ()=>{
-      const p = state.profile;
-      $("#setPackage").value = p.package || "Start";
-      $("#setGoal").value = p.goal || "";
-      $("#setLevel").value = p.level || 2;
-      $("#setStart").value = p.cycleStart || todayISO();
-      $("#setEnd").value = p.cycleEnd || todayISO();
+      $("#setGoal").value = profile.goal || "";
+      $("#setLevel").value = profile.level || 2;
+      $("#setLang").value = profile.lang || "hu";
       openOverlay(settingsOverlay);
     });
 
     $("#btnSaveSettings").addEventListener("click", async ()=>{
-      const p = state.profile;
-      p.package = ($("#setPackage").value || "Start").trim();
-      p.goal = ($("#setGoal").value || "Formálás").trim();
-      p.level = clamp(parseInt($("#setLevel").value || "2",10),1,4);
-      p.cycleStart = ($("#setStart").value || todayISO()).trim();
-      p.cycleEnd = ($("#setEnd").value || todayISO()).trim();
-      p.updatedAtHuman = fmtDate(todayISO());
+      const goal = ($("#setGoal").value || "").trim();
+      const level = clamp(parseInt($("#setLevel").value || "2", 10), 1, 4);
+      const lang = (($("#setLang").value || "hu").trim().toLowerCase() === "de") ? "de" : "hu";
 
-      await setDoc(doc(db, "users", uid), {
-        package: p.package,
-        goal: p.goal,
-        level: p.level,
-        cycleStart: p.cycleStart,
-        cycleEnd: p.cycleEnd,
-        updatedAt: serverTimestamp()
-      }, { merge: true });
+      // user only fields (rules engedik, role-t nem)
+      await fs.setDoc(fs.doc(db, "users", UID), {
+        goal,
+        level,
+        lang,
+        updatedAt: fs.serverTimestamp()
+      }, { merge:true });
+
+      profile.goal = goal;
+      profile.level = level;
+      profile.lang = lang;
+      state.lang = lang;
+
+      // week cache újra a nyelv miatt (cím/desc HU/DE)
+      weekCache.clear();
+      await ensureWeekLoaded(state.weekIdx + 1);
 
       closeOverlay(settingsOverlay);
       renderAll();
-      showBanner("Mentve ✅ (Firestore)");
-      setTimeout(hideBanner, 2500);
     });
 
-    $("#btnLogout").addEventListener("click", async ()=>{
-      await signOut(auth);
-      location.assign(LOGIN_URL);
-    });
-
-    // =========================
-    // INIT
-    // =========================
+    // ========== Init ==========
     document.getElementById("y").textContent = new Date().getFullYear();
 
-    // Auth guard
-    onAuthStateChanged(auth, async (user)=>{
+    onAuth(async (user)=>{
       try{
         if(!user){
-          location.assign(LOGIN_URL);
+          toLogin("hu");
           return;
         }
+        UID = user.uid;
 
-        uid = user.uid;
+        // local states
+        state.done = lsGet(UID, "done", {});
+        state.diet = lsGet(UID, "diet", {});
+        state.checkin = lsGet(UID, "checkin", null);
 
-        const prof = await ensureUserProfile(user);
+        // profile + plan
+        profile = await loadUserProfile(UID);
+        state.lang = (profile.lang === "de") ? "de" : "hu";
 
-        state = {
-          profile: {
-            email: user.email,
-            package: prof.package || "Start",
-            goal: prof.goal || "Formálás",
-            level: prof.level || 2,
-            cycleStart: prof.cycleStart || "2026-02-10",
-            cycleEnd: prof.cycleEnd || "2026-03-10",
-            updatedAtHuman: "—"
-          },
-          done: lsGet(uid, "done", {}),
-          diet: lsGet(uid, "diet", {}),
-          checkin: lsGet(uid, "checkin", null),
-          weekIdx: 0,
-          techCat: DEMO.tech.categories[0]?.id || "tech_core"
-        };
+        planMeta = await loadPlanMeta(profile.planId);
+
+        // default week
+        state.weekIdx = calcWeekIndex(profile);
+
+        // preload current week
+        await ensureWeekLoaded(state.weekIdx + 1);
 
         renderAll();
-        showBanner("Belépve ✅ " + user.email);
-        setTimeout(hideBanner, 2200);
+
+        debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
+
       }catch(err){
         console.error(err);
-        showBanner("Hiba történt betöltés közben. Nyisd meg a Console-t.");
+        openInfo("Hiba", `
+          <p class="note">Hiba történt betöltés közben.</p>
+          <div class="row" style="grid-template-columns: 1fr;">
+            <div class="title">Részletek</div>
+            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
+          </div>
+          <p class="note">Leggyakoribb ok: hiányzik a planTemplates sablon a Firestore-ban (pl. start_v1).</p>
+        `);
       }
     });
   </script>
