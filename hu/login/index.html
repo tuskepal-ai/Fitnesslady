@@ -4,80 +4,59 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady – Bejelentkezés</title>
-  <meta name="description" content="FitnessLady – Bejelentkezés és regisztráció" />
+  <meta name="description" content="FitnessLady – Bejelentkezés / Regisztráció" />
 
   <style>
     :root{
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-
       --pink:#ff4fd8;
       --pink2:#b14cff;
-
       --radius:22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 520px;
+      --max: 980px;
     }
-
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
         radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
+      color:var(--text);
       overflow-x:hidden;
     }
 
-    /* hero.png full-page háttér */
+    /* full bg: hero.png */
     body::before{
       content:"";
       position: fixed;
       inset: 0;
       z-index: -1;
-      background-image: url("/hero.png");
+      background-image: var(--hero-url);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-      will-change: transform;
-      transform: translate3d(0,0,0);
-      backface-visibility: hidden;
+      opacity:.92;
+      transform: translateZ(0);
     }
 
-    /* topbar (mini) */
+    a{ color:inherit; text-decoration:none; }
+    .container{ width:min(var(--max), 92vw); margin:0 auto; }
     .topbar{
-      position: sticky;
-      top:0;
+      position: sticky; top:0;
       z-index: 50;
-      background: rgba(8,6,12,.70);
+      background: rgba(8,6,12,.80);
       border-bottom: 1px solid rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .topbar-inner{
-      width: min(1180px, 92vw);
-      margin: 0 auto;
-      height: 64px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
+      padding: 14px 0;
     }
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.2px;
-      white-space: nowrap;
-      text-decoration:none;
-      color:var(--text);
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; letter-spacing:.2px;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
@@ -85,193 +64,94 @@
       box-shadow: 0 0 18px rgba(255,79,216,.7);
       flex: 0 0 auto;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,.12);
-      text-decoration:none;
-      font-weight: 900;
-      white-space: nowrap;
-    }
 
-    /* wrap */
     .wrap{
-      width: min(var(--max), 92vw);
-      margin: 0 auto;
-      padding: 26px 0 60px;
       min-height: calc(100vh - 64px);
       display:flex;
       align-items:center;
-      justify-content:center;
+      padding: 26px 0 56px;
     }
 
-    /* glass card */
     .glass{
-      width: 100%;
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.10);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      position: relative;
-      overflow:hidden;
     }
 
-    .glass::before{
-      content:"";
-      position:absolute; inset:-3px;
-      border-radius: inherit;
-      background:
-        radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
-        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
-      opacity: .55;
-      filter: blur(10px);
-      pointer-events:none;
-    }
-
-    .card{
-      position: relative;
-      padding: 18px;
-    }
-
+    .card{ padding: 18px; width: min(520px, 100%); margin: 0 auto; }
     h1{
-      margin: 0 0 6px;
+      margin:0 0 8px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
       font-size: 26px;
-      letter-spacing: -.4px;
+      letter-spacing:-.3px;
     }
-    .sub{
-      margin: 0 0 16px;
-      color: var(--muted);
-      font-size: 13.5px;
-      line-height: 1.6;
-    }
+    .sub{ margin:0 0 14px; color: var(--muted); line-height:1.55; font-size: 13.5px; }
 
-    label{
-      display:block;
-      font-size: 12.8px;
-      color: var(--muted);
-      margin: 12px 0 6px;
-      font-weight: 750;
-      letter-spacing: .15px;
-    }
+    label{ display:block; font-size:12.8px; color:rgba(255,255,255,.72); font-weight:850; margin:10px 0 6px; }
     input{
       width:100%;
-      padding: 12px 12px;
+      padding:12px 12px;
       border-radius: 14px;
       border: 1px solid rgba(255,255,255,.12);
-      background: rgba(10,8,14,.55);
-      color: var(--text);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
       outline:none;
-      transition: border-color .18s ease, background .18s ease, transform .18s ease;
     }
-    input:focus{
-      border-color: rgba(255,79,216,.38);
-      background: rgba(10,8,14,.68);
-    }
+    input:focus{ border-color: rgba(255,255,255,.22); }
 
-    .row{
-      display:flex;
-      gap: 10px;
-      flex-wrap:wrap;
-      margin-top: 14px;
-    }
-
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top:14px; }
     button{
-      flex:1;
-      min-width: 150px;
+      flex:1; min-width: 160px;
       padding: 12px 14px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
-      cursor:pointer;
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
       font-weight: 900;
-      color: var(--text);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
-      user-select:none;
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease;
     }
-    button:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.20);
-    }
-
+    button:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.22); }
     .primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
       border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-    }
-    .ghost{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-    }
-
-    .small{
-      font-size: 12.5px;
-      color: var(--muted2);
-      margin-top: 12px;
-      line-height: 1.5;
+      box-shadow: 0 18px 46px rgba(255,79,216,.22);
     }
 
     .log{
       margin-top: 14px;
       white-space: pre-wrap;
       font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      background: rgba(10,8,14,.55);
+      background: rgba(0,0,0,.22);
       border: 1px solid rgba(255,255,255,.12);
-      border-radius: 16px;
+      border-radius: 14px;
       padding: 12px;
-      min-height: 74px;
-      color: rgba(255,255,255,.88);
+      min-height: 72px;
+      color: rgba(255,255,255,.86);
     }
-
-    .hint{
-      margin-top: 10px;
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      justify-content: space-between;
-      color: var(--muted2);
-      font-size: 12.5px;
-    }
-    .link{
-      color: rgba(255,255,255,.88);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      button, input{ transition:none; }
-    }
+    .hint{ margin-top:10px; color:rgba(255,255,255,.60); font-size:12.5px; line-height:1.55; }
   </style>
 </head>
 
 <body>
   <header class="topbar">
-    <div class="topbar-inner">
-      <a class="brand" href="/hu/" aria-label="Fitness Lady">
-        <span class="dot"></span>
-        <span>Fitness Lady</span>
+    <div class="container" style="display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+      <a class="brand" id="homeLink" href="/hu/" aria-label="FitnessLady főoldal">
+        <span class="dot"></span><span>Fitness Lady</span>
       </a>
-      <a class="pill" href="/hu/">Vissza a főoldalra</a>
+      <a href="/hu/" style="color:rgba(255,255,255,.80); font-weight:800;">← Vissza a főoldalra</a>
     </div>
   </header>
 
-  <div class="wrap">
-    <div class="glass">
-      <div class="card">
+  <main class="wrap">
+    <div class="container">
+      <div class="glass card">
         <h1>Bejelentkezés / Regisztráció</h1>
-        <p class="sub">Belépés vagy regisztráció után automatikusan a <b>vevő oldalra</b> viszünk.</p>
+        <p class="sub">Belépés után automatikusan a <b>„Saját programom”</b> oldalra visz.</p>
 
         <label>Email</label>
         <input id="email" type="email" placeholder="pl. teszt@fitnesslady.ch" autocomplete="email">
@@ -281,29 +161,38 @@
 
         <div class="row">
           <button class="primary" id="btnLogin" type="button">Belépés</button>
-          <button class="ghost" id="btnRegister" type="button">Regisztráció</button>
+          <button id="btnRegister" type="button">Regisztráció</button>
         </div>
 
         <div class="row">
-          <button class="ghost" id="btnMe" type="button">Profil lekérés</button>
-          <button class="ghost" id="btnLogout" type="button">Kilépés</button>
-        </div>
-
-        <div class="hint">
-          <span>Ha már be vagy lépve: automatikusan átdobunk az appba.</span>
-          <a class="link" href="/hu/app/">Vevő oldal megnyitása</a>
+          <button id="btnMe" type="button">Profil lekérés</button>
+          <button id="btnLogout" type="button">Kilépés</button>
         </div>
 
         <div class="log" id="log">Log: betöltés…</div>
-
-        <div class="small">
-          Tipp: ha “nem dob át”, csinálj egy hard refresh-t: <b>Ctrl+F5</b> (Windows) / <b>Cmd+Shift+R</b> (Mac).
+        <div class="hint">
+          Tipp: ha fehér oldal lenne, nyisd meg DevTools → Console és másold ide a hibát.
         </div>
       </div>
     </div>
-  </div>
+  </main>
 
   <script type="module">
+    // =========================
+    // Base prefix (GitHub Pages vs custom domain)
+    // =========================
+    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+
+    const homeLink = document.getElementById("homeLink");
+    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+
+    const next = new URLSearchParams(location.search).get("next") || `${BASE_PREFIX}/hu/app/`;
+    const goApp = () => location.assign(next);
+
+    // =========================
+    // Firebase SDK (Web module)
+    // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
     import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
     import {
@@ -333,62 +222,67 @@
 
     const app = initializeApp(firebaseConfig);
     try { getAnalytics(app); } catch (e) {}
+
     const auth = getAuth(app);
     const db = getFirestore(app);
-
-    const REDIRECT_AFTER_AUTH = "/hu/app/";
 
     const $ = (id) => document.getElementById(id);
     const log = (msg) => { $("log").textContent = "Log: " + msg; console.log(msg); };
 
     function getInputs() {
-      const email = $("email").value.trim();
+      const email = $("email").value.trim().toLowerCase();
       const password = $("pass").value;
       return { email, password };
     }
 
-    // Regisztráció
+    async function ensureUserDoc(user){
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) return;
+
+      // első ügyfélként: kapsz alap profilt
+      await setDoc(ref, {
+        email: user.email,
+        package: "Start",
+        goal: "Formálás",
+        level: 2,
+        active: true,
+        cycleStart: "2026-02-10",
+        cycleEnd: "2026-03-10",
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      }, { merge: true });
+    }
+
     async function doRegister() {
       const { email, password } = getInputs();
       if (!email || password.length < 6) return log("Hiba: email kell + jelszó min. 6 karakter.");
       log("Regisztráció indul…");
 
       const cred = await createUserWithEmailAndPassword(auth, email, password);
+      await ensureUserDoc(cred.user);
 
-      // User doc mentése (ehhez Firestore Rules kell)
-      await setDoc(doc(db, "users", cred.user.uid), {
-        email: cred.user.email,
-        package: "Start",
-        goal: "Formálás",
-        level: 2,
-        active: true,
-        createdAt: serverTimestamp(),
-        updatedAt: serverTimestamp()
-      }, { merge: true });
-
-      log("Sikeres regisztráció ✅ Átirányítás az appba…");
-      window.location.href = REDIRECT_AFTER_AUTH;
+      log("Sikeres regisztráció ✅ Átirányítás /hu/app/ …");
+      goApp();
     }
 
-    // Belépés
     async function doLogin() {
       const { email, password } = getInputs();
       if (!email || !password) return log("Hiba: add meg az emailt és jelszót.");
       log("Belépés…");
 
       const cred = await signInWithEmailAndPassword(auth, email, password);
+      await ensureUserDoc(cred.user);
 
-      log("Belépve ✅ " + cred.user.email + " → átirányítás…");
-      window.location.href = REDIRECT_AFTER_AUTH;
+      log("Belépve ✅ Átirányítás /hu/app/ …");
+      goApp();
     }
 
-    // Kilépés
     async function doLogout() {
       await signOut(auth);
       log("Kijelentkezve.");
     }
 
-    // Profil lekérés
     async function doMe() {
       const user = auth.currentUser;
       if (!user) return log("Nincs belépve user.");
@@ -401,17 +295,13 @@
     $("btnLogout").addEventListener("click", () => doLogout().catch(e => log("Logout hiba: " + e.message)));
     $("btnMe").addEventListener("click", () => doMe().catch(e => log("Me hiba: " + e.message)));
 
-    // Ha már be van lépve, ne álljon itt → dobjuk át az appba
     onAuthStateChanged(auth, (user) => {
       if (user) {
-        log("Auth state: LOGGED IN → " + user.email + " (redirect…)");
-
-        // rövid delay, hogy a log látszódjon 1 pillanatra (nem kötelező)
-        setTimeout(() => {
-          window.location.href = REDIRECT_AFTER_AUTH;
-        }, 250);
+        // ha már be van lépve → automatikusan app
+        log("Auth: belépve → " + user.email + " • redirect…");
+        goApp();
       } else {
-        log("Auth state: LOGGED OUT");
+        log("Auth: kijelentkezve");
       }
     });
   </script>
