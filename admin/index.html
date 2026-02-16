@@ -4,322 +4,205 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady — Admin</title>
-
   <style>
     :root{
-      --bg:#07060b;
-      --text:rgba(255,255,255,.92);
+      --bg:#07060b; --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-      --pink:#ff4fd8;
-      --pink2:#b14cff;
-      --gold:#ffd38a;
-      --radius:22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1180px;
-      --glassA: rgba(255,255,255,.06);
-      --glassB: rgba(255,255,255,.02);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.14);
+      --stroke:rgba(255,255,255,.10);
+      --glassA:rgba(255,255,255,.06);
+      --glassB:rgba(255,255,255,.02);
+      --pink:#ff4fd8; --pink2:#b14cff;
+      --radius:18px;
+      --max:1180px;
+      --shadow:0 18px 55px rgba(0,0,0,.55);
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
+      color:var(--text);
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
-      color:var(--text);
       overflow-x:hidden;
     }
     body::before{
       content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
+      position:fixed; inset:0; z-index:-1;
       background-image: var(--hero-url, url("/hero.png"));
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: translateZ(0);
+      background-size:cover;
+      background-position:center;
       opacity:.92;
     }
-    a{ color:inherit; text-decoration:none; }
-    button, input, select{ font:inherit; }
-
-    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
-
+    .container{width:min(var(--max),92vw); margin:0 auto;}
     .topbar{
-      position: fixed; top:0; left:0; right:0; z-index: 50;
-      background: rgba(8,6,12,.55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      position:fixed; top:0; left:0; right:0; z-index:50;
+      background:rgba(8,6,12,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
+      backdrop-filter:blur(12px);
     }
-    .topbar-inner{
-      height: 64px;
-      display:flex; align-items:center; justify-content: space-between;
-      gap: 12px;
-    }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:900; white-space:nowrap; }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
-    }
-
+    .topbar-inner{height:64px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
+    .brand{display:flex; align-items:center; gap:10px; font-weight:900;}
+    .dot{width:10px;height:10px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#ffd0f6,var(--pink)); box-shadow:0 0 18px rgba(255,79,216,.7)}
     .pill{
-      display:inline-flex; align-items:center; justify-content:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:9px 12px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,12,26,.55);
+      color:var(--text);
       cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
       user-select:none;
-      white-space: nowrap;
+      gap:8px;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
     .pill.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 950;
+      background:linear-gradient(135deg,var(--pink),var(--pink2));
+      color:#140813; font-weight:900;
+      border-color:rgba(255,255,255,.18);
+      box-shadow:0 18px 46px rgba(255,79,216,.26);
     }
-    .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
-
-    main{ padding-top:64px; min-height:100vh; min-height:100dvh; }
-    .page{ padding: 18px 0 64px; }
-
+    main{padding-top:64px; min-height:100vh}
+    .page{padding:18px 0 64px}
     .glass{
-      background: linear-gradient(180deg, var(--glassA), var(--glassB));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background:linear-gradient(180deg,var(--glassA),var(--glassB));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      padding:16px;
     }
-    .card{ padding: 16px; }
-    h1,h2,h3{ margin:0 0 10px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; letter-spacing:-.2px; }
-    h1{ font-size: 22px; }
-    .sub{ margin:0 0 12px; color: var(--muted); line-height: 1.55; font-size: 13.5px; }
-
-    .grid{ display:grid; grid-template-columns: 1.1fr .9fr; gap: 14px; align-items:start; }
-    @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } }
-
-    .field{ display:grid; gap:8px; margin: 10px 0 12px; }
-    label{ font-size: 12.5px; color: var(--muted2); font-weight: 850; }
+    .grid{display:grid; grid-template-columns: 1fr 420px; gap:14px; align-items:start;}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
+    h1{font-size:20px; margin:0 0 10px;}
+    h2{font-size:16px; margin:0 0 10px;}
+    .sub{margin:0 0 12px; color:var(--muted); font-size:13.5px; line-height:1.5;}
     input, select{
       width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.92);
-      outline: none;
+      padding:12px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.22);
+      color:rgba(255,255,255,.92);
+      outline:none;
     }
-    input:focus, select:focus{ border-color: rgba(255,255,255,.22); }
-
-    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+    label{display:block; margin:10px 0 6px; font-size:12.5px; color:rgba(255,255,255,.70); font-weight:800;}
+    .list{display:grid; gap:10px;}
     .row{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items:center;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
+      display:grid; grid-template-columns: 1fr auto;
+      gap:10px; align-items:center;
+      padding:12px;
+      border-radius:16px;
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.10);
+      cursor:pointer;
     }
-    .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
-    .desc{ color: var(--muted); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
-    .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
-
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 6px 10px; border-radius:999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      color: var(--muted);
-      white-space: nowrap;
-      font-weight: 900;
-      font-size: 12px;
+    .row:hover{border-color:rgba(255,255,255,.18)}
+    .title{font-weight:900; font-size:13.5px;}
+    .meta{color:rgba(255,255,255,.65); font-size:12.5px; margin-top:4px; line-height:1.35;}
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:6px 10px; border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.07);
+      font-weight:800; font-size:12px; color:rgba(255,255,255,.75);
+      white-space:nowrap;
     }
-
-    .mono{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.78);
-      white-space: pre-wrap;
-      word-break: break-word;
-      background: rgba(0,0,0,.25);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 14px;
-      padding: 12px;
+    .rightActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    .log{
+      margin-top:10px;
+      padding:12px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.22);
+      color:rgba(255,255,255,.80);
+      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size:12px;
+      white-space:pre-wrap;
+      min-height:56px;
     }
-
-    .toast{
-      position: fixed;
-      left: 50%;
-      bottom: 18px;
-      transform: translateX(-50%);
-      z-index: 90;
-      max-width: min(720px, 92vw);
-      padding: 10px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.72);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      box-shadow: 0 18px 55px rgba(0,0,0,.55);
-      color: rgba(255,255,255,.92);
-      display:none;
-      gap:10px;
-      align-items:center;
-      justify-content:space-between;
-    }
-    .toast.show{ display:flex; }
+    .danger{border-color:rgba(255,255,255,.18); background:rgba(255,255,255,.06);}
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a class="brand" id="homeLink" href="/hu/" aria-label="Vissza a főoldalra">
+      <div class="brand">
         <span class="dot"></span>
         <span>FitnessLady Admin</span>
-      </a>
-
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="pill ghost" id="btnGoApp" type="button">👤 Vevő oldal</button>
-        <button class="pill ghost" id="btnLogout" type="button">⎋ Kilépés</button>
+        <span class="badge" id="meBadge">—</span>
+      </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="pill" id="btnOpenApp" type="button">↗ Vevő app</button>
+        <button class="pill danger" id="btnLogout" type="button">⎋ Kilépés</button>
       </div>
     </div>
   </header>
 
   <main>
     <div class="container page">
+      <div class="glass" style="margin-bottom:14px;">
+        <h1>Vásárlók / ügyfelek kezelése</h1>
+        <p class="sub">Itt látod a <b>users</b> kollekciót. Kattints egy felhasználóra → jobb oldalon szerkeszted → Mentés.</p>
 
-      <section class="glass card" style="margin-bottom:14px;">
-        <h1>Admin vezérlőpult</h1>
-        <p class="sub" id="statusLine">Betöltés…</p>
-
-        <div class="grid" style="margin-top:10px;">
-          <div>
-            <div class="field">
-              <label for="search">Keresés (email / uid)</label>
-              <input id="search" type="text" placeholder="pl. tuskepal@gmail.com" />
-            </div>
-          </div>
-
-          <div>
-            <div class="field">
-              <label>Gyors műveletek</label>
-              <div style="display:flex; gap:10px; flex-wrap:wrap;">
-                <button class="pill primary" id="btnReload" type="button">↻ Frissítés</button>
-                <button class="pill ghost" id="btnMakeMeAdminHint" type="button">ℹ️ Admin beállítás</button>
-              </div>
-            </div>
-          </div>
+        <div style="display:grid; grid-template-columns: 1fr 220px; gap:10px; align-items:center;">
+          <input id="q" placeholder="Keresés email/uid/csomag/cél…" />
+          <button class="pill primary" id="btnRefresh" type="button">↻ Frissítés</button>
         </div>
-      </section>
+      </div>
 
       <div class="grid">
-        <!-- LEFT: users list -->
-        <section class="glass card">
-          <h2>Vevők</h2>
-          <p class="sub">Kattints egy userre → jobbra szerkesztés. (Firestore: users collection)</p>
-          <ul class="list" id="usersList"></ul>
+        <!-- LEFT: USERS LIST -->
+        <section class="glass">
+          <h2>Felhasználók</h2>
+          <div class="list" id="userList"></div>
+          <div class="log" id="listLog">Betöltés…</div>
         </section>
 
-        <!-- RIGHT: editor -->
-        <section class="glass card">
-          <h2>Szerkesztő</h2>
-          <p class="sub" id="editorHint">Válassz egy vevőt a listából.</p>
+        <!-- RIGHT: EDITOR -->
+        <section class="glass">
+          <h2>Személyre szabás</h2>
+          <p class="sub" id="selSub">Válassz egy felhasználót bal oldalon.</p>
 
-          <div id="editor" style="display:none;">
-            <div class="field">
-              <label>UID</label>
-              <input id="ed_uid" type="text" disabled />
-            </div>
+          <label>Email</label>
+          <input id="f_email" disabled />
 
-            <div class="field">
-              <label>E-mail</label>
-              <input id="ed_email" type="text" disabled />
-            </div>
+          <label>UID</label>
+          <input id="f_uid" disabled />
 
-            <div class="field">
-              <label>Aktív hozzáférés</label>
-              <select id="ed_active">
-                <option value="true">true (engedélyezve)</option>
-                <option value="false">false (tiltva)</option>
-              </select>
-            </div>
+          <label>Csomag</label>
+          <select id="f_package">
+            <option value="Start">Start</option>
+            <option value="Balance">Balance</option>
+            <option value="Pro">Pro</option>
+          </select>
 
-            <div class="field">
-              <label>Csomag</label>
-              <select id="ed_package">
-                <option value="Start">Start</option>
-                <option value="Balance">Balance</option>
-                <option value="Pro">Pro</option>
-              </select>
-            </div>
+          <label>Cél</label>
+          <input id="f_goal" placeholder="pl. Formálás / Fogyás / Erő" />
 
-            <div class="field">
-              <label>Cél</label>
-              <input id="ed_goal" type="text" placeholder="Formálás / Fogyás / Erő..." />
-            </div>
+          <label>Szint (1–4)</label>
+          <input id="f_level" type="number" min="1" max="4" />
 
-            <div class="field">
-              <label>Szint (1–4)</label>
-              <select id="ed_level">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-              </select>
-            </div>
+          <label>Aktív</label>
+          <select id="f_active">
+            <option value="true">true</option>
+            <option value="false">false</option>
+          </select>
 
-            <div class="field">
-              <label>Role (csak ha kell)</label>
-              <select id="ed_role">
-                <option value="user">user</option>
-                <option value="admin">admin</option>
-              </select>
-              <div style="color:rgba(255,255,255,.6); font-size:12.5px; line-height:1.45;">
-                Tipp: csak a te UID-od legyen <b>admin</b>.
-              </div>
-            </div>
+          <label>Role</label>
+          <input id="f_role" disabled />
 
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:8px;">
-              <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
-              <button class="pill ghost" id="btnOpenUserDoc" type="button">🔎 Firestore doc</button>
-            </div>
-
-            <div style="margin-top:12px;">
-              <div class="chip" id="ed_meta">—</div>
-              <div class="mono" id="ed_raw" style="margin-top:10px;">—</div>
-            </div>
+          <div class="rightActions">
+            <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
+            <button class="pill" id="btnOpenAs" type="button">↗ Megnyitás (app)</button>
           </div>
+
+          <div class="log" id="editLog">—</div>
         </section>
       </div>
     </div>
   </main>
-
-  <div class="toast" id="toast">
-    <div id="toastMsg">—</div>
-    <button class="pill ghost" id="toastClose" type="button">OK</button>
-  </div>
 
   <script type="module">
     // =========================
@@ -328,36 +211,19 @@
     const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
 
-    const homeLink = document.getElementById("homeLink");
-    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
-
-    // Buttons: quick nav
-    document.getElementById("btnGoApp").addEventListener("click", ()=>{
-      location.href = `${BASE_PREFIX}/app/`;
-    });
+    const $ = (id) => document.getElementById(id);
+    const logList = (m) => { $("listLog").textContent = m; console.log(m); };
+    const logEdit = (m) => { $("editLog").textContent = m; console.log(m); };
 
     // =========================
-    // Firebase (Auth + Firestore)
+    // Firebase
     // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
     import {
-      getAuth,
-      signInWithEmailAndPassword,
-      signOut,
-      onAuthStateChanged
+      getAuth, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
     import {
-      getFirestore,
-      collection,
-      doc,
-      getDoc,
-      getDocs,
-      query,
-      orderBy,
-      limit,
-      setDoc,
-      serverTimestamp
+      getFirestore, collection, getDocs, doc, getDoc, setDoc, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -370,221 +236,199 @@
       measurementId: "G-MH1YK9C2YF"
     };
 
-    const fbApp = initializeApp(firebaseConfig);
-    try { getAnalytics(fbApp); } catch(e) {}
-    const auth = getAuth(fbApp);
-    const db = getFirestore(fbApp);
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
 
     // =========================
-    // UI helpers
-    // =========================
-    const $ = (id)=>document.getElementById(id);
-    const escapeHtml = (s)=>String(s??"").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[c]));
-
-    const toast = (msg)=>{
-      $("toastMsg").textContent = msg;
-      $("toast").classList.add("show");
-      window.clearTimeout(window.__t);
-      window.__t = window.setTimeout(()=>$("toast").classList.remove("show"), 3200);
-    };
-    $("toastClose").addEventListener("click", ()=>$("toast").classList.remove("show"));
-
-    function setStatus(s){ $("statusLine").textContent = s; }
-
-    // =========================
-    // Simple login prompt if not logged in
-    // =========================
-    async function requireLoginUI(){
-      const email = prompt("Admin belépés email:");
-      if(!email) throw new Error("Belépés megszakítva.");
-      const pw = prompt("Jelszó:");
-      if(!pw) throw new Error("Belépés megszakítva.");
-      await signInWithEmailAndPassword(auth, email.trim().toLowerCase(), pw);
-    }
-
-    // =========================
-    // Admin check (users/{uid}.role === "admin")
-    // =========================
-    async function assertAdmin(user){
-      const snap = await getDoc(doc(db, "users", user.uid));
-      const data = snap.exists() ? snap.data() : null;
-      if (!data || data.role !== "admin") {
-        throw new Error("Nincs admin jogosultság (users/{uid}.role != admin).");
-      }
-      return data;
-    }
-
-    // =========================
-    // Data + render
+    // State
     // =========================
     let me = null;
+    let meProfile = null;
+    let usersCache = [];   // { uid, data }
     let selectedUid = null;
-    let cache = []; // user docs
 
-    function normalizeUser(u){
-      return {
-        uid: u.uid,
-        email: u.email || "",
-        active: !!u.active,
-        package: u.package || "Start",
-        goal: u.goal || "Formálás",
-        level: Number(u.level || 2),
-        role: u.role || "user",
-        createdAt: u.createdAt || null,
-        updatedAt: u.updatedAt || null,
-        raw: u
-      };
+    function escapeHtml(s){
+      return String(s ?? "").replace(/[&<>"']/g, c => ({
+        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+      }[c]));
     }
 
-    function matchesSearch(u, s){
-      if(!s) return true;
-      s = s.toLowerCase().trim();
-      return (u.uid || "").toLowerCase().includes(s) || (u.email || "").toLowerCase().includes(s);
+    async function loadMeProfile(uid){
+      const snap = await getDoc(doc(db, "users", uid));
+      return snap.exists() ? snap.data() : null;
     }
 
-    function renderList(){
-      const s = $("search").value;
-      const list = $("usersList");
+    function requireAdmin(){
+      const isAdmin = (meProfile?.role === "admin");
+      if(!isAdmin){
+        document.body.innerHTML = `
+          <div style="min-height:100vh; display:grid; place-items:center; padding:24px; color:white;">
+            <div style="max-width:720px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:18px;">
+              <h2 style="margin:0 0 10px;">Nincs admin jogosultság</h2>
+              <p style="margin:0; opacity:.8; line-height:1.5;">
+                A belépett fiókod users/${escapeHtml(me?.uid)} doksijában a <b>role</b> nem <b>admin</b>.
+                Állítsd be Firestore-ban: role = "admin", és frissítsd az oldalt.
+              </p>
+            </div>
+          </div>
+        `;
+        throw new Error("Not admin");
+      }
+    }
+
+    function renderList(filterText=""){
+      const list = $("userList");
       list.innerHTML = "";
 
-      const filtered = cache.filter(u => matchesSearch(u, s));
+      const ft = filterText.trim().toLowerCase();
 
-      if(filtered.length === 0){
-        list.innerHTML = `<li class="row"><div><div class="title">Nincs találat</div><div class="desc">Próbáld email/uid alapján.</div></div></li>`;
+      const rows = usersCache
+        .filter(u=>{
+          if(!ft) return true;
+          const d = u.data || {};
+          const hay = [
+            u.uid,
+            d.email,
+            d.package,
+            d.goal,
+            String(d.level ?? ""),
+            String(d.active ?? "")
+          ].join(" ").toLowerCase();
+          return hay.includes(ft);
+        });
+
+      if(rows.length === 0){
+        list.innerHTML = `<div class="sub">Nincs találat.</div>`;
         return;
       }
 
-      filtered.forEach(u=>{
-        const li = document.createElement("li");
-        li.className = "row";
-        li.style.cursor = "pointer";
-        li.innerHTML = `
+      rows.forEach(u=>{
+        const d = u.data || {};
+        const el = document.createElement("div");
+        el.className = "row";
+        el.innerHTML = `
           <div>
-            <div class="title">${escapeHtml(u.email || "—")} ${u.role==="admin" ? '<span class="chip" style="margin-left:6px;">👑 admin</span>' : ''}</div>
-            <div class="desc">
-              UID: <span style="opacity:.85">${escapeHtml(u.uid)}</span><br>
-              <span class="chip">${u.active ? "✅ active" : "⛔ inactive"}</span>
-              <span class="chip">📦 ${escapeHtml(u.package)}</span>
-              <span class="chip">⚡ ${escapeHtml(String(u.level))}/4</span>
+            <div class="title">${escapeHtml(d.email || "(nincs email)")}</div>
+            <div class="meta">
+              UID: ${escapeHtml(u.uid)}<br/>
+              Csomag: <b>${escapeHtml(d.package || "—")}</b> • Cél: ${escapeHtml(d.goal || "—")} • Szint: ${escapeHtml(d.level ?? "—")} • Aktív: ${escapeHtml(String(d.active ?? "—"))}
             </div>
           </div>
-          <div class="actions">
-            <button class="pill ghost" type="button">Szerkesztés</button>
-          </div>
+          <div class="badge">${escapeHtml(d.role || "user")}</div>
         `;
-        li.addEventListener("click", ()=>selectUser(u.uid));
-        list.appendChild(li);
+        el.addEventListener("click", ()=>selectUser(u.uid));
+        list.appendChild(el);
       });
     }
 
-    function renderEditor(u){
-      $("editor").style.display = "block";
-      $("editorHint").textContent = "Szerkesztés: mentsd el, és a vevő oldal rögtön ezt fogja olvasni Firestore-ból.";
+    function fillEditor(uid){
+      const u = usersCache.find(x=>x.uid===uid);
+      if(!u) return;
 
-      $("ed_uid").value = u.uid;
-      $("ed_email").value = u.email || "";
-      $("ed_active").value = u.active ? "true" : "false";
-      $("ed_package").value = u.package || "Start";
-      $("ed_goal").value = u.goal || "";
-      $("ed_level").value = String(u.level || 2);
-      $("ed_role").value = u.role || "user";
+      const d = u.data || {};
+      $("selSub").textContent = `Kijelölve: ${d.email || uid}`;
 
-      $("ed_meta").textContent = `${u.active ? "✅ active" : "⛔ inactive"} • ${u.package} • level ${u.level}/4 • role: ${u.role}`;
-      $("ed_raw").textContent = JSON.stringify(u.raw, null, 2);
+      $("f_email").value = d.email || "";
+      $("f_uid").value = uid;
+
+      $("f_package").value = ["Start","Balance","Pro"].includes(d.package) ? d.package : "Start";
+      $("f_goal").value = d.goal || "";
+      $("f_level").value = Number(d.level ?? 2);
+      $("f_active").value = String(d.active ?? true);
+
+      $("f_role").value = d.role || "user";
+
+      logEdit("Szerkeszthető mezők: package/goal/level/active");
     }
 
     async function selectUser(uid){
       selectedUid = uid;
-      const u = cache.find(x=>x.uid===uid);
-      if(!u) return;
-      renderEditor(u);
+      fillEditor(uid);
     }
 
-    async function loadUsers(){
-      setStatus("Users betöltése Firestore-ból…");
-
-      // Egyszerű: users collection teljes lista (ha később sok lesz, paging kell)
-      const qy = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(200));
-      const snaps = await getDocs(qy);
-
-      cache = snaps.docs.map(d=>normalizeUser({ uid: d.id, ...d.data() }));
-      setStatus(`Bejelentkezve: ${me.email} • Users: ${cache.length}`);
-      renderList();
-
-      // Ha volt kiválasztva, frissítsük az editor-t
-      if(selectedUid){
-        const u = cache.find(x=>x.uid===selectedUid);
-        if(u) renderEditor(u);
-      }
+    async function fetchUsers(){
+      logList("Users betöltése…");
+      const snap = await getDocs(collection(db, "users"));
+      usersCache = snap.docs.map(d=>({ uid: d.id, data: d.data() }));
+      logList(`Kész. Összesen: ${usersCache.length} user`);
+      renderList($("q").value || "");
     }
 
-    // =========================
-    // Save
-    // =========================
-    $("btnSave").addEventListener("click", async ()=>{
-      if(!selectedUid) return toast("Nincs kiválasztott user.");
+    async function saveSelected(){
+      if(!selectedUid) return logEdit("Nincs kijelölt user.");
 
-      const payload = {
-        active: $("ed_active").value === "true",
-        package: $("ed_package").value,
-        goal: ($("ed_goal").value || "").trim() || "Formálás",
-        level: Number($("ed_level").value || 2),
-        role: $("ed_role").value || "user",
+      const patch = {
+        package: $("f_package").value,
+        goal: $("f_goal").value.trim(),
+        level: Math.max(1, Math.min(4, parseInt($("f_level").value || "2", 10))),
+        active: $("f_active").value === "true",
         updatedAt: serverTimestamp()
       };
 
-      // Biztonság: nehogy véletlen mindenkit adminná tegyél
-      if(payload.role === "admin" && selectedUid !== auth.currentUser.uid){
-        toast("Figyelem: csak a saját UID-odat tedd adminná. Mentést letiltottam.");
-        return;
+      logEdit("Mentés folyamatban…");
+      await setDoc(doc(db, "users", selectedUid), patch, { merge: true });
+
+      // cache frissítés
+      const idx = usersCache.findIndex(x=>x.uid===selectedUid);
+      if(idx >= 0){
+        usersCache[idx].data = { ...(usersCache[idx].data||{}), ...patch };
       }
 
-      await setDoc(doc(db, "users", selectedUid), payload, { merge: true });
-      toast("Mentve ✅");
-      await loadUsers();
-    });
+      logEdit("Mentve ✅");
+      renderList($("q").value || "");
+      fillEditor(selectedUid);
+    }
 
-    $("btnOpenUserDoc").addEventListener("click", ()=>{
-      if(!selectedUid) return toast("Nincs kiválasztott user.");
-      // Firestore Console linket nem tudok garantálni, ezért csak UID-t adunk
-      navigator.clipboard?.writeText(selectedUid).catch(()=>{});
-      toast("UID kimásolva vágólapra ✅");
-    });
+    // =========================
+    // UI events
+    // =========================
+    $("btnRefresh").addEventListener("click", ()=>fetchUsers().catch(e=>logList("Hiba: " + e.message)));
+    $("q").addEventListener("input", ()=>renderList($("q").value || ""));
 
-    $("search").addEventListener("input", renderList);
-    $("btnReload").addEventListener("click", ()=>loadUsers().catch(e=>toast(e.message)));
-    $("btnMakeMeAdminHint").addEventListener("click", ()=>{
-      toast('A saját users/{uid} doc-ban állítsd: role="admin".');
-    });
+    $("btnSave").addEventListener("click", ()=>saveSelected().catch(e=>logEdit("Mentési hiba: " + e.message)));
 
     $("btnLogout").addEventListener("click", async ()=>{
       await signOut(auth);
-      location.reload();
+      location.href = `${BASE_PREFIX}/hu/login/`;
+    });
+
+    $("btnOpenApp").addEventListener("click", ()=>{
+      location.href = `${BASE_PREFIX}/app/`;
+    });
+
+    $("btnOpenAs").addEventListener("click", ()=>{
+      // ugyanazzal a sessionnel csak az app nyílik meg, nem “imperszonál”
+      location.href = `${BASE_PREFIX}/app/`;
     });
 
     // =========================
-    // Boot
+    // Auth gate
     // =========================
     onAuthStateChanged(auth, async (user)=>{
-      try{
-        if(!user){
-          await requireLoginUI();
-          return;
-        }
-        me = user;
-
-        await assertAdmin(user);
-        toast("Admin OK ✅");
-        await loadUsers();
-
-      }catch(e){
-        console.error(e);
-        setStatus("Hiba: " + (e?.message || "ismeretlen"));
-        alert("Admin hozzáférés hiba: " + (e?.message || "ismeretlen") + "\n\n1) Lépj be a saját email/jelszóval\n2) Firestore users/{uid}-ban role: admin");
-        try{ await signOut(auth); }catch{}
+      if(!user){
+        location.href = `${BASE_PREFIX}/hu/login/`;
+        return;
       }
+
+      me = user;
+      $("meBadge").textContent = user.email || user.uid;
+
+      meProfile = await loadMeProfile(user.uid);
+      // ha nincs doc, akkor csinálunk (de role-t nem állítunk itt)
+      if(!meProfile){
+        await setDoc(doc(db, "users", user.uid), {
+          email: user.email,
+          active: true,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }, { merge:true });
+        meProfile = await loadMeProfile(user.uid);
+      }
+
+      requireAdmin(); // dob ha nem admin
+
+      await fetchUsers();
     });
   </script>
 </body>
