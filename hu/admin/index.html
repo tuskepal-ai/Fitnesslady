@@ -1,827 +1,967 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady — Admin</title>
-  <meta name="description" content="FitnessLady admin panel — ügyfelek kezelése, program/étrend/személyre szabás beállítása." />
+
+  <meta name="theme-color" content="#120018" />
 
   <style>
     :root{
-      --bg:#07060b;
+      --bg:#07000b;
+      --card:rgba(30,8,45,.68);
+      --card2:rgba(40,10,60,.55);
+      --stroke:rgba(255,255,255,.10);
       --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
+      --muted:rgba(255,255,255,.66);
       --pink:#ff4fd8;
-      --pink2:#b14cff;
-      --gold:#ffd38a;
-      --radius:22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1180px;
-      --glassA: rgba(255,255,255,.06);
-      --glassB: rgba(255,255,255,.02);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.14);
-      --danger:#ff5a73;
-      --ok:#6dffb8;
+      --pink2:#c64bff;
+      --ok:#2ee59d;
+      --warn:#ffcc66;
+      --err:#ff5b6b;
+      --shadow: 0 18px 45px rgba(0,0,0,.55);
+      --radius: 20px;
+      --radius2: 26px;
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
-        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
-        var(--bg);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
       color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 420px at 20% 15%, rgba(198,75,255,.18), transparent 55%),
+        radial-gradient(800px 380px at 80% 25%, rgba(255,79,216,.16), transparent 55%),
+        radial-gradient(1000px 480px at 55% 85%, rgba(255,79,216,.10), transparent 60%),
+        linear-gradient(180deg, #050008, #040007 55%, #030006);
       overflow-x:hidden;
     }
-    body::before{
-      content:"";
-      position: fixed; inset:0; z-index:-1;
-      background-image:url("/hero.png");
-      background-size:cover;
-      background-position:center;
-      background-repeat:no-repeat;
-      opacity:.92;
-    }
-    a{ color:inherit; text-decoration:none; }
-    button,input,select,textarea{ font:inherit; }
-    .container{ width:min(var(--max), 92vw); margin:0 auto; }
 
+    .bg {
+      position:fixed; inset:0;
+      background:
+        radial-gradient(1200px 600px at 35% 35%, rgba(255,79,216,.14), transparent 60%),
+        radial-gradient(1000px 520px at 70% 55%, rgba(198,75,255,.12), transparent 62%);
+      filter: blur(0px);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(10,0,15,.55);
+      border-bottom: 1px solid var(--stroke);
+    }
     .topbar{
-      position:fixed; top:0; left:0; right:0;
-      z-index:50;
-      background: rgba(8,6,12,.55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
     }
-    .topbar-inner{
-      height:64px;
-      display:flex; align-items:center; justify-content:space-between;
-      gap:12px;
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
     }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
     .dot{
       width:10px; height:10px; border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex:0 0 auto;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.55);
     }
-
     .pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      font-size:14px;
+      white-space:nowrap;
+    }
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .btn{
       cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
       user-select:none;
-      white-space: nowrap;
-      gap:8px;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:10px 14px;
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
-    .pill.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 950;
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 18px 38px rgba(0,0,0,.30); border-color: rgba(255,255,255,.18); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 50px rgba(255,79,216,.18);
     }
-    .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{
-      background: rgba(255,90,115,.12);
-      border-color: rgba(255,90,115,.30);
-      color: rgba(255,255,255,.92);
-    }
-    .pill.ok{
-      background: rgba(109,255,184,.12);
-      border-color: rgba(109,255,184,.30);
-      color: rgba(255,255,255,.92);
+    .btn.danger{
+      background: rgba(255,91,107,.14);
+      border-color: rgba(255,91,107,.30);
     }
 
-    main{ padding-top: 64px; min-height:100vh; min-height:100dvh; }
-    .page{ padding: 18px 0 64px; }
+    main{
+      max-width:1100px;
+      margin: 22px auto 80px;
+      padding: 0 14px;
+    }
 
-    .glass{
-      background: linear-gradient(180deg, var(--glassA), var(--glassB));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
+    .card{
+      border:1px solid var(--stroke);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(25,7,40,.75), rgba(20,5,35,.55));
       box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      overflow:hidden;
     }
-    .card{ padding:16px; }
-    h1,h2,h3{ margin:0 0 10px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; letter-spacing:-.2px; }
-    h1{ font-size: 26px; }
-    h2{ font-size: 20px; }
-    h3{ font-size: 16px; }
-    .sub{ margin:0 0 12px; color:var(--muted); line-height:1.55; font-size:13.5px; }
+    .cardHeader{
+      padding:16px 16px 0;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size: 34px;
+      letter-spacing:.2px;
+    }
+    .sub{
+      margin:0 0 14px;
+      color: var(--muted);
+      line-height:1.45;
+    }
+
+    .tabs{
+      display:flex; gap:10px;
+      padding: 0 16px 16px;
+      flex-wrap:wrap;
+    }
+    .tab{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      transition:.12s;
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
+      box-shadow: 0 18px 42px rgba(255,79,216,.14);
+      border-color: rgba(255,255,255,.16);
+    }
 
     .grid{
       display:grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap:14px;
-      align-items:start;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      padding: 14px 16px 16px;
     }
-    @media (max-width: 980px){
+    @media (max-width: 900px){
       .grid{ grid-template-columns: 1fr; }
+      h1{ font-size: 30px; }
     }
 
-    .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin: 8px 0 12px; }
-    .tab{
-      padding: 8px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.86);
-      cursor:pointer;
-      font-size: 13px;
-      font-weight: 900;
-      user-select:none;
+    .panel{
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      padding: 14px;
     }
-    .tab.is-active{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-    }
+    .panel h2{margin:0 0 6px; font-size: 22px;}
+    .panel p{margin:0 0 12px; color:var(--muted); line-height:1.45;}
 
-    .row{
-      display:grid;
-      grid-template-columns: 1fr auto;
-      gap: 10px;
-      align-items:center;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-    .row .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
-    .row .desc{ color: var(--muted); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
-    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
-
-    .field{ display:grid; gap:8px; margin: 10px 0 12px; }
-    label{ font-size: 12.5px; color: var(--muted2); font-weight: 900; }
-    input,select,textarea{
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .field{
       width:100%;
-      padding: 12px 12px;
+      padding:12px 12px;
       border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
+      border:1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.92);
-      outline: none;
+      color: var(--text);
+      outline:none;
     }
-    textarea{ min-height: 110px; resize: vertical; }
-    input:focus,select:focus,textarea:focus{ border-color: rgba(255,255,255,.22); }
+    .field:focus{
+      border-color: rgba(255,79,216,.45);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+    label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
 
-    .note{ color: var(--muted2); font-size: 12.6px; line-height: 1.55; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
-
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+      max-height: 520px;
+      overflow:auto;
+      padding-right: 2px;
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding: 12px;
+      cursor:pointer;
+      transition:.12s;
+    }
+    .item:hover{
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 16px 34px rgba(0,0,0,.25);
+      transform: translateY(-1px);
+    }
+    .item .t{ font-weight:900; }
+    .item .m{ color:var(--muted); font-size:13px; margin-top:4px; }
     .badge{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 8px 11px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:12px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.86);
-      font-weight: 900;
-      font-size: 12.5px;
-      white-space: nowrap;
+      color: rgba(255,255,255,.85);
+      margin-left:8px;
     }
+    .badge.ok{ border-color: rgba(46,229,157,.30); background: rgba(46,229,157,.10); }
+    .badge.err{ border-color: rgba(255,91,107,.30); background: rgba(255,91,107,.12); }
+    .badge.warn{ border-color: rgba(255,204,102,.30); background: rgba(255,204,102,.10); }
 
-    .split{
-      display:grid; grid-template-columns: 1fr 1fr; gap:10px;
-    }
-    @media (max-width: 680px){
-      .split{ grid-template-columns: 1fr; }
-    }
+    textarea.field{ min-height: 140px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
 
-    .hidden{ display:none !important; }
+    .log{
+      margin: 14px 16px 16px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.18);
+      padding: 12px 14px;
+      color: rgba(255,255,255,.80);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
 
     footer{
-      padding: 18px 0 46px;
-      border-top:1px solid rgba(255,255,255,.08);
-      background: rgba(10,8,14,.55);
-      backdrop-filter: blur(10px);
+      max-width:1100px;
+      margin: 24px auto 30px;
+      padding: 0 14px;
+      color: rgba(255,255,255,.60);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      font-size: 13px;
     }
-    .footer-inner{
-      display:flex;
-      justify-content:space-between;
-      gap:12px;
-      flex-wrap:wrap;
-      color:rgba(255,255,255,.70);
-      font-size:13px;
+
+    .toast{
+      position: fixed;
+      top: 74px;
+      right: 14px;
+      z-index: 50;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      max-width: 92vw;
+      display:none;
+      color: rgba(255,255,255,.92);
+      font-weight: 700;
     }
+    .toast.ok{ border-color: rgba(46,229,157,.28); }
+    .toast.err{ border-color: rgba(255,91,107,.30); }
+    .toast.warn{ border-color: rgba(255,204,102,.28); }
   </style>
 </head>
+
 <body>
-  <header class="topbar">
-    <div class="container topbar-inner">
+  <div class="bg"></div>
+
+  <header>
+    <div class="topbar">
       <div class="brand">
         <span class="dot"></span>
-        <span>FitnessLady Admin</span>
+        <span>FitnessLady <span style="opacity:.85">Admin</span></span>
       </div>
 
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-        <span class="badge" id="authBadge">ellenőrzés…</span>
-        <a class="pill ghost" href="/hu/app/" title="Vevő app">↗ App</a>
-        <button class="pill ghost" id="btnSignOut" type="button">⎋ Kilépés</button>
+      <div class="actions">
+        <span class="pill" id="statusPill">ellenőrzés…</span>
+        <button class="btn" id="btnApp" title="Vevő oldal">↗ App</button>
+        <button class="btn danger" id="btnLogout" title="Kilépés">↩ Kilépés</button>
       </div>
     </div>
   </header>
 
   <main>
-    <div class="container page">
-      <section class="glass card" style="margin-bottom:14px;">
+    <section class="card">
+      <div class="cardHeader">
         <h1>Admin panel</h1>
         <p class="sub">
-          Itt látod a vevőket, és be tudod állítani: csomag, cél, szint, aktív státusz, étrend (JSON), valamint a “személyre szabás” (overrides).
+          Itt látod a vevőket, és be tudod állítani: csomag, cél, szint, aktív státusz, étrend (JSON),
+          valamint a “személyre szabás” (overrides).
+          <br><b>Belépés csak adminnak</b> (users/{uid}.role = "admin").
         </p>
+      </div>
 
-        <div class="tabs" id="tabs">
-          <button class="tab is-active" data-tab="customers" type="button">Customers</button>
-          <button class="tab" data-tab="plans" type="button">Plans</button>
-          <button class="tab" data-tab="overrides" type="button">Overrides</button>
-        </div>
-
-        <div class="row" style="grid-template-columns: 1fr;">
-          <div class="mono" id="logBox">Log: betöltés…</div>
-        </div>
-      </section>
+      <div class="tabs">
+        <div class="tab active" data-tab="customers">Customers</div>
+        <div class="tab" data-tab="plans">Plans</div>
+        <div class="tab" data-tab="overrides">Overrides</div>
+      </div>
 
       <div class="grid">
-        <!-- LEFT: Customers list -->
-        <section class="glass card" id="panelCustomers">
-          <h2>Vevők</h2>
-          <p class="sub">Kattints egy vevőre. Jobbra szerkesztesz, majd Mentés → Firestore.</p>
+        <!-- BAL: lista / tab tartalom -->
+        <div class="panel">
+          <h2 id="leftTitle">Vevők</h2>
+          <p id="leftDesc">Kattints egy vevőre. Jobbra szerkesztesz, majd Mentés → Firestore.</p>
 
-          <div class="field">
-            <label for="search">Keresés (e-mail / uid / docId)</label>
-            <input id="search" type="text" placeholder="pl. teszt@email.com" />
+          <div id="customersBlock">
+            <label>Keresés (e-mail / uid / docId)</label>
+            <input class="field" id="search" placeholder="pl. teszt@email.com" />
+
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnReload">⟳ Lista frissítése</button>
+              <button class="btn primary" id="btnNewUser">＋ Új vevő (doc)</button>
+            </div>
+
+            <div style="height:12px"></div>
+            <div class="list" id="list"></div>
           </div>
 
-          <ul class="list" id="customerList"></ul>
-        </section>
+          <div id="plansBlock" style="display:none">
+            <p style="color:var(--muted);margin:0 0 12px">
+              Plan sablonok (planTemplates) — jelenleg JSON gyors szerkesztés (profi/éles).
+            </p>
+            <label>Plan ID</label>
+            <input class="field" id="planId" placeholder="pl. Start / Balance / Pro" />
+            <label>Weeks JSON (planTemplates/{planId}/weeks/{weekNo})</label>
+            <textarea class="field" id="planWeeksJson" placeholder='{"weekNo":1,"videos":[...]} ...'></textarea>
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnLoadPlan">Betöltés</button>
+              <button class="btn primary" id="btnSavePlan">Mentés</button>
+            </div>
+          </div>
 
-        <!-- RIGHT: Editor -->
-        <section class="glass card" id="panelEditor">
+          <div id="overridesBlock" style="display:none">
+            <p style="color:var(--muted);margin:0 0 12px">
+              Overrides = személyre szabott videók/elemek a user alá: users/{uid}/overrides/{doc}
+            </p>
+            <label>Vevő UID</label>
+            <input class="field" id="ovUid" placeholder="pl. mOBrBrPlycPJb..." />
+            <label>Override Doc ID</label>
+            <input class="field" id="ovDoc" placeholder="pl. slot1 / 2026-02-15 / customA" />
+            <label>Override JSON</label>
+            <textarea class="field" id="ovJson" placeholder='{"title":"Személyre szabás 1","vimeoUrl":"...","active":true}'></textarea>
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnLoadOv">Betöltés</button>
+              <button class="btn primary" id="btnSaveOv">Mentés</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- JOBB: szerkesztő -->
+        <div class="panel">
           <h2>Szerkesztő</h2>
-          <p class="sub" id="editorSub">Válassz egy vevőt bal oldalt.</p>
+          <p>Válassz egy vevőt bal oldalt.</p>
 
-          <div id="editorEmpty" class="note">Nincs kiválasztott vevő.</div>
+          <div id="editorEmpty" style="color:var(--muted)">Nincs kiválasztott vevő.</div>
 
-          <div id="editorForm" class="hidden">
-            <div class="row" style="grid-template-columns: 1fr;">
+          <div id="editor" style="display:none">
+            <div class="row" style="justify-content:space-between; align-items:flex-start;">
               <div>
-                <div class="title" id="edTitle">—</div>
-                <div class="desc mono" id="edIds">—</div>
+                <div style="font-weight:900;font-size:16px" id="edTitle">—</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:4px" id="edMeta">—</div>
+              </div>
+              <div class="row">
+                <button class="btn" id="btnOpenDoc">↗ Firestore</button>
+                <button class="btn danger" id="btnDeleteUser">Törlés</button>
               </div>
             </div>
 
-            <div class="split">
-              <div class="field">
-                <label for="edActive">Active</label>
-                <select id="edActive">
-                  <option value="true">true</option>
-                  <option value="false">false</option>
-                </select>
-              </div>
+            <label>Aktív</label>
+            <select class="field" id="edActive">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
 
-              <div class="field">
-                <label for="edRole">Role</label>
-                <select id="edRole">
-                  <option value="">(none)</option>
-                  <option value="admin">admin</option>
-                  <option value="user">user</option>
-                </select>
-              </div>
+            <label>Role</label>
+            <select class="field" id="edRole">
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+
+            <label>Email</label>
+            <input class="field" id="edEmail" placeholder="vevo@email.com" />
+
+            <label>Csomag (package)</label>
+            <select class="field" id="edPackage">
+              <option value="Start">Start</option>
+              <option value="Balance">Balance</option>
+              <option value="Pro">Pro</option>
+            </select>
+
+            <label>Cél (goal)</label>
+            <input class="field" id="edGoal" placeholder="pl. Formálás" />
+
+            <label>Szint (level)</label>
+            <input class="field" id="edLevel" inputmode="numeric" placeholder="pl. 2" />
+
+            <label>Étrend (diet JSON) — gyors szerkesztés</label>
+            <textarea class="field" id="edDiet" placeholder='{"kcal":1800,"protein":140,"carb":170,"fat":55,"note":"...","weekPlan":{...}}'></textarea>
+
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnReloadUser">Frissítés</button>
+              <button class="btn primary" id="btnSaveUser">Mentés → Firestore</button>
             </div>
 
-            <div class="field">
-              <label for="edEmail">E-mail</label>
-              <input id="edEmail" type="email" placeholder="email" />
-              <div class="note">Megjegyzés: Auth emailt ez nem írja át, csak a Firestore profilt.</div>
+            <div style="height:14px"></div>
+            <div style="color:var(--muted);font-size:12px">
+              Tipp: a vevő oldalon a program az users/{uid} + users/{uid}/overrides alapján épül.
             </div>
-
-            <div class="split">
-              <div class="field">
-                <label for="edPackage">Csomag</label>
-                <select id="edPackage">
-                  <option value="Start">Start</option>
-                  <option value="Balance">Balance</option>
-                  <option value="Pro">Pro</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="edLevel">Szint (1–4)</label>
-                <select id="edLevel">
-                  <option value="1">1</option><option value="2">2</option>
-                  <option value="3">3</option><option value="4">4</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="edGoal">Cél</label>
-              <input id="edGoal" type="text" placeholder="pl. Formálás / Fogyás / Erő" />
-            </div>
-
-            <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
-
-            <h3>Étrend (diet)</h3>
-            <p class="note">
-              PRO mód: egy mezőben tároljuk JSON-ként. App oldal ezt tudja olvasni (később csinálunk “szép UI”-t).
-            </p>
-
-            <div class="split">
-              <div class="field">
-                <label for="edKcal">Kcal</label>
-                <input id="edKcal" type="number" placeholder="pl. 1800" />
-              </div>
-              <div class="field">
-                <label for="edProtein">Fehérje (g)</label>
-                <input id="edProtein" type="number" placeholder="pl. 150" />
-              </div>
-            </div>
-            <div class="split">
-              <div class="field">
-                <label for="edCarb">CH (g)</label>
-                <input id="edCarb" type="number" placeholder="pl. 170" />
-              </div>
-              <div class="field">
-                <label for="edFat">Zsír (g)</label>
-                <input id="edFat" type="number" placeholder="pl. 55" />
-              </div>
-            </div>
-
-            <div class="field">
-              <label for="edDietNote">Általános megjegyzés</label>
-              <textarea id="edDietNote" placeholder="pl. pihenőnapon kevesebb CH, sok víz..."></textarea>
-            </div>
-
-            <div class="field">
-              <label for="edDietWeekJson">Heti terv (JSON) — gyors szerkesztés</label>
-              <textarea id="edDietWeekJson" class="mono" placeholder='{"mon":{"meals":[{"title":"Reggeli","items":["..."]}],"note":""},"tue":{...}}'></textarea>
-              <div class="note">A Mentés gomb validálja, hogy JSON-e (ha nem, nem enged menteni).</div>
-            </div>
-
-            <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
-
-            <h3>Személyre szabás (overrides)</h3>
-            <p class="note">
-              Ide tudsz vevő-specifikus videókat / slotokat adni. PRO: egy JSON mező.
-            </p>
-            <div class="field">
-              <label for="edOverridesJson">Overrides JSON</label>
-              <textarea id="edOverridesJson" class="mono" placeholder='{"week1":{"slot1":{"title":"Glute fókusz","video":"https://player.vimeo.com/video/..."}}}'></textarea>
-            </div>
-
-            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
-              <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
-              <button class="pill ghost" id="btnReload" type="button">↺ Újratölt</button>
-              <button class="pill danger" id="btnDeactivate" type="button">⛔ Active=false</button>
-            </div>
-
-            <div class="note" id="saveMsg" style="margin-top:10px;"></div>
           </div>
-        </section>
+        </div>
       </div>
-    </div>
+
+      <div class="log" id="log">Log: betöltés…</div>
+    </section>
   </main>
 
   <footer>
-    <div class="container footer-inner">
-      <div>© <span id="y"></span> FitnessLady — Admin</div>
-      <div>Tüske web design</div>
-    </div>
+    <div>© 2026 FitnessLady — Admin</div>
+    <div>Tüske web design</div>
   </footer>
 
-  <script type="module">
-    // =========================
-    // 0) FIREBASE CONFIG (KÖTELEZŐ kitölteni)
-    // =========================
-    // Ide másold be a Firebase Console -> Project settings -> Your apps -> Web app config adatait.
-    const firebaseConfig = {
-      apiKey: "PASTE_YOUR_API_KEY",
-      authDomain: "PASTE_YOUR_AUTH_DOMAIN",
-      projectId: "PASTE_YOUR_PROJECT_ID",
-      storageBucket: "PASTE_YOUR_STORAGE_BUCKET",
-      messagingSenderId: "PASTE_YOUR_SENDER_ID",
-      appId: "PASTE_YOUR_APP_ID"
-    };
+  <div class="toast" id="toast"></div>
 
-    // =========================
-    // 1) Imports
-    // =========================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  <!-- Firebase v9 (modular) -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
     import {
       getAuth,
       onAuthStateChanged,
-      signInWithEmailAndPassword,
       signOut
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import {
       getFirestore,
-      doc,
-      getDoc,
-      getDocs,
-      collection,
-      updateDoc,
-      serverTimestamp,
-      query,
-      orderBy
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+      doc, getDoc, setDoc, updateDoc, deleteDoc,
+      collection, getDocs, query, orderBy, limit, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
     // =========================
-    // 2) Helpers
+    // A TE Firebase web configod
     // =========================
-    const $ = (s, r=document)=>r.querySelector(s);
-    const $$ = (s, r=document)=>Array.from(r.querySelectorAll(s));
-    const nowISO = ()=>new Date().toISOString();
-    const esc = (v)=>String(v??"");
-    const logBox = $("#logBox");
-    const authBadge = $("#authBadge");
-    const saveMsg = $("#saveMsg");
+    const firebaseConfig = {
+      apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
+      authDomain: "fitneady-15fd0.firebaseapp.com",
+      projectId: "fitneady-15fd0",
+      storageBucket: "fitneady-15fd0.firebasestorage.app",
+      messagingSenderId: "480597492603",
+      appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
+      measurementId: "G-MH1YK9C2YF"
+    };
+
+    const $ = (id)=>document.getElementById(id);
+    const logEl = $("log");
+    const toastEl = $("toast");
 
     function log(msg){
-      logBox.textContent = `Log: ${msg}`;
-      console.log("[Admin]", msg);
+      const t = (new Date()).toLocaleString();
+      logEl.textContent = `Log: ${t}\n${msg}`;
+      console.log(msg);
+    }
+    function toast(msg, type="ok"){
+      toastEl.className = `toast ${type}`;
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
     }
 
-    function safeJsonParse(str){
+    // UI refs
+    const statusPill = $("statusPill");
+    const btnApp = $("btnApp");
+    const btnLogout = $("btnLogout");
+
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const customersBlock = $("customersBlock");
+    const plansBlock = $("plansBlock");
+    const overridesBlock = $("overridesBlock");
+    const leftTitle = $("leftTitle");
+    const leftDesc = $("leftDesc");
+
+    const listEl = $("list");
+    const searchEl = $("search");
+    const btnReload = $("btnReload");
+    const btnNewUser = $("btnNewUser");
+
+    const editorEmpty = $("editorEmpty");
+    const editor = $("editor");
+    const edTitle = $("edTitle");
+    const edMeta = $("edMeta");
+    const btnOpenDoc = $("btnOpenDoc");
+    const btnDeleteUser = $("btnDeleteUser");
+
+    const edActive = $("edActive");
+    const edRole = $("edRole");
+    const edEmail = $("edEmail");
+    const edPackage = $("edPackage");
+    const edGoal = $("edGoal");
+    const edLevel = $("edLevel");
+    const edDiet = $("edDiet");
+    const btnReloadUser = $("btnReloadUser");
+    const btnSaveUser = $("btnSaveUser");
+
+    // Plans
+    const planIdEl = $("planId");
+    const planWeeksJsonEl = $("planWeeksJson");
+    const btnLoadPlan = $("btnLoadPlan");
+    const btnSavePlan = $("btnSavePlan");
+
+    // Overrides
+    const ovUidEl = $("ovUid");
+    const ovDocEl = $("ovDoc");
+    const ovJsonEl = $("ovJson");
+    const btnLoadOv = $("btnLoadOv");
+    const btnSaveOv = $("btnSaveOv");
+
+    // State
+    let app, auth, db;
+    let currentUser = null;      // firebase auth user
+    let currentProfile = null;   // users/{uid} doc
+    let selectedUid = null;      // editor user uid
+    let selectedDoc = null;      // user doc data
+
+    // =========================
+    // Init
+    // =========================
+    try{
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+    }catch(e){
+      log(`Firebase init hiba: ${e?.message || e}`);
+      statusPill.textContent = "Hiba / Konfig";
+      toast("Firebase init hiba!", "err");
+    }
+
+    // =========================
+    // Navigation buttons
+    // =========================
+    btnApp.addEventListener("click", ()=>{
+      window.location.href = "/hu/app/";
+    });
+
+    btnLogout.addEventListener("click", async ()=>{
       try{
-        if(!str || !String(str).trim()) return null;
-        return JSON.parse(str);
+        await signOut(auth);
+        toast("Kiléptél.", "ok");
+        window.location.href = "/hu/login/";
       }catch(e){
-        return { __error: e?.message || "Invalid JSON" };
+        log(`Kilépés hiba: ${e?.message || e}`);
+        toast("Kilépés hiba!", "err");
       }
-    }
-
-    function stringifyPretty(obj){
-      if(obj == null) return "";
-      try{ return JSON.stringify(obj, null, 2); }catch{ return ""; }
-    }
-
-    function setSaveMsg(text, kind=""){
-      saveMsg.textContent = text || "";
-      saveMsg.style.color = kind==="ok" ? "rgba(109,255,184,.92)"
-        : kind==="err" ? "rgba(255,90,115,.92)"
-        : "rgba(255,255,255,.72)";
-    }
-
-    // =========================
-    // 3) Init Firebase
-    // =========================
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-
-    // =========================
-    // 4) State
-    // =========================
-    let me = null;            // auth user
-    let meProfile = null;     // /users/{uid}
-    let customers = [];       // [{id, data}]
-    let selected = null;      // {id, data}
-
-    // =========================
-    // 5) UI Elements
-    // =========================
-    const customerList = $("#customerList");
-    const search = $("#search");
-
-    const editorEmpty = $("#editorEmpty");
-    const editorForm = $("#editorForm");
-    const editorSub = $("#editorSub");
-
-    const edTitle = $("#edTitle");
-    const edIds = $("#edIds");
-    const edActive = $("#edActive");
-    const edRole = $("#edRole");
-    const edEmail = $("#edEmail");
-    const edPackage = $("#edPackage");
-    const edLevel = $("#edLevel");
-    const edGoal = $("#edGoal");
-
-    const edKcal = $("#edKcal");
-    const edProtein = $("#edProtein");
-    const edCarb = $("#edCarb");
-    const edFat = $("#edFat");
-    const edDietNote = $("#edDietNote");
-    const edDietWeekJson = $("#edDietWeekJson");
-    const edOverridesJson = $("#edOverridesJson");
-
-    // Tabs panels
-    const panelCustomers = $("#panelCustomers");
-    const panelEditor = $("#panelEditor");
-
-    // =========================
-    // 6) Auth Flow
-    // =========================
-    async function ensureAdminOrBlock(){
-      // admin check: /users/{uid}.role === 'admin'
-      const ref = doc(db, "users", me.uid);
-      const snap = await getDoc(ref);
-      if(!snap.exists()){
-        throw new Error("Nincs /users/{uid} profilod. Hozd létre a users doc-ot a te UID-eddel.");
-      }
-      meProfile = snap.data();
-      const role = (meProfile.role || "").toLowerCase();
-      if(role !== "admin"){
-        throw new Error("Nincs admin jogosultságod (users/{uid}.role != admin).");
-      }
-      authBadge.textContent = `Belépve: ${me.email} • role=admin`;
-      authBadge.style.borderColor = "rgba(109,255,184,.30)";
-      authBadge.style.background = "rgba(109,255,184,.10)";
-      log("admin jogosultság OK");
-    }
-
-    async function promptLogin(){
-      // egyszerű, stabil login prompt (mobilon is működik)
-      const email = window.prompt("Admin belépés — Email:", "");
-      if(!email) throw new Error("Belépés megszakítva (nincs email).");
-      const pw = window.prompt("Jelszó:", "");
-      if(!pw) throw new Error("Belépés megszakítva (nincs jelszó).");
-      await signInWithEmailAndPassword(auth, email.trim(), pw);
-    }
-
-    $("#btnSignOut").addEventListener("click", async ()=>{
-      await signOut(auth);
-      location.reload();
     });
 
     // =========================
-    // 7) Data Loading
+    // Tabs
     // =========================
-    async function loadCustomers(){
-      log("customers betöltése…");
-      // Rendezés createdAt szerint (ha nincs, akkor doc id)
-      const qy = query(collection(db, "users"), orderBy("createdAt", "desc"));
-      const snap = await getDocs(qy);
-      customers = snap.docs.map(d => ({ id: d.id, data: d.data() }));
-      log(`customers OK (${customers.length} db)`);
-      renderCustomerList();
+    function setTab(name){
+      tabs.forEach(t=> t.classList.toggle("active", t.dataset.tab===name));
+
+      customersBlock.style.display = (name==="customers") ? "block" : "none";
+      plansBlock.style.display     = (name==="plans")     ? "block" : "none";
+      overridesBlock.style.display = (name==="overrides") ? "block" : "none";
+
+      if(name==="customers"){
+        leftTitle.textContent = "Vevők";
+        leftDesc.textContent = "Kattints egy vevőre. Jobbra szerkesztesz, majd Mentés → Firestore.";
+      }
+      if(name==="plans"){
+        leftTitle.textContent = "Plans";
+        leftDesc.textContent = "Plan sablonok (planTemplates) gyors szerkesztése.";
+      }
+      if(name==="overrides"){
+        leftTitle.textContent = "Overrides";
+        leftDesc.textContent = "Személyre szabások kezelése (users/{uid}/overrides).";
+      }
+      log(`Tab: ${name}`);
     }
 
-    // =========================
-    // 8) Render list
-    // =========================
-    function matchCustomer(c, term){
-      if(!term) return true;
-      const t = term.toLowerCase().trim();
-      const d = c.data || {};
-      const hay = [
-        c.id,
-        d.uid,
-        d.email,
-        d.goal,
-        d.package,
-        d.role
-      ].map(x => String(x||"").toLowerCase()).join(" ");
-      return hay.includes(t);
-    }
+    tabs.forEach(t=> t.addEventListener("click", ()=> setTab(t.dataset.tab)));
 
-    function renderCustomerList(){
-      const term = (search.value || "").trim();
-      const filtered = customers.filter(c => matchCustomer(c, term));
+    // =========================
+    // Auth guard + Admin check
+    // =========================
+    onAuthStateChanged(auth, async (u)=>{
+      currentUser = u;
 
-      customerList.innerHTML = "";
-      if(filtered.length === 0){
-        const li = document.createElement("li");
-        li.className = "row";
-        li.style.gridTemplateColumns = "1fr";
-        li.innerHTML = `<div class="note">Nincs találat.</div>`;
-        customerList.appendChild(li);
+      if(!u){
+        statusPill.textContent = "Nincs belépve";
+        log("Nincs belépett user. Redirect → /hu/login/");
+        window.location.href = "/hu/login/";
         return;
       }
 
-      filtered.forEach(c=>{
-        const d = c.data || {};
-        const email = d.email || "(nincs email)";
-        const pack = d.package || "—";
-        const goal = d.goal || "—";
-        const active = d.active !== false; // default true
-        const role = (d.role || "").toLowerCase();
+      statusPill.textContent = `Belépve: ${u.email || u.uid} • ellenőrzés…`;
 
-        const li = document.createElement("li");
-        li.className = "row";
-        li.style.cursor = "pointer";
-        li.innerHTML = `
-          <div>
-            <div class="title">${active ? "✅" : "⛔"} ${email}</div>
-            <div class="desc">Csomag: <b>${esc(pack)}</b> • Cél: ${esc(goal)} ${role==="admin" ? " • <b>ADMIN</b>" : ""}</div>
+      // Admin jog: users/{uid}.role === "admin"
+      try{
+        const pRef = doc(db, "users", u.uid);
+        const pSnap = await getDoc(pRef);
+
+        if(!pSnap.exists()){
+          statusPill.textContent = "Hiba / Nincs profil";
+          log(`Nincs users/${u.uid} profil. Hozd létre Firestore-ban (role='admin').`);
+          toast("Nincs profil (users/{uid})!", "err");
+          return;
+        }
+
+        currentProfile = pSnap.data();
+        const role = (currentProfile.role || "user").toLowerCase();
+
+        if(role !== "admin"){
+          statusPill.textContent = "Hiba / Nincs jogosultság";
+          log(`Nincs admin jog. users/${u.uid}.role = ${role}`);
+          toast("Nincs admin jogosultság!", "err");
+          return;
+        }
+
+        statusPill.textContent = `Belépve: ${u.email} • role=admin`;
+        log("Admin OK. Betöltés…");
+        toast("Admin belépés OK", "ok");
+
+        await loadUsers();
+      }catch(e){
+        statusPill.textContent = "Hiba / Firebase";
+        log(`Admin check hiba: ${e?.message || e}`);
+        toast("Admin ellenőrzés hiba!", "err");
+      }
+    });
+
+    // =========================
+    // Customers list (cached)
+    // =========================
+    let usersCache = [];
+
+    async function loadUsers(){
+      listEl.innerHTML = "";
+      selectedUid = null;
+      selectedDoc = null;
+      editor.style.display = "none";
+      editorEmpty.style.display = "block";
+
+      try{
+        const qy = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(200));
+        const snap = await getDocs(qy);
+        usersCache = [];
+        snap.forEach(d=> usersCache.push({ id:d.id, ...d.data() }));
+        renderList(usersCache);
+        log(`Users betöltve: ${usersCache.length} db`);
+      }catch(e){
+        log(`Users load hiba: ${e?.message || e}`);
+        toast("Nem tudom betölteni a users listát (Rules?)", "err");
+      }
+    }
+
+    function renderList(items){
+      const term = (searchEl.value || "").trim().toLowerCase();
+      const filtered = !term ? items : items.filter(u=>{
+        const id = (u.id || "").toLowerCase();
+        const email = (u.email || "").toLowerCase();
+        return id.includes(term) || email.includes(term);
+      });
+
+      listEl.innerHTML = "";
+      if(filtered.length === 0){
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `<div class="t">Nincs találat</div><div class="m">Próbálj másik keresést.</div>`;
+        listEl.appendChild(d);
+        return;
+      }
+
+      filtered.forEach(u=>{
+        const active = !!u.active;
+        const role = (u.role || "user").toLowerCase();
+        const pkg = u.package || "—";
+        const goal = u.goal || "—";
+        const level = (u.level ?? "—");
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="t">
+            ${(u.email || "(nincs email)")}
+            <span class="badge ${active ? "ok" : "err"}">${active ? "active" : "inactive"}</span>
+            <span class="badge ${role==="admin" ? "warn" : ""}">${role}</span>
           </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-            <span class="badge mono">${esc(c.id)}</span>
+          <div class="m">
+            uid/docId: <b>${u.id}</b><br>
+            csomag: <b>${pkg}</b> • cél: <b>${goal}</b> • szint: <b>${level}</b>
           </div>
         `;
-        li.addEventListener("click", ()=>{
-          selectCustomer(c.id);
-        });
-        customerList.appendChild(li);
+        el.addEventListener("click", ()=> selectUser(u.id));
+        listEl.appendChild(el);
       });
     }
 
-    search.addEventListener("input", renderCustomerList);
+    searchEl.addEventListener("input", ()=> renderList(usersCache));
+    btnReload.addEventListener("click", ()=> loadUsers());
+    btnNewUser.addEventListener("click", ()=> createNewUserDoc());
 
-    // =========================
-    // 9) Editor
-    // =========================
-    function selectCustomer(id){
-      const c = customers.find(x=>x.id===id);
-      if(!c) return;
+    async function createNewUserDoc(){
+      const email = prompt("Új vevő email:");
+      if(!email) return;
 
-      selected = { id: c.id, data: structuredClone(c.data || {}) };
-      editorEmpty.classList.add("hidden");
-      editorForm.classList.remove("hidden");
+      const docId = email.trim().toLowerCase().replace(/[^a-z0-9@._-]/g, "_");
 
-      const d = selected.data;
-      editorSub.textContent = "Mentés után a vevő oldala azonnal ezt fogja olvasni Firestore-ból.";
+      try{
+        await setDoc(doc(db,"users",docId),{
+          email: email.trim(),
+          role: "user",
+          active: true,
+          package: "Start",
+          goal: "Formálás",
+          level: 1,
+          diet: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }, { merge:true });
 
-      edTitle.textContent = d.email || "(nincs email)";
-      edIds.textContent = `docId: ${selected.id}`;
-
-      edActive.value = (d.active === false) ? "false" : "true";
-      edRole.value = d.role || "";
-      edEmail.value = d.email || "";
-      edPackage.value = d.package || "Start";
-      edLevel.value = String(d.level || 2);
-      edGoal.value = d.goal || "";
-
-      // diet objektum: diet = {kcal, protein, carb, fat, note, weekPlan}
-      const diet = d.diet || {};
-      edKcal.value = diet.kcal ?? "";
-      edProtein.value = diet.protein ?? "";
-      edCarb.value = diet.carb ?? "";
-      edFat.value = diet.fat ?? "";
-      edDietNote.value = diet.note ?? "";
-      edDietWeekJson.value = stringifyPretty(diet.weekPlan ?? null);
-
-      // overrides JSON: d.overrides
-      edOverridesJson.value = stringifyPretty(d.overrides ?? null);
-
-      setSaveMsg("");
+        toast("Új doc létrehozva.", "ok");
+        await loadUsers();
+      }catch(e){
+        log(`New user doc hiba: ${e?.message || e}`);
+        toast("Nem tudtam létrehozni.", "err");
+      }
     }
 
-    $("#btnReload").addEventListener("click", async ()=>{
-      if(!selected) return;
-      await refreshSelectedFromServer();
-    });
+    // =========================
+    // Editor
+    // =========================
+    async function selectUser(uid){
+      selectedUid = uid;
+      editorEmpty.style.display = "none";
+      editor.style.display = "block";
+      edTitle.textContent = "Betöltés…";
+      edMeta.textContent = uid;
 
-    async function refreshSelectedFromServer(){
-      setSaveMsg("Újratöltés…");
-      const ref = doc(db, "users", selected.id);
-      const snap = await getDoc(ref);
-      if(!snap.exists()){
-        setSaveMsg("A vevő dokumentuma nem található.", "err");
-        return;
+      try{
+        const uRef = doc(db, "users", uid);
+        const uSnap = await getDoc(uRef);
+        if(!uSnap.exists()){
+          selectedDoc = null;
+          edTitle.textContent = "Nincs ilyen user doc";
+          toast("Nincs ilyen doc.", "err");
+          return;
+        }
+
+        selectedDoc = uSnap.data();
+        const email = selectedDoc.email || "(nincs email)";
+        edTitle.textContent = email;
+        edMeta.textContent = `docId/uid: ${uid}`;
+
+        edActive.value = String(!!selectedDoc.active);
+        edRole.value = (selectedDoc.role || "user");
+        edEmail.value = selectedDoc.email || "";
+        edPackage.value = selectedDoc.package || "Start";
+        edGoal.value = selectedDoc.goal || "";
+        edLevel.value = String(selectedDoc.level ?? "");
+
+        if(selectedDoc.diet == null){
+          edDiet.value = "";
+        }else{
+          try{
+            edDiet.value = (typeof selectedDoc.diet === "string")
+              ? selectedDoc.diet
+              : JSON.stringify(selectedDoc.diet, null, 2);
+          }catch{
+            edDiet.value = "";
+          }
+        }
+
+        btnOpenDoc.onclick = ()=>{
+          const url = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/databases/-default-/data/~2Fusers~2F${encodeURIComponent(uid)}`;
+          window.open(url, "_blank");
+        };
+
+        log(`User kiválasztva: ${uid}`);
+      }catch(e){
+        log(`selectUser hiba: ${e?.message || e}`);
+        toast("Betöltés hiba.", "err");
       }
-      // frissíts listát is
-      const idx = customers.findIndex(x=>x.id===selected.id);
-      const fresh = snap.data();
-      if(idx>=0) customers[idx] = { id: selected.id, data: fresh };
-      selected = { id: selected.id, data: structuredClone(fresh) };
-      selectCustomer(selected.id);
-      renderCustomerList();
-      setSaveMsg("Újratöltve.", "ok");
     }
 
-    $("#btnDeactivate").addEventListener("click", ()=>{
-      if(!selected) return;
-      edActive.value = "false";
-      setSaveMsg("Beállítva: active=false (ne felejts Mentés).");
+    btnReloadUser.addEventListener("click", ()=>{
+      if(!selectedUid) return;
+      selectUser(selectedUid);
     });
 
-    $("#btnSave").addEventListener("click", async ()=>{
-      if(!selected) return;
+    btnSaveUser.addEventListener("click", async ()=>{
+      if(!selectedUid) return;
 
-      // 1) JSON validáció
-      const weekPlanParsed = safeJsonParse(edDietWeekJson.value);
-      if(weekPlanParsed && weekPlanParsed.__error){
-        setSaveMsg(`Diet week JSON hibás: ${weekPlanParsed.__error}`, "err");
-        return;
-      }
-      const overridesParsed = safeJsonParse(edOverridesJson.value);
-      if(overridesParsed && overridesParsed.__error){
-        setSaveMsg(`Overrides JSON hibás: ${overridesParsed.__error}`, "err");
-        return;
+      let dietValue = null;
+      const dietText = (edDiet.value || "").trim();
+      if(dietText){
+        try{
+          dietValue = JSON.parse(dietText);
+        }catch(e){
+          toast("Étrend JSON hibás (nem valid JSON).", "err");
+          return;
+        }
       }
 
-      // 2) payload
       const payload = {
-        active: edActive.value === "true",
-        role: edRole.value || null,
-        email: (edEmail.value || "").trim().toLowerCase(),
+        active: (edActive.value === "true"),
+        role: edRole.value,
+        email: (edEmail.value || "").trim(),
         package: edPackage.value,
-        level: parseInt(edLevel.value, 10) || 2,
         goal: (edGoal.value || "").trim(),
-        diet: {
-          kcal: edKcal.value === "" ? null : Number(edKcal.value),
-          protein: edProtein.value === "" ? null : Number(edProtein.value),
-          carb: edCarb.value === "" ? null : Number(edCarb.value),
-          fat: edFat.value === "" ? null : Number(edFat.value),
-          note: (edDietNote.value || "").trim(),
-          weekPlan: weekPlanParsed ?? null
-        },
-        overrides: overridesParsed ?? null,
+        level: Number(String(edLevel.value || "").trim() || 0),
+        diet: dietValue,
         updatedAt: serverTimestamp()
       };
 
-      // role null → törlés helyett null-t írunk (rules egyszerű marad)
-      // Ha zavar, később átállítjuk deleteField-re.
-
-      setSaveMsg("Mentés…");
       try{
-        const ref = doc(db, "users", selected.id);
-        await updateDoc(ref, payload);
-
-        // frissíts listában is
-        const idx = customers.findIndex(x=>x.id===selected.id);
-        if(idx>=0){
-          const merged = { ...(customers[idx].data||{}), ...payload };
-          // serverTimestamp nem jön vissza rögtön, oké
-          customers[idx] = { id: selected.id, data: merged };
-        }
-        setSaveMsg("Mentve ✅ Firestore frissült.", "ok");
-        renderCustomerList();
+        await updateDoc(doc(db, "users", selectedUid), payload);
+        toast("Mentve.", "ok");
+        log(`Mentés OK: users/${selectedUid}`);
+        await loadUsers();
+        await selectUser(selectedUid);
       }catch(e){
-        console.error(e);
-        setSaveMsg(`Mentés hiba: ${e?.message || e}`, "err");
+        log(`Mentés hiba: ${e?.message || e}`);
+        toast("Mentés hiba (Rules?)", "err");
       }
     });
 
-    // =========================
-    // 10) Tabs (most csak UI váltás — később bővítjük)
-    // =========================
-    $("#tabs").addEventListener("click", (e)=>{
-      const btn = e.target.closest("[data-tab]");
-      if(!btn) return;
-      $$("#tabs .tab").forEach(t=>t.classList.remove("is-active"));
-      btn.classList.add("is-active");
+    btnDeleteUser.addEventListener("click", async ()=>{
+      if(!selectedUid) return;
+      const ok = confirm(`Biztos törlöd? users/${selectedUid}`);
+      if(!ok) return;
 
-      const tab = btn.getAttribute("data-tab");
-      // jelenleg: customers panel + editor mindig látszik
-      // később: plans/overrides külön panelek
-      if(tab === "customers"){
-        panelCustomers.classList.remove("hidden");
-        panelEditor.classList.remove("hidden");
-        log("Customers tab");
-      }else if(tab === "plans"){
-        panelCustomers.classList.remove("hidden");
-        panelEditor.classList.remove("hidden");
-        log("Plans tab (következő körben bővítjük: sablonok / planTemplates)");
-      }else if(tab === "overrides"){
-        panelCustomers.classList.remove("hidden");
-        panelEditor.classList.remove("hidden");
-        log("Overrides tab (itt a kiválasztott user overrides mezője a PRO)");
-      }
-    });
-
-    // =========================
-    // 11) Boot
-    // =========================
-    document.getElementById("y").textContent = new Date().getFullYear();
-
-    onAuthStateChanged(auth, async (user)=>{
       try{
-        if(!user){
-          authBadge.textContent = "Nincs belépve";
-          authBadge.style.borderColor = "rgba(255,255,255,.12)";
-          authBadge.style.background = "rgba(255,255,255,.06)";
-          log("belépés szükséges…");
-          await promptLogin();
-          return; // onAuthStateChanged újra lefut
+        await deleteDoc(doc(db, "users", selectedUid));
+        toast("Törölve.", "ok");
+        selectedUid = null;
+        selectedDoc = null;
+        editor.style.display = "none";
+        editorEmpty.style.display = "block";
+        await loadUsers();
+      }catch(e){
+        log(`Törlés hiba: ${e?.message || e}`);
+        toast("Törlés hiba (Rules?)", "err");
+      }
+    });
+
+    // =========================
+    // Plans (planTemplates)
+    // =========================
+    btnLoadPlan.addEventListener("click", async ()=>{
+      const planId = (planIdEl.value || "").trim();
+      if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
+
+      try{
+        const s = await getDoc(doc(db, "planTemplates", planId));
+        const base = s.exists() ? s.data() : null;
+
+        const weeksSnap = await getDocs(query(collection(db, "planTemplates", planId, "weeks"), orderBy("weekNo","asc"), limit(50)));
+        const weeks = [];
+        weeksSnap.forEach(d=> weeks.push({ id:d.id, ...d.data() }));
+
+        const out = { base, weeks };
+        planWeeksJsonEl.value = JSON.stringify(out, null, 2);
+        toast("Plan betöltve.", "ok");
+      }catch(e){
+        log(`Plan load hiba: ${e?.message || e}`);
+        toast("Plan betöltés hiba.", "err");
+      }
+    });
+
+    btnSavePlan.addEventListener("click", async ()=>{
+      const planId = (planIdEl.value || "").trim();
+      if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
+
+      const txt = (planWeeksJsonEl.value || "").trim();
+      if(!txt){ toast("Üres JSON.", "warn"); return; }
+
+      let data;
+      try{ data = JSON.parse(txt); }
+      catch{ toast("JSON hibás.", "err"); return; }
+
+      try{
+        if(data.base){
+          await setDoc(doc(db, "planTemplates", planId), { ...data.base, updatedAt: serverTimestamp() }, { merge:true });
+        }else{
+          await setDoc(doc(db, "planTemplates", planId), { updatedAt: serverTimestamp() }, { merge:true });
         }
 
-        me = user;
-        log("auth OK, admin ellenőrzés…");
-        await ensureAdminOrBlock();
+        if(Array.isArray(data.weeks)){
+          for(const w of data.weeks){
+            const weekNo = Number(w.weekNo ?? w.id ?? 0);
+            if(!weekNo) continue;
+            const id = String(weekNo);
+            const payload = { ...w, weekNo, updatedAt: serverTimestamp() };
+            delete payload.id;
+            await setDoc(doc(db, "planTemplates", planId, "weeks", id), payload, { merge:true });
+          }
+        }
 
-        // betöltés
-        await loadCustomers();
-
-        // auto select: első vevő
-        if(customers[0]) selectCustomer(customers[0].id);
-
-        setSaveMsg("Kész. Válassz vevőt bal oldalt.");
-      }catch(err){
-        console.error(err);
-        authBadge.textContent = "Hiba / Nincs jogosultság";
-        authBadge.style.borderColor = "rgba(255,90,115,.30)";
-        authBadge.style.background = "rgba(255,90,115,.10)";
-        log(err?.message || String(err));
-        setSaveMsg(err?.message || String(err), "err");
+        toast("Plan mentve.", "ok");
+      }catch(e){
+        log(`Plan save hiba: ${e?.message || e}`);
+        toast("Plan mentés hiba (Rules?)", "err");
       }
     });
+
+    // =========================
+    // Overrides
+    // =========================
+    btnLoadOv.addEventListener("click", async ()=>{
+      const uid = (ovUidEl.value || "").trim();
+      const docId = (ovDocEl.value || "").trim();
+      if(!uid || !docId){ toast("UID + Doc ID kell.", "warn"); return; }
+
+      try{
+        const s = await getDoc(doc(db, "users", uid, "overrides", docId));
+        if(!s.exists()){
+          ovJsonEl.value = "";
+          toast("Nincs ilyen override doc.", "warn");
+          return;
+        }
+        ovJsonEl.value = JSON.stringify(s.data(), null, 2);
+        toast("Override betöltve.", "ok");
+      }catch(e){
+        log(`Override load hiba: ${e?.message || e}`);
+        toast("Override betöltés hiba.", "err");
+      }
+    });
+
+    btnSaveOv.addEventListener("click", async ()=>{
+      const uid = (ovUidEl.value || "").trim();
+      const docId = (ovDocEl.value || "").trim();
+      if(!uid || !docId){ toast("UID + Doc ID kell.", "warn"); return; }
+
+      const txt = (ovJsonEl.value || "").trim();
+      if(!txt){ toast("Üres JSON.", "warn"); return; }
+
+      let data;
+      try{ data = JSON.parse(txt); }
+      catch{ toast("JSON hibás.", "err"); return; }
+
+      try{
+        await setDoc(doc(db, "users", uid, "overrides", docId), { ...data, updatedAt: serverTimestamp() }, { merge:true });
+        toast("Override mentve.", "ok");
+      }catch(e){
+        log(`Override save hiba: ${e?.message || e}`);
+        toast("Override mentés hiba (Rules?)", "err");
+      }
+    });
+
+    // First tab
+    setTab("customers");
+    log("Admin UI betöltve. Várjuk az auth állapotot…");
   </script>
 </body>
 </html>
