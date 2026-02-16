@@ -4,137 +4,209 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady — Admin</title>
+
   <style>
     :root{
-      --bg:#07060b; --text:rgba(255,255,255,.92);
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
-      --stroke:rgba(255,255,255,.10);
-      --glassA:rgba(255,255,255,.06);
-      --glassB:rgba(255,255,255,.02);
-      --pink:#ff4fd8; --pink2:#b14cff;
-      --radius:18px;
-      --max:1180px;
-      --shadow:0 18px 55px rgba(0,0,0,.55);
+      --muted2:rgba(255,255,255,.55);
+
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --gold:#ffd38a;
+
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 1180px;
+
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
     }
-    *{box-sizing:border-box}
-    html,body{height:100%}
+
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
     body{
       margin:0;
-      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial;
-      color:var(--text);
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
+      color:var(--text);
       overflow-x:hidden;
     }
+
     body::before{
       content:"";
-      position:fixed; inset:0; z-index:-1;
-      background-image: var(--hero-url, url("/hero.png"));
-      background-size:cover;
-      background-position:center;
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: var(--hero-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       opacity:.92;
+      transform: translateZ(0);
     }
-    .container{width:min(var(--max),92vw); margin:0 auto;}
+
+    a{ color:inherit; text-decoration:none; }
+    button, input, select{ font:inherit; }
+
+    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
+
     .topbar{
-      position:fixed; top:0; left:0; right:0; z-index:50;
-      background:rgba(8,6,12,.55);
-      border-bottom:1px solid rgba(255,255,255,.06);
-      backdrop-filter:blur(12px);
+      position: fixed; top:0; left:0; right:0; z-index: 50;
+      background: rgba(8,6,12,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
     }
-    .topbar-inner{height:64px; display:flex; align-items:center; justify-content:space-between; gap:12px;}
-    .brand{display:flex; align-items:center; gap:10px; font-weight:900;}
-    .dot{width:10px;height:10px;border-radius:999px;background:radial-gradient(circle at 30% 30%,#ffd0f6,var(--pink)); box-shadow:0 0 18px rgba(255,79,216,.7)}
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:900; letter-spacing:.2px; white-space: nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
-      padding:9px 12px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(20,12,26,.55);
-      color:var(--text);
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      color: var(--text);
       cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
       user-select:none;
+      white-space: nowrap;
       gap:8px;
     }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
     .pill.primary{
-      background:linear-gradient(135deg,var(--pink),var(--pink2));
-      color:#140813; font-weight:900;
-      border-color:rgba(255,255,255,.18);
-      box-shadow:0 18px 46px rgba(255,79,216,.26);
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      font-weight: 900;
     }
-    main{padding-top:64px; min-height:100vh}
-    .page{padding:18px 0 64px}
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+
+    main{ padding-top: 64px; min-height: 100vh; }
+    .page{ padding: 18px 0 64px; }
+
     .glass{
-      background:linear-gradient(180deg,var(--glassA),var(--glassB));
-      border:1px solid var(--stroke);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      backdrop-filter:blur(16px);
-      padding:16px;
+      background: linear-gradient(180deg, var(--glassA), var(--glassB));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
     }
-    .grid{display:grid; grid-template-columns: 1fr 420px; gap:14px; align-items:start;}
-    @media (max-width: 980px){ .grid{grid-template-columns:1fr;} }
-    h1{font-size:20px; margin:0 0 10px;}
-    h2{font-size:16px; margin:0 0 10px;}
-    .sub{margin:0 0 12px; color:var(--muted); font-size:13.5px; line-height:1.5;}
+
+    .card{ padding: 16px; }
+    h1,h2,h3{ margin:0 0 10px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; letter-spacing:-.2px; }
+    h1{ font-size: 22px; }
+    .sub{ margin:0 0 12px; color: var(--muted); line-height:1.55; font-size: 13.5px; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+
+    .row{
+      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
+    }
+    .field{
+      display:grid; gap: 7px; margin: 10px 0;
+    }
+    label{ font-size: 12.5px; color: var(--muted2); font-weight: 850; }
     input, select{
       width:100%;
-      padding:12px 12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.22);
-      color:rgba(255,255,255,.92);
-      outline:none;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      outline: none;
     }
-    label{display:block; margin:10px 0 6px; font-size:12.5px; color:rgba(255,255,255,.70); font-weight:800;}
-    .list{display:grid; gap:10px;}
-    .row{
-      display:grid; grid-template-columns: 1fr auto;
-      gap:10px; align-items:center;
-      padding:12px;
-      border-radius:16px;
-      background:rgba(0,0,0,.18);
-      border:1px solid rgba(255,255,255,.10);
-      cursor:pointer;
+
+    .tableWrap{
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      overflow:hidden;
+      background: rgba(0,0,0,.18);
     }
-    .row:hover{border-color:rgba(255,255,255,.18)}
-    .title{font-weight:900; font-size:13.5px;}
-    .meta{color:rgba(255,255,255,.65); font-size:12.5px; margin-top:4px; line-height:1.35;}
-    .badge{
-      display:inline-flex; align-items:center; gap:6px;
-      padding:6px 10px; border-radius:999px;
-      border:1px solid rgba(255,255,255,.14);
-      background:rgba(255,255,255,.07);
-      font-weight:800; font-size:12px; color:rgba(255,255,255,.75);
-      white-space:nowrap;
+    table{ width:100%; border-collapse: collapse; }
+    thead th{
+      text-align:left;
+      padding: 12px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.78);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.04);
     }
-    .rightActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;}
+    tbody td{
+      padding: 12px;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      font-size: 13px;
+      color: rgba(255,255,255,.88);
+      vertical-align: top;
+    }
+    tbody tr:hover{ background: rgba(255,255,255,.04); cursor:pointer; }
+    .muted{ color: var(--muted); font-size: 12.6px; }
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      white-space: nowrap;
+      font-weight: 850;
+      font-size: 12px;
+    }
     .log{
-      margin-top:10px;
-      padding:12px;
-      border-radius:14px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(0,0,0,.22);
-      color:rgba(255,255,255,.80);
-      font-family:ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      font-size:12px;
       white-space:pre-wrap;
-      min-height:56px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 12px;
+      min-height: 64px;
+      color: rgba(255,255,255,.86);
     }
-    .danger{border-color:rgba(255,255,255,.18); background:rgba(255,255,255,.06);}
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <div class="brand">
+      <a class="brand" id="homeLink" href="/hu/">
         <span class="dot"></span>
         <span>FitnessLady Admin</span>
-        <span class="badge" id="meBadge">—</span>
-      </div>
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="pill" id="btnOpenApp" type="button">↗ Vevő app</button>
+      </a>
+
+      <div class="row">
+        <a class="pill ghost" id="openApp" href="/hu/app/">↗ Vevő app</a>
+        <button class="pill ghost" id="btnRefresh" type="button">⟳ Frissítés</button>
         <button class="pill danger" id="btnLogout" type="button">⎋ Kilépés</button>
       </div>
     </div>
@@ -142,63 +214,114 @@
 
   <main>
     <div class="container page">
-      <div class="glass" style="margin-bottom:14px;">
-        <h1>Vásárlók / ügyfelek kezelése</h1>
-        <p class="sub">Itt látod a <b>users</b> kollekciót. Kattints egy felhasználóra → jobb oldalon szerkeszted → Mentés.</p>
-
-        <div style="display:grid; grid-template-columns: 1fr 220px; gap:10px; align-items:center;">
-          <input id="q" placeholder="Keresés email/uid/csomag/cél…" />
-          <button class="pill primary" id="btnRefresh" type="button">↻ Frissítés</button>
+      <section class="glass card" style="margin-bottom:14px;">
+        <h1>Admin panel — ügyfelek kezelése</h1>
+        <p class="sub">
+          Itt látod a <b>users</b> collectiont és tudod szerkeszteni a vevők profilját (csomag, cél, szint, aktív).
+        </p>
+        <div class="row">
+          <span class="chip" id="meChip">Betöltés…</span>
+          <span class="chip" id="roleChip">Role: —</span>
         </div>
-      </div>
+      </section>
 
       <div class="grid">
         <!-- LEFT: USERS LIST -->
-        <section class="glass">
-          <h2>Felhasználók</h2>
-          <div class="list" id="userList"></div>
-          <div class="log" id="listLog">Betöltés…</div>
-        </section>
-
-        <!-- RIGHT: EDITOR -->
-        <section class="glass">
-          <h2>Személyre szabás</h2>
-          <p class="sub" id="selSub">Válassz egy felhasználót bal oldalon.</p>
-
-          <label>Email</label>
-          <input id="f_email" disabled />
-
-          <label>UID</label>
-          <input id="f_uid" disabled />
-
-          <label>Csomag</label>
-          <select id="f_package">
-            <option value="Start">Start</option>
-            <option value="Balance">Balance</option>
-            <option value="Pro">Pro</option>
-          </select>
-
-          <label>Cél</label>
-          <input id="f_goal" placeholder="pl. Formálás / Fogyás / Erő" />
-
-          <label>Szint (1–4)</label>
-          <input id="f_level" type="number" min="1" max="4" />
-
-          <label>Aktív</label>
-          <select id="f_active">
-            <option value="true">true</option>
-            <option value="false">false</option>
-          </select>
-
-          <label>Role</label>
-          <input id="f_role" disabled />
-
-          <div class="rightActions">
-            <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
-            <button class="pill" id="btnOpenAs" type="button">↗ Megnyitás (app)</button>
+        <section class="glass card">
+          <div class="row" style="justify-content:space-between;">
+            <div>
+              <h3>Vevők</h3>
+              <div class="muted">Kattints egy userre a szerkesztéshez.</div>
+            </div>
+            <div style="min-width:260px; width: min(420px, 100%);">
+              <input id="q" type="search" placeholder="Keresés email / uid / csomag / cél…" />
+            </div>
           </div>
 
-          <div class="log" id="editLog">—</div>
+          <div style="height:10px;"></div>
+          <div class="tableWrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Csomag</th>
+                  <th>Szint</th>
+                  <th>Aktív</th>
+                </tr>
+              </thead>
+              <tbody id="usersTbody">
+                <tr><td colspan="4" class="muted">Betöltés…</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="height:12px;"></div>
+          <div class="log" id="log">Log: indul…</div>
+        </section>
+
+        <!-- RIGHT: EDIT -->
+        <section class="glass card">
+          <h3>Kiválasztott vevő</h3>
+          <p class="sub">Kattints bal oldalt egy vevőre, majd itt módosítsd és mentsd.</p>
+
+          <div class="field">
+            <label>UID</label>
+            <input id="e_uid" type="text" disabled />
+          </div>
+
+          <div class="field">
+            <label>Email</label>
+            <input id="e_email" type="text" disabled />
+          </div>
+
+          <div class="field">
+            <label>Csomag</label>
+            <select id="e_package">
+              <option value="Start">Start</option>
+              <option value="Balance">Balance</option>
+              <option value="Pro">Pro</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label>Cél</label>
+            <input id="e_goal" type="text" placeholder="pl. Formálás / Fogyás / Erő" />
+          </div>
+
+          <div class="field">
+            <label>Szint (1–4)</label>
+            <input id="e_level" type="number" min="1" max="4" />
+          </div>
+
+          <div class="field">
+            <label>Aktív</label>
+            <select id="e_active">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+          </div>
+
+          <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
+
+          <div class="field">
+            <label>Role (opcionális)</label>
+            <select id="e_role">
+              <option value="">(nincs)</option>
+              <option value="admin">admin</option>
+              <option value="user">user</option>
+            </select>
+            <div class="muted">
+              Megjegyzés: a <b>role mező Firestore-ban önmagában nem elég biztonságra</b>, a Rules-t is ehhez kell kötni.
+            </div>
+          </div>
+
+          <div class="row">
+            <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
+            <button class="pill ghost" id="btnClear" type="button">✕ Kiválasztás törlése</button>
+          </div>
+
+          <div style="height:12px;"></div>
+          <div class="log" id="selLog">Nincs kiválasztott user.</div>
         </section>
       </div>
     </div>
@@ -210,10 +333,8 @@
     // =========================
     const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
-
-    const $ = (id) => document.getElementById(id);
-    const logList = (m) => { $("listLog").textContent = m; console.log(m); };
-    const logEdit = (m) => { $("editLog").textContent = m; console.log(m); };
+    document.getElementById("homeLink").href = `${BASE_PREFIX}/hu/`;
+    document.getElementById("openApp").href = `${BASE_PREFIX}/hu/app/`;
 
     // =========================
     // Firebase
@@ -223,7 +344,13 @@
       getAuth, onAuthStateChanged, signOut
     } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
     import {
-      getFirestore, collection, getDocs, doc, getDoc, setDoc, serverTimestamp
+      getFirestore,
+      collection,
+      getDocs,
+      doc,
+      getDoc,
+      updateDoc,
+      serverTimestamp
     } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -241,169 +368,171 @@
     const db = getFirestore(app);
 
     // =========================
+    // Helpers
+    // =========================
+    const $ = (id) => document.getElementById(id);
+    const log = (msg) => { $("log").textContent = "Log: " + msg; console.log(msg); };
+    const selLog = (msg) => { $("selLog").textContent = msg; };
+
+    const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
+      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
+    }[c]));
+
+    // =========================
+    // ADMIN GATE (gyors, praktikus)
+    // =========================
+    // 1) ide tedd a SAJÁT admin emailedet
+    // (később Rules + Custom Claims lesz a "profi" megoldás)
+    const ADMIN_EMAIL_ALLOWLIST = new Set([
+      "tuskepal@gmail.com" // <-- EZT hagyd így, ha ez a tiéd
+    ]);
+
+    async function isAdminUser(user){
+      if(!user?.email) return false;
+      if(ADMIN_EMAIL_ALLOWLIST.has(user.email.toLowerCase())) return true;
+
+      // plusz ellenőrzés: ha a saját users/{uid} docban role=admin
+      try{
+        const snap = await getDoc(doc(db, "users", user.uid));
+        if(snap.exists() && (snap.data()?.role === "admin")) return true;
+      }catch(e){ /* ignore */ }
+
+      return false;
+    }
+
+    // =========================
     // State
     // =========================
     let me = null;
-    let meProfile = null;
-    let usersCache = [];   // { uid, data }
+    let users = []; // {uid, ...data}
+    let filtered = [];
     let selectedUid = null;
 
-    function escapeHtml(s){
-      return String(s ?? "").replace(/[&<>"']/g, c => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-      }[c]));
-    }
-
-    async function loadMeProfile(uid){
-      const snap = await getDoc(doc(db, "users", uid));
-      return snap.exists() ? snap.data() : null;
-    }
-
-    function requireAdmin(){
-      const isAdmin = (meProfile?.role === "admin");
-      if(!isAdmin){
-        document.body.innerHTML = `
-          <div style="min-height:100vh; display:grid; place-items:center; padding:24px; color:white;">
-            <div style="max-width:720px; background:rgba(0,0,0,.45); border:1px solid rgba(255,255,255,.12); border-radius:16px; padding:18px;">
-              <h2 style="margin:0 0 10px;">Nincs admin jogosultság</h2>
-              <p style="margin:0; opacity:.8; line-height:1.5;">
-                A belépett fiókod users/${escapeHtml(me?.uid)} doksijában a <b>role</b> nem <b>admin</b>.
-                Állítsd be Firestore-ban: role = "admin", és frissítsd az oldalt.
-              </p>
-            </div>
-          </div>
-        `;
-        throw new Error("Not admin");
-      }
-    }
-
-    function renderList(filterText=""){
-      const list = $("userList");
-      list.innerHTML = "";
-
-      const ft = filterText.trim().toLowerCase();
-
-      const rows = usersCache
-        .filter(u=>{
-          if(!ft) return true;
-          const d = u.data || {};
-          const hay = [
-            u.uid,
-            d.email,
-            d.package,
-            d.goal,
-            String(d.level ?? ""),
-            String(d.active ?? "")
-          ].join(" ").toLowerCase();
-          return hay.includes(ft);
-        });
-
-      if(rows.length === 0){
-        list.innerHTML = `<div class="sub">Nincs találat.</div>`;
+    function renderTable(){
+      const tb = $("usersTbody");
+      tb.innerHTML = "";
+      if(filtered.length === 0){
+        tb.innerHTML = `<tr><td colspan="4" class="muted">Nincs találat.</td></tr>`;
         return;
       }
 
-      rows.forEach(u=>{
-        const d = u.data || {};
-        const el = document.createElement("div");
-        el.className = "row";
-        el.innerHTML = `
-          <div>
-            <div class="title">${escapeHtml(d.email || "(nincs email)")}</div>
-            <div class="meta">
-              UID: ${escapeHtml(u.uid)}<br/>
-              Csomag: <b>${escapeHtml(d.package || "—")}</b> • Cél: ${escapeHtml(d.goal || "—")} • Szint: ${escapeHtml(d.level ?? "—")} • Aktív: ${escapeHtml(String(d.active ?? "—"))}
-            </div>
-          </div>
-          <div class="badge">${escapeHtml(d.role || "user")}</div>
+      for(const u of filtered){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>
+            <div style="font-weight:850;">${escapeHtml(u.email || "—")}</div>
+            <div class="muted">${escapeHtml(u.uid)}</div>
+          </td>
+          <td>${escapeHtml(u.package || "—")}</td>
+          <td>${escapeHtml(String(u.level ?? "—"))}</td>
+          <td>${u.active === false ? "false" : "true"}</td>
         `;
-        el.addEventListener("click", ()=>selectUser(u.uid));
-        list.appendChild(el);
-      });
+        tr.addEventListener("click", ()=>selectUser(u.uid));
+        tb.appendChild(tr);
+      }
     }
 
-    function fillEditor(uid){
-      const u = usersCache.find(x=>x.uid===uid);
+    function applyFilter(){
+      const q = ($("q").value || "").trim().toLowerCase();
+      if(!q){
+        filtered = [...users];
+      }else{
+        filtered = users.filter(u => {
+          const hay = [
+            u.uid,
+            u.email,
+            u.package,
+            u.goal,
+            String(u.level ?? ""),
+            String(u.active ?? "")
+          ].join(" ").toLowerCase();
+          return hay.includes(q);
+        });
+      }
+      renderTable();
+    }
+
+    async function loadUsers(){
+      log("Users betöltése Firestore-ból…");
+      const snap = await getDocs(collection(db, "users"));
+      users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
+      users.sort((a,b)=>String(a.email||"").localeCompare(String(b.email||"")));
+      filtered = [...users];
+      applyFilter();
+      log(`Kész: ${users.length} user betöltve.`);
+    }
+
+    function clearSelection(){
+      selectedUid = null;
+      $("e_uid").value = "";
+      $("e_email").value = "";
+      $("e_package").value = "Start";
+      $("e_goal").value = "";
+      $("e_level").value = 2;
+      $("e_active").value = "true";
+      $("e_role").value = "";
+      selLog("Nincs kiválasztott user.");
+    }
+
+    function selectUser(uid){
+      const u = users.find(x=>x.uid===uid);
       if(!u) return;
 
-      const d = u.data || {};
-      $("selSub").textContent = `Kijelölve: ${d.email || uid}`;
-
-      $("f_email").value = d.email || "";
-      $("f_uid").value = uid;
-
-      $("f_package").value = ["Start","Balance","Pro"].includes(d.package) ? d.package : "Start";
-      $("f_goal").value = d.goal || "";
-      $("f_level").value = Number(d.level ?? 2);
-      $("f_active").value = String(d.active ?? true);
-
-      $("f_role").value = d.role || "user";
-
-      logEdit("Szerkeszthető mezők: package/goal/level/active");
-    }
-
-    async function selectUser(uid){
       selectedUid = uid;
-      fillEditor(uid);
-    }
-
-    async function fetchUsers(){
-      logList("Users betöltése…");
-      const snap = await getDocs(collection(db, "users"));
-      usersCache = snap.docs.map(d=>({ uid: d.id, data: d.data() }));
-      logList(`Kész. Összesen: ${usersCache.length} user`);
-      renderList($("q").value || "");
+      $("e_uid").value = u.uid;
+      $("e_email").value = u.email || "";
+      $("e_package").value = (u.package || "Start");
+      $("e_goal").value = (u.goal || "");
+      $("e_level").value = (u.level ?? 2);
+      $("e_active").value = (u.active === false ? "false" : "true");
+      $("e_role").value = (u.role || "");
+      selLog(`Kiválasztva: ${u.email || u.uid}`);
     }
 
     async function saveSelected(){
-      if(!selectedUid) return logEdit("Nincs kijelölt user.");
+      if(!selectedUid) return selLog("Nincs kiválasztott user.");
 
-      const patch = {
-        package: $("f_package").value,
-        goal: $("f_goal").value.trim(),
-        level: Math.max(1, Math.min(4, parseInt($("f_level").value || "2", 10))),
-        active: $("f_active").value === "true",
+      const ref = doc(db, "users", selectedUid);
+
+      const payload = {
+        package: $("e_package").value,
+        goal: ($("e_goal").value || "").trim(),
+        level: Math.max(1, Math.min(4, parseInt($("e_level").value || "2", 10))),
+        active: $("e_active").value === "true",
         updatedAt: serverTimestamp()
       };
 
-      logEdit("Mentés folyamatban…");
-      await setDoc(doc(db, "users", selectedUid), patch, { merge: true });
+      const roleVal = $("e_role").value;
+      if(roleVal) payload.role = roleVal;
+      else payload.role = ""; // vagy hagyd ki, ha nem akarod tárolni
 
-      // cache frissítés
-      const idx = usersCache.findIndex(x=>x.uid===selectedUid);
+      await updateDoc(ref, payload);
+
+      // frissítsük a listát lokálisan is
+      const idx = users.findIndex(x=>x.uid===selectedUid);
       if(idx >= 0){
-        usersCache[idx].data = { ...(usersCache[idx].data||{}), ...patch };
+        users[idx] = { ...users[idx], ...payload, updatedAt: new Date() };
       }
-
-      logEdit("Mentve ✅");
-      renderList($("q").value || "");
-      fillEditor(selectedUid);
+      applyFilter();
+      selLog("Mentve ✅");
+      log(`Mentve: ${selectedUid}`);
     }
 
     // =========================
     // UI events
     // =========================
-    $("btnRefresh").addEventListener("click", ()=>fetchUsers().catch(e=>logList("Hiba: " + e.message)));
-    $("q").addEventListener("input", ()=>renderList($("q").value || ""));
-
-    $("btnSave").addEventListener("click", ()=>saveSelected().catch(e=>logEdit("Mentési hiba: " + e.message)));
+    $("q").addEventListener("input", applyFilter);
+    $("btnRefresh").addEventListener("click", ()=>loadUsers().catch(e=>log("Hiba: "+(e?.message||e))));
+    $("btnClear").addEventListener("click", clearSelection);
+    $("btnSave").addEventListener("click", ()=>saveSelected().catch(e=>selLog("Mentési hiba: "+(e?.message||e))));
 
     $("btnLogout").addEventListener("click", async ()=>{
       await signOut(auth);
       location.href = `${BASE_PREFIX}/hu/login/`;
     });
 
-    $("btnOpenApp").addEventListener("click", ()=>{
-      location.href = `${BASE_PREFIX}/app/`;
-    });
-
-    $("btnOpenAs").addEventListener("click", ()=>{
-      // ugyanazzal a sessionnel csak az app nyílik meg, nem “imperszonál”
-      location.href = `${BASE_PREFIX}/app/`;
-    });
-
     // =========================
-    // Auth gate
+    // Auth gate + init
     // =========================
     onAuthStateChanged(auth, async (user)=>{
       if(!user){
@@ -412,23 +541,21 @@
       }
 
       me = user;
-      $("meBadge").textContent = user.email || user.uid;
+      $("meChip").textContent = `Belépve: ${user.email || user.uid}`;
 
-      meProfile = await loadMeProfile(user.uid);
-      // ha nincs doc, akkor csinálunk (de role-t nem állítunk itt)
-      if(!meProfile){
-        await setDoc(doc(db, "users", user.uid), {
-          email: user.email,
-          active: true,
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
-        }, { merge:true });
-        meProfile = await loadMeProfile(user.uid);
+      const ok = await isAdminUser(user);
+      $("roleChip").textContent = ok ? "Role: ADMIN ✅" : "Role: NEM ADMIN ❌";
+
+      if(!ok){
+        // Biztonság: ne mutassuk az admin oldalt
+        log("Nincs admin jogosultság. Átdobás a vevő appra.");
+        location.href = `${BASE_PREFIX}/hu/app/`;
+        return;
       }
 
-      requireAdmin(); // dob ha nem admin
-
-      await fetchUsers();
+      // admin ok
+      await loadUsers();
+      clearSelection();
     });
   </script>
 </body>
