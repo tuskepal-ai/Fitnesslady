@@ -3,355 +3,211 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady — Admin</title>
-
+  <title>FitnessLady – Admin</title>
   <style>
     :root{
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-
-      --pink:#ff4fd8;
-      --pink2:#b14cff;
-      --gold:#ffd38a;
-
-      --radius:22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1180px;
-
-      --glassA: rgba(255,255,255,.06);
-      --glassB: rgba(255,255,255,.02);
+      --muted:rgba(255,255,255,.72);
+      --card: rgba(255,255,255,.06);
       --stroke: rgba(255,255,255,.10);
+      --accent1:#ff4fd8;
+      --accent2:#b14cff;
+      --radius:18px;
+      --max: 1200px;
     }
-
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
       color:var(--text);
-      overflow-x:hidden;
     }
-
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image: var(--hero-url);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity:.92;
-      transform: translateZ(0);
-    }
-
-    a{ color:inherit; text-decoration:none; }
-    button, input, select{ font:inherit; }
-
-    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
-
+    .container{width:min(var(--max), 92vw); margin:0 auto; padding:18px 0 50px}
     .topbar{
-      position: fixed; top:0; left:0; right:0; z-index: 50;
-      background: rgba(8,6,12,.55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      position:sticky; top:0; z-index:5;
       backdrop-filter: blur(12px);
+      background: rgba(8,6,12,.55);
+      border-bottom:1px solid rgba(255,255,255,.06);
     }
     .topbar-inner{
-      height: 64px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
+      width:min(var(--max), 92vw); margin:0 auto;
+      height:64px; display:flex; align-items:center; justify-content:space-between; gap:12px;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:900; letter-spacing:.2px; white-space: nowrap;
-    }
-    .dot{
-      width:10px;height:10px;border-radius:999px;
-      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
-      box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
-    }
-
+    .brand{display:flex; gap:10px; align-items:center; font-weight:900}
+    .dot{width:10px;height:10px;border-radius:999px;background:radial-gradient(circle at 30% 30%, #ffd0f6, var(--accent1));
+         box-shadow:0 0 18px rgba(255,79,216,.7)}
     .pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 9px 12px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      color: var(--text);
-      cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
-      user-select:none;
-      white-space: nowrap;
-      gap:8px;
+      display:inline-flex; align-items:center; justify-content:center; gap:8px;
+      padding:10px 12px; border-radius:999px; cursor:pointer; user-select:none;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color:var(--text); font-weight:900;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
     .pill.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
+      background: linear-gradient(135deg, var(--accent1), var(--accent2));
+      color:#120812;
       border-color: rgba(255,255,255,.18);
-      font-weight: 900;
     }
-    .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
-
-    main{ padding-top: 64px; min-height: 100vh; }
-    .page{ padding: 18px 0 64px; }
-
-    .glass{
-      background: linear-gradient(180deg, var(--glassA), var(--glassB));
+    .grid{display:grid; grid-template-columns: 1.2fr .8fr; gap:14px; margin-top:14px}
+    @media (max-width: 980px){ .grid{grid-template-columns:1fr} }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.03));
       border: 1px solid var(--stroke);
       border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      padding: 14px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
       backdrop-filter: blur(16px);
     }
-
-    .card{ padding: 16px; }
-    h1,h2,h3{ margin:0 0 10px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; letter-spacing:-.2px; }
-    h1{ font-size: 22px; }
-    .sub{ margin:0 0 12px; color: var(--muted); line-height:1.55; font-size: 13.5px; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    .row{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-    }
-    .field{
-      display:grid; gap: 7px; margin: 10px 0;
-    }
-    label{ font-size: 12.5px; color: var(--muted2); font-weight: 850; }
+    h1{margin:0;font-size:18px}
+    h2{margin:0 0 10px;font-size:15px}
+    .sub{margin:8px 0 0; color:var(--muted); font-size:13px; line-height:1.5}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:space-between}
     input, select{
       width:100%;
-      padding: 12px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.12);
+      padding:12px 12px;
+      border-radius: 12px;
+      border:1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.92);
-      outline: none;
+      color: var(--text);
+      outline:none;
     }
-
-    .tableWrap{
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      overflow:hidden;
-      background: rgba(0,0,0,.18);
-    }
-    table{ width:100%; border-collapse: collapse; }
-    thead th{
-      text-align:left;
-      padding: 12px;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.78);
-      border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(255,255,255,.04);
-    }
-    tbody td{
-      padding: 12px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-      font-size: 13px;
-      color: rgba(255,255,255,.88);
-      vertical-align: top;
-    }
-    tbody tr:hover{ background: rgba(255,255,255,.04); cursor:pointer; }
-    .muted{ color: var(--muted); font-size: 12.6px; }
-    .chip{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      color: var(--muted);
-      white-space: nowrap;
-      font-weight: 850;
-      font-size: 12px;
-    }
-    .log{
-      white-space:pre-wrap;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
-      background: rgba(0,0,0,.22);
-      border: 1px solid rgba(255,255,255,.12);
-      border-radius: 14px;
-      padding: 12px;
-      min-height: 64px;
-      color: rgba(255,255,255,.86);
-    }
+    label{display:block; font-size:12px; color:var(--muted); font-weight:800; margin:10px 0 6px}
+    .table-wrap{overflow:auto; border-radius:14px; border:1px solid rgba(255,255,255,.10)}
+    table{width:100%; border-collapse:collapse; min-width:760px; background: rgba(0,0,0,.10)}
+    th,td{padding:10px 10px; border-bottom:1px solid rgba(255,255,255,.08); text-align:left; font-size:13px}
+    th{font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:rgba(255,255,255,.70)}
+    tr:hover{background: rgba(255,255,255,.05); cursor:pointer}
+    .badge{display:inline-flex; padding:6px 10px; border-radius:999px; border:1px solid rgba(255,255,255,.12);
+           background: rgba(255,255,255,.06); color:rgba(255,255,255,.78); font-size:12px; font-weight:900}
+    .danger{border-color: rgba(255,100,100,.35)}
+    .ok{color:#b7ffcf}
+    .warn{color:#ffd38a}
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size:12px; opacity:.9}
+    .muted{color:var(--muted)}
+    .small{font-size:12px;color:var(--muted);line-height:1.45}
+    .hr{height:1px; background:rgba(255,255,255,.08); margin:12px 0}
   </style>
 </head>
-
 <body>
   <header class="topbar">
-    <div class="container topbar-inner">
-      <a class="brand" id="homeLink" href="/hu/">
-        <span class="dot"></span>
-        <span>FitnessLady Admin</span>
-      </a>
-
-      <div class="row">
-        <a class="pill ghost" id="openApp" href="/hu/app/">↗ Vevő app</a>
-        <button class="pill ghost" id="btnRefresh" type="button">⟳ Frissítés</button>
-        <button class="pill danger" id="btnLogout" type="button">⎋ Kilépés</button>
+    <div class="topbar-inner">
+      <div class="brand"><span class="dot"></span> FitnessLady <span class="badge">ADMIN</span></div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="pill" id="btnGoApp" type="button">Vevő oldal</button>
+        <button class="pill" id="btnRefresh" type="button">Frissítés</button>
+        <button class="pill primary" id="btnLogout" type="button">Kilépés</button>
       </div>
     </div>
   </header>
 
-  <main>
-    <div class="container page">
-      <section class="glass card" style="margin-bottom:14px;">
-        <h1>Admin panel — ügyfelek kezelése</h1>
-        <p class="sub">
-          Itt látod a <b>users</b> collectiont és tudod szerkeszteni a vevők profilját (csomag, cél, szint, aktív).
-        </p>
-        <div class="row">
-          <span class="chip" id="meChip">Betöltés…</span>
-          <span class="chip" id="roleChip">Role: —</span>
+  <div class="container">
+    <div class="card">
+      <div class="row">
+        <div>
+          <h1>Admin panel</h1>
+          <div class="sub" id="me">Betöltés…</div>
         </div>
-      </section>
+        <div class="mono" id="status"></div>
+      </div>
+      <div class="sub">Itt látod a felhasználókat (users kollekció), és kiválasztás után szerkeszted: csomag, cél, szint, active, role.</div>
+    </div>
 
-      <div class="grid">
-        <!-- LEFT: USERS LIST -->
-        <section class="glass card">
-          <div class="row" style="justify-content:space-between;">
-            <div>
-              <h3>Vevők</h3>
-              <div class="muted">Kattints egy userre a szerkesztéshez.</div>
-            </div>
-            <div style="min-width:260px; width: min(420px, 100%);">
-              <input id="q" type="search" placeholder="Keresés email / uid / csomag / cél…" />
-            </div>
+    <div class="grid">
+      <!-- LEFT: LIST -->
+      <div class="card">
+        <div class="row" style="align-items:flex-end">
+          <div style="flex:1;min-width:220px">
+            <label>Keresés (email)</label>
+            <input id="q" placeholder="pl. tuskepal@gmail.com" />
           </div>
-
-          <div style="height:10px;"></div>
-          <div class="tableWrap">
-            <table>
-              <thead>
-                <tr>
-                  <th>Email</th>
-                  <th>Csomag</th>
-                  <th>Szint</th>
-                  <th>Aktív</th>
-                </tr>
-              </thead>
-              <tbody id="usersTbody">
-                <tr><td colspan="4" class="muted">Betöltés…</td></tr>
-              </tbody>
-            </table>
+          <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="pill" id="btnClear" type="button">Törlés</button>
+            <span class="badge" id="count">0 user</span>
           </div>
+        </div>
 
-          <div style="height:12px;"></div>
-          <div class="log" id="log">Log: indul…</div>
-        </section>
+        <div class="hr"></div>
 
-        <!-- RIGHT: EDIT -->
-        <section class="glass card">
-          <h3>Kiválasztott vevő</h3>
-          <p class="sub">Kattints bal oldalt egy vevőre, majd itt módosítsd és mentsd.</p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Email</th>
+                <th>Csomag</th>
+                <th>Cél</th>
+                <th>Szint</th>
+                <th>Aktív</th>
+                <th>Role</th>
+              </tr>
+            </thead>
+            <tbody id="tbody"></tbody>
+          </table>
+        </div>
 
-          <div class="field">
-            <label>UID</label>
-            <input id="e_uid" type="text" disabled />
-          </div>
+        <div class="small" style="margin-top:10px">
+          Tipp: kattints egy sorra → jobbra megjelenik a szerkesztő.
+        </div>
+      </div>
 
-          <div class="field">
-            <label>Email</label>
-            <input id="e_email" type="text" disabled />
-          </div>
+      <!-- RIGHT: EDIT -->
+      <div class="card">
+        <h2>Kijelölt user</h2>
+        <div class="small muted">Kattints bal oldalt egy userre.</div>
 
-          <div class="field">
-            <label>Csomag</label>
-            <select id="e_package">
-              <option value="Start">Start</option>
-              <option value="Balance">Balance</option>
-              <option value="Pro">Pro</option>
-            </select>
-          </div>
+        <div class="hr"></div>
 
-          <div class="field">
-            <label>Cél</label>
-            <input id="e_goal" type="text" placeholder="pl. Formálás / Fogyás / Erő" />
-          </div>
+        <div class="small"><b>UID:</b> <span class="mono" id="selUid">—</span></div>
+        <div class="small"><b>Email:</b> <span class="mono" id="selEmail">—</span></div>
 
-          <div class="field">
-            <label>Szint (1–4)</label>
-            <input id="e_level" type="number" min="1" max="4" />
-          </div>
+        <label>Csomag</label>
+        <select id="fPackage">
+          <option value="Start">Start</option>
+          <option value="Balance">Balance</option>
+          <option value="Pro">Pro</option>
+        </select>
 
-          <div class="field">
-            <label>Aktív</label>
-            <select id="e_active">
-              <option value="true">true</option>
-              <option value="false">false</option>
-            </select>
-          </div>
+        <label>Cél</label>
+        <input id="fGoal" placeholder="pl. Formálás / Fogyás / Erő" />
 
-          <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
+        <label>Szint (1–4)</label>
+        <input id="fLevel" type="number" min="1" max="4" />
 
-          <div class="field">
-            <label>Role (opcionális)</label>
-            <select id="e_role">
-              <option value="">(nincs)</option>
-              <option value="admin">admin</option>
-              <option value="user">user</option>
-            </select>
-            <div class="muted">
-              Megjegyzés: a <b>role mező Firestore-ban önmagában nem elég biztonságra</b>, a Rules-t is ehhez kell kötni.
-            </div>
-          </div>
+        <label>Aktív</label>
+        <select id="fActive">
+          <option value="true">true</option>
+          <option value="false">false</option>
+        </select>
 
-          <div class="row">
-            <button class="pill primary" id="btnSave" type="button">💾 Mentés</button>
-            <button class="pill ghost" id="btnClear" type="button">✕ Kiválasztás törlése</button>
-          </div>
+        <label>Role</label>
+        <select id="fRole">
+          <option value="user">user</option>
+          <option value="admin">admin</option>
+        </select>
 
-          <div style="height:12px;"></div>
-          <div class="log" id="selLog">Nincs kiválasztott user.</div>
-        </section>
+        <div class="hr"></div>
+
+        <div class="row">
+          <button class="pill" id="btnResetSel" type="button">Visszaállítás</button>
+          <button class="pill primary" id="btnSave" type="button">Mentés</button>
+        </div>
+
+        <div class="small" style="margin-top:10px" id="saveMsg"></div>
       </div>
     </div>
-  </main>
+  </div>
 
   <script type="module">
-    // =========================
-    // GitHub Pages prefix + hero
-    // =========================
-    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
-    document.getElementById("homeLink").href = `${BASE_PREFIX}/hu/`;
-    document.getElementById("openApp").href = `${BASE_PREFIX}/hu/app/`;
-
-    // =========================
-    // Firebase
-    // =========================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-    import {
-      getAuth, onAuthStateChanged, signOut
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-    import {
-      getFirestore,
-      collection,
-      getDocs,
-      doc,
-      getDoc,
-      updateDoc,
-      serverTimestamp
-    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, doc, getDoc, collection, getDocs, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
+    const appUrl   = `${BASE_PREFIX}/hu/app/`;
+    const loginUrl = `${BASE_PREFIX}/hu/login/`;
 
     const firebaseConfig = {
       apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
@@ -367,195 +223,142 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
-    // =========================
-    // Helpers
-    // =========================
-    const $ = (id) => document.getElementById(id);
-    const log = (msg) => { $("log").textContent = "Log: " + msg; console.log(msg); };
-    const selLog = (msg) => { $("selLog").textContent = msg; };
+    const el = (id)=>document.getElementById(id);
+    const status = (msg)=> el("status").textContent = msg || "";
 
-    const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
-      "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-    }[c]));
+    let meUid = null;
+    let meEmail = null;
 
-    // =========================
-    // ADMIN GATE (gyors, praktikus)
-    // =========================
-    // 1) ide tedd a SAJÁT admin emailedet
-    // (később Rules + Custom Claims lesz a "profi" megoldás)
-    const ADMIN_EMAIL_ALLOWLIST = new Set([
-      "tuskepal@gmail.com" // <-- EZT hagyd így, ha ez a tiéd
-    ]);
+    // loaded users cache
+    let users = [];
+    let selected = null; // {id, ...data}
 
-    async function isAdminUser(user){
-      if(!user?.email) return false;
-      if(ADMIN_EMAIL_ALLOWLIST.has(user.email.toLowerCase())) return true;
+    function safe(v){ return String(v ?? ""); }
+    function lower(v){ return safe(v).toLowerCase(); }
 
-      // plusz ellenőrzés: ha a saját users/{uid} docban role=admin
-      try{
-        const snap = await getDoc(doc(db, "users", user.uid));
-        if(snap.exists() && (snap.data()?.role === "admin")) return true;
-      }catch(e){ /* ignore */ }
+    async function ensureAdmin(user){
+      const snap = await getDoc(doc(db, "users", user.uid));
+      const data = snap.exists() ? snap.data() : {};
+      const role = lower(data.role);
 
-      return false;
+      if(role !== "admin"){
+        // nem admin -> app vagy login
+        location.replace(appUrl);
+        return false;
+      }
+      return true;
     }
-
-    // =========================
-    // State
-    // =========================
-    let me = null;
-    let users = []; // {uid, ...data}
-    let filtered = [];
-    let selectedUid = null;
 
     function renderTable(){
-      const tb = $("usersTbody");
-      tb.innerHTML = "";
-      if(filtered.length === 0){
-        tb.innerHTML = `<tr><td colspan="4" class="muted">Nincs találat.</td></tr>`;
-        return;
-      }
+      const q = lower(el("q").value).trim();
+      const filtered = q ? users.filter(u => lower(u.email).includes(q)) : users;
 
-      for(const u of filtered){
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td>
-            <div style="font-weight:850;">${escapeHtml(u.email || "—")}</div>
-            <div class="muted">${escapeHtml(u.uid)}</div>
-          </td>
-          <td>${escapeHtml(u.package || "—")}</td>
-          <td>${escapeHtml(String(u.level ?? "—"))}</td>
-          <td>${u.active === false ? "false" : "true"}</td>
-        `;
-        tr.addEventListener("click", ()=>selectUser(u.uid));
-        tb.appendChild(tr);
-      }
+      el("count").textContent = `${filtered.length} user`;
+      const tbody = el("tbody");
+      tbody.innerHTML = filtered.map(u => `
+        <tr data-uid="${safe(u.id)}">
+          <td>${safe(u.email)}</td>
+          <td>${safe(u.package)}</td>
+          <td>${safe(u.goal)}</td>
+          <td>${safe(u.level)}</td>
+          <td>${safe(u.active)}</td>
+          <td>${safe(u.role)}</td>
+        </tr>
+      `).join("");
+
+      tbody.querySelectorAll("tr").forEach(tr=>{
+        tr.addEventListener("click", ()=>{
+          const uid = tr.getAttribute("data-uid");
+          const u = users.find(x => x.id === uid);
+          if(!u) return;
+          selectUser(u);
+        });
+      });
     }
 
-    function applyFilter(){
-      const q = ($("q").value || "").trim().toLowerCase();
-      if(!q){
-        filtered = [...users];
-      }else{
-        filtered = users.filter(u => {
-          const hay = [
-            u.uid,
-            u.email,
-            u.package,
-            u.goal,
-            String(u.level ?? ""),
-            String(u.active ?? "")
-          ].join(" ").toLowerCase();
-          return hay.includes(q);
-        });
-      }
-      renderTable();
+    function selectUser(u){
+      selected = JSON.parse(JSON.stringify(u)); // deep-ish copy
+      el("selUid").textContent = safe(u.id);
+      el("selEmail").textContent = safe(u.email);
+
+      el("fPackage").value = safe(u.package || "Start");
+      el("fGoal").value = safe(u.goal || "");
+      el("fLevel").value = safe(u.level ?? 2);
+      el("fActive").value = String(!!u.active);
+      el("fRole").value = safe(u.role || "user");
+
+      el("saveMsg").textContent = "";
+    }
+
+    function resetSelectionForm(){
+      if(!selected) return;
+      // reload from current users cache (server last loaded)
+      const fresh = users.find(x => x.id === selected.id);
+      if(fresh) selectUser(fresh);
     }
 
     async function loadUsers(){
-      log("Users betöltése Firestore-ból…");
+      status("Users betöltése…");
       const snap = await getDocs(collection(db, "users"));
-      users = snap.docs.map(d => ({ uid: d.id, ...d.data() }));
-      users.sort((a,b)=>String(a.email||"").localeCompare(String(b.email||"")));
-      filtered = [...users];
-      applyFilter();
-      log(`Kész: ${users.length} user betöltve.`);
-    }
-
-    function clearSelection(){
-      selectedUid = null;
-      $("e_uid").value = "";
-      $("e_email").value = "";
-      $("e_package").value = "Start";
-      $("e_goal").value = "";
-      $("e_level").value = 2;
-      $("e_active").value = "true";
-      $("e_role").value = "";
-      selLog("Nincs kiválasztott user.");
-    }
-
-    function selectUser(uid){
-      const u = users.find(x=>x.uid===uid);
-      if(!u) return;
-
-      selectedUid = uid;
-      $("e_uid").value = u.uid;
-      $("e_email").value = u.email || "";
-      $("e_package").value = (u.package || "Start");
-      $("e_goal").value = (u.goal || "");
-      $("e_level").value = (u.level ?? 2);
-      $("e_active").value = (u.active === false ? "false" : "true");
-      $("e_role").value = (u.role || "");
-      selLog(`Kiválasztva: ${u.email || u.uid}`);
+      const arr = [];
+      snap.forEach(d => arr.push({ id:d.id, ...d.data() }));
+      arr.sort((a,b)=> safe(a.email).localeCompare(safe(b.email)));
+      users = arr;
+      renderTable();
+      status("OK ✅");
     }
 
     async function saveSelected(){
-      if(!selectedUid) return selLog("Nincs kiválasztott user.");
+      if(!selected) return;
 
-      const ref = doc(db, "users", selectedUid);
-
+      const uid = selected.id;
       const payload = {
-        package: $("e_package").value,
-        goal: ($("e_goal").value || "").trim(),
-        level: Math.max(1, Math.min(4, parseInt($("e_level").value || "2", 10))),
-        active: $("e_active").value === "true",
+        email: selected.email || el("selEmail").textContent || null,
+        package: el("fPackage").value,
+        goal: el("fGoal").value.trim(),
+        level: Math.max(1, Math.min(4, parseInt(el("fLevel").value || "2", 10))),
+        active: el("fActive").value === "true",
+        role: el("fRole").value,
         updatedAt: serverTimestamp()
       };
 
-      const roleVal = $("e_role").value;
-      if(roleVal) payload.role = roleVal;
-      else payload.role = ""; // vagy hagyd ki, ha nem akarod tárolni
-
-      await updateDoc(ref, payload);
-
-      // frissítsük a listát lokálisan is
-      const idx = users.findIndex(x=>x.uid===selectedUid);
-      if(idx >= 0){
-        users[idx] = { ...users[idx], ...payload, updatedAt: new Date() };
-      }
-      applyFilter();
-      selLog("Mentve ✅");
-      log(`Mentve: ${selectedUid}`);
+      el("saveMsg").textContent = "Mentés…";
+      await setDoc(doc(db, "users", uid), payload, { merge:true });
+      el("saveMsg").innerHTML = `<span class="ok">Mentve ✅</span>`;
+      await loadUsers();
+      // keep selection on saved user
+      const fresh = users.find(x=>x.id===uid);
+      if(fresh) selectUser(fresh);
     }
 
-    // =========================
     // UI events
-    // =========================
-    $("q").addEventListener("input", applyFilter);
-    $("btnRefresh").addEventListener("click", ()=>loadUsers().catch(e=>log("Hiba: "+(e?.message||e))));
-    $("btnClear").addEventListener("click", clearSelection);
-    $("btnSave").addEventListener("click", ()=>saveSelected().catch(e=>selLog("Mentési hiba: "+(e?.message||e))));
+    el("q").addEventListener("input", renderTable);
+    el("btnClear").addEventListener("click", ()=>{ el("q").value=""; renderTable(); });
+    el("btnRefresh").addEventListener("click", ()=> loadUsers().catch(e=>status("Hiba: "+(e?.message||e))));
+    el("btnGoApp").addEventListener("click", ()=> location.href = appUrl);
+    el("btnResetSel").addEventListener("click", resetSelectionForm);
+    el("btnSave").addEventListener("click", ()=> saveSelected().catch(e=>{
+      el("saveMsg").innerHTML = `<span class="warn">Hiba: ${safe(e?.message||e)}</span>`;
+    }));
 
-    $("btnLogout").addEventListener("click", async ()=>{
+    el("btnLogout").addEventListener("click", async ()=>{
       await signOut(auth);
-      location.href = `${BASE_PREFIX}/hu/login/`;
+      location.replace(loginUrl);
     });
 
-    // =========================
-    // Auth gate + init
-    // =========================
     onAuthStateChanged(auth, async (user)=>{
       if(!user){
-        location.href = `${BASE_PREFIX}/hu/login/`;
+        location.replace(loginUrl);
         return;
       }
+      meUid = user.uid;
+      meEmail = user.email;
+      el("me").textContent = `Belépve: ${meEmail} (UID: ${meUid})`;
 
-      me = user;
-      $("meChip").textContent = `Belépve: ${user.email || user.uid}`;
+      const ok = await ensureAdmin(user);
+      if(!ok) return;
 
-      const ok = await isAdminUser(user);
-      $("roleChip").textContent = ok ? "Role: ADMIN ✅" : "Role: NEM ADMIN ❌";
-
-      if(!ok){
-        // Biztonság: ne mutassuk az admin oldalt
-        log("Nincs admin jogosultság. Átdobás a vevő appra.");
-        location.href = `${BASE_PREFIX}/hu/app/`;
-        return;
-      }
-
-      // admin ok
       await loadUsers();
-      clearSelection();
     });
   </script>
 </body>
