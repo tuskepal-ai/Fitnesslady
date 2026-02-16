@@ -1,410 +1,1064 @@
-<script type="module">
-  // =========================
-  // GitHub Pages prefix + hero
-  // =========================
-  const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
-  document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fitness Lady — Saját programom</title>
+  <meta name="description" content="Fitness Lady — Saját programom: csomag, heti edzések, személyre szabás slotok, étrend, check-in/cél, technika vault." />
 
-  // ✅ közös útvonalak (GitHub Pages kompatibilis)
-  const LOGIN_URL = `${BASE_PREFIX}/hu/login/`;
-  const APP_URL   = `${BASE_PREFIX}/hu/app/`;
+  <style>
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
 
-  // Home link fix
-  const homeLink = document.getElementById("homeLink");
-  if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --gold:#ffd38a;
 
-  // =========================
-  // Firebase (Auth + Firestore)
-  // =========================
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
-  import {
-    getAuth,
-    createUserWithEmailAndPassword,
-    signInWithEmailAndPassword,
-    signOut,
-    onAuthStateChanged
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-  import {
-    getFirestore,
-    doc,
-    setDoc,
-    getDoc,
-    serverTimestamp
-  } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 1180px;
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
-    authDomain: "fitneady-15fd0.firebaseapp.com",
-    projectId: "fitneady-15fd0",
-    storageBucket: "fitneady-15fd0.firebasestorage.app",
-    messagingSenderId: "480597492603",
-    appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
-    measurementId: "G-MH1YK9C2YF"
-  };
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+    }
 
-  const fbApp = initializeApp(firebaseConfig);
-  try { getAnalytics(fbApp); } catch(e) {}
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ scroll-behavior:smooth; }
 
-  const auth = getAuth(fbApp);
-  const db = getFirestore(fbApp);
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
 
-  // =========================
-  // Helpers + UI shortcuts
-  // =========================
-  const $ = (sel, root=document) => root.querySelector(sel);
-  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    /* Full page hero.png background (GitHub Pages prefix is set in JS via CSS var) */
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: var(--hero-url, url("/hero.png"));
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: translateZ(0);
+      opacity:.92;
+    }
 
-  const todayISO = () => new Date().toISOString().slice(0,10);
-  const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-  const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
-  const fmtDate = (iso)=>{
-    if(!iso) return "—";
-    const d = new Date(iso+"T00:00:00");
-    const dd = String(d.getDate()).padStart(2,"0");
-    const mm = String(d.getMonth()+1).padStart(2,"0");
-    const yy = d.getFullYear();
-    return `${yy}.${mm}.${dd}`;
-  };
-  const escapeHtml = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
+    a{ color:inherit; text-decoration:none; }
+    button{ font:inherit; }
 
-  // Touch glow
-  function enableTapGlow(selector=".interactive"){
-    $$(selector).forEach(el=>{
-      el.addEventListener("touchstart", ()=>{
-        el.classList.add("is-active");
-        window.clearTimeout(el.__t);
-        el.__t = window.setTimeout(()=>el.classList.remove("is-active"), 650);
-      }, {passive:true});
-    });
-  }
-  enableTapGlow();
+    .container{
+      width: min(var(--max), 92vw);
+      margin: 0 auto;
+    }
 
-  // =========================
-  // Demo adatok (marad a dizájn + struktúra)
-  // =========================
-  const DEMO = {
-    profile: {
-      package: "Start",
-      goal: "Formálás",
-      level: 2,
-      cycleStart: "2026-02-10",
-      cycleEnd: "2026-03-10",
-      lastUpdated: "2026-02-13",
-      checkinDone: 0
-    },
-    packages: {
-      Start: { weeks: 4, workoutsPerWeek: 3, slotsPerWeek: 1 },
-      Balance: { weeks: 6, workoutsPerWeek: 4, slotsPerWeek: 2 },
-      Pro: { weeks: 8, workoutsPerWeek: 4, slotsPerWeek: 2 }
-    },
-    plans: {
-      Start: [
-        { week: 1, workouts: [
-            { id:"W1-A", title:"Edzés A — Full body (alap)", desc:"Technika + ritmus. 35–45 perc.", video:"https://player.vimeo.com/video/000000001" },
-            { id:"W1-B", title:"Edzés B — Alsótest fókusz", desc:"Farizom + comb, kontrollált tempó.", video:"https://player.vimeo.com/video/000000002" },
-            { id:"W1-C", title:"Edzés C — Core + formálás", desc:"Törzs stabilitás + finisher.", video:"https://player.vimeo.com/video/000000003" }
+    /* ===== Topbar ===== */
+    .topbar{
+      position: fixed;
+      top:0; left:0; right:0;
+      z-index: 50;
+      background: rgba(8,6,12,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:800;
+      letter-spacing:.2px;
+      white-space: nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap: 14px;
+      color: var(--muted);
+      font-size: 13.5px;
+      font-weight: 700;
+    }
+    .nav a{
+      position: relative;
+      padding: 10px 6px;
+      opacity:.92;
+    }
+    .nav a:hover{ opacity:1; color: var(--text); }
+    .nav a::after{
+      content:"";
+      position:absolute;
+      left: 8px; right: 8px; bottom: 6px;
+      height: 2px;
+      border-radius: 99px;
+      background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
+      transform: scaleX(0);
+      transform-origin: left;
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease;
+    }
+    .nav a:hover::after,
+    .nav a.is-active::after{
+      transform: scaleX(1);
+      opacity: 1;
+    }
+
+    .pill{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+      white-space: nowrap;
+      gap:8px;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 46px rgba(255,79,216,.26);
+      font-weight: 900;
+    }
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+
+    .menu-btn{
+      width: 40px; height: 40px; border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      display:none;
+      align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+
+    /* ===== Layout ===== */
+    main{
+      padding-top: 64px;
+      min-height: 100vh;
+      min-height: 100dvh;
+    }
+    .page{
+      padding: 18px 0 64px;
+    }
+
+    .glass{
+      background: linear-gradient(180deg, var(--glassA), var(--glassB));
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .interactive{
+      position: relative;
+      overflow: hidden;
+      transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
+      will-change: transform;
+    }
+    .interactive::before{
+      content:"";
+      position:absolute; inset:-3px;
+      border-radius: inherit;
+      background:
+        radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
+        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
+      opacity: 0;
+      filter: blur(6px);
+      transition: opacity .30s ease;
+      pointer-events:none;
+    }
+    .interactive:hover,
+    .interactive:focus-visible,
+    .interactive.is-active{
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    .interactive:hover::before,
+    .interactive:focus-visible::before,
+    .interactive.is-active::before{ opacity: 1; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .nav{ display:none; }
+      .menu-btn{ display:inline-flex; }
+    }
+
+    /* ===== Cards ===== */
+    .card{ padding: 16px; }
+    .card h2, .card h3{
+      margin:0 0 8px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.2px;
+    }
+    .card h2{ font-size: 22px; }
+    .card h3{ font-size: 18px; }
+    .sub{
+      margin:0 0 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13.5px;
+    }
+
+    .meta-row{
+      display:flex; flex-wrap:wrap;
+      gap: 10px;
+      margin-top: 10px;
+      color: var(--muted2);
+      font-size: 12.8px;
+    }
+    .meta-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* ===== Progress ===== */
+    .progress{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      height: 12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .progress > span{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .progress-label{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      color: var(--muted2);
+      margin: 10px 0 8px;
+    }
+
+    /* ===== Tabs ===== */
+    .tabs{
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+      margin: 8px 0 12px;
+    }
+    .tab{
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      cursor:pointer;
+      font-size: 13px;
+      font-weight: 850;
+      user-select:none;
+    }
+    .tab.is-active{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+    }
+
+    /* ===== Workout list ===== */
+    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .row .title{
+      font-weight: 900;
+      letter-spacing:.2px;
+      font-size: 13.5px;
+    }
+    .row .desc{
+      color: var(--muted);
+      font-size: 12.8px;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
+    .row .actions{
+      display:flex;
+      gap: 8px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+    }
+    .tiny{
+      padding: 8px 10px;
+      font-size: 12.5px;
+      border-radius: 999px;
+    }
+
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: var(--muted);
+      white-space: nowrap;
+      font-weight: 850;
+      font-size: 12px;
+    }
+
+    section{ scroll-margin-top: 82px; }
+
+    /* ===== Modal ===== */
+    .modal-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 80;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-overlay.is-open{ display:flex; }
+
+    .modal{
+      width: min(980px, 94vw);
+      max-height: min(82vh, 760px);
+      border-radius: var(--radius);
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-header{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.45);
+    }
+    .modal-title{
+      margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+    .modal-close{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-body{
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(min(82vh, 760px) - 64px);
+      background: rgba(7,6,11,.38);
+    }
+    .note{
+      color: var(--muted2);
+      font-size: 12.6px;
+      line-height: 1.55;
+    }
+
+    /* ===== Footer ===== */
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .interactive, .pill{ transition:none; }
+      .progress > span{ transition:none; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" id="homeLink" href="#" aria-label="Vissza a főoldalra">
+        <span class="dot"></span>
+        <span>Fitness Lady</span>
+      </a>
+
+      <nav class="nav" aria-label="Vevő menü">
+        <a href="#program" data-nav>Programom</a>
+        <a href="#etrend" data-nav>Étrend</a>
+        <a href="#checkin" data-nav>Célom & Check-in</a>
+        <a href="#technika" data-nav>Technika</a>
+      </nav>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
+        <button class="pill ghost" id="btnLogout" type="button" title="Kijelentkezés">⎋ Kilépés</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page">
+
+      <!-- HERO / STATUS -->
+      <section id="top" class="glass interactive card" style="margin-bottom:14px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <div class="chip" id="chipPackage">Csomag: —</div>
+            <h2 style="margin-top:10px;">Saját programom</h2>
+            <p class="sub" id="subStatus">Betöltés…</p>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="pill primary" id="btnRenew" type="button">Megújítás</button>
+            <button class="pill ghost" id="btnUpgrade" type="button">Upgrade</button>
+            <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
+          </div>
+        </div>
+
+        <div class="progress-label">
+          <span id="lblWeek">Hét: —</span>
+          <span id="lblDays">Hátralévő napok: —</span>
+        </div>
+        <div class="progress" aria-label="Ciklus haladás">
+          <span id="barCycle"></span>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-pill" id="pillGoal">🎯 Cél: —</div>
+          <div class="meta-pill" id="pillIntensity">⚡ Szint: —</div>
+          <div class="meta-pill" id="pillUpdated">✨ Utolsó frissítés: —</div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <!-- LEFT: Program -->
+        <section id="program" class="glass interactive card">
+          <h3>Heti edzések</h3>
+          <p class="sub">Heti bontásban látod az edzéseidet. A “Személyre szabás” slotokat Edina hetente 1–2 alkalommal frissíti.</p>
+
+          <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 0 0 10px;">
+            <button class="pill ghost tiny" id="btnMarkAll" type="button">✅ Heti edzések kipipálása</button>
+            <button class="pill ghost tiny" id="btnResetWeek" type="button">↺ Hét újraindítása</button>
+            <button class="pill ghost tiny" id="btnOpenPlayerHelp" type="button">ℹ️ Lejátszás info</button>
+          </div>
+
+          <ul class="list" id="workoutList"></ul>
+
+          <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
+
+          <h3>Személyre szabás</h3>
+          <p class="sub">A slotok csak a te programodhoz tartozó videókat mutatják. Más csomag tartalma nem látható.</p>
+          <ul class="list" id="slotList"></ul>
+        </section>
+
+        <!-- RIGHT: Diet + Check-in -->
+        <div style="display:grid; gap:14px;">
+          <!-- Étrend -->
+          <section id="etrend" class="glass interactive card">
+            <h3>Étrend</h3>
+            <p class="sub">Ez a rész most teszt. Később finomítjuk, hogyan nézzen ki (napi bontás, sablonok, képek).</p>
+
+            <div class="row" style="grid-template-columns: 1fr; gap:8px;">
+              <div>
+                <div class="title">Mai keret (teszt)</div>
+                <div class="desc">Pipáld ki, ami megvan — motiváció és ritmus.</div>
+              </div>
+              <div style="display:grid; gap:8px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button class="pill ghost tiny" data-toggle="diet_water" type="button">💧 2L víz</button>
+                  <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje megvolt</button>
+                  <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
+                  <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
+                </div>
+                <div class="note" id="dietNote">Tipp: később ide jön a napi étkezés-sablon (Reggeli/Ebéd/Vacsora/Snack) + opcionális kép étkezésenként.</div>
+              </div>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+              <button class="pill primary tiny" id="btnDietPlan" type="button">Napi étkezés (teszt)</button>
+              <button class="pill ghost tiny" id="btnDietPrefs" type="button">Preferenciák</button>
+            </div>
+          </section>
+
+          <!-- Célom / Check-in + motiváció -->
+          <section id="checkin" class="glass interactive card">
+            <h3>Célom & Check-in</h3>
+            <p class="sub">Itt látod a célodat, a heti check-in állapotot és egy motiváló üzenetet.</p>
+
+            <div class="row" style="grid-template-columns: 1fr; gap:10px;">
+              <div>
+                <div class="title" id="goalTitle">🎯 Cél: —</div>
+                <div class="desc" id="goalDesc">—</div>
+              </div>
+
+              <div style="display:grid; gap:8px;">
+                <div class="progress-label" style="margin:0;">
+                  <span>Heti check-in</span>
+                  <span id="checkinLabel">0/1</span>
+                </div>
+                <div class="progress"><span id="barCheckin"></span></div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
+                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kitöltése</button>
+                  <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
+                </div>
+
+                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- Technika Vault -->
+      <section id="technika" class="glass interactive card" style="margin-top:14px;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <h3>Technika Vault (örök)</h3>
+            <p class="sub">Ez a rész akkor is elérhető marad, ha a csomagod lejár. (Indulás: 8–12 videó.)</p>
+          </div>
+          <button class="pill ghost tiny" id="btnAddTechDone" type="button">✅ Technikák kipipálása</button>
+        </div>
+
+        <div class="tabs" id="techTabs" aria-label="Technika kategóriák"></div>
+        <ul class="list" id="techList"></ul>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>© <span id="y"></span> Fitness Lady — Vevő oldal</div>
+      <div>Tüske web design</div>
+    </div>
+  </footer>
+
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="settingsTitle">Beállítások (teszt)</h2>
+        <button class="modal-close interactive" id="settingsClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="note">Itt tudod tesztben átállítani a csomagot, célt, szintet és a ciklus dátumokat. Élesben ezt az admin oldalon állítod majd.</p>
+
+        <div class="field">
+          <label for="setPackage">Csomag</label>
+          <input id="setPackage" type="text" placeholder="Start / Balance / Pro" />
+        </div>
+
+        <div class="field">
+          <label for="setGoal">Cél</label>
+          <input id="setGoal" type="text" placeholder="pl. formálás / fogyás / erő" />
+        </div>
+
+        <div class="field">
+          <label for="setLevel">Szint (1–4)</label>
+          <input id="setLevel" type="number" min="1" max="4" />
+        </div>
+
+        <div class="field">
+          <label for="setStart">Ciklus kezdete (YYYY-MM-DD)</label>
+          <input id="setStart" type="text" placeholder="2026-02-10" />
+        </div>
+
+        <div class="field">
+          <label for="setEnd">Ciklus vége (YYYY-MM-DD)</label>
+          <input id="setEnd" type="text" placeholder="2026-03-10" />
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="pill primary" id="btnSaveSettings" type="button">Mentés</button>
+          <button class="pill ghost" id="btnResetDemo" type="button">Demo visszaállítás</button>
+        </div>
+
+        <p class="note" style="margin-top:10px;">
+          Tipp: később ezek a mezők egy admin táblából/DB-ből jönnek, és a vevő oldala csak renderel.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SMALL MODAL: VIDEO PLAYER / DIET -->
+  <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="infoTitle">Info</h2>
+        <button class="modal-close interactive" id="infoClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body" id="infoBody"></div>
+    </div>
+  </div>
+
+  <script type="module">
+    // =========================
+    // GitHub Pages prefix + hero + links
+    // =========================
+    const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+
+    const homeLink = document.getElementById("homeLink");
+    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+
+    // Login page path (same rule as above)
+    const LOGIN_URL = `${BASE_PREFIX}/hu/login/`;
+
+    // =========================
+    // Firebase (Auth + Firestore)
+    // =========================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc,
+      setDoc,
+      getDoc,
+      serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
+      authDomain: "fitneady-15fd0.firebaseapp.com",
+      projectId: "fitneady-15fd0",
+      storageBucket: "fitneady-15fd0.firebasestorage.app",
+      messagingSenderId: "480597492603",
+      appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
+      measurementId: "G-MH1YK9C2YF"
+    };
+
+    const fbApp = initializeApp(firebaseConfig);
+    try { getAnalytics(fbApp); } catch(e) {}
+    const auth = getAuth(fbApp);
+    const db = getFirestore(fbApp);
+
+    // =========================
+    // Helpers
+    // =========================
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const todayISO = () => new Date().toISOString().slice(0,10);
+    const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
+    const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+    const fmtDate = (iso)=>{
+      if(!iso) return "—";
+      const d = new Date(iso+"T00:00:00");
+      const dd = String(d.getDate()).padStart(2,"0");
+      const mm = String(d.getMonth()+1).padStart(2,"0");
+      const yy = d.getFullYear();
+      return `${yy}.${mm}.${dd}`;
+    };
+    const escapeHtml = (s)=>String(s??"")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+
+    function enableTapGlow(selector=".interactive"){
+      $$(selector).forEach(el=>{
+        el.addEventListener("touchstart", ()=>{
+          el.classList.add("is-active");
+          window.clearTimeout(el.__t);
+          el.__t = window.setTimeout(()=>el.classList.remove("is-active"), 650);
+        }, {passive:true});
+      });
+    }
+
+    // =========================
+    // Demo data (plan + technika) — profile Firestore-ból jön
+    // =========================
+    const DEMO = {
+      profile: {
+        package: "Start",
+        goal: "Formálás",
+        level: 2,
+        cycleStart: "2026-02-10",
+        cycleEnd: "2026-03-10"
+      },
+      packages: {
+        Start: { weeks: 4, workoutsPerWeek: 3, slotsPerWeek: 1 },
+        Balance: { weeks: 6, workoutsPerWeek: 4, slotsPerWeek: 2 },
+        Pro: { weeks: 8, workoutsPerWeek: 4, slotsPerWeek: 2 }
+      },
+      plans: {
+        Start: [
+          { week: 1, workouts: [
+              { id:"W1-A", title:"Edzés A — Full body (alap)", desc:"Technika + ritmus. 35–45 perc.", video:"https://player.vimeo.com/video/000000001" },
+              { id:"W1-B", title:"Edzés B — Alsótest fókusz", desc:"Farizom + comb, kontrollált tempó.", video:"https://player.vimeo.com/video/000000002" },
+              { id:"W1-C", title:"Edzés C — Core + formálás", desc:"Törzs stabilitás + finisher.", video:"https://player.vimeo.com/video/000000003" }
+            ],
+            slots: [
+              { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina hetente 1 alkalommal frissíti.", video:"https://player.vimeo.com/video/000000010", note:"Most: glute fókusz (kímélő)." }
+            ]
+          },
+          { week: 2, workouts: [
+              { id:"W2-A", title:"Edzés A — Full body (progresszió)", desc:"Kicsit több intenzitás, 35–45 perc.", video:"https://player.vimeo.com/video/000000004" },
+              { id:"W2-B", title:"Edzés B — Alsótest + core", desc:"Farizom + core kombó.", video:"https://player.vimeo.com/video/000000005" },
+              { id:"W2-C", title:"Edzés C — Formásodás", desc:"Stabil terhelés, tartható.", video:"https://player.vimeo.com/video/000000006" }
+            ],
+            slots: [
+              { slot:"Slot 1", title:"Személyre szabott csere", desc:"Haladás alapján módosítva.", video:"https://player.vimeo.com/video/000000011", note:"Most: core stabilitás (szint 2)." }
+            ]
+          },
+          { week: 3, workouts: [
+              { id:"W3-A", title:"Edzés A — Full body (erősebb)", desc:"Rövidebb pihenő, 35–45 perc.", video:"https://player.vimeo.com/video/000000007" },
+              { id:"W3-B", title:"Edzés B — Alsótest (progresszió)", desc:"Térdbarát opciókkal.", video:"https://player.vimeo.com/video/000000008" },
+              { id:"W3-C", title:"Edzés C — Core + cardio light", desc:"Low impact finisher.", video:"https://player.vimeo.com/video/000000009" }
+            ],
+            slots: [
+              { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina frissítette.", video:"https://player.vimeo.com/video/000000012", note:"Most: glute builder (szint 2)." }
+            ]
+          },
+          { week: 4, workouts: [
+              { id:"W4-A", title:"Edzés A — Deload / finomítás", desc:"Technika, minőség, nem túlerőltetés.", video:"https://player.vimeo.com/video/000000013" },
+              { id:"W4-B", title:"Edzés B — Forma-hét", desc:"Feszesítés + kontroll.", video:"https://player.vimeo.com/video/000000014" },
+              { id:"W4-C", title:"Edzés C — Teszt & zárás", desc:"Érzés, ismétlés, rögzítés.", video:"https://player.vimeo.com/video/000000015" }
+            ],
+            slots: [
+              { slot:"Slot 1", title:"Személyre szabott csere", desc:"Záró hét finomhangolás.", video:"https://player.vimeo.com/video/000000016", note:"Most: mobilitás + core reset." }
+            ]
+          }
+        ]
+      },
+      tech: {
+        categories: [
+          { id:"tech_squat", name:"Guggolás" },
+          { id:"tech_hinge", name:"Csípő-hajlítás" },
+          { id:"tech_core", name:"Core" },
+          { id:"tech_posture", name:"Tartás" }
+        ],
+        items: {
+          tech_squat: [
+            { id:"T-SQ-1", title:"Guggolás — alap beállítás", desc:"Lábfej, térd, törzs. 2–3 perc.", video:"https://player.vimeo.com/video/000000101" },
+            { id:"T-SQ-2", title:"Guggolás — gyakori hibák", desc:"Térd befelé, túl mély, tempó.", video:"https://player.vimeo.com/video/000000102" }
           ],
-          slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina hetente 1 alkalommal frissíti.", video:"https://player.vimeo.com/video/000000010", note:"Most: glute fókusz (kímélő)." }
-          ]
-        },
-        { week: 2, workouts: [
-            { id:"W2-A", title:"Edzés A — Full body (progresszió)", desc:"Kicsit több intenzitás, 35–45 perc.", video:"https://player.vimeo.com/video/000000004" },
-            { id:"W2-B", title:"Edzés B — Alsótest + core", desc:"Farizom + core kombó.", video:"https://player.vimeo.com/video/000000005" },
-            { id:"W2-C", title:"Edzés C — Formásodás", desc:"Stabil terhelés, tartható.", video:"https://player.vimeo.com/video/000000006" }
+          tech_hinge: [
+            { id:"T-HI-1", title:"RDL / csípő-hajlítás — alap", desc:"Csípő hátra, semleges gerinc.", video:"https://player.vimeo.com/video/000000103" },
+            { id:"T-HI-2", title:"Hinge — derék védelem", desc:"Mitől fáj, és hogyan javítsd.", video:"https://player.vimeo.com/video/000000104" }
           ],
-          slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Haladás alapján módosítva.", video:"https://player.vimeo.com/video/000000011", note:"Most: core stabilitás (szint 2)." }
-          ]
-        },
-        { week: 3, workouts: [
-            { id:"W3-A", title:"Edzés A — Full body (erősebb)", desc:"Rövidebb pihenő, 35–45 perc.", video:"https://player.vimeo.com/video/000000007" },
-            { id:"W3-B", title:"Edzés B — Alsótest (progresszió)", desc:"Térdbarát opciókkal.", video:"https://player.vimeo.com/video/000000008" },
-            { id:"W3-C", title:"Edzés C — Core + cardio light", desc:"Low impact finisher.", video:"https://player.vimeo.com/video/000000009" }
+          tech_core: [
+            { id:"T-CO-1", title:"Plank — helyes tartás", desc:"Lapocka, medence, légzés.", video:"https://player.vimeo.com/video/000000105" },
+            { id:"T-CO-2", title:"Dead bug — kontroll", desc:"Derék leszorít, lassú tempó.", video:"https://player.vimeo.com/video/000000106" },
+            { id:"T-CO-3", title:"Légzés — core aktiválás", desc:"Rövid drill edzés előtt.", video:"https://player.vimeo.com/video/000000107" }
           ],
-          slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Edina frissítette.", video:"https://player.vimeo.com/video/000000012", note:"Most: glute builder (szint 2)." }
-          ]
-        },
-        { week: 4, workouts: [
-            { id:"W4-A", title:"Edzés A — Deload / finomítás", desc:"Technika, minőség, nem túlerőltetés.", video:"https://player.vimeo.com/video/000000013" },
-            { id:"W4-B", title:"Edzés B — Forma-hét", desc:"Feszesítés + kontroll.", video:"https://player.vimeo.com/video/000000014" },
-            { id:"W4-C", title:"Edzés C — Teszt & zárás", desc:"Érzés, ismétlés, rögzítés.", video:"https://player.vimeo.com/video/000000015" }
-          ],
-          slots: [
-            { slot:"Slot 1", title:"Személyre szabott csere", desc:"Záró hét finomhangolás.", video:"https://player.vimeo.com/video/000000016", note:"Most: mobilitás + core reset." }
+          tech_posture: [
+            { id:"T-PO-1", title:"Tartás — váll/nyak", desc:"1–2 perces gyors fix.", video:"https://player.vimeo.com/video/000000108" },
+            { id:"T-PO-2", title:"Mobilitás — csípő", desc:"Rövid mobilitás blokk.", video:"https://player.vimeo.com/video/000000109" }
           ]
         }
-      ]
-    },
-    tech: {
-      categories: [
-        { id:"tech_squat", name:"Guggolás" },
-        { id:"tech_hinge", name:"Csípő-hajlítás" },
-        { id:"tech_core", name:"Core" },
-        { id:"tech_posture", name:"Tartás" }
-      ],
-      items: {
-        tech_squat: [
-          { id:"T-SQ-1", title:"Guggolás — alap beállítás", desc:"Lábfej, térd, törzs. 2–3 perc.", video:"https://player.vimeo.com/video/000000101" },
-          { id:"T-SQ-2", title:"Guggolás — gyakori hibák", desc:"Térd befelé, túl mély, tempó.", video:"https://player.vimeo.com/video/000000102" }
-        ],
-        tech_hinge: [
-          { id:"T-HI-1", title:"RDL / csípő-hajlítás — alap", desc:"Csípő hátra, semleges gerinc.", video:"https://player.vimeo.com/video/000000103" },
-          { id:"T-HI-2", title:"Hinge — derék védelem", desc:"Mitől fáj, és hogyan javítsd.", video:"https://player.vimeo.com/video/000000104" }
-        ],
-        tech_core: [
-          { id:"T-CO-1", title:"Plank — helyes tartás", desc:"Lapocka, medence, légzés.", video:"https://player.vimeo.com/video/000000105" },
-          { id:"T-CO-2", title:"Dead bug — kontroll", desc:"Derék leszorít, lassú tempó.", video:"https://player.vimeo.com/video/000000106" },
-          { id:"T-CO-3", title:"Légzés — core aktiválás", desc:"Rövid drill edzés előtt.", video:"https://player.vimeo.com/video/000000107" }
-        ],
-        tech_posture: [
-          { id:"T-PO-1", title:"Tartás — váll/nyak", desc:"1–2 perces gyors fix.", video:"https://player.vimeo.com/video/000000108" },
-          { id:"T-PO-2", title:"Mobilitás — csípő", desc:"Rövid mobilitás blokk.", video:"https://player.vimeo.com/video/000000109" }
-        ]
+      }
+    };
+
+    // =========================
+    // UID-scoped localStorage (done/diet/checkin)
+    // =========================
+    const k = (uid, key) => `fl_${uid}_${key}_v1`;
+    const lsGet = (uid, key, fallback) => {
+      try {
+        const v = localStorage.getItem(k(uid,key));
+        return v ? JSON.parse(v) : fallback;
+      } catch { return fallback; }
+    };
+    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
+
+    // =========================
+    // Modals (settings + info)
+    // =========================
+    const settingsOverlay = $("#settingsOverlay");
+    const infoOverlay = $("#infoOverlay");
+    const infoBody = $("#infoBody");
+    const infoTitle = $("#infoTitle");
+
+    function openOverlay(overlay){
+      overlay.classList.add("is-open");
+      overlay.setAttribute("aria-hidden","false");
+    }
+    function closeOverlay(overlay){
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden","true");
+    }
+    function openInfo(title, html){
+      infoTitle.textContent = title;
+      infoBody.innerHTML = html;
+      openOverlay(infoOverlay);
+    }
+
+    $("#settingsClose").addEventListener("click", ()=>closeOverlay(settingsOverlay));
+    $("#infoClose").addEventListener("click", ()=>closeOverlay(infoOverlay));
+    settingsOverlay.addEventListener("click",(e)=>{ if(e.target===settingsOverlay) closeOverlay(settingsOverlay); });
+    infoOverlay.addEventListener("click",(e)=>{ if(e.target===infoOverlay) closeOverlay(infoOverlay); });
+
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape"){
+        [settingsOverlay, infoOverlay].forEach(ov=>{
+          if(ov.classList.contains("is-open")) closeOverlay(ov);
+        });
+      }
+    });
+
+    // =========================
+    // Mobile menu + active nav
+    // =========================
+    enableTapGlow();
+
+    const menuBtn = $("#menuBtn");
+    let menuOpen = false;
+
+    function closeMobileNav(){
+      $("#mobileNav")?.remove();
+      menuOpen = false;
+    }
+
+    menuBtn?.addEventListener("click", ()=>{
+      if(menuOpen){ closeMobileNav(); return; }
+      closeMobileNav();
+
+      menuOpen = true;
+      const nav = document.createElement("div");
+      nav.id = "mobileNav";
+      nav.style.position = "fixed";
+      nav.style.top = "64px";
+      nav.style.left = "14px";
+      nav.style.right = "14px";
+      nav.style.zIndex = "60";
+      nav.style.background = "rgba(20,12,26,.72)";
+      nav.style.border = "1px solid rgba(255,255,255,.10)";
+      nav.style.borderRadius = "18px";
+      nav.style.backdropFilter = "blur(14px)";
+      nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
+      nav.style.padding = "12px";
+      nav.innerHTML = `
+        <a href="#program" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Programom</a>
+        <a href="#etrend" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Étrend</a>
+        <a href="#checkin" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Célom & Check-in</a>
+        <a href="#technika" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Technika</a>
+      `;
+      document.body.appendChild(nav);
+    });
+
+    document.addEventListener("click",(e)=>{
+      const nav = $("#mobileNav");
+      if(!nav) return;
+      if(e.target === menuBtn) return;
+      if(nav.contains(e.target)) { closeMobileNav(); return; }
+      closeMobileNav();
+    });
+
+    (()=> {
+      const links = $$('[data-nav]');
+      const sections = links
+        .map(a => document.querySelector(a.getAttribute('href')))
+        .filter(Boolean);
+
+      const setActive = (id) => {
+        links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
+      };
+
+      const io = new IntersectionObserver((entries)=>{
+        const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
+        if(visible?.target?.id) setActive(visible.target.id);
+      }, { threshold: [0.18, 0.28, 0.4] });
+
+      sections.forEach(s=>io.observe(s));
+    })();
+
+    // =========================
+    // Firestore profile
+    // =========================
+    async function ensureUserProfile(user){
+      const ref = doc(db, "users", user.uid);
+      const snap = await getDoc(ref);
+      if (snap.exists()) return snap.data();
+
+      const initial = {
+        email: user.email,
+        package: DEMO.profile.package,
+        goal: DEMO.profile.goal,
+        level: DEMO.profile.level,
+        active: true,
+        cycleStart: DEMO.profile.cycleStart,
+        cycleEnd: DEMO.profile.cycleEnd,
+        createdAt: serverTimestamp(),
+        updatedAt: serverTimestamp()
+      };
+      await setDoc(ref, initial, { merge: true });
+      return initial;
+    }
+
+    // =========================
+    // App state + render
+    // =========================
+    let uid = null;
+    let state = null;
+
+    function calcWeekIndex(profile){
+      const start = profile.cycleStart;
+      const end = profile.cycleEnd;
+      const totalDays = Math.max(1, daysBetween(start,end));
+      const passedDays = clamp(daysBetween(start, todayISO()), 0, totalDays);
+      const weeks = DEMO.packages[profile.package]?.weeks ?? 4;
+      const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
+      return week - 1;
+    }
+
+    function renderHeader(){
+      const p = state.profile;
+      const pack = DEMO.packages[p.package] ? p.package : "Start";
+      p.package = pack;
+
+      $("#chipPackage").textContent = `Csomag: ${p.package}`;
+      $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
+      $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
+      $("#pillUpdated").textContent = `✨ Utolsó frissítés: ${p.updatedAtHuman || "—"}`;
+
+      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
+      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+      const leftDays = clamp(totalDays - passedDays, 0, totalDays);
+
+      const weeks = DEMO.packages[p.package]?.weeks ?? 4;
+      const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
+
+      $("#lblWeek").textContent = `Hét: ${week}/${weeks}`;
+      $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
+
+      const pct = Math.round((passedDays / totalDays) * 100);
+      $("#barCycle").style.width = `${pct}%`;
+
+      const status = leftDays === 0
+        ? `A csomagod lejárt (${fmtDate(p.cycleEnd)}). A Technika Vault továbbra is elérhető.`
+        : `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)} • Következő lépés: tartsd a ritmust és pipáld a heti edzéseket.`;
+      $("#subStatus").textContent = status;
+
+      $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
+      $("#goalDesc").textContent = p.goal
+        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket és az étrendet.`
+        : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`;
+
+      const done = state.checkin?.done ? 1 : 0;
+      $("#checkinLabel").textContent = `${done}/1`;
+      $("#barCheckin").style.width = `${done*100}%`;
+
+      const expired = leftDays === 0;
+      $("#program").style.opacity = expired ? .55 : 1;
+      $("#program").style.pointerEvents = expired ? "none" : "auto";
+      if(expired){
+        $("#motivationBox").textContent = "A Technika Vault örök. A teljes programhoz újíts meg vagy válts csomagot.";
       }
     }
-  };
 
-  // =========================
-  // User-scoped localStorage (done/diet/checkin)
-  // =========================
-  const k = (uid, key) => `fl_${uid}_${key}_v1`;
-  const lsGet = (uid, key, fallback) => {
-    try {
-      const v = localStorage.getItem(k(uid,key));
-      return v ? JSON.parse(v) : fallback;
-    } catch { return fallback; }
-  };
-  const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
+    function renderWeekTabs(){
+      const p = state.profile;
+      const weeks = DEMO.packages[p.package]?.weeks ?? 4;
+      const cur = calcWeekIndex(p);
+      state.weekIdx = clamp(state.weekIdx ?? cur, 0, weeks-1);
 
-  // =========================
-  // Modals (null-safe)
-  // =========================
-  const authOverlay = $("#authOverlay");
-  const settingsOverlay = $("#settingsOverlay");
-  const infoOverlay = $("#infoOverlay");
-  const infoBody = $("#infoBody");
-  const infoTitle = $("#infoTitle");
-
-  function openOverlay(overlay){
-    if(!overlay) return;
-    overlay.classList.add("is-open");
-    overlay.setAttribute("aria-hidden","false");
-  }
-  function closeOverlay(overlay){
-    if(!overlay) return;
-    overlay.classList.remove("is-open");
-    overlay.setAttribute("aria-hidden","true");
-  }
-  function openInfo(title, html){
-    if(infoTitle) infoTitle.textContent = title;
-    if(infoBody) infoBody.innerHTML = html;
-    openOverlay(infoOverlay);
-  }
-
-  $("#authClose")?.addEventListener("click", ()=>closeOverlay(authOverlay));
-  $("#settingsClose")?.addEventListener("click", ()=>closeOverlay(settingsOverlay));
-  $("#infoClose")?.addEventListener("click", ()=>closeOverlay(infoOverlay));
-
-  authOverlay?.addEventListener("click",(e)=>{ if(e.target===authOverlay) closeOverlay(authOverlay); });
-  settingsOverlay?.addEventListener("click",(e)=>{ if(e.target===settingsOverlay) closeOverlay(settingsOverlay); });
-  infoOverlay?.addEventListener("click",(e)=>{ if(e.target===infoOverlay) closeOverlay(infoOverlay); });
-
-  document.addEventListener("keydown",(e)=>{
-    if(e.key==="Escape"){
-      [authOverlay, settingsOverlay, infoOverlay].forEach(ov=>{
-        if(ov && ov.classList.contains("is-open")) closeOverlay(ov);
-      });
+      const tabs = $("#weekTabs");
+      tabs.innerHTML = "";
+      for(let i=0;i<weeks;i++){
+        const b = document.createElement("button");
+        b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
+        b.type = "button";
+        b.textContent = `Hét ${i+1}`;
+        b.addEventListener("click", ()=>{
+          state.weekIdx = i;
+          renderProgram();
+        });
+        tabs.appendChild(b);
+      }
     }
-  });
 
-  // =========================
-  // Mobile menu + active nav
-  // =========================
-  const menuBtn = $("#menuBtn");
-  let menuOpen = false;
+    function workoutKey(week, id){ return `w${week}_${id}`; }
+    function techKey(cat, id){ return `t_${cat}_${id}`; }
 
-  function closeMobileNav(){
-    $("#mobileNav")?.remove();
-    menuOpen = false;
-  }
+    function renderProgram(){
+      renderWeekTabs();
 
-  menuBtn?.addEventListener("click", ()=>{
-    if(menuOpen){ closeMobileNav(); return; }
-    closeMobileNav();
+      const p = state.profile;
+      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
+      const weekObj = packPlan[state.weekIdx] || packPlan[0];
 
-    menuOpen = true;
-    const nav = document.createElement("div");
-    nav.id = "mobileNav";
-    nav.style.position = "fixed";
-    nav.style.top = "64px";
-    nav.style.left = "14px";
-    nav.style.right = "14px";
-    nav.style.zIndex = "60";
-    nav.style.background = "rgba(20,12,26,.72)";
-    nav.style.border = "1px solid rgba(255,255,255,.10)";
-    nav.style.borderRadius = "18px";
-    nav.style.backdropFilter = "blur(14px)";
-    nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-    nav.style.padding = "12px";
-    nav.innerHTML = `
-      <a href="#program" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Programom</a>
-      <a href="#etrend" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Étrend</a>
-      <a href="#checkin" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Célom & Check-in</a>
-      <a href="#technika" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Technika</a>
-    `;
-    document.body.appendChild(nav);
-  });
-
-  document.addEventListener("click",(e)=>{
-    const nav = $("#mobileNav");
-    if(!nav) return;
-    if(e.target === menuBtn) return;
-    if(nav.contains(e.target)) { closeMobileNav(); return; }
-    closeMobileNav();
-  });
-
-  (()=> {
-    const links = $$('[data-nav]');
-    const sections = links
-      .map(a => document.querySelector(a.getAttribute('href')))
-      .filter(Boolean);
-
-    const setActive = (id) => {
-      links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
-    };
-
-    const io = new IntersectionObserver((entries)=>{
-      const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
-      if(visible?.target?.id) setActive(visible.target.id);
-    }, { threshold: [0.18, 0.28, 0.4] });
-
-    sections.forEach(s=>io.observe(s));
-  })();
-
-  // =========================
-  // Firestore profile
-  // =========================
-  async function ensureUserProfile(user){
-    const ref = doc(db, "users", user.uid);
-    const snap = await getDoc(ref);
-    if (snap.exists()) return snap.data();
-
-    const initial = {
-      email: user.email,
-      package: DEMO.profile.package,
-      goal: DEMO.profile.goal,
-      level: DEMO.profile.level,
-      active: true,
-      cycleStart: DEMO.profile.cycleStart,
-      cycleEnd: DEMO.profile.cycleEnd,
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-    await setDoc(ref, initial, { merge: true });
-    return initial;
-  }
-
-  // =========================
-  // App state + render
-  // =========================
-  let uid = null;
-  let state = null;
-
-  function calcWeekIndex(profile){
-    const start = profile.cycleStart;
-    const end = profile.cycleEnd;
-    const totalDays = Math.max(1, daysBetween(start,end));
-    const passedDays = clamp(daysBetween(start, todayISO()), 0, totalDays);
-    const weeks = DEMO.packages[profile.package]?.weeks ?? 4;
-    const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
-    return week - 1;
-  }
-
-  function renderHeader(){
-    const p = state.profile;
-    const pack = DEMO.packages[p.package] ? p.package : "Start";
-    p.package = pack;
-
-    $("#chipPackage") && ($("#chipPackage").textContent = `Csomag: ${p.package}`);
-    $("#pillGoal") && ($("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`);
-    $("#pillIntensity") && ($("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`);
-    $("#pillUpdated") && ($("#pillUpdated").textContent = `✨ Utolsó frissítés: ${p.updatedAtHuman || "—"}`);
-
-    const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-    const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
-    const leftDays = clamp(totalDays - passedDays, 0, totalDays);
-
-    const weeks = DEMO.packages[p.package]?.weeks ?? 4;
-    const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
-
-    $("#lblWeek") && ($("#lblWeek").textContent = `Hét: ${week}/${weeks}`);
-    $("#lblDays") && ($("#lblDays").textContent = `Hátralévő napok: ${leftDays}`);
-    $("#barCycle") && ($("#barCycle").style.width = `${Math.round((passedDays / totalDays) * 100)}%`);
-
-    const status = leftDays === 0
-      ? `A csomagod lejárt (${fmtDate(p.cycleEnd)}). A Technika Vault továbbra is elérhető.`
-      : `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)} • Következő lépés: tartsd a ritmust és pipáld a heti edzéseket.`;
-    $("#subStatus") && ($("#subStatus").textContent = status);
-
-    $("#goalTitle") && ($("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`);
-    $("#goalDesc") && ($("#goalDesc").textContent = p.goal
-      ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket és az étrendet.`
-      : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`);
-
-    const done = state.checkin?.done ? 1 : 0;
-    $("#checkinLabel") && ($("#checkinLabel").textContent = `${done}/1`);
-    $("#barCheckin") && ($("#barCheckin").style.width = `${done*100}%`);
-
-    const expired = leftDays === 0;
-    const programEl = $("#program");
-    if(programEl){
-      programEl.style.opacity = expired ? .55 : 1;
-      programEl.style.pointerEvents = expired ? "none" : "auto";
-    }
-    if(expired && $("#motivationBox")){
-      $("#motivationBox").textContent = "A Technika Vault örök. A teljes programhoz újíts meg vagy válts csomagot.";
-    }
-  }
-
-  function renderWeekTabs(){
-    const p = state.profile;
-    const weeks = DEMO.packages[p.package]?.weeks ?? 4;
-    const cur = calcWeekIndex(p);
-    state.weekIdx = clamp(state.weekIdx ?? cur, 0, weeks-1);
-
-    const tabs = $("#weekTabs");
-    if(!tabs) return;
-    tabs.innerHTML = "";
-    for(let i=0;i<weeks;i++){
-      const b = document.createElement("button");
-      b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
-      b.type = "button";
-      b.textContent = `Hét ${i+1}`;
-      b.addEventListener("click", ()=>{
-        state.weekIdx = i;
-        renderProgram();
-      });
-      tabs.appendChild(b);
-    }
-  }
-
-  function workoutKey(week, id){ return `w${week}_${id}`; }
-  function techKey(cat, id){ return `t_${cat}_${id}`; }
-
-  function renderProgram(){
-    renderWeekTabs();
-
-    const p = state.profile;
-    const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-    const weekObj = packPlan[state.weekIdx] || packPlan[0];
-
-    const ul = $("#workoutList");
-    if(ul){
+      const ul = $("#workoutList");
       ul.innerHTML = "";
       weekObj.workouts.forEach(w=>{
         const key = workoutKey(weekObj.week, w.id);
@@ -424,10 +1078,8 @@
         `;
         ul.appendChild(li);
       });
-    }
 
-    const sl = $("#slotList");
-    if(sl){
+      const sl = $("#slotList");
       sl.innerHTML = "";
       weekObj.slots.forEach((s, idx)=>{
         const key = `slot_w${weekObj.week}_${idx}`;
@@ -445,51 +1097,49 @@
         `;
         sl.appendChild(li);
       });
-    }
 
-    $$("[data-play]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const url = b.getAttribute("data-play");
-        openInfo("Lejátszás (teszt)", `
-          <p class="note">Teszt módban a videó helyére Vimeo embed linket mutatunk. Élesben itt jön a domain-lockolt Vimeo lejátszó.</p>
-          <div class="row" style="grid-template-columns: 1fr;">
-            <div class="title">Vimeo embed URL</div>
-            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
-          </div>
-        `);
+      $$("[data-play]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const url = b.getAttribute("data-play");
+          openInfo("Lejátszás (teszt)", `
+            <p class="note">Teszt módban a videó helyére Vimeo embed linket mutatunk. Élesben itt jön a domain-lockolt Vimeo lejátszó.</p>
+            <div class="row" style="grid-template-columns: 1fr;">
+              <div class="title">Vimeo embed URL</div>
+              <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
+            </div>
+          `);
+        });
       });
-    });
 
-    $$("[data-toggle-done]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const key = b.getAttribute("data-toggle-done");
-        state.done[key] = !state.done[key];
-        lsSet(uid, "done", state.done);
-        renderProgram();
+      $$("[data-toggle-done]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const key = b.getAttribute("data-toggle-done");
+          state.done[key] = !state.done[key];
+          lsSet(uid, "done", state.done);
+          renderProgram();
+        });
       });
-    });
 
-    $$("[data-request-swap]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        openInfo("Csere kérése (teszt)", `
-          <p>Élesben ez admin “to-do” vagy WhatsApp/Email Edinának.</p>
-          <div class="row" style="grid-template-columns: 1fr;">
-            <div class="title">Üzenet minta</div>
-            <div class="desc">
-              <code style="white-space:pre-wrap; word-break:break-word;">
+      $$("[data-request-swap]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          openInfo("Csere kérése (teszt)", `
+            <p>Élesben ez admin “to-do” vagy WhatsApp/Email Edinának.</p>
+            <div class="row" style="grid-template-columns: 1fr;">
+              <div class="title">Üzenet minta</div>
+              <div class="desc">
+                <code style="white-space:pre-wrap; word-break:break-word;">
 Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj.week}).
 Úgy érzem: [túl könnyű / túl nehéz / fáj a térdem / több glute fókusz]. Köszi! 😊
-              </code>
+                </code>
+              </div>
             </div>
-          </div>
-        `);
+          `);
+        });
       });
-    });
-  }
+    }
 
-  function renderTechnika(){
-    const tabs = $("#techTabs");
-    if(tabs){
+    function renderTechnika(){
+      const tabs = $("#techTabs");
       tabs.innerHTML = "";
       DEMO.tech.categories.forEach(c=>{
         const b = document.createElement("button");
@@ -502,10 +1152,8 @@ Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj
         });
         tabs.appendChild(b);
       });
-    }
 
-    const list = $("#techList");
-    if(list){
+      const list = $("#techList");
       list.innerHTML = "";
       const items = DEMO.tech.items[state.techCat] || [];
       items.forEach(it=>{
@@ -526,237 +1174,219 @@ Szia Edina! Kérlek nézd meg a heti személyre szabás slotomat (Hét ${weekObj
         `;
         list.appendChild(li);
       });
+
+      $$("[data-toggle-tech]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const key = b.getAttribute("data-toggle-tech");
+          state.done[key] = !state.done[key];
+          lsSet(uid, "done", state.done);
+          renderTechnika();
+        });
+      });
+
+      $$("[data-play]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const url = b.getAttribute("data-play");
+          openInfo("Lejátszás (teszt)", `
+            <p class="note">Teszt módban csak a Vimeo embed URL-t mutatjuk.</p>
+            <div class="row" style="grid-template-columns: 1fr;">
+              <div class="title">Vimeo embed URL</div>
+              <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
+            </div>
+          `);
+        });
+      });
     }
 
-    $$("[data-toggle-tech]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const key = b.getAttribute("data-toggle-tech");
-        state.done[key] = !state.done[key];
-        lsSet(uid, "done", state.done);
-        renderTechnika();
+    function refreshDietButtons(){
+      const d = state.diet;
+      $$("[data-toggle]").forEach(btn=>{
+        const key = btn.getAttribute("data-toggle");
+        const on = !!d[key];
+        btn.classList.toggle("primary", on);
+        btn.classList.toggle("ghost", !on);
       });
-    });
+    }
 
-    $$("[data-play]").forEach(b=>{
-      b.addEventListener("click", ()=>{
-        const url = b.getAttribute("data-play");
-        openInfo("Lejátszás (teszt)", `
-          <p class="note">Teszt módban csak a Vimeo embed URL-t mutatjuk.</p>
-          <div class="row" style="grid-template-columns: 1fr;">
-            <div class="title">Vimeo embed URL</div>
-            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(url)}</code></div>
-          </div>
-        `);
-      });
-    });
-  }
-
-  function refreshDietButtons(){
-    const d = state.diet;
-    $$("[data-toggle]").forEach(btn=>{
-      const key = btn.getAttribute("data-toggle");
-      const on = !!d[key];
-      btn.classList.toggle("primary", on);
-      btn.classList.toggle("ghost", !on);
-    });
-  }
-
-  function renderAll(){
-    renderHeader();
-    renderProgram();
-    renderTechnika();
-    refreshDietButtons();
-    enableTapGlow();
-  }
-
-  // =========================
-  // Buttons (null-safe kötés)
-  // =========================
-  $("#btnMarkAll")?.addEventListener("click", ()=>{
-    const p = state.profile;
-    const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-    const weekObj = packPlan[state.weekIdx] || packPlan[0];
-    weekObj.workouts.forEach(w=> state.done[workoutKey(weekObj.week, w.id)] = true);
-    lsSet(uid, "done", state.done);
-    renderProgram();
-  });
-
-  $("#btnResetWeek")?.addEventListener("click", ()=>{
-    const p = state.profile;
-    const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
-    const weekObj = packPlan[state.weekIdx] || packPlan[0];
-    weekObj.workouts.forEach(w=> delete state.done[workoutKey(weekObj.week, w.id)]);
-    lsSet(uid, "done", state.done);
-    renderProgram();
-  });
-
-  $("#btnAddTechDone")?.addEventListener("click", ()=>{
-    const items = DEMO.tech.items[state.techCat] || [];
-    items.forEach(it=> state.done[techKey(state.techCat, it.id)] = true);
-    lsSet(uid, "done", state.done);
-    renderTechnika();
-  });
-
-  $$("[data-toggle]").forEach(btn=>{
-    btn.addEventListener("click", ()=>{
-      const key = btn.getAttribute("data-toggle");
-      state.diet[key] = !state.diet[key];
-      lsSet(uid, "diet", state.diet);
+    function renderAll(){
+      renderHeader();
+      renderProgram();
+      renderTechnika();
       refreshDietButtons();
+      enableTapGlow();
+    }
+
+    // =========================
+    // Buttons
+    // =========================
+    $("#btnMarkAll").addEventListener("click", ()=>{
+      const p = state.profile;
+      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
+      const weekObj = packPlan[state.weekIdx] || packPlan[0];
+      weekObj.workouts.forEach(w=> state.done[workoutKey(weekObj.week, w.id)] = true);
+      lsSet(uid, "done", state.done);
+      renderProgram();
     });
-  });
 
-  const MOTS = [
-    "„A rendszer nem nyomás. A rendszer szabadság.”",
-    "„A haladás nem tökéletesség. Hanem következetesség.”",
-    "„Nem csak formát építesz – bizalmat és jövőt.”",
-    "„Amit ma megteszel, az a holnapi önbizalmad.”"
-  ];
-  $("#btnMotivation")?.addEventListener("click", ()=>{
-    const m = MOTS[Math.floor(Math.random()*MOTS.length)];
-    $("#motivationBox") && ($("#motivationBox").textContent = m);
-  });
+    $("#btnResetWeek").addEventListener("click", ()=>{
+      const p = state.profile;
+      const packPlan = DEMO.plans[p.package] || DEMO.plans.Start;
+      const weekObj = packPlan[state.weekIdx] || packPlan[0];
+      weekObj.workouts.forEach(w=> delete state.done[workoutKey(weekObj.week, w.id)]);
+      lsSet(uid, "done", state.done);
+      renderProgram();
+    });
 
-  $("#btnDoCheckin")?.addEventListener("click", ()=>{
-    openInfo("Check-in (teszt)", `
-      <p class="note">Tesztben: egy kattintás “kész”-re állítja.</p>
-      <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
-        <button class="pill primary tiny" id="btnConfirmCheckin" type="button">✅ Check-in kész (teszt)</button>
-      </div>
-    `);
+    $("#btnAddTechDone").addEventListener("click", ()=>{
+      const items = DEMO.tech.items[state.techCat] || [];
+      items.forEach(it=> state.done[techKey(state.techCat, it.id)] = true);
+      lsSet(uid, "done", state.done);
+      renderTechnika();
+    });
 
-    setTimeout(()=>{
-      $("#btnConfirmCheckin")?.addEventListener("click", ()=>{
-        state.checkin = { done: true, at: new Date().toISOString() };
-        lsSet(uid, "checkin", state.checkin);
-        closeOverlay(infoOverlay);
-        renderHeader();
+    $$("[data-toggle]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const key = btn.getAttribute("data-toggle");
+        state.diet[key] = !state.diet[key];
+        lsSet(uid, "diet", state.diet);
+        refreshDietButtons();
       });
-    }, 0);
-  });
+    });
 
-  $("#btnOpenSettings")?.addEventListener("click", ()=>{
-    const p = state.profile;
-    $("#setPackage") && ($("#setPackage").value = p.package || "Start");
-    $("#setGoal") && ($("#setGoal").value = p.goal || "");
-    $("#setLevel") && ($("#setLevel").value = p.level || 2);
-    $("#setStart") && ($("#setStart").value = p.cycleStart || todayISO());
-    $("#setEnd") && ($("#setEnd").value = p.cycleEnd || todayISO());
-    openOverlay(settingsOverlay);
-  });
+    const MOTS = [
+      "„A rendszer nem nyomás. A rendszer szabadság.”",
+      "„A haladás nem tökéletesség. Hanem következetesség.”",
+      "„Nem csak formát építesz – bizalmat és jövőt.”",
+      "„Amit ma megteszel, az a holnapi önbizalmad.”"
+    ];
+    $("#btnMotivation").addEventListener("click", ()=>{
+      $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
+    });
 
-  $("#btnSaveSettings")?.addEventListener("click", async ()=>{
-    const p = state.profile;
-    p.package = ($("#setPackage")?.value || "Start").trim();
-    p.goal = ($("#setGoal")?.value || "Formálás").trim();
-    p.level = clamp(parseInt($("#setLevel")?.value || "2",10),1,4);
-    p.cycleStart = ($("#setStart")?.value || todayISO()).trim();
-    p.cycleEnd = ($("#setEnd")?.value || todayISO()).trim();
-    p.updatedAtHuman = fmtDate(todayISO());
+    $("#btnDoCheckin").addEventListener("click", ()=>{
+      openInfo("Check-in (teszt)", `
+        <p class="note">Tesztben: egy kattintás “kész”-re állítja.</p>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+          <button class="pill primary tiny" id="btnConfirmCheckin" type="button">✅ Check-in kész (teszt)</button>
+        </div>
+      `);
 
-    await setDoc(doc(db, "users", uid), {
-      package: p.package,
-      goal: p.goal,
-      level: p.level,
-      cycleStart: p.cycleStart,
-      cycleEnd: p.cycleEnd,
-      updatedAt: serverTimestamp()
-    }, { merge: true });
+      setTimeout(()=>{
+        $("#btnConfirmCheckin")?.addEventListener("click", ()=>{
+          state.checkin = { done: true, at: new Date().toISOString() };
+          lsSet(uid, "checkin", state.checkin);
+          closeOverlay(infoOverlay);
+          renderHeader();
+        });
+      }, 0);
+    });
 
-    closeOverlay(settingsOverlay);
-    renderAll();
-  });
+    $("#btnOpenSettings").addEventListener("click", ()=>{
+      const p = state.profile;
+      $("#setPackage").value = p.package || "Start";
+      $("#setGoal").value = p.goal || "";
+      $("#setLevel").value = p.level || 2;
+      $("#setStart").value = p.cycleStart || todayISO();
+      $("#setEnd").value = p.cycleEnd || todayISO();
+      openOverlay(settingsOverlay);
+    });
 
-  // =========================
-  // AUTH modal gombok (ha még ott vannak a HTML-ben)
-  // - de az APP védett: ha nincs user, redirect loginra
-  // =========================
-  function clearAuthFields(){
-    $("#authMsg") && ($("#authMsg").textContent = "");
-    $("#pw") && ($("#pw").value = "");
-    $("#pw1") && ($("#pw1").value = "");
-    $("#pw2") && ($("#pw2").value = "");
-  }
+    $("#btnSaveSettings").addEventListener("click", async ()=>{
+      const p = state.profile;
+      p.package = ($("#setPackage").value || "Start").trim();
+      p.goal = ($("#setGoal").value || "Formálás").trim();
+      p.level = clamp(parseInt($("#setLevel").value || "2",10),1,4);
+      p.cycleStart = ($("#setStart").value || todayISO()).trim();
+      p.cycleEnd = ($("#setEnd").value || todayISO()).trim();
+      p.updatedAtHuman = fmtDate(todayISO());
 
-  $("#btnActivate")?.addEventListener("click", async ()=>{
-    const email = ($("#email")?.value || "").trim().toLowerCase();
-    const pw1 = $("#pw1")?.value || "";
-    const pw2 = $("#pw2")?.value || "";
+      await setDoc(doc(db, "users", uid), {
+        package: p.package,
+        goal: p.goal,
+        level: p.level,
+        cycleStart: p.cycleStart,
+        cycleEnd: p.cycleEnd,
+        updatedAt: serverTimestamp()
+      }, { merge: true });
 
-    if(!email || !email.includes("@")) return ($("#authMsg") && ($("#authMsg").textContent = "Adj meg érvényes e-mailt."));
-    if(pw1.length < 6) return ($("#authMsg") && ($("#authMsg").textContent = "A jelszó legyen legalább 6 karakter."));
-    if(pw1 !== pw2) return ($("#authMsg") && ($("#authMsg").textContent = "A két jelszó nem egyezik."));
+      closeOverlay(settingsOverlay);
+      renderAll();
+    });
 
-    try{
-      await createUserWithEmailAndPassword(auth, email, pw1);
-      $("#authMsg") && ($("#authMsg").textContent = "Sikeres regisztráció ✅");
-      // ✅ onAuthStateChanged úgyis renderel, de ha valamiért a login oldalt akarod használni:
-      // window.location.href = APP_URL;
-    }catch(e){
-      $("#authMsg") && ($("#authMsg").textContent = e?.message || "Regisztrációs hiba.");
-    }
-  });
+    $("#btnResetDemo").addEventListener("click", ()=>{
+      // csak local state reset (nem töröljük Firestore profilt)
+      state.done = {};
+      state.diet = {};
+      state.checkin = null;
+      lsSet(uid, "done", state.done);
+      lsSet(uid, "diet", state.diet);
+      lsSet(uid, "checkin", state.checkin);
+      closeOverlay(settingsOverlay);
+      renderAll();
+    });
 
-  $("#btnLogin")?.addEventListener("click", async ()=>{
-    const email = ($("#email")?.value || "").trim().toLowerCase();
-    const pw = $("#pw")?.value || "";
+    $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
+      openInfo("Lejátszás — hogyan lesz élesben?", `
+        <p><b>Teszt verzió</b>: csak URL-t mutatunk.</p>
+        <p><b>Éles verzió</b>: Vimeo embed lejátszó jelenik meg, domain-lockkal.</p>
+        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
+          <li>Vimeo: <b>Hide from Vimeo</b></li>
+          <li>Embed: <b>Only on fitnesslady.ch</b></li>
+          <li>Download: <b>OFF</b></li>
+        </ul>
+      `);
+    });
 
-    if(!email || !email.includes("@")) return ($("#authMsg") && ($("#authMsg").textContent = "Adj meg érvényes e-mailt."));
-    if(!pw) return ($("#authMsg") && ($("#authMsg").textContent = "Írd be a jelszót."));
+    $("#btnRenew").addEventListener("click", ()=>{
+      openInfo("Megújítás (teszt)", `
+        <p class="note">Élesben ez Payrexx/Stripe checkout-ra visz (megújítás).</p>
+      `);
+    });
+    $("#btnUpgrade").addEventListener("click", ()=>{
+      openInfo("Upgrade (teszt)", `
+        <p class="note">Élesben itt tudsz Start → Balance → Pro váltani.</p>
+      `);
+    });
 
-    try{
-      await signInWithEmailAndPassword(auth, email, pw);
-      $("#authMsg") && ($("#authMsg").textContent = "Belépve ✅");
-      // ✅ onAuthStateChanged renderel, nem kell extra redirect
-    }catch(e){
-      $("#authMsg") && ($("#authMsg").textContent = e?.message || "Belépési hiba.");
-    }
-  });
+    // Logout (Firebase)
+    $("#btnLogout").addEventListener("click", async ()=>{
+      await signOut(auth);
+      location.href = LOGIN_URL;
+    });
 
-  // ✅ KIJELENTKEZÉS: mindig loginra
-  $("#btnLogout")?.addEventListener("click", async ()=>{
-    await signOut(auth);
-    window.location.href = LOGIN_URL;
-  });
+    // =========================
+    // INIT
+    // =========================
+    document.getElementById("y").textContent = new Date().getFullYear();
 
-  // =========================
-  // INIT + auth state (APP GUARD)
-  // =========================
-  document.getElementById("y") && (document.getElementById("y").textContent = new Date().getFullYear());
+    onAuthStateChanged(auth, async (user)=>{
+      if(!user){
+        // nincs login -> vissza a loginra
+        location.replace(LOGIN_URL);
+        return;
+      }
 
-  onAuthStateChanged(auth, async (user)=>{
-    // ✅ App védelme: ha nincs belépve -> login oldal
-    if(!user){
-      uid = null;
-      clearAuthFields();
-      window.location.href = LOGIN_URL;
-      return;
-    }
+      uid = user.uid;
 
-    uid = user.uid;
+      const prof = await ensureUserProfile(user);
 
-    // profil Firestore-ból
-    const prof = await ensureUserProfile(user);
+      state = {
+        profile: {
+          ...DEMO.profile,
+          ...prof,
+          email: user.email,
+          updatedAtHuman: "—"
+        },
+        done: lsGet(uid, "done", {}),
+        diet: lsGet(uid, "diet", {}),
+        checkin: lsGet(uid, "checkin", null),
+        weekIdx: 0,
+        techCat: DEMO.tech.categories[0]?.id || "tech_core"
+      };
 
-    // user-scoped local state
-    state = {
-      profile: {
-        ...DEMO.profile,
-        ...prof,
-        email: user.email,
-        // ha updatedAt szerver timestamp, human-t itt egyszerűen “—”-re tesszük
-        updatedAtHuman: (prof?.lastUpdated ? fmtDate(prof.lastUpdated) : "—")
-      },
-      done: lsGet(uid, "done", {}),
-      diet: lsGet(uid, "diet", {}),
-      checkin: lsGet(uid, "checkin", null),
-      weekIdx: 0,
-      techCat: DEMO.tech.categories[0]?.id || "tech_core"
-    };
+      renderAll();
+    });
+  </script>
 
-    // ha még létezik authOverlay a HTML-ben, csukjuk le (de appban nem kötelező)
-    closeOverlay(authOverlay);
-
-    renderAll();
-  });
-      </script>
+</body>
+</html>
