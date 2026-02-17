@@ -716,6 +716,10 @@
           dietText: "",
           motivationText: "",
 
+          // legacy mezők is maradhatnak
+          diet: "",
+          motivation: "",
+
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         };
@@ -798,6 +802,49 @@
       return fallback;
     }
 
+    function extractVimeoId(maybe){
+      const s = String(maybe || "").trim();
+      if(!s) return "";
+      if(/^\d+$/.test(s)) return s;
+      const m1 = s.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if(m1?.[1]) return m1[1];
+      const m2 = s.match(/player\.vimeo\.com\/video\/(\d+)/i);
+      if(m2?.[1]) return m2[1];
+      return s; // ha admin direkt valamit ír (pl. már ID), ne dobjuk el
+    }
+
+    // ✅ NORMALIZÁLÁS: támogatja a Firestore új struktúrát (title/video/duration) ID nélkül
+    function normalizeTemplateWeek(templateWeek, weekNo){
+      const tw = templateWeek || {};
+      const rawWorkouts = Array.isArray(tw.workouts) ? tw.workouts : [];
+      const rawSlots = Array.isArray(tw.slots) ? tw.slots : [];
+
+      const workouts = rawWorkouts.map((w, idx)=>{
+        const id = (w && typeof w === "object" && w.id) ? String(w.id) : `w${idx+1}`;
+        // title lehet string vagy obj
+        const title = (w && typeof w === "object" && w.title != null) ? w.title : `Hét ${weekNo} • Edzés ${idx+1}`;
+        // desc lehet string/obj, ha nincs -> üres
+        const desc = (w && typeof w === "object" && w.desc != null) ? w.desc : "";
+        // vimeoId / video
+        const vimeoId = extractVimeoId((w && typeof w === "object" && (w.vimeoId ?? w.video)) || "");
+        const duration = (w && typeof w === "object" && w.duration != null) ? w.duration : "";
+        return { ...w, id, title, desc, vimeoId, duration };
+      });
+
+      // ha nincs slots a sablonban, legyen üres tömb
+      const slots = rawSlots.map((s, idx)=>{
+        const slotIndex = (s && typeof s === "object" && s.slotIndex != null) ? s.slotIndex : (idx+1);
+        // egységesítés az app szerkezetére
+        const title = (s && typeof s === "object" && s.title != null) ? s.title : { hu:`Személyre szabás ${slotIndex}`, de:`Personalisierung ${slotIndex}` };
+        const desc = (s && typeof s === "object" && s.desc != null) ? s.desc : { hu:"Admin tölti ki.", de:"Admin füllt aus." };
+        const defaultNote = (s && typeof s === "object" && s.defaultNote != null) ? s.defaultNote : { hu:"—", de:"—" };
+        const defaultVimeoId = extractVimeoId((s && typeof s === "object" && (s.defaultVimeoId ?? s.vimeoId ?? s.video)) || "");
+        return { ...s, slotIndex, title, desc, defaultNote, defaultVimeoId };
+      });
+
+      return { ...tw, workouts, slots };
+    }
+
     function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
       if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
@@ -862,7 +909,6 @@
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
 
-      // updatedAt: ha Timestamp, akkor a shared fmtDate nem tudja biztosan -> egyszerűen “—”
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
       const weeks = planMeta?.weeks || 4;
@@ -894,14 +940,14 @@
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
 
-      // ✅ ÉTREND MEGJELENÍTÉS (Firestore)
-      const dietText = (p.dietText || "").trim();
+      // ✅ ÉTREND: új + legacy fallback
+      const dietText = String((p.dietText ?? p.diet ?? "") || "").trim();
       $("#dietContent").innerHTML = dietText
         ? nl2brSafe(dietText)
         : `<span class="note">Még nincs megadva részletes étrend. (Admin fogja feltölteni.)</span>`;
 
-      // ✅ MOTIVÁCIÓ MEGJELENÍTÉS (Firestore)
-      const mot = (p.motivationText || "").trim();
+      // ✅ MOTIVÁCIÓ: új + legacy fallback
+      const mot = String((p.motivationText ?? p.motivation ?? "") || "").trim();
       $("#motivationBox").innerHTML = mot
         ? nl2brSafe(mot)
         : `„A rendszer nem nyomás. A rendszer szabadság.”`;
@@ -929,16 +975,17 @@
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      let templateWeekRaw = await loadPlanWeek(profile.planId, weekNo);
+      const templateWeek = normalizeTemplateWeek(templateWeekRaw, weekNo);
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
 
-      const ovWorkouts = overridesWeek?.workouts || {};
-      const ovSlots = overridesWeek?.slots || {};
+      const ovWorkouts = (overridesWeek?.workouts && typeof overridesWeek.workouts === "object") ? overridesWeek.workouts : {};
+      const ovSlots = (overridesWeek?.slots && typeof overridesWeek.slots === "object") ? overridesWeek.slots : {};
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id] || null, state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)] || null, state.lang))
       };
 
       const pack = { templateWeek, overridesWeek, merged };
@@ -1113,7 +1160,7 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      const txt = (profile?.dietText || "").trim();
+      const txt = String((profile?.dietText ?? profile?.diet ?? "") || "").trim();
       openInfo("Napi terv", txt
         ? `<div class="noteStrong">${nl2brSafe(txt)}</div>`
         : `<p class="note">Még nincs beállított részletes étrend. (Admin fogja feltölteni.)</p>`
@@ -1131,7 +1178,7 @@
       "„Amit ma megteszel, az a holnapi önbizalmad.”"
     ];
     $("#btnMotivation").addEventListener("click", ()=>{
-      const m = (profile?.motivationText || "").trim();
+      const m = String((profile?.motivationText ?? profile?.motivation ?? "") || "").trim();
       if(m){
         $("#motivationBox").innerHTML = nl2brSafe(m);
         return;
