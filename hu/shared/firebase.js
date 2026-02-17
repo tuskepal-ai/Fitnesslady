@@ -1,26 +1,21 @@
-// ./hu/shared/firebase.js
-// ÉLES: Firebase CDN (nincs bundler), Hostpoint + GitHub Pages kompatibilis
+// /shared/firebase.js
+// Firebase modular (ESM) – éles, statikus hoston (Hostpoint) működik
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
   signOut
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 import {
   getFirestore,
   doc,
   getDoc,
   setDoc,
   serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// GitHub Pages prefix (repo: /Fitnesslady)
-export const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
-
-// Firebase config (a tied)
+// --- A TE FIREBASE KONFIGOD (amit küldtél) ---
 const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -31,15 +26,13 @@ const firebaseConfig = {
   measurementId: "G-MH1YK9C2YF"
 };
 
-export const app = initializeApp(firebaseConfig);
-
-// Analytics ne tudja elrontani a UI-t
-try { getAnalytics(app); } catch (e) {}
+// Initialize
+const app = initializeApp(firebaseConfig);
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Firestore helper export “fs” néven (ahogy a vevő oldal használja)
+// Firestore helper namespace, hogy a hívások szépek legyenek
 export const fs = {
   doc,
   getDoc,
@@ -47,45 +40,82 @@ export const fs = {
   serverTimestamp
 };
 
-// ---- helpers ----
-export function onAuth(cb){
+// --- APP HELPERS ---
+export function onAuth(cb) {
   return onAuthStateChanged(auth, cb);
 }
 
-export async function logout(){
+export async function logout() {
   await signOut(auth);
 }
 
-export function toLogin(lang="hu"){
-  // Nálad: /hu/login/ (ha más, itt írd át)
-  const l = (lang === "de") ? "de" : "hu";
-  location.href = `${BASE_PREFIX}/${l}/login/`;
+export function toLogin(lang = "hu") {
+  // Egységes login útvonal
+  // (ha később lesz /de/login/, itt lehet bővíteni)
+  if (lang === "de") {
+    location.href = "/hu/login/"; // most még HU-ra viszünk fixen
+    return;
+  }
+  location.href = "/hu/login/";
 }
 
-export function safeJsonParse(str, fallback){
-  try{
-    if(str === null || str === undefined) return fallback;
+export function escapeHtml(input) {
+  const s = String(input ?? "");
+  return s
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
+export function safeJsonParse(str, fallback = null) {
+  try {
+    if (str === null || str === undefined) return fallback;
     return JSON.parse(str);
-  }catch{
+  } catch {
     return fallback;
   }
 }
 
-export function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
+export function clamp(n, min, max) {
+  const x = Number.isFinite(n) ? n : min;
+  return Math.max(min, Math.min(max, x));
 }
 
-export const todayISO = () => new Date().toISOString().slice(0,10);
-export const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-export const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
+export function todayISO() {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, "0");
+  const day = String(d.getDate()).padStart(2, "0");
+  return `${y}-${m}-${day}`;
+}
 
-export function fmtDate(iso){
-  if(!iso) return "—";
-  const d = new Date(iso+"T00:00:00");
-  const dd = String(d.getDate()).padStart(2,"0");
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const yy = d.getFullYear();
-  return `${yy}.${mm}.${dd}`;
+export function fmtDate(iso) {
+  if (!iso) return "—";
+  // ISO (YYYY-MM-DD) vagy timestamp string esetén
+  try {
+    if (typeof iso === "string" && iso.includes("T")) {
+      return new Date(iso).toLocaleDateString("hu-HU");
+    }
+    if (typeof iso === "string" && iso.length >= 10) {
+      const d = new Date(iso + "T00:00:00");
+      return d.toLocaleDateString("hu-HU");
+    }
+    return String(iso);
+  } catch {
+    return String(iso);
+  }
+}
+
+export function daysBetween(isoA, isoB) {
+  // isoA / isoB: "YYYY-MM-DD"
+  try {
+    const a = new Date(String(isoA).slice(0, 10) + "T00:00:00Z").getTime();
+    const b = new Date(String(isoB).slice(0, 10) + "T00:00:00Z").getTime();
+    const diff = Math.floor((b - a) / (1000 * 60 * 60 * 24));
+    return diff;
+  } catch {
+    return 0;
+  }
 }
