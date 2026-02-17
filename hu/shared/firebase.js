@@ -1,5 +1,6 @@
 // FILE: /hu/shared/firebase.js
-// Firebase v9 modular (CDN) — ÉLES shared helpers HU
+// Firebase v9 modular (CDN) — shared helpers HU (éles)
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getAuth,
@@ -15,10 +16,11 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * ÁLLÍTSD BE: admin email(ek)
+ * ADMIN EMAIL-ek (opcionális)
+ * Ha ide felveszed a saját emailed, admin oldalra role nélkül is be tudsz menni.
  */
 export const ADMIN_EMAILS = [
-  // "te@domain.com",
+  "tuskepal@gmail.com",
 ];
 
 export const BASE_PREFIX = ""; // GitHub Pages root
@@ -36,7 +38,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Firestore namespace export (kompatibilitás az app kóddal)
+// Firestore namespace export (kompatibilitás)
 export const fs = {
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, getDocs, query, orderBy, limit, where,
@@ -53,20 +55,9 @@ export function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#39;");
 }
-
-/**
- * ✅ FIX: ha a localStorage-ban "null" van, JSON.parse("null") -> null
- * Ilyenkor vissza kell adni a fallback-ot, különben state.done = null lesz és borul a kód.
- */
 export function safeJsonParse(txt, fallback=null){
-  try{
-    const v = JSON.parse(txt);
-    return (v === null || typeof v === "undefined") ? fallback : v;
-  }catch{
-    return fallback;
-  }
+  try{ return JSON.parse(txt); }catch{ return fallback; }
 }
-
 export function clamp(n, a, b){
   const x = Number(n);
   return Math.min(b, Math.max(a, x));
@@ -103,9 +94,11 @@ export function toApp(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
   window.location.href = `${BASE_PREFIX}/${l}/app/`;
 }
-export function toAdmin(lang="hu"){
-  const l = (lang === "de") ? "de" : "hu";
-  window.location.href = `${BASE_PREFIX}/${l}/admin/`;
+/**
+ * FONTOS: admin mindig HU legyen (kérésed szerint)
+ */
+export function toAdmin(){
+  window.location.href = `${BASE_PREFIX}/hu/admin/`;
 }
 
 // ---------- Auth ----------
@@ -119,62 +112,63 @@ export async function loginEmailPassword(email, password){
   return await signInWithEmailAndPassword(auth, email, password);
 }
 
-// ---------- Profile bootstrap & role check ----------
+// ---------- Role / user bootstrap ----------
 export function isAdminEmail(email){
   const e = String(email || "").trim().toLowerCase();
   return ADMIN_EMAILS.map(x=>String(x).trim().toLowerCase()).includes(e);
 }
 
+/**
+ * EGYSÉGES USER SÉMA:
+ * - dietText, motivationText mezők (ezeket olvassa az app)
+ * - planId, role, status, lifetimeAccess, cycleStart/cycleEnd
+ */
 export async function ensureUserDoc(uid, email){
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
 
+  const base = {
+    email: email || "",
+    displayName: "",
+    lang: "hu",
+    role: "user",
+    status: "active",
+
+    planId: "start_v1",
+    goal: "Formálás",
+    level: 2,
+
+    lifetimeAccess: true,
+    cycleStart: null,
+    cycleEnd: null,
+
+    dietText: "",
+    motivationText: "",
+
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  };
+
   if(!snap.exists()){
-    const initial = {
-      email: email || "",
-      role: "user",
-      status: "active",
-
-      planId: "start_v1",
-      goal: "Formálás",
-      level: 2,
-      lang: "hu",
-
-      // ✅ ÚJ mezők (ezeket használja az app)
-      dietText: "",
-      motivationText: "",
-
-      // ✅ LEGACY (ha admin régebbit ír, ne vesszen el)
-      diet: "",
-      motivation: "",
-
-      lifetimeAccess: true,
-      cycleStart: null,
-      cycleEnd: null,
-
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-    await setDoc(ref, initial, { merge: true });
-    return initial;
+    await setDoc(ref, base, { merge: true });
+    return base;
   }
 
   const data = snap.data() || {};
   const patch = {};
-
   if(email && data.email !== email) patch.email = email;
-
-  // legacy -> új mezők sync
-  if((data.dietText == null || data.dietText === "") && data.diet) patch.dietText = String(data.diet || "");
-  if((data.motivationText == null || data.motivationText === "") && data.motivation) patch.motivationText = String(data.motivation || "");
-
+  if(!("dietText" in data) && ("diet" in data) && typeof data.diet === "string") patch.dietText = data.diet;
+  if(!("motivationText" in data) && ("motivation" in data) && typeof data.motivation === "string") patch.motivationText = data.motivation;
+  if(!("status" in data)) patch.status = "active";
+  if(!("planId" in data)) patch.planId = "start_v1";
+  if(!("lifetimeAccess" in data)) patch.lifetimeAccess = true;
+  if(!("goal" in data)) patch.goal = "Formálás";
+  if(!("level" in data)) patch.level = 2;
   if(Object.keys(patch).length){
     patch.updatedAt = serverTimestamp();
     await setDoc(ref, patch, { merge:true });
-    return { ...data, ...patch };
   }
-
-  return data;
+  return { ...base, ...data, ...patch };
 }
 
 export async function getUserRole(uid){
@@ -183,4 +177,27 @@ export async function getUserRole(uid){
   if(!snap.exists()) return null;
   const role = String((snap.data()?.role || "")).toLowerCase();
   return role || null;
+}
+
+/**
+ * Admin mentéshez: teljes user profil mentése
+ */
+export async function adminSaveUser(uid, payload){
+  const ref = doc(db, "users", uid);
+  await setDoc(ref, { ...payload, updatedAt: serverTimestamp() }, { merge:true });
+}
+
+/**
+ * Admin: user keresés email alapján
+ */
+export async function findUserByEmail(email){
+  const e = String(email || "").trim().toLowerCase();
+  if(!e) return null;
+
+  const qy = query(collection(db, "users"), where("email","==", e), limit(1));
+  const snaps = await getDocs(qy);
+  if(snaps.empty) return null;
+
+  const docSnap = snaps.docs[0];
+  return { uid: docSnap.id, data: docSnap.data() || {} };
 }
