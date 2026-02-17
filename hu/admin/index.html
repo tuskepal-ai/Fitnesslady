@@ -13,7 +13,6 @@
       --card:rgba(30,8,45,.68);
       --card2:rgba(40,10,60,.55);
       --stroke:rgba(255,255,255,.10);
-      --stroke2:rgba(255,255,255,.14);
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.66);
       --pink:#ff4fd8;
@@ -25,9 +24,7 @@
       --radius: 20px;
       --radius2: 26px;
     }
-
     *{box-sizing:border-box}
-
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
@@ -41,11 +38,12 @@
       overflow-x:hidden;
     }
 
-    .bg{
+    .bg {
       position:fixed; inset:0;
       background:
         radial-gradient(1200px 600px at 35% 35%, rgba(255,79,216,.14), transparent 60%),
         radial-gradient(1000px 520px at 70% 55%, rgba(198,75,255,.12), transparent 62%);
+      filter: blur(0px);
       pointer-events:none;
       opacity:.9;
     }
@@ -58,9 +56,8 @@
       background: rgba(10,0,15,.55);
       border-bottom: 1px solid var(--stroke);
     }
-
     .topbar{
-      max-width:1200px;
+      max-width:1100px;
       margin:0 auto;
       padding:14px 14px;
       display:flex;
@@ -68,18 +65,15 @@
       justify-content:space-between;
       gap:10px;
     }
-
     .brand{
       display:flex; align-items:center; gap:10px;
       font-weight:800; letter-spacing:.2px;
     }
-
     .dot{
       width:10px; height:10px; border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #fff, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.55);
     }
-
     .pill{
       display:inline-flex; align-items:center; gap:10px;
       padding:10px 14px;
@@ -90,11 +84,7 @@
       font-size:14px;
       white-space:nowrap;
     }
-
-    .actions{
-      display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;
-    }
-
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
     .btn{
       cursor:pointer;
       user-select:none;
@@ -103,14 +93,10 @@
       padding:10px 14px;
       background: rgba(255,255,255,.06);
       color:var(--text);
-      font-weight:800;
+      font-weight:700;
       transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
     }
-    .btn:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 18px 38px rgba(0,0,0,.30);
-      border-color: rgba(255,255,255,.18);
-    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 18px 38px rgba(0,0,0,.30); border-color: rgba(255,255,255,.18); }
     .btn.primary{
       background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
       border-color: rgba(255,255,255,.16);
@@ -122,7 +108,7 @@
     }
 
     main{
-      max-width:1200px;
+      max-width:1100px;
       margin: 22px auto 80px;
       padding: 0 14px;
     }
@@ -134,11 +120,14 @@
       box-shadow: var(--shadow);
       overflow:hidden;
     }
-
-    .cardHeader{ padding:16px 16px 0; }
-
-    h1{ margin:0 0 6px; font-size: 34px; letter-spacing:.2px; }
-
+    .cardHeader{
+      padding:16px 16px 0;
+    }
+    h1{
+      margin:0 0 6px;
+      font-size: 34px;
+      letter-spacing:.2px;
+    }
     .sub{
       margin:0 0 14px;
       color: var(--muted);
@@ -150,33 +139,19 @@
       padding: 0 16px 16px;
       flex-wrap:wrap;
     }
-
     .tab{
       padding:10px 14px;
       border-radius:999px;
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.05);
       cursor:pointer;
-      font-weight:900;
+      font-weight:800;
       color: var(--text);
       transition:.12s;
-      display:flex; align-items:center; gap:10px;
-    }
-    .tab .ico{
-      width:26px; height:26px; border-radius:10px;
-      display:inline-flex; align-items:center; justify-content:center;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow: 0 10px 24px rgba(0,0,0,.22);
-      font-size:15px;
     }
     .tab.active{
       background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
       box-shadow: 0 18px 42px rgba(255,79,216,.14);
-      border-color: rgba(255,255,255,.16);
-    }
-    .tab.active .ico{
-      background: rgba(0,0,0,.18);
       border-color: rgba(255,255,255,.16);
     }
 
@@ -186,8 +161,7 @@
       gap: 14px;
       padding: 14px 16px 16px;
     }
-
-    @media (max-width: 980px){
+    @media (max-width: 900px){
       .grid{ grid-template-columns: 1fr; }
       h1{ font-size: 30px; }
     }
@@ -202,7 +176,6 @@
     .panel p{margin:0 0 12px; color:var(--muted); line-height:1.45;}
 
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
-
     .field{
       width:100%;
       padding:12px 12px;
@@ -212,26 +185,11 @@
       color: var(--text);
       outline:none;
     }
-
     .field:focus{
       border-color: rgba(255,79,216,.45);
       box-shadow: 0 0 0 4px rgba(255,79,216,.12);
     }
-
-    label{
-      display:block;
-      font-size:13px;
-      color:var(--muted);
-      margin:10px 0 6px;
-    }
-
-    textarea.field{
-      min-height: 140px;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12px;
-      line-height: 1.45;
-      white-space: pre-wrap;
-    }
+    label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
 
     .list{
       display:flex; flex-direction:column; gap:10px;
@@ -239,7 +197,6 @@
       overflow:auto;
       padding-right: 2px;
     }
-
     .item{
       border:1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
@@ -248,16 +205,13 @@
       cursor:pointer;
       transition:.12s;
     }
-
     .item:hover{
       border-color: rgba(255,255,255,.18);
       box-shadow: 0 16px 34px rgba(0,0,0,.25);
       transform: translateY(-1px);
     }
-
     .item .t{ font-weight:900; }
     .item .m{ color:var(--muted); font-size:13px; margin-top:4px; }
-
     .badge{
       display:inline-flex; align-items:center; gap:6px;
       font-size:12px;
@@ -271,6 +225,14 @@
     .badge.ok{ border-color: rgba(46,229,157,.30); background: rgba(46,229,157,.10); }
     .badge.err{ border-color: rgba(255,91,107,.30); background: rgba(255,91,107,.12); }
     .badge.warn{ border-color: rgba(255,204,102,.30); background: rgba(255,204,102,.10); }
+
+    textarea.field{
+      min-height: 140px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+    }
 
     .log{
       margin: 14px 16px 16px;
@@ -286,7 +248,7 @@
     }
 
     footer{
-      max-width:1200px;
+      max-width:1100px;
       margin: 24px auto 30px;
       padding: 0 14px;
       color: rgba(255,255,255,.60);
@@ -308,69 +270,24 @@
       max-width: 92vw;
       display:none;
       color: rgba(255,255,255,.92);
-      font-weight: 900;
+      font-weight: 700;
     }
     .toast.ok{ border-color: rgba(46,229,157,.28); }
     .toast.err{ border-color: rgba(255,91,107,.30); }
     .toast.warn{ border-color: rgba(255,204,102,.28); }
 
-    /* Editor: ikon-szekciók */
-    .segTabs{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin: 10px 0 12px;
-    }
-    .seg{
-      border:1px solid var(--stroke2);
-      background: rgba(255,255,255,.05);
-      border-radius: 999px;
-      padding: 10px 12px;
-      cursor:pointer;
-      font-weight:900;
-      color: var(--text);
-      display:inline-flex;
-      align-items:center;
-      gap:10px;
-      transition:.12s;
-    }
-    .seg:hover{
-      transform: translateY(-1px);
-      box-shadow: 0 16px 34px rgba(0,0,0,.25);
-      border-color: rgba(255,255,255,.18);
-    }
-    .seg .ico{
-      width:30px; height:30px;
-      border-radius: 12px;
-      display:flex; align-items:center; justify-content:center;
+    .sectionSep{
+      height:1px;
       background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.12);
-      box-shadow: 0 12px 26px rgba(0,0,0,.22);
-      font-size: 16px;
+      margin: 14px 0;
+      border:none;
     }
-    .seg.active{
-      background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
-      border-color: rgba(255,255,255,.16);
-      box-shadow: 0 18px 42px rgba(255,79,216,.14);
-    }
-    .seg.active .ico{
-      background: rgba(0,0,0,.18);
-      border-color: rgba(255,255,255,.16);
-    }
-
-    .section{
-      display:none;
-      margin-top: 6px;
-      padding-top: 6px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
-    .section.active{ display:block; }
 
     .hint{
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.45;
-      margin-top: 10px;
+      color: rgba(255,255,255,.60);
+      font-size: 12.5px;
+      line-height: 1.55;
+      margin-top: 6px;
     }
   </style>
 </head>
@@ -398,16 +315,15 @@
       <div class="cardHeader">
         <h1>Admin panel</h1>
         <p class="sub">
-          Éles (nem demo). Itt mindent tudsz kezelni: vevők, videók (planTemplates), személyre szabás (overrides),
-          és a vevő alatti tartalmak (étrend + motiváció) — <b>szabad szövegként</b>.
+          Vevők, program sablonok és személyre szabások kezelése.
           <br><b>Belépés csak adminnak</b> (users/{uid}.role = "admin").
         </p>
       </div>
 
       <div class="tabs">
-        <div class="tab active" data-tab="customers"><span class="ico">👤</span>Customers</div>
-        <div class="tab" data-tab="plans"><span class="ico">🎥</span>Videók</div>
-        <div class="tab" data-tab="overrides"><span class="ico">✨</span>Személyre szabás</div>
+        <div class="tab active" data-tab="customers">Customers</div>
+        <div class="tab" data-tab="plans">Plans</div>
+        <div class="tab" data-tab="overrides">Overrides</div>
       </div>
 
       <div class="grid">
@@ -432,28 +348,22 @@
 
           <div id="plansBlock" style="display:none">
             <p style="color:var(--muted);margin:0 0 12px">
-              Videó sablonok (planTemplates) — gyors, éles szerkesztés.
+              Plan sablonok (planTemplates) — JSON szerkesztés (éles).
             </p>
             <label>Plan ID</label>
             <input class="field" id="planId" placeholder="pl. Start / Balance / Pro" />
             <label>Weeks JSON (planTemplates/{planId}/weeks/{weekNo})</label>
-            <textarea class="field" id="planWeeksJson" placeholder='{"base":{...},"weeks":[{"weekNo":1,"workouts":[...]}]}'></textarea>
+            <textarea class="field" id="planWeeksJson" placeholder='{"base":{...},"weeks":[...]} '></textarea>
             <div style="height:12px"></div>
             <div class="row">
               <button class="btn" id="btnLoadPlan">Betöltés</button>
               <button class="btn primary" id="btnSavePlan">Mentés</button>
             </div>
-
-            <div class="hint">
-              Tipp: a workout elem így néz ki:
-              <br><code>{"title":"Alsótest edzés","video":"","duration":30}</code>
-              <br>Ha még nincs videó, <b>video</b> lehet üres string: <code>""</code>.
-            </div>
           </div>
 
           <div id="overridesBlock" style="display:none">
             <p style="color:var(--muted);margin:0 0 12px">
-              Overrides = személyre szabott videók/elemek a user alá: <b>users/{uid}/overrides/{doc}</b>
+              Overrides = személyre szabott elemek: users/{uid}/overrides/{doc}
             </p>
             <label>Vevő UID</label>
             <input class="field" id="ovUid" placeholder="pl. mOBrBrPlycPJb..." />
@@ -469,7 +379,7 @@
           </div>
         </div>
 
-        <!-- JOBB: Profi editor ikon-szekciókkal -->
+        <!-- JOBB -->
         <div class="panel">
           <h2>Szerkesztő</h2>
           <p>Válassz egy vevőt bal oldalt.</p>
@@ -488,90 +398,48 @@
               </div>
             </div>
 
-            <div class="segTabs" id="segTabs">
-              <div class="seg active" data-seg="base"><span class="ico">⚙️</span>Alap</div>
-              <div class="seg" data-seg="videos"><span class="ico">🎥</span>Videók</div>
-              <div class="seg" data-seg="diet"><span class="ico">🍽️</span>Étrend</div>
-              <div class="seg" data-seg="motivation"><span class="ico">💜</span>Motiváció</div>
-              <div class="seg" data-seg="personal"><span class="ico">✨</span>Személyre szabás</div>
-            </div>
+            <label>Aktív</label>
+            <select class="field" id="edActive">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
 
-            <!-- BASE -->
-            <div class="section active" id="sec_base">
-              <label>Aktív</label>
-              <select class="field" id="edActive">
-                <option value="true">true</option>
-                <option value="false">false</option>
-              </select>
+            <label>Role</label>
+            <select class="field" id="edRole">
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
 
-              <label>Role</label>
-              <select class="field" id="edRole">
-                <option value="user">user</option>
-                <option value="admin">admin</option>
-              </select>
+            <label>Email</label>
+            <input class="field" id="edEmail" placeholder="vevo@email.com" />
 
-              <label>Email</label>
-              <input class="field" id="edEmail" placeholder="vevo@email.com" />
+            <label>Csomag (package)</label>
+            <select class="field" id="edPackage">
+              <option value="Start">Start</option>
+              <option value="Balance">Balance</option>
+              <option value="Pro">Pro</option>
+            </select>
 
-              <label>Csomag (package)</label>
-              <select class="field" id="edPackage">
-                <option value="Start">Start</option>
-                <option value="Balance">Balance</option>
-                <option value="Pro">Pro</option>
-              </select>
+            <label>Cél (goal)</label>
+            <input class="field" id="edGoal" placeholder="pl. Formálás" />
 
-              <label>Cél (goal)</label>
-              <input class="field" id="edGoal" placeholder="pl. Formálás" />
+            <label>Szint (level)</label>
+            <input class="field" id="edLevel" inputmode="numeric" placeholder="pl. 2" />
 
-              <label>Szint (level)</label>
-              <input class="field" id="edLevel" inputmode="numeric" placeholder="pl. 2" />
-            </div>
+            <hr class="sectionSep" />
 
-            <!-- VIDEOS -->
-            <div class="section" id="sec_videos">
-              <div class="hint" style="margin-top:0">
-                Itt a vevő alap csomagját állítod. A konkrét heti videókat a <b>Videók</b> fül alatt (planTemplates)
-                vagy <b>Személyre szabás</b> alatt (overrides) tudod kezelni.
-              </div>
+            <label>Étrend (szabad szöveg) — ide bármit írhatsz (recept, terv, lista, megjegyzés)</label>
+            <textarea class="field" id="edDietText" placeholder="Írj ide bármit... pl. napi menü, receptek, bevásárlólista, tiltások, preferenciák."></textarea>
+            <div class="hint">Ez a <b>users/{uid}.dietText</b> mezőbe mentődik, és a vevő oldalon meg fog jelenni.</div>
 
-              <label>Plan gyors megnyitás</label>
-              <div class="row">
-                <button class="btn" id="btnGoPlans">🎥 Videók szerkesztése</button>
-                <button class="btn" id="btnGoOverrides">✨ Személyre szabás</button>
-              </div>
+            <label>Motiváció (szabad szöveg) — amit a vevő lát</label>
+            <textarea class="field" id="edMotivationText" placeholder="Írj ide motivációt, napi üzenetet, instrukciót..."></textarea>
+            <div class="hint">Ez a <b>users/{uid}.motivationText</b> mezőbe mentődik, és a vevő oldalon meg fog jelenni.</div>
 
-              <div class="hint">
-                Szabály: Balance = 1-el több videó/hét, Pro = 2-vel több videó/hét (a Start-hoz képest).
-              </div>
-            </div>
+            <hr class="sectionSep" />
 
-            <!-- DIET (FREE TEXT) -->
-            <div class="section" id="sec_diet">
-              <label>Étrend — szabad szerkesztés (bármi)</label>
-              <textarea class="field" id="edDiet" placeholder="Ide írhatsz recepteket, listát, heti tervet, bármit. Nem kell JSON!"></textarea>
-              <div class="hint">
-                Mentéskor sima szövegként kerül a Firestore-ba: <code>users/{uid}.diet</code>.
-              </div>
-            </div>
-
-            <!-- MOTIVATION (FREE TEXT) -->
-            <div class="section" id="sec_motivation">
-              <label>Motiváció — szabad szerkesztés</label>
-              <textarea class="field" id="edMotivation" placeholder="Motivációs üzenet, célmegerősítés, napi tipp, bármi."></textarea>
-              <div class="hint">
-                Mentéskor sima szövegként kerül a Firestore-ba: <code>users/{uid}.motivation</code>.
-              </div>
-            </div>
-
-            <!-- PERSONAL -->
-            <div class="section" id="sec_personal">
-              <div class="hint" style="margin-top:0">
-                Személyre szabott videók/elemek: <code>users/{uid}/overrides/{doc}</code>.
-              </div>
-              <div class="row">
-                <button class="btn primary" id="btnPrefillOv">✨ UID betöltése Overrides-hoz</button>
-              </div>
-            </div>
+            <label>Étrend (diet JSON) — opcionális strukturált adat (ha később kell)</label>
+            <textarea class="field" id="edDiet" placeholder='{"kcal":1800,"protein":140,"note":"..."}'></textarea>
 
             <div style="height:12px"></div>
             <div class="row">
@@ -579,8 +447,9 @@
               <button class="btn primary" id="btnSaveUser">Mentés → Firestore</button>
             </div>
 
-            <div class="hint">
-              Tipp: a vevő oldalon a program az <code>users/{uid}</code> + <code>users/{uid}/overrides</code> alapján épül.
+            <div style="height:14px"></div>
+            <div style="color:var(--muted);font-size:12px">
+              Tipp: a vevő oldal a <b>users/{uid}</b> doc alapján renderel (dietText, motivationText, goal, level, csomag, stb.).
             </div>
           </div>
         </div>
@@ -633,6 +502,7 @@
       window.__toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
     }
 
+    // UI refs
     const statusPill = $("statusPill");
     const btnApp = $("btnApp");
     const btnLogout = $("btnLogout");
@@ -662,27 +532,19 @@
     const edPackage = $("edPackage");
     const edGoal = $("edGoal");
     const edLevel = $("edLevel");
+    const edDietText = $("edDietText");
+    const edMotivationText = $("edMotivationText");
     const edDiet = $("edDiet");
-    const edMotivation = $("edMotivation");
     const btnReloadUser = $("btnReloadUser");
     const btnSaveUser = $("btnSaveUser");
 
-    const segs = Array.from(document.querySelectorAll(".seg"));
-    const sec_base = $("sec_base");
-    const sec_videos = $("sec_videos");
-    const sec_diet = $("sec_diet");
-    const sec_motivation = $("sec_motivation");
-    const sec_personal = $("sec_personal");
-
-    const btnGoPlans = $("btnGoPlans");
-    const btnGoOverrides = $("btnGoOverrides");
-    const btnPrefillOv = $("btnPrefillOv");
-
+    // Plans
     const planIdEl = $("planId");
     const planWeeksJsonEl = $("planWeeksJson");
     const btnLoadPlan = $("btnLoadPlan");
     const btnSavePlan = $("btnSavePlan");
 
+    // Overrides
     const ovUidEl = $("ovUid");
     const ovDocEl = $("ovDoc");
     const ovJsonEl = $("ovJson");
@@ -705,7 +567,10 @@
       toast("Firebase init hiba!", "err");
     }
 
-    btnApp.addEventListener("click", ()=> window.location.href = "/hu/app/");
+    btnApp.addEventListener("click", ()=>{
+      window.location.href = "/hu/app/";
+    });
+
     btnLogout.addEventListener("click", async ()=>{
       try{
         await signOut(auth);
@@ -728,36 +593,16 @@
         leftDesc.textContent = "Kattints egy vevőre. Jobbra szerkesztesz, majd Mentés → Firestore.";
       }
       if(name==="plans"){
-        leftTitle.textContent = "Videók";
+        leftTitle.textContent = "Plans";
         leftDesc.textContent = "Plan sablonok (planTemplates) gyors szerkesztése.";
       }
       if(name==="overrides"){
-        leftTitle.textContent = "Személyre szabás";
-        leftDesc.textContent = "Overrides kezelése (users/{uid}/overrides).";
+        leftTitle.textContent = "Overrides";
+        leftDesc.textContent = "Személyre szabások kezelése (users/{uid}/overrides).";
       }
       log(`Tab: ${name}`);
     }
     tabs.forEach(t=> t.addEventListener("click", ()=> setTab(t.dataset.tab)));
-
-    function setSeg(name){
-      segs.forEach(s=> s.classList.toggle("active", s.dataset.seg===name));
-      [sec_base, sec_videos, sec_diet, sec_motivation, sec_personal].forEach(x=> x.classList.remove("active"));
-      if(name==="base") sec_base.classList.add("active");
-      if(name==="videos") sec_videos.classList.add("active");
-      if(name==="diet") sec_diet.classList.add("active");
-      if(name==="motivation") sec_motivation.classList.add("active");
-      if(name==="personal") sec_personal.classList.add("active");
-    }
-    segs.forEach(s=> s.addEventListener("click", ()=> setSeg(s.dataset.seg)));
-
-    btnGoPlans.addEventListener("click", ()=> setTab("plans"));
-    btnGoOverrides.addEventListener("click", ()=> setTab("overrides"));
-    btnPrefillOv.addEventListener("click", ()=>{
-      if(!selectedUid){ toast("Nincs kiválasztott vevő.", "warn"); return; }
-      setTab("overrides");
-      ovUidEl.value = selectedUid;
-      toast("UID beállítva az Overrides-hoz.", "ok");
-    });
 
     onAuthStateChanged(auth, async (u)=>{
       currentUser = u;
@@ -784,6 +629,7 @@
 
         currentProfile = pSnap.data();
         const role = (currentProfile.role || "user").toLowerCase();
+
         if(role !== "admin"){
           statusPill.textContent = "Hiba / Nincs jogosultság";
           log(`Nincs admin jog. users/${u.uid}.role = ${role}`);
@@ -885,8 +731,11 @@
           package: "Start",
           goal: "Formálás",
           level: 1,
-          diet: "",
-          motivation: "",
+
+          dietText: "",
+          motivationText: "",
+          diet: null,
+
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         }, { merge:true });
@@ -900,12 +749,6 @@
     }
 
     async function selectUser(uid){
-      if(!uid){
-        log("selectUser: uid üres/null → skip");
-        toast("Vevő kiválasztás hiba (uid üres).", "warn");
-        return;
-      }
-
       selectedUid = uid;
       editorEmpty.style.display = "none";
       editor.style.display = "block";
@@ -915,7 +758,6 @@
       try{
         const uRef = doc(db, "users", uid);
         const uSnap = await getDoc(uRef);
-
         if(!uSnap.exists()){
           selectedDoc = null;
           edTitle.textContent = "Nincs ilyen user doc";
@@ -935,25 +777,26 @@
         edGoal.value = selectedDoc.goal || "";
         edLevel.value = String(selectedDoc.level ?? "");
 
-        const d = selectedDoc.diet;
-        if(d == null){
-          edDiet.value = "";
-        }else if(typeof d === "string"){
-          edDiet.value = d;
-        }else{
-          try{ edDiet.value = JSON.stringify(d, null, 2); }
-          catch{ edDiet.value = ""; }
-        }
+        edDietText.value = (selectedDoc.dietText ?? "");
+        edMotivationText.value = (selectedDoc.motivationText ?? "");
 
-        const m = selectedDoc.motivation;
-        edMotivation.value = (m == null) ? "" : String(m);
+        if(selectedDoc.diet == null){
+          edDiet.value = "";
+        }else{
+          try{
+            edDiet.value = (typeof selectedDoc.diet === "string")
+              ? selectedDoc.diet
+              : JSON.stringify(selectedDoc.diet, null, 2);
+          }catch{
+            edDiet.value = "";
+          }
+        }
 
         btnOpenDoc.onclick = ()=>{
           const url = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/databases/-default-/data/~2Fusers~2F${encodeURIComponent(uid)}`;
           window.open(url, "_blank");
         };
 
-        setSeg("base");
         log(`User kiválasztva: ${uid}`);
       }catch(e){
         log(`selectUser hiba: ${e?.message || e}`);
@@ -966,14 +809,19 @@
       selectUser(selectedUid);
     });
 
-    // ✅ FIX ITT: uid mentése loadUsers() előtt
     btnSaveUser.addEventListener("click", async ()=>{
       if(!selectedUid) return;
 
-      const uid = selectedUid; // <-- FIX: mentsük el, mert loadUsers lenullázza a selectedUid-ot
-
-      const dietText = (edDiet.value || "").trim();
-      const motText  = (edMotivation.value || "").trim();
+      let dietValue = null;
+      const dietTextJson = (edDiet.value || "").trim();
+      if(dietTextJson){
+        try{
+          dietValue = JSON.parse(dietTextJson);
+        }catch(e){
+          toast("Étrend JSON hibás (nem valid JSON).", "err");
+          return;
+        }
+      }
 
       const payload = {
         active: (edActive.value === "true"),
@@ -982,17 +830,20 @@
         package: edPackage.value,
         goal: (edGoal.value || "").trim(),
         level: Number(String(edLevel.value || "").trim() || 0),
-        diet: dietText ? dietText : "",
-        motivation: motText ? motText : "",
+
+        dietText: (edDietText.value || ""),
+        motivationText: (edMotivationText.value || ""),
+
+        diet: dietValue,
         updatedAt: serverTimestamp()
       };
 
       try{
-        await updateDoc(doc(db, "users", uid), payload);
+        await updateDoc(doc(db, "users", selectedUid), payload);
         toast("Mentve.", "ok");
-        log(`Mentés OK: users/${uid}`);
+        log(`Mentés OK: users/${selectedUid}`);
         await loadUsers();
-        await selectUser(uid); // <-- FIX: a mentett uid-ot töltjük vissza
+        await selectUser(selectedUid);
       }catch(e){
         log(`Mentés hiba: ${e?.message || e}`);
         toast("Mentés hiba (Rules?)", "err");
@@ -1001,12 +852,11 @@
 
     btnDeleteUser.addEventListener("click", async ()=>{
       if(!selectedUid) return;
-      const uid = selectedUid;
-      const ok = confirm(`Biztos törlöd? users/${uid}`);
+      const ok = confirm(`Biztos törlöd? users/${selectedUid}`);
       if(!ok) return;
 
       try{
-        await deleteDoc(doc(db, "users", uid));
+        await deleteDoc(doc(db, "users", selectedUid));
         toast("Törölve.", "ok");
         selectedUid = null;
         selectedDoc = null;
@@ -1019,6 +869,7 @@
       }
     });
 
+    // Plans (planTemplates)
     btnLoadPlan.addEventListener("click", async ()=>{
       const planId = (planIdEl.value || "").trim();
       if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
@@ -1027,7 +878,7 @@
         const s = await getDoc(doc(db, "planTemplates", planId));
         const base = s.exists() ? s.data() : null;
 
-        const weeksSnap = await getDocs(query(collection(db, "planTemplates", planId, "weeks"), orderBy("weekNo","asc"), limit(60)));
+        const weeksSnap = await getDocs(query(collection(db, "planTemplates", planId, "weeks"), orderBy("weekNo","asc"), limit(50)));
         const weeks = [];
         weeksSnap.forEach(d=> weeks.push({ id:d.id, ...d.data() }));
 
@@ -1076,6 +927,7 @@
       }
     });
 
+    // Overrides
     btnLoadOv.addEventListener("click", async ()=>{
       const uid = (ovUidEl.value || "").trim();
       const docId = (ovDocEl.value || "").trim();
@@ -1118,7 +970,7 @@
     });
 
     setTab("customers");
-    log("Admin UI V3 betöltve. Várjuk az auth állapotot…");
+    log("Admin UI betöltve. Várjuk az auth állapotot…");
   </script>
 </body>
 </html>
