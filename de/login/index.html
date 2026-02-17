@@ -1,21 +1,16 @@
+<!-- FILE: /de/login/index.html -->
 <!doctype html>
 <html lang="de">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Login — Weiterleitung…</title>
-  <meta name="robots" content="noindex,nofollow" />
-  <meta http-equiv="cache-control" content="no-cache" />
-</head>
-<body style="font-family:system-ui; padding:18px;">
-  Weiterleitung… <a href="/hu/login/?lang=de&next=/hu/app/?lang=de">/hu/login/</a>
-
+  <title>Fitness Lady — Login</title>
+  <meta name="robots" content="noindex" />
   <script>
-    // DE login oldal csak kapu: a működő HU login-t használjuk.
-    const url = new URL("/hu/login/", location.origin);
-    url.searchParams.set("lang", "de");
-    url.searchParams.set("next", "/hu/app/?lang=de");
-    location.replace(url.toString());
+    // DE login: HU login UI-t használjuk, csak német nyelvvel
+    localStorage.setItem("lang", "de");
+    location.replace("/hu/login/?lang=de");
   </script>
-</body>
+</head>
+<body></body>
 </html>
