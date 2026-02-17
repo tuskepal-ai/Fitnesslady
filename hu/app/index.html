@@ -6,26 +6,22 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fitness Lady — Saját programom</title>
   <meta name="description" content="Fitness Lady — Saját programom: csomag, heti edzések, személyre szabás slotok, étrend, check-in/cél, technika vault." />
-
   <style>
+    /* A TE CSS-ED változatlan (amit küldtél) */
     :root{
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
       --muted2:rgba(255,255,255,.55);
-
       --pink:#ff4fd8;
       --pink2:#b14cff;
       --gold:#ffd38a;
-
       --radius:22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
-
       --glassA: rgba(255,255,255,.06);
       --glassB: rgba(255,255,255,.02);
       --stroke: rgba(255,255,255,.10);
-
       --hero-url: none;
     }
     *{ box-sizing:border-box; }
@@ -54,11 +50,9 @@
       transform: translateZ(0);
       opacity:.92;
     }
-
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
     .container{ width: min(var(--max), 92vw); margin: 0 auto; }
-
     .topbar{
       position: fixed; top:0; left:0; right:0;
       z-index: 50;
@@ -102,7 +96,6 @@
       transition: transform .28s ease, opacity .28s ease;
     }
     .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
-
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px;
@@ -129,7 +122,6 @@
     }
     .pill.ghost{ background: rgba(255,255,255,.06); }
     .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
-
     .menu-btn{
       width: 40px; height: 40px; border-radius: 999px;
       background: rgba(255,255,255,.06);
@@ -139,10 +131,8 @@
       align-items:center; justify-content:center;
       cursor:pointer;
     }
-
     main{ padding-top: 64px; min-height: 100vh; min-height: 100dvh; }
     .page{ padding: 18px 0 64px; }
-
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.10);
@@ -179,7 +169,6 @@
     .interactive:hover::before,
     .interactive:focus-visible::before,
     .interactive.is-active::before{ opacity: 1; }
-
     .grid{
       display:grid;
       grid-template-columns: 1.2fr .8fr;
@@ -191,7 +180,6 @@
       .nav{ display:none; }
       .menu-btn{ display:inline-flex; }
     }
-
     .card{ padding: 16px; }
     .card h2, .card h3{
       margin:0 0 8px;
@@ -201,7 +189,6 @@
     .card h2{ font-size: 22px; }
     .card h3{ font-size: 18px; }
     .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
-
     .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
     .meta-pill{
       display:inline-flex; align-items:center; gap:8px;
@@ -212,7 +199,6 @@
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
     }
-
     .progress{
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
@@ -237,7 +223,6 @@
       color: rgba(255,255,255,.55);
       margin: 10px 0 8px;
     }
-
     .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 12px; }
     .tab{
       padding: 8px 11px;
@@ -255,7 +240,6 @@
       color:#140813;
       border-color: rgba(255,255,255,.18);
     }
-
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .row{
       display:grid;
@@ -271,7 +255,6 @@
     .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
     .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
     .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
-
     .chip{
       display:inline-flex; align-items:center; gap:8px;
       padding: 6px 10px;
@@ -283,9 +266,7 @@
       font-weight: 850;
       font-size: 12px;
     }
-
     section{ scroll-margin-top: 82px; }
-
     .modal-overlay{
       position: fixed; inset: 0; z-index: 80;
       background: rgba(0,0,0,.58);
@@ -335,7 +316,6 @@
     }
     .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
     .noteStrong{ color: rgba(255,255,255,.78); font-size: 13.2px; line-height: 1.65; white-space: pre-wrap; }
-
     footer{
       padding: 18px 0 46px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -346,7 +326,6 @@
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color:rgba(255,255,255,.70); font-size:13px;
     }
-
     .debug{
       position: fixed;
       bottom: 10px;
@@ -364,7 +343,6 @@
       backdrop-filter: blur(10px);
     }
     .debug.is-on{ display:block; }
-
     @media (max-width: 980px){
       .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
       .pill, .glass, .meta-pill{
@@ -645,6 +623,7 @@
       }
     });
 
+    // Mobile menu
     const menuBtn = $("#menuBtn");
     let menuOpen = false;
     function closeMobileNav(){ $("#mobileNav")?.remove(); menuOpen = false; }
@@ -681,6 +660,7 @@
       closeMobileNav();
     });
 
+    // Active nav underline
     (()=> {
       const links = $$('[data-nav]');
       const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
@@ -692,6 +672,7 @@
       sections.forEach(s=>io.observe(s));
     })();
 
+    // localStorage user-scoped
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
@@ -705,7 +686,8 @@
           displayName: "",
           lang: "hu",
           role: "user",
-          status: "active",
+          active: true,
+          package: "Start",
           planId: "start_v1",
           goal: "Formálás",
           level: 2,
@@ -713,12 +695,9 @@
           cycleStart: null,
           cycleEnd: null,
 
+          // ✅ szabad szöveg
           dietText: "",
           motivationText: "",
-
-          // legacy mezők is maradhatnak
-          diet: "",
-          motivation: "",
 
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
@@ -802,58 +781,18 @@
       return fallback;
     }
 
-    function extractVimeoId(maybe){
-      const s = String(maybe || "").trim();
-      if(!s) return "";
-      if(/^\d+$/.test(s)) return s;
-      const m1 = s.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-      if(m1?.[1]) return m1[1];
-      const m2 = s.match(/player\.vimeo\.com\/video\/(\d+)/i);
-      if(m2?.[1]) return m2[1];
-      return s; // ha admin direkt valamit ír (pl. már ID), ne dobjuk el
-    }
-
-    // ✅ NORMALIZÁLÁS: támogatja a Firestore új struktúrát (title/video/duration) ID nélkül
-    function normalizeTemplateWeek(templateWeek, weekNo){
-      const tw = templateWeek || {};
-      const rawWorkouts = Array.isArray(tw.workouts) ? tw.workouts : [];
-      const rawSlots = Array.isArray(tw.slots) ? tw.slots : [];
-
-      const workouts = rawWorkouts.map((w, idx)=>{
-        const id = (w && typeof w === "object" && w.id) ? String(w.id) : `w${idx+1}`;
-        // title lehet string vagy obj
-        const title = (w && typeof w === "object" && w.title != null) ? w.title : `Hét ${weekNo} • Edzés ${idx+1}`;
-        // desc lehet string/obj, ha nincs -> üres
-        const desc = (w && typeof w === "object" && w.desc != null) ? w.desc : "";
-        // vimeoId / video
-        const vimeoId = extractVimeoId((w && typeof w === "object" && (w.vimeoId ?? w.video)) || "");
-        const duration = (w && typeof w === "object" && w.duration != null) ? w.duration : "";
-        return { ...w, id, title, desc, vimeoId, duration };
-      });
-
-      // ha nincs slots a sablonban, legyen üres tömb
-      const slots = rawSlots.map((s, idx)=>{
-        const slotIndex = (s && typeof s === "object" && s.slotIndex != null) ? s.slotIndex : (idx+1);
-        // egységesítés az app szerkezetére
-        const title = (s && typeof s === "object" && s.title != null) ? s.title : { hu:`Személyre szabás ${slotIndex}`, de:`Personalisierung ${slotIndex}` };
-        const desc = (s && typeof s === "object" && s.desc != null) ? s.desc : { hu:"Admin tölti ki.", de:"Admin füllt aus." };
-        const defaultNote = (s && typeof s === "object" && s.defaultNote != null) ? s.defaultNote : { hu:"—", de:"—" };
-        const defaultVimeoId = extractVimeoId((s && typeof s === "object" && (s.defaultVimeoId ?? s.vimeoId ?? s.video)) || "");
-        return { ...s, slotIndex, title, desc, defaultNote, defaultVimeoId };
-      });
-
-      return { ...tw, workouts, slots };
-    }
-
     function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
       if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
+
       const tTitle = pickLang(templateW.title, lang, "");
       const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
       w._title = oTitle || tTitle || "—";
+
       const tDesc = pickLang(templateW.desc, lang, "");
       const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
       w._desc = oDesc || tDesc || "";
+
       return w;
     }
 
@@ -903,12 +842,12 @@
 
     function renderHeader(){
       const p = profile;
+
       const planName = pickLang(planMeta?.name, state.lang, p.planId || "—");
       $("#chipPackage").textContent = `Csomag: ${planName}`;
 
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
-
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
       const weeks = planMeta?.weeks || 4;
@@ -940,14 +879,13 @@
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
 
-      // ✅ ÉTREND: új + legacy fallback
-      const dietText = String((p.dietText ?? p.diet ?? "") || "").trim();
+      // ✅ Firestore szöveg megjelenítés
+      const dietText = (p.dietText || "").trim();
       $("#dietContent").innerHTML = dietText
         ? nl2brSafe(dietText)
         : `<span class="note">Még nincs megadva részletes étrend. (Admin fogja feltölteni.)</span>`;
 
-      // ✅ MOTIVÁCIÓ: új + legacy fallback
-      const mot = String((p.motivationText ?? p.motivation ?? "") || "").trim();
+      const mot = (p.motivationText || "").trim();
       $("#motivationBox").innerHTML = mot
         ? nl2brSafe(mot)
         : `„A rendszer nem nyomás. A rendszer szabadság.”`;
@@ -972,20 +910,34 @@
       }
     }
 
+    // ✅✅✅ KRITIKUS FIX: ha nincs w.id, generálunk biztos id-t (w1,w2,...)
+    function normalizeWorkouts(list){
+      const arr = Array.isArray(list) ? list : [];
+      return arr.map((w, idx)=>{
+        const id = (w && typeof w === "object" && w.id) ? String(w.id) : `w${idx+1}`;
+        return { ...(w||{}), id };
+      });
+    }
+
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      let templateWeekRaw = await loadPlanWeek(profile.planId, weekNo);
-      const templateWeek = normalizeTemplateWeek(templateWeekRaw, weekNo);
+      const templateWeekRaw = await loadPlanWeek(profile.planId, weekNo);
+      const templateWeek = {
+        ...templateWeekRaw,
+        workouts: normalizeWorkouts(templateWeekRaw?.workouts),
+        slots: Array.isArray(templateWeekRaw?.slots) ? templateWeekRaw.slots : []
+      };
+
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
 
-      const ovWorkouts = (overridesWeek?.workouts && typeof overridesWeek.workouts === "object") ? overridesWeek.workouts : {};
-      const ovSlots = (overridesWeek?.slots && typeof overridesWeek.slots === "object") ? overridesWeek.slots : {};
+      const ovWorkouts = overridesWeek?.workouts || {};
+      const ovSlots = overridesWeek?.slots || {};
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id] || null, state.lang)),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)] || null, state.lang))
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
       };
 
       const pack = { templateWeek, overridesWeek, merged };
@@ -1116,6 +1068,7 @@
       enableTapGlow();
     }
 
+    // Buttons
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
       toLogin(state.lang || "hu");
@@ -1160,7 +1113,7 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      const txt = String((profile?.dietText ?? profile?.diet ?? "") || "").trim();
+      const txt = (profile?.dietText || "").trim();
       openInfo("Napi terv", txt
         ? `<div class="noteStrong">${nl2brSafe(txt)}</div>`
         : `<p class="note">Még nincs beállított részletes étrend. (Admin fogja feltölteni.)</p>`
@@ -1178,7 +1131,7 @@
       "„Amit ma megteszel, az a holnapi önbizalmad.”"
     ];
     $("#btnMotivation").addEventListener("click", ()=>{
-      const m = String((profile?.motivationText ?? profile?.motivation ?? "") || "").trim();
+      const m = (profile?.motivationText || "").trim();
       if(m){
         $("#motivationBox").innerHTML = nl2brSafe(m);
         return;
