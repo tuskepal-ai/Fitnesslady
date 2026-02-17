@@ -334,6 +334,7 @@
       background: rgba(7,6,11,.38);
     }
     .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
+    .noteStrong{ color: rgba(255,255,255,.78); font-size: 13.2px; line-height: 1.65; white-space: pre-wrap; }
 
     footer{
       padding: 18px 0 46px;
@@ -455,7 +456,7 @@
         <div style="display:grid; gap:14px;">
           <section id="etrend" class="glass interactive card">
             <h3>Étrend</h3>
-            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend adminból lesz szerkeszthető.</p>
+            <p class="sub">A részletes étrend adminból érkezik. (Szabad szöveg: receptek, terv, megjegyzés.)</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:8px;">
               <div>
@@ -469,7 +470,7 @@
                   <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
                   <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
                 </div>
-                <div class="note" id="dietNote">A részletes étrend a következő körben jön (admin szerkesztéssel).</div>
+                <div class="noteStrong" id="dietContent">Betöltés…</div>
               </div>
             </div>
 
@@ -501,7 +502,7 @@
                   <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
                 </div>
 
-                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
+                <div class="noteStrong" id="motivationBox">Betöltés…</div>
               </div>
             </div>
           </section>
@@ -586,7 +587,6 @@
       escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
     } from "../shared/firebase.js";
 
-    // HERO + home link (éles)
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
@@ -645,7 +645,6 @@
       }
     });
 
-    // Mobile menu
     const menuBtn = $("#menuBtn");
     let menuOpen = false;
     function closeMobileNav(){ $("#mobileNav")?.remove(); menuOpen = false; }
@@ -682,7 +681,6 @@
       closeMobileNav();
     });
 
-    // Active nav underline
     (()=> {
       const links = $$('[data-nav]');
       const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
@@ -694,17 +692,10 @@
       sections.forEach(s=>io.observe(s));
     })();
 
-    // localStorage user-scoped
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
-    // ✅ FIX #1: sose legyen null / rossz típus (különben state.done[key] crash)
-    function ensurePlainObject(v){
-      return (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
-    }
-
-    // Firestore loaders
     async function loadUserProfile(uid){
       const ref = fs.doc(db, "users", uid);
       const snap = await fs.getDoc(ref);
@@ -721,6 +712,10 @@
           lifetimeAccess: true,
           cycleStart: null,
           cycleEnd: null,
+
+          dietText: "",
+          motivationText: "",
+
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         };
@@ -730,13 +725,8 @@
       return snap.data();
     }
 
-    // ✅ ÉLES FALLBACK: ha még nincs planTemplates, nem dől el a UI.
     function defaultPlanMeta(planId){
-      return {
-        id: planId || "start_v1",
-        name: { hu: "Start", de: "Start" },
-        weeks: 4
-      };
+      return { id: planId || "start_v1", name: { hu: "Start", de: "Start" }, weeks: 4 };
     }
 
     function defaultWeek(weekNo){
@@ -762,8 +752,7 @@
         if(!snap.exists()){
           openInfo("Program feltöltés alatt", `
             <p class="note"><b>Nincs ilyen:</b> planTemplates/${escapeHtml(planId)}.</p>
-            <p class="note">Adminban hozd létre a sablont: <b>planTemplates/${escapeHtml(planId)}</b> + <b>weeks/1..N</b>.</p>
-            <p class="note">A vevő oldal ettől még működik, csak a programlista placeholder.</p>
+            <p class="note">Adminban hozd létre: <b>planTemplates/${escapeHtml(planId)}</b> + <b>weeks/1..N</b>.</p>
           `);
           return defaultPlanMeta(planId);
         }
@@ -778,22 +767,18 @@
       try{
         const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
         const snap = await fs.getDoc(ref);
-        if(!snap.exists()){
-          return defaultWeek(weekNo);
-        }
+        if(!snap.exists()) return defaultWeek(weekNo);
         return snap.data();
-      }catch(err){
+      }catch(_){
         return defaultWeek(weekNo);
       }
     }
 
-    // ✅ FIX: helyes doc útvonal + kompatibilitás (2 variáns)
     async function loadOverridesWeek(uid, weekNo){
       const tryPaths = [
         ["users", uid, "overridesWeeks", String(weekNo)],
         ["users", uid, "overrides", String(weekNo)],
       ];
-
       for(const segs of tryPaths){
         try{
           const ref = fs.doc(db, ...segs);
@@ -804,7 +789,6 @@
       return null;
     }
 
-    // Merge helpers
     function pickLang(obj, lang, fallback="—"){
       if(!obj) return fallback;
       if(typeof obj === "string") return obj;
@@ -817,15 +801,12 @@
     function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
       if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
-
       const tTitle = pickLang(templateW.title, lang, "");
       const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
       w._title = oTitle || tTitle || "—";
-
       const tDesc = pickLang(templateW.desc, lang, "");
       const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
       w._desc = oDesc || tDesc || "";
-
       return w;
     }
 
@@ -842,7 +823,6 @@
       return s;
     }
 
-    // State
     let UID = null;
     let profile = null;
     let planMeta = null;
@@ -868,14 +848,21 @@
 
     function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
 
+    function nl2brSafe(text){
+      const t = (text || "").toString();
+      if(!t.trim()) return "";
+      return escapeHtml(t).replace(/\n/g, "<br>");
+    }
+
     function renderHeader(){
       const p = profile;
-
       const planName = pickLang(planMeta?.name, state.lang, p.planId || "—");
       $("#chipPackage").textContent = `Csomag: ${planName}`;
 
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
+
+      // updatedAt: ha Timestamp, akkor a shared fmtDate nem tudja biztosan -> egyszerűen “—”
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
       const weeks = planMeta?.weeks || 4;
@@ -906,6 +893,18 @@
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
+
+      // ✅ ÉTREND MEGJELENÍTÉS (Firestore)
+      const dietText = (p.dietText || "").trim();
+      $("#dietContent").innerHTML = dietText
+        ? nl2brSafe(dietText)
+        : `<span class="note">Még nincs megadva részletes étrend. (Admin fogja feltölteni.)</span>`;
+
+      // ✅ MOTIVÁCIÓ MEGJELENÍTÉS (Firestore)
+      const mot = (p.motivationText || "").trim();
+      $("#motivationBox").innerHTML = mot
+        ? nl2brSafe(mot)
+        : `„A rendszer nem nyomás. A rendszer szabadság.”`;
     }
 
     function renderWeekTabs(){
@@ -927,48 +926,19 @@
       }
     }
 
-    // ✅ FIX #2: normalize workout/slot IDs, hogy sose legyen undefined
-    function normalizeTemplateWeek(templateWeek, weekNo){
-      const tw = templateWeek || {};
-      const workouts = Array.isArray(tw.workouts) ? tw.workouts : [];
-      const slots = Array.isArray(tw.slots) ? tw.slots : [];
-
-      const normWorkouts = workouts.map((w, idx)=>{
-        const id = (w && typeof w === "object" && w.id) ? w.id : `w${idx+1}`;
-        return { ...(w||{}), id };
-      });
-
-      const normSlots = slots.map((s, idx)=>{
-        const slotIndex = (s && typeof s === "object" && (s.slotIndex || s.slotIndex === 0)) ? s.slotIndex : (idx+1);
-        return { ...(s||{}), slotIndex };
-      });
-
-      // ha üres, legalább placeholder
-      if(normWorkouts.length === 0 || normSlots.length === 0){
-        const fallback = defaultWeek(weekNo);
-        return {
-          workouts: normWorkouts.length ? normWorkouts : fallback.workouts,
-          slots: normSlots.length ? normSlots : fallback.slots,
-        };
-      }
-
-      return { workouts: normWorkouts, slots: normSlots };
-    }
-
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      const rawTemplateWeek = await loadPlanWeek(profile.planId, weekNo);
-      const templateWeek = normalizeTemplateWeek(rawTemplateWeek, weekNo);
+      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
 
-      const ovWorkouts = (overridesWeek && typeof overridesWeek.workouts === "object" && overridesWeek.workouts) ? overridesWeek.workouts : {};
-      const ovSlots = (overridesWeek && typeof overridesWeek.slots === "object" && overridesWeek.slots) ? overridesWeek.slots : {};
+      const ovWorkouts = overridesWeek?.workouts || {};
+      const ovSlots = overridesWeek?.slots || {};
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map((w) => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
-        slots: (templateWeek.slots || []).map((s) => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
       };
 
       const pack = { templateWeek, overridesWeek, merged };
@@ -1099,7 +1069,6 @@
       enableTapGlow();
     }
 
-    // Buttons
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
       toLogin(state.lang || "hu");
@@ -1144,8 +1113,13 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      openInfo("Napi terv", `<p class="note">A részletes étrend adminból jön (következő kör).</p>`);
+      const txt = (profile?.dietText || "").trim();
+      openInfo("Napi terv", txt
+        ? `<div class="noteStrong">${nl2brSafe(txt)}</div>`
+        : `<p class="note">Még nincs beállított részletes étrend. (Admin fogja feltölteni.)</p>`
+      );
     });
+
     $("#btnDietPrefs").addEventListener("click", ()=>{
       openInfo("Preferenciák", `<p class="note">Következő kör: allergia/kedvencek/étkezésszám.</p>`);
     });
@@ -1157,6 +1131,11 @@
       "„Amit ma megteszel, az a holnapi önbizalmad.”"
     ];
     $("#btnMotivation").addEventListener("click", ()=>{
+      const m = (profile?.motivationText || "").trim();
+      if(m){
+        $("#motivationBox").innerHTML = nl2brSafe(m);
+        return;
+      }
       $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
     });
 
@@ -1198,7 +1177,6 @@
       renderAll();
     });
 
-    // Init
     document.getElementById("y").textContent = new Date().getFullYear();
 
     onAuth(async (user)=>{
@@ -1209,22 +1187,19 @@
         }
         UID = user.uid;
 
-        // ✅ FIX #1 alkalmazása
-        state.done = ensurePlainObject(lsGet(UID, "done", {}));
-        state.diet = ensurePlainObject(lsGet(UID, "diet", {}));
+        state.done = lsGet(UID, "done", {});
+        state.diet = lsGet(UID, "diet", {});
         state.checkin = lsGet(UID, "checkin", null);
 
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
         planMeta = await loadPlanMeta(profile.planId);
-
         state.weekIdx = calcWeekIndex(profile);
 
         await ensureWeekLoaded(state.weekIdx + 1);
 
         renderAll();
-
         debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
 
       }catch(err){
@@ -1235,7 +1210,6 @@
             <div class="title">Részletek</div>
             <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
           </div>
-          <p class="note">Ha hiányzik a planTemplates sablon, a rendszer most már nem dől el — placeholderrel fut.</p>
         `);
       }
     });
