@@ -16,8 +16,6 @@ import {
 
 /**
  * ÁLLÍTSD BE: admin email(ek)
- * - ez oldja meg, hogy admin beengedjen akkor is, ha a users/{uid} doc még nincs “admin”-ra állítva
- * - később bővíthető több emailre
  */
 export const ADMIN_EMAILS = [
   // "te@domain.com",
@@ -119,30 +117,54 @@ export function isAdminEmail(email){
 export async function ensureUserDoc(uid, email){
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
+
   if(!snap.exists()){
     const initial = {
       email: email || "",
       role: "user",
-      active: true,
-      package: "Start",
+      status: "active",
+
+      planId: "start_v1",
       goal: "Formálás",
       level: 2,
       lang: "hu",
-      diet: null,
-      motivation: null,
+
+      // ✅ ÚJ mezők (ezeket használja az app)
+      dietText: "",
+      motivationText: "",
+
+      // ✅ LEGACY (ha admin régebbit ír, ne vesszen el)
+      diet: "",
+      motivation: "",
+
+      lifetimeAccess: true,
+      cycleStart: null,
+      cycleEnd: null,
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
     await setDoc(ref, initial, { merge: true });
     return initial;
-  }else{
-    // ha régi struktúrából jön, legalább email-t frissítsük
-    const data = snap.data() || {};
-    if(email && data.email !== email){
-      await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
-    }
-    return data;
   }
+
+  // ha régi struktúrából jön: frissítsük minimálisan
+  const data = snap.data() || {};
+  const patch = {};
+
+  if(email && data.email !== email) patch.email = email;
+
+  // ha legacy mezők vannak, de az új hiányzik → másoljuk át, hogy az app lássa
+  if((data.dietText == null || data.dietText === "") && data.diet) patch.dietText = String(data.diet || "");
+  if((data.motivationText == null || data.motivationText === "") && data.motivation) patch.motivationText = String(data.motivation || "");
+
+  if(Object.keys(patch).length){
+    patch.updatedAt = serverTimestamp();
+    await setDoc(ref, patch, { merge:true });
+    return { ...data, ...patch };
+  }
+
+  return data;
 }
 
 export async function getUserRole(uid){
