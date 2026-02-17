@@ -1,4 +1,4 @@
-<!-- ./hu/app/index.html -->
+<!-- /hu/app/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -12,11 +12,21 @@
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
 
       --pink:#ff4fd8;
       --pink2:#b14cff;
+      --gold:#ffd38a;
 
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
+
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+
       --hero-url: none;
     }
     *{ box-sizing:border-box; }
@@ -28,6 +38,7 @@
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
       color:var(--text);
       overflow-x:hidden;
@@ -75,7 +86,6 @@
       box-shadow: 0 0 18px rgba(255,79,216,.7);
       flex: 0 0 auto;
     }
-
     .nav{
       display:flex; align-items:center; gap: 14px;
       color: var(--muted); font-size: 13.5px; font-weight: 700;
@@ -547,7 +557,7 @@
         </div>
 
         <p class="note" style="margin-top:10px;">
-          Ha admin vagy és mégis mindent állítani akarsz: az admin oldalon csinálod.
+          Ha admin vagy és mindent állítani akarsz: az admin oldalon csinálod.
         </p>
       </div>
     </div>
@@ -684,117 +694,93 @@
       sections.forEach(s=>io.observe(s));
     })();
 
-    // ========== user-scoped localStorage ==========
+    // ========== user-scoped localStorage (done/diet/checkin) ==========
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
-    // ========== HARD DEFAULTS (EZ OLDJA MEG A 'indexOf' HIBÁT) ==========
-    const DEFAULTS = {
-      lang: "hu",
-      role: "user",
-      status: "active",
-      planId: "start_v1",
-      goal: "Formálás",
-      level: 2,
-      lifetimeAccess: true,
-      cycleStart: null,
-      cycleEnd: null
-    };
+    // ========== FALLBACK template (ha Firestore-ban hiányzik) ==========
+    function buildFallbackTemplate(planId="start_v1"){
+      const weeks = 4;
+      const makeWeek = (weekNo) => ({
+        workouts: [
+          { id: `w${weekNo}_1`, title:{hu:`Hét ${weekNo} — Edzés 1`, de:`Woche ${weekNo} — Training 1`}, desc:{hu:"(Fallback) Admin még nem töltött fel sablont.", de:"(Fallback) Admin hat noch kein Template hochgeladen."}, vimeoId:"" },
+          { id: `w${weekNo}_2`, title:{hu:`Hét ${weekNo} — Edzés 2`, de:`Woche ${weekNo} — Training 2`}, desc:{hu:"(Fallback) A végleges edzések adminból jönnek.", de:"(Fallback) Finales Training kommt aus dem Admin."}, vimeoId:"" },
+          { id: `w${weekNo}_3`, title:{hu:`Hét ${weekNo} — Edzés 3`, de:`Woche ${weekNo} — Training 3`}, desc:{hu:"(Fallback) Kérd meg az admint a sablon feltöltésére.", de:"(Fallback) Bitte Admin um das Template."}, vimeoId:"" }
+        ],
+        slots: [
+          { slotIndex: 1, title:{hu:"Személyre szabás 1", de:"Personalisierung 1"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
+          { slotIndex: 2, title:{hu:"Személyre szabás 2", de:"Personalisierung 2"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
+          { slotIndex: 3, title:{hu:"Személyre szabás 3", de:"Personalisierung 3"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" }
+        ]
+      });
 
-    function normalizeProfile(raw){
-      const p = raw || {};
-      // kötelező mezők default
-      p.lang = (p.lang === "de") ? "de" : DEFAULTS.lang;
-      p.role = (p.role === "admin") ? "admin" : (p.role || DEFAULTS.role);
-      p.status = p.status || DEFAULTS.status;
+      const byWeek = new Map();
+      for(let w=1; w<=weeks; w++) byWeek.set(w, makeWeek(w));
 
-      // FONTOS: planId mindig legyen string
-      p.planId = (typeof p.planId === "string" && p.planId.trim()) ? p.planId.trim() : DEFAULTS.planId;
-
-      p.goal = p.goal || DEFAULTS.goal;
-      p.level = Number.isFinite(Number(p.level)) ? clamp(Number(p.level), 1, 4) : DEFAULTS.level;
-
-      p.lifetimeAccess = (typeof p.lifetimeAccess === "boolean") ? p.lifetimeAccess : DEFAULTS.lifetimeAccess;
-      p.cycleStart = p.cycleStart || DEFAULTS.cycleStart;
-      p.cycleEnd = p.cycleEnd || DEFAULTS.cycleEnd;
-
-      return p;
+      return {
+        meta: { id: planId, name:{hu:"Start", de:"Start"}, weeks, active:true, __fallback:true },
+        week: (weekNo) => byWeek.get(weekNo)
+      };
     }
 
     // ========== Firestore loaders ==========
     async function loadUserProfile(uid){
-      const ref = fs.doc(db, "users", String(uid));
+      const ref = fs.doc(db, "users", uid);
       const snap = await fs.getDoc(ref);
 
-      // ha nincs doc: létrehozzuk defaultokkal
       if(!snap.exists()){
-        const initial = normalizeProfile({
+        const initial = {
           email: auth.currentUser?.email || "",
           displayName: "",
+          lang: "hu",
+          role: "user",
+          status: "active",
+          planId: "start_v1",
+          goal: "Formálás",
+          level: 2,
+          lifetimeAccess: true,
+          cycleStart: null,
+          cycleEnd: null,
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
-        });
+        };
         await fs.setDoc(ref, initial, { merge: true });
         return initial;
       }
 
-      // ha van doc, de hiányos: self-heal merge
-      const current = normalizeProfile(snap.data());
-      const patch = {
-        lang: current.lang,
-        role: current.role,
-        status: current.status,
-        planId: current.planId,
-        goal: current.goal,
-        level: current.level,
-        lifetimeAccess: current.lifetimeAccess,
-        cycleStart: current.cycleStart,
-        cycleEnd: current.cycleEnd,
-        updatedAt: fs.serverTimestamp()
-      };
-      await fs.setDoc(ref, patch, { merge: true });
-
-      // email-t is frissítjük ha kell (nem kötelező)
-      if(auth.currentUser?.email && current.email !== auth.currentUser.email){
-        await fs.setDoc(ref, { email: auth.currentUser.email, updatedAt: fs.serverTimestamp() }, { merge: true });
-        current.email = auth.currentUser.email;
-      }
-
-      return current;
+      const data = snap.data() || {};
+      // Biztosítsuk, hogy mindig legyen planId
+      if(!data.planId) data.planId = "start_v1";
+      if(!data.lang) data.lang = "hu";
+      if(!data.level) data.level = 2;
+      if(!data.goal) data.goal = "Formálás";
+      return data;
     }
 
     async function loadPlanMeta(planId){
-      const safePlanId = (typeof planId === "string" && planId.trim()) ? planId.trim() : DEFAULTS.planId;
-      const ref = fs.doc(db, "planTemplates", safePlanId);
+      const ref = fs.doc(db, "planTemplates", planId);
       const snap = await fs.getDoc(ref);
-      if(!snap.exists()){
-        throw new Error(`Nincs ilyen planTemplates/${safePlanId}. Hozd létre adminban vagy Firestore-ban!`);
-      }
-      const meta = snap.data() || {};
-      meta.weeks = Number.isFinite(Number(meta.weeks)) ? Number(meta.weeks) : 4;
-      return meta;
+      if(!snap.exists()) return null;
+      return snap.data();
     }
 
     async function loadPlanWeek(planId, weekNo){
-      const safePlanId = (typeof planId === "string" && planId.trim()) ? planId.trim() : DEFAULTS.planId;
-      const ref = fs.doc(db, "planTemplates", safePlanId, "weeks", String(weekNo));
+      const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
       const snap = await fs.getDoc(ref);
-      if(!snap.exists()){
-        throw new Error(`Hiányzik: planTemplates/${safePlanId}/weeks/${weekNo}`);
-      }
+      if(!snap.exists()) return null;
       return snap.data();
     }
 
     async function loadOverridesWeek(uid, weekNo){
-      const ref = fs.doc(db, "users", String(uid), "overrides", "weeks", String(weekNo));
+      const ref = fs.doc(db, "users", uid, "overrides", "weeks", String(weekNo));
       const snap = await fs.getDoc(ref);
       return snap.exists() ? snap.data() : null;
     }
 
     // Merge helpers (HU/DE mezők)
     function pickLang(obj, lang, fallback="—"){
-      if(!obj) return fallback;
+      if(obj == null) return fallback;
       if(typeof obj === "string") return obj;
       if(obj[lang]) return obj[lang];
       if(obj["hu"]) return obj["hu"];
@@ -834,8 +820,10 @@
     let UID = null;
     let profile = null;
     let planMeta = null;
+    let fallback = null; // ha nincs Firestore template
 
-    const weekCache = new Map(); // weekNo -> pack
+    // week cache for fast tab switching
+    const weekCache = new Map(); // weekNo -> { templateWeek, overridesWeek, merged }
 
     const state = {
       weekIdx: 0,
@@ -860,13 +848,17 @@
     function renderHeader(){
       const p = profile;
 
-      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
+      const planName = pickLang(planMeta?.name, state.lang, p.planId || "—");
+      $("#chipPackage").textContent = `Csomag: ${planName}${planMeta?.__fallback ? " (fallback)" : ""}`;
+
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
+      const weeks = planMeta?.weeks || 4;
+
       if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
-        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta.weeks || 4}`;
+        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${weeks}`;
         $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
         $("#barCycle").style.width = `100%`;
         $("#subStatus").textContent = `Üdv, ${p.email || "!"} • A programod aktív. A heti edzéseket a füleken választod.`;
@@ -874,9 +866,9 @@
         const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
         const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
         const leftDays = clamp(totalDays - passedDays, 0, totalDays);
-        const week = clamp(Math.floor((passedDays / totalDays) * (planMeta.weeks||4)) + 1, 1, (planMeta.weeks||4));
+        const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
 
-        $("#lblWeek").textContent = `Hét: ${week}/${planMeta.weeks||4}`;
+        $("#lblWeek").textContent = `Hét: ${week}/${weeks}`;
         $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
         const pct = Math.round((passedDays / totalDays) * 100);
         $("#barCycle").style.width = `${pct}%`;
@@ -891,11 +883,33 @@
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
+
+      // Ha fallback: írjuk ki, hogy adminnak fel kell tölteni a sablont
+      if(planMeta?.__fallback){
+        const msg = `
+          <div class="row" style="grid-template-columns:1fr;">
+            <div>
+              <div class="title">⚠️ Admin teendő</div>
+              <div class="desc">
+                Hiányzik a Firestore sablon: <b>planTemplates/${escapeHtml(profile.planId)}</b>.
+                Most a vevő oldal <b>fallback</b> adatokkal fut, hogy minden gomb működjön.
+              </div>
+            </div>
+          </div>
+        `;
+        // csak egyszer dobjuk fel
+        if(!window.__fl_fallback_notified){
+          window.__fl_fallback_notified = true;
+          openInfo("Hiányzó sablon (Firestore)", msg + `
+            <p class="note">Megoldás: töltsd fel adminból a planTemplates/${escapeHtml(profile.planId)} sablont + weeks/1..N.</p>
+          `);
+        }
+      }
     }
 
     // ========== Week tabs ==========
     function renderWeekTabs(){
-      const weeks = planMeta.weeks || 4;
+      const weeks = planMeta?.weeks || 4;
       const tabs = $("#weekTabs");
       tabs.innerHTML = "";
       for(let i=0;i<weeks;i++){
@@ -917,7 +931,20 @@
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      let templateWeek = null;
+
+      if(planMeta?.__fallback && fallback){
+        templateWeek = fallback.week(weekNo);
+      }else{
+        templateWeek = await loadPlanWeek(profile.planId, weekNo);
+        if(!templateWeek){
+          // ha meta megvan, de a week hiányzik: essünk vissza fallback-re, ne álljon meg
+          fallback = fallback || buildFallbackTemplate(profile.planId);
+          planMeta = { ...fallback.meta, __fallback:true };
+          templateWeek = fallback.week(weekNo);
+        }
+      }
+
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
 
       const ovWorkouts = overridesWeek?.workouts || {};
@@ -962,8 +989,8 @@
             <div class="desc">${escapeHtml(w._desc || "")}</div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(w.vimeoId || "")}" type="button">▶ Lejátszás</button>
-            <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}" type="button">${done ? 'Visszavon' : 'Kész'}</button>
+            <button class="pill ghost tiny" type="button" data-play="${escapeHtml(w.vimeoId || "")}">▶ Lejátszás</button>
+            <button class="pill ${done ? 'danger' : 'primary'} tiny" type="button" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
           </div>
         `;
         ul.appendChild(li);
@@ -980,7 +1007,7 @@
             <div class="desc">${escapeHtml(s._desc)}<br><span style="color:rgba(255,255,255,.72); font-size:12.6px;">Megjegyzés: ${escapeHtml(s._note)}</span></div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(s.vimeoId || "")}" type="button">▶ Lejátszás</button>
+            <button class="pill ghost tiny" type="button" data-play="${escapeHtml(s.vimeoId || "")}">▶ Lejátszás</button>
           </div>
         `;
         sl.appendChild(li);
@@ -996,7 +1023,7 @@
           }
           const src = `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
           openInfo("Lejátszás", `
-            <p class="note">Ha a videó nem indul: Vimeo domain-lock beállítás ellenőrzés (fitnesslady.ch).</p>
+            <p class="note">Ha a videó nem indul: Vimeo embed domain whitelist (fitnesslady.ch).</p>
             <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
               <iframe
                 src="${escapeHtml(src)}"
@@ -1023,8 +1050,10 @@
 
     // ========== Technika vault ==========
     function renderTechnika(){
-      $("#techTabs").innerHTML = "";
-      $("#techList").innerHTML = `
+      const tabs = $("#techTabs");
+      const list = $("#techList");
+      tabs.innerHTML = "";
+      list.innerHTML = `
         <li class="row">
           <div>
             <div class="title">Technika Vault</div>
@@ -1036,7 +1065,7 @@
         </li>
       `;
       $("#btnTechInfo")?.addEventListener("click", ()=>{
-        openInfo("Technika Vault", `<p class="note">Következő kör: tech sablon + app render.</p>`);
+        openInfo("Technika Vault", `<p class="note">Következő kör: technika sablon + app render.</p>`);
       });
     }
 
@@ -1084,7 +1113,7 @@
 
     $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
       openInfo("Vimeo beágyazás (éles)", `
-        <p class="note"><b>Éles</b> beállítás: Vimeo videók embed whitelist: fitnesslady.ch</p>
+        <p class="note"><b>Éles</b> beállítás: Vimeo videók legyenek Private/Hide, és Embed csak a te domainjeiden.</p>
         <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
           <li>Vimeo: Hide from Vimeo / Private</li>
           <li>Embed whitelist: fitnesslady.ch</li>
@@ -1107,7 +1136,7 @@
       openInfo("Napi terv", `<p class="note">A részletes étrendet a következő körben Firestore-ból hozzuk (adminból állítható).</p>`);
     });
     $("#btnDietPrefs").addEventListener("click", ()=>{
-      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, kedvencek, étkezésszám, sablon.</p>`);
+      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, kedvencek, étkezésszám, edzésnap/pihenőnap sablon.</p>`);
     });
 
     const MOTS = [
@@ -1136,11 +1165,11 @@
     });
 
     $("#btnSaveSettings").addEventListener("click", async ()=>{
-      const goal = ($("#setGoal").value || "").trim() || DEFAULTS.goal;
+      const goal = ($("#setGoal").value || "").trim();
       const level = clamp(parseInt($("#setLevel").value || "2", 10), 1, 4);
       const lang = (($("#setLang").value || "hu").trim().toLowerCase() === "de") ? "de" : "hu";
 
-      await fs.setDoc(fs.doc(db, "users", String(UID)), {
+      await fs.setDoc(fs.doc(db, "users", UID), {
         goal,
         level,
         lang,
@@ -1168,28 +1197,30 @@
           toLogin("hu");
           return;
         }
-
         UID = user.uid;
 
         state.done = lsGet(UID, "done", {});
         state.diet = lsGet(UID, "diet", {});
         state.checkin = lsGet(UID, "checkin", null);
 
-        // profile (self-heal)
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
-        // plan meta (planId most már biztosan string)
-        planMeta = await loadPlanMeta(profile.planId);
+        // ---- PLAN META: Firestore -> ha nincs, fallback ----
+        const meta = await loadPlanMeta(profile.planId);
+        if(!meta){
+          fallback = buildFallbackTemplate(profile.planId);
+          planMeta = { ...fallback.meta, __fallback:true };
+        }else{
+          planMeta = meta;
+        }
 
-        // default week
         state.weekIdx = calcWeekIndex(profile);
 
-        // preload
         await ensureWeekLoaded(state.weekIdx + 1);
-
         renderAll();
-        debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
+
+        debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang} fallback=${!!planMeta.__fallback}`);
 
       }catch(err){
         console.error(err);
@@ -1197,9 +1228,9 @@
           <p class="note">Hiba történt betöltés közben.</p>
           <div class="row" style="grid-template-columns: 1fr;">
             <div class="title">Részletek</div>
-            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err?.message || String(err))}</code></div>
+            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
           </div>
-          <p class="note">Ha ez planTemplates hiány, akkor adminból fel kell tölteni a sablont (pl. start_v1).</p>
+          <p class="note">Ha Firestore sablon hiányzik, az app most már fallback-kel is tud futni. Ha mégis itt áll meg: shared/firebase.js betöltés / Firebase config / CORS probléma.</p>
         `);
       }
     });
