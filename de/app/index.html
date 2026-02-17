@@ -5,23 +5,415 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Fitness Lady — Mein Programm</title>
-  <meta name="robots" content="noindex" />
+  <meta name="description" content="Fitness Lady — Mein Programm: Plan, Wochen-Workouts, Personalisierung, Ernährung, Check-in & Motivation." />
+
+  <style>
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 1180px;
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
+      --hero-url: none;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: var(--hero-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      opacity:.92;
+    }
+    a{ color:inherit; text-decoration:none; }
+    button{ font:inherit; }
+    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
+
+    .topbar{
+      position: fixed; top:0; left:0; right:0;
+      z-index: 50;
+      background: rgba(8,6,12,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; white-space: nowrap; }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease;
+      user-select:none;
+      white-space: nowrap;
+      gap:8px;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 46px rgba(255,79,216,.26);
+      font-weight: 900;
+    }
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+
+    main{ padding-top: 64px; min-height: 100vh; min-height: 100dvh; }
+    .page{ padding: 18px 0 64px; }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .card{ padding: 16px; }
+    .card h2, .card h3{
+      margin:0 0 8px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.2px;
+    }
+    .card h2{ font-size: 22px; }
+    .card h3{ font-size: 18px; }
+    .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
+
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
+    .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+
+    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
+    }
+
+    .toast{
+      position: fixed;
+      left: 14px;
+      right: 14px;
+      bottom: 14px;
+      z-index: 90;
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,.86);
+      display:none;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .toast.show{ display:block; }
+
+    @media (max-width: 980px){
+      .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+      .pill, .glass{
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+      }
+    }
+  </style>
 </head>
+
 <body>
-  <script>
-    // Vevő: DE app = HU app + lang=de
-    try {
-      localStorage.setItem("lang", "de");
-    } catch (e) {}
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/de/" aria-label="Zur Startseite">
+        <span class="dot"></span><span>Fitness Lady</span>
+      </a>
 
-    // ha volt query param a DE oldalon, megtartjuk
-    const qs = new URLSearchParams(location.search);
-    qs.set("lang", "de");
+      <div style="display:flex; align-items:center; gap:10px;">
+        <button class="pill ghost" id="btnLogout" type="button">⎋ Logout</button>
+      </div>
+    </div>
+  </header>
 
-    // optional: ha valahonnan vissza akarod küldeni a usert
-    // qs.set("from", "de");
+  <main>
+    <div class="container page">
 
-    location.replace(`/hu/app/?${qs.toString()}`);
+      <section class="glass card" style="margin-bottom:14px;">
+        <h2>Mein Bereich</h2>
+        <p class="sub" id="subStatus">Laden…</p>
+      </section>
+
+      <section class="glass card" style="margin-bottom:14px;">
+        <h3>Ernährung (Heute)</h3>
+        <p class="sub">Diese Häkchen werden jetzt zuverlässig gespeichert (Firestore).</p>
+
+        <div class="row" style="grid-template-columns:1fr; gap:10px;">
+          <div>
+            <div class="title">Tages-Check</div>
+            <div class="desc">Dranbleiben — Rhythmus & Konsistenz.</div>
+          </div>
+
+          <div style="display:flex; gap:8px; flex-wrap:wrap;">
+            <button class="pill ghost" data-toggle="diet_water" type="button">💧 2L Wasser</button>
+            <button class="pill ghost" data-toggle="diet_protein" type="button">🥚 Protein geschafft</button>
+            <button class="pill ghost" data-toggle="diet_steps" type="button">👟 8k Schritte</button>
+            <button class="pill ghost" data-toggle="diet_sleep" type="button">🌙 Schlaf ok</button>
+          </div>
+
+          <div class="note" id="dietSavedInfo">—</div>
+        </div>
+      </section>
+
+      <section class="glass card">
+        <h3>Motivation</h3>
+        <p class="sub">Motivation wird gespeichert (heute).</p>
+
+        <div class="row" style="grid-template-columns:1fr; gap:10px;">
+          <div>
+            <div class="title">Dein Satz für heute</div>
+            <div class="desc" id="motivationText">„Das System ist Freiheit.“</div>
+          </div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="pill primary" id="btnMotivation" type="button">Neue Motivation</button>
+          </div>
+
+          <div class="note" id="motivationSavedInfo">—</div>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>© <span id="y"></span> Fitness Lady</div>
+      <div>Tüske web design</div>
+    </div>
+  </footer>
+
+  <div class="toast" id="toast">Gespeichert ✅</div>
+
+  <script type="module">
+    import {
+      BASE_PREFIX, auth, db, fs,
+      onAuth, logout, toLogin,
+      safeJsonParse, todayISO, escapeHtml
+    } from "../shared/firebase.js";
+
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+
+    const toast = $("#toast");
+    let toastT = null;
+    function showToast(text="Gespeichert ✅"){
+      toast.textContent = text;
+      toast.classList.add("show");
+      clearTimeout(toastT);
+      toastT = setTimeout(()=>toast.classList.remove("show"), 1200);
+    }
+
+    // ---------- STATE ----------
+    let UID = null;
+
+    const state = {
+      diet: {},
+      motivationIdx: 0,
+      motivationText: "„Das System ist Freiheit.“",
+      lastSavedAt: null
+    };
+
+    // local fallback (ha offline) – de most már Firestore a fő
+    const k = (uid, key) => `fl_${uid}_${key}_v1`;
+    const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
+    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
+
+    function ensurePlainObject(v){
+      return (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+    }
+
+    // ---------- FIRESTORE DAILY DOC ----------
+    function dailyRef(uid){
+      return fs.doc(db, "users", uid, "daily", todayISO());
+    }
+
+    async function loadDaily(){
+      // 1) local gyors betöltés
+      state.diet = ensurePlainObject(lsGet(UID, "diet", {}));
+      state.motivationIdx = Number(lsGet(UID, "motivationIdx", 0)) || 0;
+      state.motivationText = String(lsGet(UID, "motivationText", state.motivationText) || state.motivationText);
+
+      // 2) Firestore (source of truth)
+      try{
+        const snap = await fs.getDoc(dailyRef(UID));
+        if(snap.exists()){
+          const d = snap.data();
+          if(d?.diet) state.diet = ensurePlainObject(d.diet);
+          if(typeof d?.motivationIdx === "number") state.motivationIdx = d.motivationIdx;
+          if(typeof d?.motivationText === "string" && d.motivationText.trim()) state.motivationText = d.motivationText;
+          state.lastSavedAt = d?.updatedAt ? d.updatedAt : null;
+        }
+      }catch(e){
+        // ha hiba, local marad
+        console.warn("Daily load failed:", e);
+      }
+
+      // local sync
+      lsSet(UID, "diet", state.diet);
+      lsSet(UID, "motivationIdx", state.motivationIdx);
+      lsSet(UID, "motivationText", state.motivationText);
+    }
+
+    let saveTimer = null;
+    async function saveDailyDebounced(){
+      clearTimeout(saveTimer);
+      saveTimer = setTimeout(saveDailyNow, 350);
+    }
+
+    async function saveDailyNow(){
+      try{
+        await fs.setDoc(dailyRef(UID), {
+          diet: state.diet,
+          motivationIdx: state.motivationIdx,
+          motivationText: state.motivationText,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        // local sync
+        lsSet(UID, "diet", state.diet);
+        lsSet(UID, "motivationIdx", state.motivationIdx);
+        lsSet(UID, "motivationText", state.motivationText);
+
+        $("#dietSavedInfo").textContent = "Gespeichert ✅";
+        $("#motivationSavedInfo").textContent = "Gespeichert ✅";
+        showToast("Gespeichert ✅");
+      }catch(e){
+        console.error(e);
+        $("#dietSavedInfo").textContent = "Speichern fehlgeschlagen (Netzwerk/Permission).";
+        $("#motivationSavedInfo").textContent = "Speichern fehlgeschlagen (Netzwerk/Permission).";
+        showToast("Fehler beim Speichern");
+      }
+    }
+
+    // ---------- UI ----------
+    function refreshDietButtons(){
+      const d = state.diet;
+      $$("[data-toggle]").forEach(btn=>{
+        const key = btn.getAttribute("data-toggle");
+        const on = !!d[key];
+        btn.classList.toggle("primary", on);
+        btn.classList.toggle("ghost", !on);
+      });
+    }
+
+    const MOTS = [
+      "„Das System ist Freiheit.“",
+      "„Fortschritt ist Konsistenz — nicht Perfektion.“",
+      "„Du baust nicht nur Form — du baust Selbstvertrauen.“",
+      "„Was du heute tust, ist dein Morgen.“"
+    ];
+
+    function render(){
+      refreshDietButtons();
+      $("#motivationText").textContent = state.motivationText;
+    }
+
+    // ---------- EVENTS ----------
+    $("#btnLogout").addEventListener("click", async ()=>{
+      await logout();
+      toLogin("de");
+    });
+
+    $$("[data-toggle]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const key = btn.getAttribute("data-toggle");
+        state.diet[key] = !state.diet[key];
+        render();
+        saveDailyDebounced();
+      });
+    });
+
+    $("#btnMotivation").addEventListener("click", ()=>{
+      const next = Math.floor(Math.random()*MOTS.length);
+      state.motivationIdx = next;
+      state.motivationText = MOTS[next];
+      render();
+      saveDailyDebounced();
+    });
+
+    // ---------- INIT ----------
+    onAuth(async (user)=>{
+      if(!user){
+        toLogin("de");
+        return;
+      }
+      UID = user.uid;
+
+      // státusz (csak info)
+      $("#subStatus").textContent = `Eingeloggt als: ${escapeHtml(user.email || "")}`;
+
+      // load + render
+      await loadDaily();
+      render();
+
+      // első info
+      $("#dietSavedInfo").textContent = "Bereit.";
+      $("#motivationSavedInfo").textContent = "Bereit.";
+    });
   </script>
 </body>
 </html>
