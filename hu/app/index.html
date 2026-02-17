@@ -333,13 +333,7 @@
       max-height: calc(min(82vh, 760px) - 64px);
       background: rgba(7,6,11,.38);
     }
-    .note{
-      color: rgba(255,255,255,.55);
-      font-size: 12.6px;
-      line-height: 1.55;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
 
     footer{
       padding: 18px 0 46px;
@@ -461,7 +455,7 @@
         <div style="display:grid; gap:14px;">
           <section id="etrend" class="glass interactive card">
             <h3>Étrend</h3>
-            <p class="sub">A részletes étrendet az admin frissíti. Itt látod a legutóbbi verziót + a napi jelölőket.</p>
+            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend adminból lesz szerkeszthető.</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:8px;">
               <div>
@@ -475,16 +469,13 @@
                   <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
                   <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
                 </div>
-
-                <!-- ✅ IDE jön a Firestore dietText -->
-                <div class="note" id="dietNote">Betöltés…</div>
+                <div class="note" id="dietNote">A részletes étrend a következő körben jön (admin szerkesztéssel).</div>
               </div>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
               <button class="pill ghost tiny" id="btnDietPlan" type="button">Napi terv</button>
               <button class="pill ghost tiny" id="btnDietPrefs" type="button">Preferenciák</button>
-              <button class="pill ghost tiny" id="btnDietMore" type="button">📄 Részletek</button>
             </div>
           </section>
 
@@ -510,8 +501,7 @@
                   <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
                 </div>
 
-                <!-- ✅ IDE jön a Firestore motivationText -->
-                <div class="note" id="motivationBox">Betöltés…</div>
+                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
               </div>
             </div>
           </section>
@@ -709,6 +699,11 @@
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
+    // ✅ FIX #1: sose legyen null / rossz típus (különben state.done[key] crash)
+    function ensurePlainObject(v){
+      return (v && typeof v === "object" && !Array.isArray(v)) ? v : {};
+    }
+
     // Firestore loaders
     async function loadUserProfile(uid){
       const ref = fs.doc(db, "users", uid);
@@ -726,9 +721,6 @@
           lifetimeAccess: true,
           cycleStart: null,
           cycleEnd: null,
-          // ✅ új mezők (szabad szöveg)
-          dietText: "",
-          motivationText: "",
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         };
@@ -795,6 +787,7 @@
       }
     }
 
+    // ✅ FIX: helyes doc útvonal + kompatibilitás (2 variáns)
     async function loadOverridesWeek(uid, weekNo){
       const tryPaths = [
         ["users", uid, "overridesWeeks", String(weekNo)],
@@ -811,6 +804,7 @@
       return null;
     }
 
+    // Merge helpers
     function pickLang(obj, lang, fallback="—"){
       if(!obj) return fallback;
       if(typeof obj === "string") return obj;
@@ -848,13 +842,6 @@
       return s;
     }
 
-    // ✅ Firestore -> UI (szabad szöveg)
-    function normalizeTextAny(v){
-      if(v == null) return "";
-      if(typeof v === "string") return v;
-      try{ return JSON.stringify(v, null, 2); }catch{ return String(v); }
-    }
-
     // State
     let UID = null;
     let profile = null;
@@ -867,9 +854,7 @@
       done: {},
       diet: {},
       checkin: null,
-      lang: "hu",
-      dietText: "",
-      motivationText: ""
+      lang: "hu"
     };
 
     function calcWeekIndex(p){
@@ -882,14 +867,6 @@
     }
 
     function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
-
-    function renderTextBlocks(){
-      const dietText = state.dietText?.trim();
-      $("#dietNote").textContent = dietText ? dietText : "Nincs részletes étrend még beállítva (admin).";
-
-      const motText = state.motivationText?.trim();
-      $("#motivationBox").textContent = motText ? motText : "„A rendszer nem nyomás. A rendszer szabadság.”";
-    }
 
     function renderHeader(){
       const p = profile;
@@ -929,8 +906,6 @@
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
-
-      renderTextBlocks();
     }
 
     function renderWeekTabs(){
@@ -952,19 +927,48 @@
       }
     }
 
+    // ✅ FIX #2: normalize workout/slot IDs, hogy sose legyen undefined
+    function normalizeTemplateWeek(templateWeek, weekNo){
+      const tw = templateWeek || {};
+      const workouts = Array.isArray(tw.workouts) ? tw.workouts : [];
+      const slots = Array.isArray(tw.slots) ? tw.slots : [];
+
+      const normWorkouts = workouts.map((w, idx)=>{
+        const id = (w && typeof w === "object" && w.id) ? w.id : `w${idx+1}`;
+        return { ...(w||{}), id };
+      });
+
+      const normSlots = slots.map((s, idx)=>{
+        const slotIndex = (s && typeof s === "object" && (s.slotIndex || s.slotIndex === 0)) ? s.slotIndex : (idx+1);
+        return { ...(s||{}), slotIndex };
+      });
+
+      // ha üres, legalább placeholder
+      if(normWorkouts.length === 0 || normSlots.length === 0){
+        const fallback = defaultWeek(weekNo);
+        return {
+          workouts: normWorkouts.length ? normWorkouts : fallback.workouts,
+          slots: normSlots.length ? normSlots : fallback.slots,
+        };
+      }
+
+      return { workouts: normWorkouts, slots: normSlots };
+    }
+
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      const rawTemplateWeek = await loadPlanWeek(profile.planId, weekNo);
+      const templateWeek = normalizeTemplateWeek(rawTemplateWeek, weekNo);
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
 
-      const ovWorkouts = overridesWeek?.workouts || {};
-      const ovSlots = overridesWeek?.slots || {};
+      const ovWorkouts = (overridesWeek && typeof overridesWeek.workouts === "object" && overridesWeek.workouts) ? overridesWeek.workouts : {};
+      const ovSlots = (overridesWeek && typeof overridesWeek.slots === "object" && overridesWeek.slots) ? overridesWeek.slots : {};
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+        workouts: (templateWeek.workouts || []).map((w) => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map((s) => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
       };
 
       const pack = { templateWeek, overridesWeek, merged };
@@ -1140,18 +1144,12 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      openInfo("Napi terv", `<p class="note">A részletes étrend az adminból jön (szabad szöveg).</p>`);
+      openInfo("Napi terv", `<p class="note">A részletes étrend adminból jön (következő kör).</p>`);
     });
     $("#btnDietPrefs").addEventListener("click", ()=>{
       openInfo("Preferenciák", `<p class="note">Következő kör: allergia/kedvencek/étkezésszám.</p>`);
     });
 
-    // ✅ Részletek modal (Firestore dietText)
-    $("#btnDietMore").addEventListener("click", ()=>{
-      openInfo("Étrend — részletek", `<pre class="note">${escapeHtml(state.dietText || "Nincs beállítva még.")}</pre>`);
-    });
-
-    // ✅ Motiváció gomb: Firestore szöveg megnyitása + fallback random
     const MOTS = [
       "„A rendszer nem nyomás. A rendszer szabadság.”",
       "„A haladás nem tökéletesség. Hanem következetesség.”",
@@ -1159,12 +1157,7 @@
       "„Amit ma megteszel, az a holnapi önbizalmad.”"
     ];
     $("#btnMotivation").addEventListener("click", ()=>{
-      const txt = (state.motivationText || "").trim();
-      if(txt){
-        openInfo("Motiváció", `<pre class="note">${escapeHtml(txt)}</pre>`);
-      }else{
-        $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
-      }
+      $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
     });
 
     $("#btnDoCheckin").addEventListener("click", ()=>{
@@ -1216,24 +1209,22 @@
         }
         UID = user.uid;
 
-        state.done = lsGet(UID, "done", {});
-        state.diet = lsGet(UID, "diet", {});
+        // ✅ FIX #1 alkalmazása
+        state.done = ensurePlainObject(lsGet(UID, "done", {}));
+        state.diet = ensurePlainObject(lsGet(UID, "diet", {}));
         state.checkin = lsGet(UID, "checkin", null);
 
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
-        // ✅ diet/motiváció Firestore-ból
-        // Preferált: dietText + motivationText
-        // Kompatibilis: régi diet mező (string/object)
-        state.dietText = normalizeTextAny(profile.dietText ?? profile.diet ?? "");
-        state.motivationText = normalizeTextAny(profile.motivationText ?? profile.motivation ?? "");
-
         planMeta = await loadPlanMeta(profile.planId);
+
         state.weekIdx = calcWeekIndex(profile);
+
         await ensureWeekLoaded(state.weekIdx + 1);
 
         renderAll();
+
         debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
 
       }catch(err){
