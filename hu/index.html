@@ -1,33 +1,37 @@
+<!-- FILE: /hu/app/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fitness Lady — Női edzésprogramok</title>
-  <meta name="description" content="Női edzésprogramok, amiket tényleg lehet tartani. Személyre szabott edzés és táplálkozás — a te életedhez igazítva." />
+  <title>Fitness Lady — Saját programom</title>
+  <meta name="description" content="Fitness Lady — Saját programom: csomag, heti edzések, személyre szabás slotok, étrend, check-in/cél, technika vault." />
 
   <style>
     :root{
       --bg:#07060b;
-
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
       --muted2:rgba(255,255,255,.55);
 
       --pink:#ff4fd8;
       --pink2:#b14cff;
-
       --gold:#ffd38a;
 
       --radius:22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
-    }
 
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
+      --stroke2: rgba(255,255,255,.14);
+
+      --hero-url: none;
+    }
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     html{ scroll-behavior:smooth; }
-
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
@@ -39,55 +43,26 @@
       color:var(--text);
       overflow-x:hidden;
     }
-
-    /* ===== FULL-PAGE BACKGROUND: hero.png végig az egész oldalon ===== */
     body::before{
       content:"";
       position: fixed;
       inset: 0;
       z-index: -1;
-      background-image: url("/hero.png");
+      background-image: var(--hero-url);
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
-
-      /* Desktop/mobil stabilizálás */
-      will-change: transform;
-      transform: translate3d(0,0,0);
-      backface-visibility: hidden;
+      transform: translateZ(0);
+      opacity:.92;
     }
 
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
+    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
 
-    /* ========= Layout helpers ========= */
-    .container{
-      width: min(var(--max), 92vw);
-      margin: 0 auto;
-    }
-    .section{
-      padding: clamp(44px, 6vw, 76px) 0;
-      background: rgba(7,6,11,.72); /* olvashatóság a full-page bg felett */
-      border-top: 1px solid rgba(255,255,255,.06);
-    }
-    .section-title{
-      margin:0 0 10px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: clamp(28px, 3.4vw, 40px);
-      letter-spacing: -.4px;
-    }
-    .section-sub{
-      margin:0 0 22px;
-      color:var(--muted);
-      max-width: 78ch;
-      line-height: 1.6;
-      font-size: 15px;
-    }
-
-    /* ========= Topbar ========= */
+    /* Topbar */
     .topbar{
-      position: fixed;
-      top:0; left:0; right:0;
+      position: fixed; top:0; left:0; right:0;
       z-index: 50;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
@@ -102,12 +77,8 @@
       gap: 12px;
     }
     .brand{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      font-weight:800;
-      letter-spacing:.2px;
-      white-space: nowrap;
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px; white-space: nowrap;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
@@ -115,63 +86,51 @@
       box-shadow: 0 0 18px rgba(255,79,216,.7);
       flex: 0 0 auto;
     }
-
     .nav{
-      display:flex;
-      align-items:center;
-      gap: 18px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 650;
+      display:flex; align-items:center; gap: 14px;
+      color: var(--muted); font-size: 13.5px; font-weight: 700;
     }
-    .nav a{
-      position: relative;
-      padding: 10px 6px;
-      opacity:.92;
-    }
+    .nav a{ position: relative; padding: 10px 6px; opacity:.92; }
     .nav a:hover{ opacity:1; color: var(--text); }
-
-    /* gold underline animation */
     .nav a::after{
       content:"";
       position:absolute;
       left: 8px; right: 8px; bottom: 6px;
-      height: 2px;
-      border-radius: 99px;
+      height: 2px; border-radius: 99px;
       background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
       transform: scaleX(0);
       transform-origin: left;
       opacity: 0;
       transition: transform .28s ease, opacity .28s ease;
     }
-    .nav a:hover::after,
-    .nav a.is-active::after{
-      transform: scaleX(1);
-      opacity: 1;
-    }
+    .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
 
-    .cta-pill{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding: 10px 14px;
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 9px 12px;
       border-radius: 999px;
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#120613;
-      font-weight: 900;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 30px rgba(255,79,216,.22);
-      white-space: nowrap;
-    }
-
-    /* Secondary pill (Saját oldalam) — dizájnhoz nem nyúlunk, csak finom) */
-    .cta-pill.secondary{
-      background: rgba(255,255,255,.06);
-      color: var(--text);
       border: 1px solid rgba(255,255,255,.12);
-      box-shadow: none;
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+      white-space: nowrap;
+      gap:8px;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 46px rgba(255,79,216,.26);
       font-weight: 900;
     }
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
 
     .menu-btn{
       width: 40px; height: 40px; border-radius: 999px;
@@ -180,150 +139,26 @@
       color: var(--text);
       display:none;
       align-items:center; justify-content:center;
-    }
-
-    /* ========= Hero ========= */
-    .hero{
-      position: relative;
-      min-height: 100vh;
-      min-height: 100dvh;
-      padding-top: 64px;
-      display:flex;
-      align-items:center;
-      overflow: hidden;
-    }
-
-    /* overlay a hero felett (olvashatóság) */
-    .hero-overlay{
-      position:absolute; inset:0;
-      background:
-        radial-gradient(1100px 700px at 22% 42%, rgba(10,7,14,.18), rgba(10,7,14,.56) 62%, rgba(10,7,14,.72) 100%),
-        linear-gradient(to right, rgba(10,7,14,.48), rgba(10,7,14,.30) 48%, rgba(10,7,14,.22));
-      pointer-events:none;
-    }
-
-    .hero-wrap{
-      position: relative;
-      width: min(var(--max), 92vw);
-
-      /* ✅ TARTALOM BALRA (nem a háttér) */
-      margin-left: clamp(14px, 4vw, 64px);
-      margin-right: auto;
-
-      padding: 38px 0 56px;
-    }
-
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 18px;
-      align-items: start;
-    }
-
-    .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 13px;
-      width: fit-content;
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    h1{
-      margin: 14px 0 12px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-weight: 700;
-      line-height: 1.05;
-      font-size: clamp(34px, 4.2vw, 62px);
-      letter-spacing: -0.8px;
-      text-shadow: 0 10px 40px rgba(0,0,0,.55);
-    }
-
-    .lead{
-      margin: 0 0 18px;
-      color: var(--muted);
-      font-size: 15.5px;
-      line-height: 1.65;
-      max-width: 62ch;
-      text-shadow: 0 10px 30px rgba(0,0,0,.45);
-    }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 12px;
-      margin: 14px 0 10px;
-    }
-
-    .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
       cursor:pointer;
-      transition: transform .18s ease, background .18s ease, border-color .18s ease;
-      white-space: nowrap;
-      position: relative;
-      overflow: hidden;
-      user-select:none;
-    }
-    .btn:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
-    .btn.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 900;
-    }
-    .btn.ghost{ background: rgba(255,255,255,.06); }
-
-    .meta-row{
-      display:flex; flex-wrap:wrap;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted2);
-      font-size: 13px;
-    }
-    .meta-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
     }
 
-    /* ========= Glass cards + hover/tap neon glow (GOLD SWEEP NINCS) ========= */
+    main{ padding-top: 64px; min-height: 100vh; min-height: 100dvh; }
+    .page{ padding: 18px 0 64px; }
+
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-
     .interactive{
       position: relative;
       overflow: hidden;
       transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
       will-change: transform;
     }
-
-    /* neon glow layer (hover/tap) */
     .interactive::before{
       content:"";
       position:absolute; inset:-3px;
@@ -336,326 +171,126 @@
       transition: opacity .30s ease;
       pointer-events:none;
     }
-
     .interactive:hover,
     .interactive:focus-visible,
     .interactive.is-active{
-      transform: translateY(-6px);
+      transform: translateY(-4px);
       border-color: rgba(255,255,255,.16);
       box-shadow: 0 22px 70px rgba(0,0,0,.55);
     }
     .interactive:hover::before,
     .interactive:focus-visible::before,
-    .interactive.is-active::before{
-      opacity: 1;
-    }
+    .interactive.is-active::before{ opacity: 1; }
 
-    /* ========= “Rólam” + “Mit kapsz pontosan?” ========= */
-    .hero-stack{
+    .grid{
       display:grid;
+      grid-template-columns: 1.2fr .8fr;
       gap: 14px;
-      align-content: start;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .nav{ display:none; }
+      .menu-btn{ display:inline-flex; }
     }
 
-    .about-card, .what-card{ padding: 18px; }
-    .about-head{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom:10px;
+    .card{ padding: 16px; }
+    .card h2, .card h3{
+      margin:0 0 8px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.2px;
     }
-    .tag{
-      font-size: 12px;
-      padding: 6px 10px;
+    .card h2{ font-size: 22px; }
+    .card h3{ font-size: 18px; }
+    .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
+
+    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
+    .meta-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
       border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07);
-      color: var(--muted);
-      white-space: nowrap;
-      font-weight: 800;
-    }
-    .about-title{
-      margin:0;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing:.2px;
-    }
-    .about-text{
-      margin:0;
-      color: var(--muted);
-      font-size: 13.5px;
-      line-height: 1.6;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
 
-    .what-grid{
-      display:grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 12px;
-      margin-top: 10px;
+    .progress{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      height: 12px;
+      overflow:hidden;
+      position:relative;
     }
-    .mini{
-      padding: 14px;
+    .progress > span{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .progress-label{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.55);
+      margin: 10px 0 8px;
+    }
+
+    .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 12px; }
+    .tab{
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      cursor:pointer;
+      font-size: 13px;
+      font-weight: 850;
+      user-select:none;
+    }
+    .tab.is-active{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 12px;
       border-radius: 18px;
       background: rgba(0,0,0,.18);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .mini b{ display:block; margin-bottom:6px; font-size: 13px; }
-    .mini span{ display:block; color:var(--muted); font-size: 12.8px; line-height:1.45; }
+    .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
+    .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+    .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
+    .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
 
-    /* ========= Packages ========= */
-    .packages{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
-    @media (max-width: 980px){
-      .packages{ grid-template-columns: 1fr; }
-    }
-    .pkg{ padding: 18px; position: relative; }
-    .pkg-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 10px;
-    }
-    .pkg h3{
-      margin:0;
-      font-size: 22px;
-      font-family: ui-serif, Georgia, serif;
-    }
-    .pkg p{
-      margin: 0 0 12px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 13.5px;
-    }
-    .list{ margin:0; padding:0; list-style:none; display:grid; gap:8px; }
-    .list li{
-      display:flex; align-items:flex-start; gap:10px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .check{
-      width: 18px; height: 18px; border-radius: 6px;
-      background: rgba(255,79,216,.18);
-      border: 1px solid rgba(255,79,216,.30);
-      box-shadow: 0 0 22px rgba(255,79,216,.16);
-      flex: 0 0 auto;
-      margin-top: 1px;
-      position:relative;
-    }
-    .check:after{
-      content:"";
-      position:absolute;
-      left: 5px; top: 4px;
-      width: 6px; height: 9px;
-      border-right: 2px solid rgba(255,255,255,.85);
-      border-bottom: 2px solid rgba(255,255,255,.85);
-      transform: rotate(40deg);
-    }
-
-    .pkg-actions{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-      margin-top: 14px;
-    }
-    .buy-btn{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border:none;
-      box-shadow: 0 18px 46px rgba(255,79,216,.20);
-      font-weight: 900;
-    }
-    .info-btn{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.12);
-      color: var(--text);
-      font-weight: 850;
-    }
-
-    /* ========= Reviews ========= */
-    .reviews-head{
-      display:flex;
-      align-items:flex-end;
-      justify-content: space-between;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 14px;
-    }
-    .reviews-actions{ display:flex; gap:10px; flex-wrap:wrap; }
-
-    .rating{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      user-select:none;
-      padding: 8px 12px;
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-    }
-    .rating .star{
-      font-size:16px;
-      line-height:1;
-      color: rgba(255,255,255,.25);
-      transform: translateY(0) scale(1);
-      transition: transform .25s ease, filter .25s ease, color .25s ease;
-      transition-delay: calc(var(--i) * 18ms);
-    }
-    .rating .rating-text{
-      font-size: 13px;
-      opacity: .78;
-      font-weight: 850;
-      letter-spacing: .2px;
-    }
-    .rating.is-anim .star,
-    .rating:hover .star{
-      color: rgba(255, 215, 130, .95);
-      filter: drop-shadow(0 0 10px rgba(255, 200, 120, .35));
-    }
-    .rating.is-anim .star{
-      animation: starPop .55s cubic-bezier(.2,.8,.2,1) both;
-      animation-delay: calc(var(--i) * 40ms);
-    }
-    @keyframes starPop{
-      0%   { transform: translateY(2px) scale(.92); filter: none; }
-      45%  { transform: translateY(-2px) scale(1.10); }
-      100% { transform: translateY(0) scale(1.00); }
-    }
-
-    .review-carousel{ border-radius: var(--radius); }
-    .review-track{
-      display:flex;
-      gap:14px;
-      padding: 10px;
-      scroll-snap-type: x mandatory;
-      overflow-x:auto;
-      scroll-behavior:smooth;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-    }
-    .review-track::-webkit-scrollbar{ display:none; }
-
-    .review-card{
-      min-width: min(440px, 86vw);
-      scroll-snap-align: start;
-      border-radius: 18px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
-      padding: 16px;
-      position: relative;
-      overflow:hidden;
-    }
-    .review-card .top{
-      display:flex;
-      justify-content: space-between;
-      gap: 12px;
-      align-items:center;
-      color: var(--muted2);
-      font-size: 12px;
-      margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.70);
       white-space: nowrap;
-    }
-    .review-card .text{
-      margin: 0 0 12px;
-      color: rgba(255,255,255,.92);
-      line-height: 1.55;
-      font-size: 14px;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
-    .review-card .stars{
-      color: rgba(255,255,255,.86);
-      letter-spacing: 1px;
-      font-size: 13px;
+      font-weight: 850;
+      font-size: 12px;
     }
 
-    .review-dots{
-      display:flex;
-      justify-content:center;
-      gap:8px;
-      padding: 8px 0 2px;
-    }
-    .review-dot{
-      width:7px; height:7px;
-      border-radius:999px;
-      background: rgba(255,255,255,.18);
-      transition: transform .2s ease, background .2s ease;
-    }
-    .review-dot.is-active{
-      background: rgba(255, 215, 130, .9);
-      transform: scale(1.35);
-    }
+    section{ scroll-margin-top: 82px; }
 
-    /* ========= Scroll reveal (smooth: opacity + transform only) ========= */
-    .reveal{
-      opacity: 0;
-      transform: translateY(16px) scale(.995);
-      transition: opacity .75s ease,
-                  transform .75s cubic-bezier(.2,.8,.2,1);
-      will-change: opacity, transform;
-    }
-    .reveal.is-visible{
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
-    .reveal[data-delay="1"]{ transition-delay: 80ms; }
-    .reveal[data-delay="2"]{ transition-delay: 160ms; }
-    .reveal[data-delay="3"]{ transition-delay: 240ms; }
-
-    /* ========= PERFORMANCE: scroll közben marad az üveg, csak glow/transition pihen ========= */
-    body.is-scrolling .interactive::before{
-      opacity: 0 !important;
-    }
-    body.is-scrolling .interactive{
-      transition: none !important;
-    }
-    body.is-scrolling .glass,
-    body.is-scrolling .review-card{
-      box-shadow: 0 10px 30px rgba(0,0,0,.38) !important;
-    }
-
-    /* scroll közben a topbar blur OFF (simább desktopon is) */
-    body.is-scrolling .topbar{
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
-    }
-
-    @media (prefers-reduced-motion: reduce){
-      html{ scroll-behavior:auto; }
-      .reveal{ opacity:1; transform:none; transition:none; }
-      .review-track{ scroll-behavior:auto; }
-      .rating .star{ transition:none; animation:none !important; }
-      .interactive, .btn{ transition:none; }
-    }
-
-    /* ========= Responsive ========= */
-    @media (max-width: 980px){
-      .hero-grid{ grid-template-columns: 1fr; }
-      .menu-btn{ display:inline-flex; }
-      .nav{ display:none; }
-      .what-grid{ grid-template-columns: 1fr; }
-      .hero-wrap{ margin-left: auto; margin-right: auto; }
-    }
-
-    /* ========= Desktop scroll fix: topbar blur OFF (mobilon marad) ========= */
-    @media (min-width: 980px){
-      .topbar{
-        backdrop-filter: none;
-        -webkit-backdrop-filter: none;
-        background: rgba(8,6,12,.80);
-      }
-      body::before{
-        transform: none;
-        will-change: auto;
-      }
-    }
-
-    /* ========= AFSZ MODAL (only shows on click) ========= */
+    /* Modal */
     .modal-overlay{
-      position: fixed;
-      inset: 0;
-      z-index: 80;
+      position: fixed; inset: 0; z-index: 80;
       background: rgba(0,0,0,.58);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
@@ -664,21 +299,16 @@
       justify-content: center;
       padding: 18px;
     }
-    .modal-overlay.is-open{ display: flex; }
-
+    .modal-overlay.is-open{ display:flex; }
     .modal{
       width: min(980px, 94vw);
-      max-height: min(78vh, 720px);
-      border-radius: var(--radius);
+      max-height: min(82vh, 760px);
+      border-radius: 22px;
       overflow: hidden;
       position: relative;
     }
-
     .modal-header{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 10px;
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
       padding: 14px 16px;
       border-bottom: 1px solid rgba(255,255,255,.08);
       background: rgba(10,8,14,.45);
@@ -703,492 +333,280 @@
     .modal-body{
       padding: 16px;
       overflow: auto;
-      max-height: calc(min(78vh, 720px) - 64px);
+      max-height: calc(min(82vh, 760px) - 64px);
       background: rgba(7,6,11,.38);
     }
+    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
 
-    /* modal typography consistent with site */
-    .modal-body h3{
-      margin: 16px 0 8px;
-      font-size: 16px;
-      font-weight: 900;
-      letter-spacing: .2px;
+    .field{ display:grid; gap:6px; margin: 10px 0; }
+    .field label{ color: rgba(255,255,255,.70); font-size: 12.5px; font-weight: 800; }
+    .field input{
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      padding: 0 12px;
+      outline: none;
     }
-    .modal-body p{
-      margin: 0 0 10px;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 13.5px;
+    .field input:focus{ border-color: rgba(255,79,216,.35); box-shadow: 0 0 0 3px rgba(255,79,216,.12); }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    /* prevent background scroll when modal open */
-    body.modal-lock{
-      overflow: hidden;
-      touch-action: none;
+    /* Debug strip */
+    .debug{
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 90;
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,.85);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+    .debug.is-on{ display:block; }
+
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .interactive, .pill{ transition:none; }
+      .progress > span{ transition:none; }
     }
   </style>
 </head>
 
 <body>
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="container topbar-inner">
-      <a class="brand" href="#top" aria-label="Fitness Lady">
-        <span class="dot"></span>
-        <span>Fitness Lady</span>
+      <a class="brand" id="homeLink" href="#" aria-label="Vissza a főoldalra">
+        <span class="dot"></span><span>Fitness Lady</span>
       </a>
 
-      <nav class="nav" aria-label="Főmenü">
-        <a href="#csomagok">Csomagok</a>
-        <a href="#hogyan">Hogyan működik?</a>
-        <a href="#velemenyek">Vélemények</a>
-        <a href="#faq">AFSZ</a>
+      <nav class="nav" aria-label="Vevő menü">
+        <a href="#program" data-nav>Programom</a>
+        <a href="#etrend" data-nav>Étrend</a>
+        <a href="#checkin" data-nav>Célom & Check-in</a>
+        <a href="#technika" data-nav>Technika</a>
       </nav>
 
       <div style="display:flex; align-items:center; gap:10px;">
-        <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
-
-        <!-- ✅ JAVÍTVA: bejelentkezés oldal -->
-        <a class="cta-pill secondary" href="/hu/login/">Saját oldalam</a>
-
-        <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
+        <button class="menu-btn" id="menuBtn" aria-label="Menü" type="button">☰</button>
+        <button class="pill ghost" id="btnLogout" type="button" title="Kijelentkezés">⎋ Kilépés</button>
       </div>
     </div>
   </header>
 
-  <!-- HERO -->
-  <main id="top" class="hero">
-    <div class="hero-overlay" aria-hidden="true"></div>
-
-    <div class="hero-wrap">
-      <div class="hero-grid">
-        <div class="reveal">
-          <div class="badge">✨ Prémium edzés • nőkre hangolva</div>
-
-          <h1>Női edzésprogramok, <br>amiket tényleg lehet tartani.</h1>
-
-          <p class="lead">
-            Nem sablon. Nem kompromisszum. Női edzésterv formához, erőhöz, jobb közérzethez —
-            neked, az időbeosztásodhoz igazítva.
-          </p>
-
-          <div class="hero-actions">
-            <a class="btn primary interactive" href="#kapcsolat">Ingyenes konzultáció</a>
-            <a class="btn interactive" href="#csomagok">Csomagok</a>
-            <a class="btn ghost interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+  <main>
+    <div class="container page">
+      <section id="top" class="glass interactive card" style="margin-bottom:14px;">
+        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <div class="chip" id="chipPackage">Csomag: —</div>
+            <h2 style="margin-top:10px;" id="titleProgram">Saját programom</h2>
+            <p class="sub" id="subStatus">Betöltés…</p>
           </div>
 
-          <div class="meta-row">
-            <div class="meta-pill">📍 [Város / Terem neve]</div>
-            <div class="meta-pill">⏱️ [Időtartamok]</div>
-            <div class="meta-pill">💬 WhatsApp/Instagram: @fitnesslady</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
           </div>
         </div>
 
-        <div class="hero-stack">
-          <!-- Rólam -->
-          <div class="glass interactive about-card reveal" data-delay="1">
-            <div class="about-head">
-              <div class="about-title">Rólam</div>
-              <div class="tag">Coach</div>
-            </div>
-            <p class="about-text">
-              Rövid bemutatkozó: ki vagy, miben segítesz, mi a módszered (2–3 mondat).
-              Cél: prémium, bizalomkeltő, “kézben van” érzés.
-            </p>
+        <div class="progress-label">
+          <span id="lblWeek">Hét: —</span>
+          <span id="lblDays">Státusz: —</span>
+        </div>
+        <div class="progress" aria-label="Haladás">
+          <span id="barCycle"></span>
+        </div>
+
+        <div class="meta-row">
+          <div class="meta-pill" id="pillGoal">🎯 Cél: —</div>
+          <div class="meta-pill" id="pillIntensity">⚡ Szint: —</div>
+          <div class="meta-pill" id="pillUpdated">✨ Frissítés: —</div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section id="program" class="glass interactive card">
+          <h3 id="hWorkouts">Heti edzések</h3>
+          <p class="sub" id="pWorkouts">Heti bontásban látod az edzéseidet. A személyre szabás slotokat Edina frissíti.</p>
+
+          <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
+
+          <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 0 0 10px;">
+            <button class="pill ghost tiny" id="btnMarkAll" type="button">✅ Heti edzések kipipálása</button>
+            <button class="pill ghost tiny" id="btnResetWeek" type="button">↺ Hét újraindítása</button>
+            <button class="pill ghost tiny" id="btnOpenPlayerHelp" type="button">ℹ️ Lejátszás info</button>
           </div>
 
-          <!-- Mit kapsz pontosan -->
-          <div class="glass interactive what-card reveal" data-delay="2">
-            <div class="about-head">
-              <div class="about-title">Mit kapsz pontosan?</div>
-              <div class="tag">Próba verzió</div>
+          <ul class="list" id="workoutList"></ul>
+
+          <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
+
+          <h3 id="hSlots">Személyre szabás</h3>
+          <p class="sub" id="pSlots">A slotok csak a te programodhoz tartozó videókat mutatják.</p>
+          <ul class="list" id="slotList"></ul>
+        </section>
+
+        <div style="display:grid; gap:14px;">
+          <section id="etrend" class="glass interactive card">
+            <h3>Étrend</h3>
+            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend az adminból állítható lesz (következő lépés).</p>
+
+            <div class="row" style="grid-template-columns: 1fr; gap:8px;">
+              <div>
+                <div class="title">Mai keret</div>
+                <div class="desc">Pipáld ki, ami megvan — ritmus és következetesség.</div>
+              </div>
+              <div style="display:grid; gap:8px;">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                  <button class="pill ghost tiny" data-toggle="diet_water" type="button">💧 2L víz</button>
+                  <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje megvolt</button>
+                  <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
+                  <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
+                </div>
+                <div class="note" id="dietNote">A részletes étrend (napokra bontva) a következő körben jön, adminból szerkeszthetően.</div>
+              </div>
             </div>
 
-            <div class="what-grid">
-              <div class="mini">
-                <b>Edzés</b>
-                <span>Heti terv + progresszió. Rövid, tartható struktúra.</span>
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
+              <button class="pill ghost tiny" id="btnDietPlan" type="button">Napi terv</button>
+              <button class="pill ghost tiny" id="btnDietPrefs" type="button">Preferenciák</button>
+            </div>
+          </section>
+
+          <section id="checkin" class="glass interactive card">
+            <h3>Célom & Check-in</h3>
+            <p class="sub">A check-in státusz elmentődik neked. Később admin is látni fogja.</p>
+
+            <div class="row" style="grid-template-columns: 1fr; gap:10px;">
+              <div>
+                <div class="title" id="goalTitle">🎯 Cél: —</div>
+                <div class="desc" id="goalDesc">—</div>
               </div>
-              <div class="mini">
-                <b>Táplálkozás</b>
-                <span>Egyszerű rendszer a napjaidhoz igazítva.</span>
-              </div>
-              <div class="mini">
-                <b>Kapcsolat</b>
-                <span>Visszajelzés, finomhangolás, támogatás.</span>
-              </div>
-              <div class="mini">
-                <b>Fókusz</b>
-                <span>Formásodás • erő • közérzet — célhoz igazítva.</span>
+
+              <div style="display:grid; gap:8px;">
+                <div class="progress-label" style="margin:0;">
+                  <span>Heti check-in</span>
+                  <span id="checkinLabel">0/1</span>
+                </div>
+                <div class="progress"><span id="barCheckin"></span></div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
+                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kész</button>
+                  <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
+                </div>
+
+                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
               </div>
             </div>
-          </div>
+          </section>
         </div>
       </div>
+
+      <section id="technika" class="glass interactive card" style="margin-top:14px;">
+        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
+          <div>
+            <h3>Technika Vault</h3>
+            <p class="sub">Technika videók kategóriákban. (Sablonból jön, admin kezeli.)</p>
+          </div>
+          <button class="pill ghost tiny" id="btnAddTechDone" type="button">✅ Technikák kipipálása</button>
+        </div>
+
+        <div class="tabs" id="techTabs" aria-label="Technika kategóriák"></div>
+        <ul class="list" id="techList"></ul>
+      </section>
     </div>
   </main>
 
-  <!-- CSOMAGOK -->
-  <section id="csomagok" class="section">
-    <div class="container">
-      <div class="section-title reveal">Csomagok</div>
-      <p class="section-sub reveal" data-delay="1">
-        Válassz a célod és időbeosztásod alapján. Prémium érzet, tiszta struktúra, stabil rendszer.
-      </p>
-
-      <div class="packages">
-        <!-- Start -->
-        <article class="glass interactive pkg reveal" data-delay="1">
-          <div class="pkg-top">
-            <h3>Start</h3>
-            <span class="tag">Ajánlott: 4 hét</span>
-          </div>
-          <p>Ha kell egy tiszta terv és lendület.</p>
-          <ul class="list">
-            <li><span class="check"></span> Személyre szabott edzésterv</li>
-            <li><span class="check"></span> Alap táplálkozási keretrendszer</li>
-            <li><span class="check"></span> 1× kontroll / módosítás</li>
-          </ul>
-          <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
-            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
-          </div>
-        </article>
-
-        <!-- Balance -->
-        <article class="glass interactive pkg reveal" data-delay="2" style="border-color: rgba(255,79,216,.22);">
-          <div class="pkg-top">
-            <h3>Balance</h3>
-            <span class="tag" style="color:#1b0717;background:linear-gradient(135deg,#ffd8a8,#ff88e6);border-color:rgba(255,255,255,.25);">Legnépszerűbb</span>
-          </div>
-          <p>Formálódás + erő, folyamatos visszajelzéssel.</p>
-          <ul class="list">
-            <li><span class="check"></span> Edzés + táplálkozás rendszer</li>
-            <li><span class="check"></span> Heti követés / finomhangolás</li>
-            <li><span class="check"></span> Szokások + napi mini célok</li>
-          </ul>
-          <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
-            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
-          </div>
-        </article>
-
-        <!-- Pro -->
-        <article class="glass interactive pkg reveal" data-delay="3">
-          <div class="pkg-top">
-            <h3>Pro</h3>
-            <span class="tag">Ajánlott: 6–8 hét</span>
-          </div>
-          <p>Maximális támogatás, nem túlerőltetés.</p>
-          <ul class="list">
-            <li><span class="check"></span> Teljes személyre szabás</li>
-            <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
-            <li><span class="check"></span> Teljesítmény + forma fókusz</li>
-          </ul>
-          <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="#" onclick="alert('Vásárlás linket később tesszük be (Stripe/Payrexx).'); return false;">Vásárlás</a>
-            <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
-          </div>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- HOGYAN MŰKÖDIK -->
-  <section id="hogyan" class="section">
-    <div class="container">
-      <div class="section-title reveal">Hogyan működik?</div>
-      <p class="section-sub reveal" data-delay="1">Egyszerű, követhető rendszer — a való élethez igazítva.</p>
-
-      <div class="packages" style="grid-template-columns: 1fr 1fr;">
-        <article class="glass interactive pkg reveal" data-delay="1">
-          <div class="pkg-top">
-            <h3>Edzés</h3>
-            <span class="tag">Struktúra</span>
-          </div>
-          <ul class="list">
-            <li><span class="check"></span> Gyakorlatok leírással</li>
-            <li><span class="check"></span> Progresszió — mikor lépsz tovább</li>
-            <li><span class="check"></span> Ajánlott ütemezés</li>
-            <li><span class="check"></span> Fenntartható terhelés</li>
-          </ul>
-        </article>
-
-        <article class="glass interactive pkg reveal" data-delay="2">
-          <div class="pkg-top">
-            <h3>Táplálkozás</h3>
-            <span class="tag">Tartható</span>
-          </div>
-          <ul class="list">
-            <li><span class="check"></span> Egyszerű, tartható rend</li>
-            <li><span class="check"></span> A napirendedhez igazítva</li>
-            <li><span class="check"></span> Rendszeres finomhangolás</li>
-            <li><span class="check"></span> Stabil energiák</li>
-          </ul>
-        </article>
-      </div>
-    </div>
-  </section>
-
-  <!-- VÉLEMÉNYEK -->
-  <section id="velemenyek" class="section">
-    <div class="container">
-      <div class="reviews-head reveal">
-        <div>
-          <div class="section-title" style="margin-bottom:6px;">Vélemények</div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
-            <div class="rating" id="avgRating" title="Kattints az animációhoz" aria-label="Átlag értékelés">
-              <span class="star" style="--i:1">★</span>
-              <span class="star" style="--i:2">★</span>
-              <span class="star" style="--i:3">★</span>
-              <span class="star" style="--i:4">★</span>
-              <span class="star" style="--i:5">★</span>
-              <span class="rating-text" id="avgText">—</span>
-            </div>
-            <span style="color:var(--muted2); font-size:13px;" id="reviewsMeta">Betöltés…</span>
-          </div>
-        </div>
-
-        <div class="reviews-actions">
-          <a class="btn primary interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
-          <button class="btn interactive" id="refreshBtn" type="button">Frissítés</button>
-        </div>
-      </div>
-
-      <div class="glass interactive review-carousel reveal" data-delay="1" id="reviewCarousel">
-        <div class="review-track" id="reviewTrack" aria-label="Vélemények carousel">
-          <article class="review-card">
-            <div class="top">
-              <span>Betöltés…</span>
-              <span> </span>
-            </div>
-            <p class="text">A vélemények hamarosan megjelennek.</p>
-            <div class="stars">★★★★★</div>
-          </article>
-        </div>
-        <div class="review-dots" id="reviewDots" aria-hidden="true"></div>
-      </div>
-    </div>
-  </section>
-
-  <!-- FAQ / AFSZ -->
-  <section id="faq" class="section">
-    <div class="container">
-      <div class="section-title reveal">AFSZ</div>
-      <p class="section-sub reveal" data-delay="1">
-        Az Általános Szerződési Feltételek kattintásra nyílnak meg egy prémium modalban (nem fixen az oldalon).
-      </p>
-
-      <div class="glass interactive pkg reveal" data-delay="2">
-        <div class="pkg-top">
-          <h3>Általános Szerződési Feltételek</h3>
-          <span class="tag">Modal</span>
-        </div>
-        <p>
-          A részletek megtekintéséhez kattints az alábbi gombra.
-        </p>
-        <div class="pkg-actions" style="grid-template-columns: 1fr;">
-          <button class="btn primary interactive" id="openAfszBtn" type="button" aria-haspopup="dialog" aria-controls="afszModalOverlay">
-            ÁFSZ megnyitása
-          </button>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- KAPCSOLAT -->
-  <section id="kapcsolat" class="section">
-    <div class="container">
-      <div class="section-title reveal">Kapcsolat</div>
-      <p class="section-sub reveal" data-delay="1">Ingyenes konzultációhoz írj WhatsAppon vagy Instagramon.</p>
-
-      <div class="glass interactive pkg reveal" data-delay="2" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn interactive" href="#" onclick="alert('Itt majd WhatsApp link lesz'); return false;">WhatsApp</a>
-          <a class="btn interactive" href="#" onclick="alert('Itt majd Instagram link lesz'); return false;">Instagram</a>
-        </div>
-        <div style="color:var(--muted); font-size:13px;">
-          📍 [Város / Terem neve] • ⏱️ [Időtartamok] • @fitnesslady
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- AFSZ MODAL (hidden until click) -->
-  <div class="modal-overlay" id="afszModalOverlay" role="dialog" aria-modal="true" aria-labelledby="afszModalTitle" aria-hidden="true">
-    <div class="glass modal" role="document">
-      <div class="modal-header">
-        <h2 class="modal-title" id="afszModalTitle">Általános Szerződési Feltételek (ÁFSZ)</h2>
-        <button class="modal-close interactive" id="closeAfszBtn" type="button" aria-label="Bezárás">✕</button>
-      </div>
-
-      <div class="modal-body" id="afszModalBody">
-        <p><b>Hatályos:</b> 2026-02-10</p>
-        <p><b>Weboldal / Márka:</b> FitnessLady</p>
-        <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady)</p>
-        <p><b>Székhely:</b> 3930 Visp, Mondstrasse 6, Svájc</p>
-        <p><b>E-mail:</b> fitnesslady92@gmail.com</p>
-        <p><b>Deviza:</b> HUF és CHF</p>
-        <p><b>Fizetési módok:</b> nemzetközi utalás, TWINT, Payrexx</p>
-
-        <h3>1. Fogalmak</h3>
-        <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady), aki a szolgáltatást nyújtja.<br>
-           <b>Felhasználó / Vásárló:</b> aki a weboldalon szolgáltatást igénybe vesz vagy vásárol.<br>
-           <b>Szolgáltatás:</b> online edzésanyagok, programok, csomagok, digitális tartalmak a weboldalon leírtak szerint.<br>
-           <b>Digitális tartalom:</b> online elérhető vagy letölthető anyag (pl. videó, program, útmutató).</p>
-
-        <h3>2. A szolgáltatás leírása</h3>
-        <ul class="list">
-          <li><span class="check"></span> A csomagok tartalmát és időtartamát a csomagleírás tartalmazza.</li>
-          <li><span class="check"></span> A szolgáltatás online formában érhető el, hozzáférést vásárlás után biztosítunk.</li>
-          <li><span class="check"></span> A tartalmak frissíthetők, a megvásárolt csomag lényegi értékének csorbítása nélkül.</li>
-        </ul>
-
-        <h3>3. Megrendelés és szerződéskötés</h3>
-        <ul class="list">
-          <li><span class="check"></span> Vásárlás: csomag kiválasztása + fizetés.</li>
-          <li><span class="check"></span> Szerződés: sikeres fizetéssel és/vagy visszaigazolással jön létre.</li>
-          <li><span class="check"></span> Valós adatok megadása kötelező.</li>
-        </ul>
-
-        <h3>4. Díjazás és fizetés</h3>
-        <ul class="list">
-          <li><span class="check"></span> Deviza: HUF és CHF.</li>
-          <li><span class="check"></span> Fizetés: nemzetközi utalás, TWINT, Payrexx.</li>
-          <li><span class="check"></span> Sikeres fizetés után hozzáférést biztosítunk.</li>
-        </ul>
-
-        <h3>5. Hozzáférés, technikai feltételek</h3>
-        <ul class="list">
-          <li><span class="check"></span> Internet és kompatibilis eszköz szükséges.</li>
-          <li><span class="check"></span> Átmeneti kiesés előfordulhat (karbantartás/külső hiba).</li>
-          <li><span class="check"></span> Hozzáférési adatok védelme a vásárló felelőssége.</li>
-        </ul>
-
-        <h3>6. Lemondás, elállás, visszatérítés</h3>
-        <ul class="list">
-          <li><span class="check"></span> Digitális tartalomnál a hozzáférés megkezdése után a visszatérítés korlátozott lehet.</li>
-          <li><span class="check"></span> Megkezdés előtt, hozzáférés-átadás nélkül: egyedi elbírálás.</li>
-          <li><span class="check"></span> Tartós elérhetetlenségnél arányos jóváírás/visszatérítés lehetséges.</li>
-          <li><span class="check"></span> Igény: írásban, rendelés azonosítóval.</li>
-        </ul>
-
-        <h3>7. Felelősségkizárás és egészségügyi nyilatkozat</h3>
-        <ul class="list">
-          <li><span class="check"></span> A programok információs célúak, használat saját felelősségre történik.</li>
-          <li><span class="check"></span> Egészségi alkalmasság esetén végezhető, szükség esetén orvosi egyeztetéssel.</li>
-          <li><span class="check"></span> Nem rendeltetésszerű használatból eredő károkért felelősség nem vállalható.</li>
-        </ul>
-
-        <h3>8. Szerzői jog, felhasználási feltételek</h3>
-        <ul class="list">
-          <li><span class="check"></span> Anyagok a Szolgáltató szellemi tulajdonát képezik.</li>
-          <li><span class="check"></span> Másolás/megosztás/továbbértékesítés engedély nélkül tilos.</li>
-          <li><span class="check"></span> Jogosulatlan megosztás esetén hozzáférés megszüntethető.</li>
-        </ul>
-
-        <h3>9. Adatkezelés (rövid)</h3>
-        <ul class="list">
-          <li><span class="check"></span> A megrendelés teljesítéséhez szükséges adatokat kezeljük.</li>
-          <li><span class="check"></span> Részletek az adatkezelési tájékoztatóban (amennyiben elérhető).</li>
-        </ul>
-
-        <h3>10. Panaszkezelés, vitarendezés</h3>
-        <ul class="list">
-          <li><span class="check"></span> Panasz: fitnesslady92@gmail.com</li>
-          <li><span class="check"></span> Irányadó jog: svájci jog. Illetékesség: Svájc, Valais/VS (Visp).</li>
-        </ul>
-
-        <h3>11. Záró rendelkezések</h3>
-        <ul class="list">
-          <li><span class="check"></span> Az ÁFSZ módosítható, közzététellel hatályos.</li>
-          <li><span class="check"></span> A már megvásárolt szolgáltatásokra a vásárláskor hatályos ÁFSZ irányadó (kivéve jogszabály).</li>
-        </ul>
-
-        <p style="margin-top:14px; color:var(--muted2); font-size:12.8px;">
-          Tüske web design
-        </p>
-      </div>
-    </div>
-  </div>
-
-  <footer style="padding: 18px 0 60px; border-top:1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.55); backdrop-filter: blur(10px);">
-    <div class="container" style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:rgba(255,255,255,.70); font-size:13px;">
+  <footer>
+    <div class="container footer-inner">
       <div>© <span id="y"></span> Fitness Lady</div>
       <div>Tüske web design</div>
     </div>
   </footer>
 
-  <script>
-    document.getElementById("y").textContent = new Date().getFullYear();
+  <!-- SETTINGS MODAL -->
+  <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="settingsTitle">Beállítások</h2>
+        <button class="modal-close interactive" id="settingsClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body">
+        <p class="note">Itt csak a saját cél/szint/nyelv módosítható. Csomagot és személyre szabást admin állít.</p>
 
-    /* ===== Scroll performance: glow/hover anim OFF scroll közben (AZ ÜVEG MARAD) =====
-       + Desktop boost: wheel listener is.
-    */
-    (() => {
-      let t = null;
-      const mark = () => {
-        if(!document.body.classList.contains('is-scrolling')) {
-          document.body.classList.add('is-scrolling');
-        }
-        window.clearTimeout(t);
-        t = window.setTimeout(() => {
-          document.body.classList.remove('is-scrolling');
-        }, 180);
-      };
-      window.addEventListener('scroll', mark, { passive: true });
-      window.addEventListener('wheel', mark, { passive: true }); // ✅ desktop simítás
-    })();
+        <div class="field">
+          <label for="setGoal">Cél</label>
+          <input id="setGoal" type="text" placeholder="pl. formálás / fogyás / erő" />
+        </div>
 
-    /* ========= Mobile menu ========= */
-    const menuBtn = document.getElementById("menuBtn");
-    let open = false;
+        <div class="field">
+          <label for="setLevel">Szint (1–4)</label>
+          <input id="setLevel" type="number" min="1" max="4" />
+        </div>
 
-    menuBtn?.addEventListener("click", () => {
-      open = !open;
-      if(open){
-        const nav = document.createElement("div");
-        nav.id = "mobileNav";
-        nav.style.position = "fixed";
-        nav.style.top = "64px";
-        nav.style.left = "14px";
-        nav.style.right = "14px";
-        nav.style.zIndex = "60";
-        nav.style.background = "rgba(20,12,26,.72)";
-        nav.style.border = "1px solid rgba(255,255,255,.10)";
-        nav.style.borderRadius = "18px";
-        nav.style.backdropFilter = "blur(14px)";
-        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-        nav.style.padding = "12px";
-        nav.innerHTML = `
-          <!-- ✅ JAVÍTVA: bejelentkezés oldal -->
-          <a href="/hu/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Saját oldalam</a>
-          <a href="#csomagok" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Csomagok</a>
-          <a href="#hogyan" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Hogyan működik?</a>
-          <a href="#velemenyek" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Vélemények</a>
-          <a href="#faq" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">AFSZ</a>
-          <a href="#kapcsolat" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Kapcsolat</a>
-        `;
-        document.body.appendChild(nav);
-      } else {
-        document.getElementById("mobileNav")?.remove();
-      }
-    });
+        <div class="field">
+          <label for="setLang">Nyelv (hu / de)</label>
+          <input id="setLang" type="text" placeholder="hu" />
+        </div>
 
-    document.addEventListener("click", (e) => {
-      const nav = document.getElementById("mobileNav");
-      if(!nav) return;
-      if(e.target === menuBtn) return;
-      if(nav.contains(e.target)) {
-        nav.remove();
-        open = false;
-      }
-    });
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="pill primary" id="btnSaveSettings" type="button">Mentés</button>
+        </div>
 
-    /* ========= Touch “active” glow ========= */
+        <p class="note" style="margin-top:10px;">
+          Ha admin vagy és mégis mindent állítani akarsz: az admin oldalon csinálod.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- INFO MODAL -->
+  <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
+    <div class="glass modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="infoTitle">Info</h2>
+        <button class="modal-close interactive" id="infoClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body" id="infoBody"></div>
+    </div>
+  </div>
+
+  <div class="debug" id="debugBox">debug</div>
+
+  <script type="module">
+    import {
+      BASE_PREFIX, auth, db, fs,
+      onAuth, logout, toLogin,
+      escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
+    } from "../shared/firebase.js";
+
+    // ========== HERO + home link ==========
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+    const homeLink = document.getElementById("homeLink");
+    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+
+    // ========== UI helpers ==========
+    const $ = (sel, root=document) => root.querySelector(sel);
+    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
     function enableTapGlow(selector=".interactive"){
-      document.querySelectorAll(selector).forEach(el=>{
+      $$(selector).forEach(el=>{
         el.addEventListener("touchstart", ()=>{
           el.classList.add("is-active");
           window.clearTimeout(el.__t);
@@ -1198,340 +616,567 @@
     }
     enableTapGlow();
 
-    /* ========= Scroll reveal ========= */
-    (() => {
-      const els = document.querySelectorAll('.reveal');
-      if(!els.length) return;
-      const io = new IntersectionObserver((entries)=>{
-        entries.forEach(e=>{
-          if(e.isIntersecting){
-            e.target.classList.add('is-visible');
-            io.unobserve(e.target);
-          }
+    // Debug toggle: add ?debug=1
+    const debugOn = new URLSearchParams(location.search).get("debug") === "1";
+    const debugBox = $("#debugBox");
+    if(debugOn) debugBox.classList.add("is-on");
+    const debug = (msg) => {
+      if(!debugOn) return;
+      debugBox.textContent = msg;
+      console.log("[APP]", msg);
+    };
+
+    // Modals
+    const settingsOverlay = $("#settingsOverlay");
+    const infoOverlay = $("#infoOverlay");
+    const infoBody = $("#infoBody");
+    const infoTitle = $("#infoTitle");
+
+    function openOverlay(overlay){
+      overlay.classList.add("is-open");
+      overlay.setAttribute("aria-hidden","false");
+    }
+    function closeOverlay(overlay){
+      overlay.classList.remove("is-open");
+      overlay.setAttribute("aria-hidden","true");
+    }
+    function openInfo(title, html){
+      infoTitle.textContent = title;
+      infoBody.innerHTML = html;
+      openOverlay(infoOverlay);
+    }
+
+    $("#settingsClose").addEventListener("click", ()=>closeOverlay(settingsOverlay));
+    $("#infoClose").addEventListener("click", ()=>closeOverlay(infoOverlay));
+    settingsOverlay.addEventListener("click",(e)=>{ if(e.target===settingsOverlay) closeOverlay(settingsOverlay); });
+    infoOverlay.addEventListener("click",(e)=>{ if(e.target===infoOverlay) closeOverlay(infoOverlay); });
+    document.addEventListener("keydown",(e)=>{
+      if(e.key==="Escape"){
+        [settingsOverlay, infoOverlay].forEach(ov=>{
+          if(ov.classList.contains("is-open")) closeOverlay(ov);
         });
-      }, { threshold: 0.12, rootMargin: "0px 0px -10% 0px" });
-      els.forEach(el=>io.observe(el));
-    })();
+      }
+    });
 
-    /* ========= Active nav underline based on scroll ========= */
-    (() => {
-      const links = Array.from(document.querySelectorAll('.nav a'))
-        .filter(a=>a.getAttribute('href')?.startsWith('#'));
-      const sections = links
-        .map(a => document.querySelector(a.getAttribute('href')))
-        .filter(Boolean);
+    // Mobile menu
+    const menuBtn = $("#menuBtn");
+    let menuOpen = false;
+    function closeMobileNav(){ $("#mobileNav")?.remove(); menuOpen = false; }
+    menuBtn?.addEventListener("click", ()=>{
+      if(menuOpen){ closeMobileNav(); return; }
+      closeMobileNav();
+      menuOpen = true;
+      const nav = document.createElement("div");
+      nav.id = "mobileNav";
+      nav.style.position = "fixed";
+      nav.style.top = "64px";
+      nav.style.left = "14px";
+      nav.style.right = "14px";
+      nav.style.zIndex = "60";
+      nav.style.background = "rgba(20,12,26,.72)";
+      nav.style.border = "1px solid rgba(255,255,255,.10)";
+      nav.style.borderRadius = "18px";
+      nav.style.backdropFilter = "blur(14px)";
+      nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
+      nav.style.padding = "12px";
+      nav.innerHTML = `
+        <a href="#program" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Programom</a>
+        <a href="#etrend" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Étrend</a>
+        <a href="#checkin" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Célom & Check-in</a>
+        <a href="#technika" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Technika</a>
+      `;
+      document.body.appendChild(nav);
+    });
+    document.addEventListener("click",(e)=>{
+      const nav = $("#mobileNav");
+      if(!nav) return;
+      if(e.target === menuBtn) return;
+      if(nav.contains(e.target)) { closeMobileNav(); return; }
+      closeMobileNav();
+    });
 
-      if(!sections.length) return;
-
-      const setActive = (id) => {
-        links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
-      };
-
+    // Active nav underline
+    (()=> {
+      const links = $$('[data-nav]');
+      const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
+      const setActive = (id) => links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
       const io = new IntersectionObserver((entries)=>{
         const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
         if(visible?.target?.id) setActive(visible.target.id);
-      }, { threshold: [0.2, 0.35, 0.5] });
-
+      }, { threshold: [0.18, 0.28, 0.4] });
       sections.forEach(s=>io.observe(s));
     })();
 
-    /* ========= Rating animation (tap/click) ========= */
-    (() => {
-      const r = document.getElementById('avgRating');
-      if(!r) return;
-      const kick = () => {
-        r.classList.remove('is-anim');
-        void r.offsetWidth;
-        r.classList.add('is-anim');
-      };
-      r.addEventListener('click', kick);
-      r.addEventListener('touchstart', kick, {passive:true});
-    })();
+    // ========== user-scoped localStorage (done/diet/checkin) ==========
+    const k = (uid, key) => `fl_${uid}_${key}_v1`;
+    const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
+    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
-    /* ========= AFSZ MODAL LOGIC ========= */
-    (() => {
-      const openBtn = document.getElementById('openAfszBtn');
-      const overlay = document.getElementById('afszModalOverlay');
-      const closeBtn = document.getElementById('closeAfszBtn');
-      let lastFocus = null;
-
-      if(!openBtn || !overlay || !closeBtn) return;
-
-      const openModal = () => {
-        lastFocus = document.activeElement;
-        overlay.classList.add('is-open');
-        overlay.setAttribute('aria-hidden', 'false');
-        document.body.classList.add('modal-lock');
-        closeBtn.focus({ preventScroll: true });
-      };
-
-      const closeModal = () => {
-        overlay.classList.remove('is-open');
-        overlay.setAttribute('aria-hidden', 'true');
-        document.body.classList.remove('modal-lock');
-        if(lastFocus && typeof lastFocus.focus === 'function') lastFocus.focus({ preventScroll: true });
-      };
-
-      openBtn.addEventListener('click', openModal);
-      closeBtn.addEventListener('click', closeModal);
-
-      overlay.addEventListener('click', (e) => {
-        if(e.target === overlay) closeModal();
-      });
-
-      document.addEventListener('keydown', (e) => {
-        if(overlay.classList.contains('is-open') && e.key === 'Escape') closeModal();
-      });
-    })();
-
-    /* ========= Reviews: load from Google Sheets CSV + auto-slide carousel ========= */
-    const SHEET_CSV_URL =
-      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSlH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDu0l1I4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
-
-    const reviewTrack = document.getElementById('reviewTrack');
-    const reviewDots  = document.getElementById('reviewDots');
-    const refreshBtn  = document.getElementById('refreshBtn');
-    const avgText     = document.getElementById('avgText');
-    const reviewsMeta = document.getElementById('reviewsMeta');
-
-    function escapeHtml(s) {
-      return String(s ?? "")
-        .replaceAll("&","&amp;")
-        .replaceAll("<","&lt;")
-        .replaceAll(">","&gt;")
-        .replaceAll('"',"&quot;")
-        .replaceAll("'","&#039;");
-    }
-    function normalize(s){ return String(s ?? "").trim().toLowerCase(); }
-
-    function parseCSV(text){
-      const rows = [];
-      let row = [];
-      let cur = "";
-      let inQuotes = false;
-
-      for(let i=0;i<text.length;i++){
-        const c = text[i];
-        const n = text[i+1];
-
-        if(c === '"' && inQuotes && n === '"'){ cur += '"'; i++; continue; }
-        if(c === '"'){ inQuotes = !inQuotes; continue; }
-
-        if(c === ',' && !inQuotes){ row.push(cur); cur=""; continue; }
-        if((c === '\n' || c === '\r') && !inQuotes){
-          if(c === '\r' && n === '\n') i++;
-          row.push(cur);
-          rows.push(row);
-          row = [];
-          cur = "";
-          continue;
-        }
-        cur += c;
+    // ========== Firestore loaders ==========
+    async function loadUserProfile(uid){
+      const ref = fs.doc(db, "users", uid);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        const initial = {
+          email: auth.currentUser?.email || "",
+          displayName: "",
+          lang: "hu",
+          role: "user",
+          status: "active",
+          planId: "start_v1",
+          goal: "Formálás",
+          level: 2,
+          lifetimeAccess: true,
+          cycleStart: null,
+          cycleEnd: null,
+          createdAt: fs.serverTimestamp(),
+          updatedAt: fs.serverTimestamp()
+        };
+        await fs.setDoc(ref, initial, { merge: true });
+        return initial;
       }
-      if(cur.length || row.length){ row.push(cur); rows.push(row); }
-      return rows;
+      return snap.data();
     }
 
-    function findHeaderIndex(headers, predicate){
-      for(let i=0;i<headers.length;i++){
-        if(predicate(normalize(headers[i]))) return i;
+    async function loadPlanMeta(planId){
+      const ref = fs.doc(db, "planTemplates", planId);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        throw new Error(`Nincs ilyen planTemplates/${planId}. Hozd létre adminban vagy Firestore-ban!`);
       }
-      return -1;
+      return snap.data();
     }
 
-    function stars(n){
-      const num = Number(n);
-      if(!Number.isFinite(num)) return "★★★★★";
-      const r = Math.max(1, Math.min(5, Math.round(num)));
-      return "★★★★★".slice(0, r) + "☆☆☆☆☆".slice(0, 5-r);
+    async function loadPlanWeek(planId, weekNo){
+      const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        throw new Error(`Hiányzik: planTemplates/${planId}/weeks/${weekNo}`);
+      }
+      return snap.data();
     }
 
-    let carouselController = null;
-
-    function destroyCarousel(){
-      if(carouselController?.destroy) carouselController.destroy();
-      carouselController = null;
-      reviewDots.innerHTML = "";
+    /**
+     * ✅ FIX: overrides hetente DOCUMENT legyen:
+     * users/{uid}/overrides/{weekNo}
+     * pl: users/jPYo.../overrides/1
+     */
+    async function loadOverridesWeek(uid, weekNo){
+      const ref = fs.doc(db, "users", uid, "overrides", String(weekNo));
+      const snap = await fs.getDoc(ref);
+      return snap.exists() ? snap.data() : null;
     }
 
-    function initCarousel(){
-      const cards = Array.from(reviewTrack.querySelectorAll('.review-card'));
-      reviewDots.innerHTML = "";
-      if(!cards.length) return;
+    // Merge helpers (HU/DE mezők)
+    function pickLang(obj, lang, fallback="—"){
+      if(!obj) return fallback;
+      if(typeof obj === "string") return obj;
+      if(obj[lang]) return obj[lang];
+      if(obj["hu"]) return obj["hu"];
+      if(obj["de"]) return obj["de"];
+      return fallback;
+    }
 
-      const dots = cards.map((_, i) => {
-        const d = document.createElement('div');
-        d.className = 'review-dot';
-        d.addEventListener('click', () => scrollToIndex(i));
-        reviewDots.appendChild(d);
-        return d;
-      });
+    function mergeWorkout(templateW, ovW, lang){
+      const w = { ...templateW };
+      if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
 
-      let idx = 0;
-      let timer = null;
-      let paused = false;
-      let scrollTick = null;
+      const tTitle = pickLang(templateW.title, lang, "");
+      const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
+      w._title = oTitle || tTitle || "—";
 
-      function updateDots(){
-        dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+      const tDesc = pickLang(templateW.desc, lang, "");
+      const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
+      w._desc = oDesc || tDesc || "";
+
+      return w;
+    }
+
+    function mergeSlot(templateS, ovS, lang){
+      const s = { ...templateS };
+      s.vimeoId = (ovS?.vimeoId) ? ovS.vimeoId : (templateS.defaultVimeoId || "");
+      const tTitle = pickLang(templateS.title, lang, "");
+      s._title = tTitle || "—";
+      const tDesc = pickLang(templateS.desc, lang, "");
+      s._desc = tDesc || "";
+      const tNote = pickLang(templateS.defaultNote, lang, "—");
+      const oNote = ovS?.note ? pickLang(ovS.note, lang, "") : "";
+      s._note = oNote || tNote || "—";
+      return s;
+    }
+
+    // ========== App state ==========
+    let UID = null;
+    let profile = null;
+    let planMeta = null;
+
+    const weekCache = new Map(); // weekNo -> { templateWeek, overridesWeek, merged }
+
+    const state = {
+      weekIdx: 0,
+      techCat: null,
+      done: {},
+      diet: {},
+      checkin: null,
+      lang: "hu"
+    };
+
+    function calcWeekIndex(p){
+      if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
+
+      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
+      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+      const weeks = planMeta?.weeks ?? 4;
+      const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
+      return week - 1;
+    }
+
+    function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
+
+    // ========== Render header ==========
+    function renderHeader(){
+      const p = profile;
+      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
+      $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
+      $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
+      $("#pillUpdated").textContent = `✨ Frissítés: —`;
+
+      if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
+        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta.weeks || 4}`;
+        $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
+        $("#barCycle").style.width = `100%`;
+        $("#subStatus").textContent = `Üdv, ${p.email || "!"} • A programod aktív. A heti edzéseket a füleken választod.`;
+      }else{
+        const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
+        const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+        const leftDays = clamp(totalDays - passedDays, 0, totalDays);
+        const week = clamp(Math.floor((passedDays / totalDays) * (planMeta.weeks||4)) + 1, 1, (planMeta.weeks||4));
+
+        $("#lblWeek").textContent = `Hét: ${week}/${planMeta.weeks||4}`;
+        $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
+        const pct = Math.round((passedDays / totalDays) * 100);
+        $("#barCycle").style.width = `${pct}%`;
+        $("#subStatus").textContent = `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)}`;
       }
 
-      function scrollToIndex(i){
-        idx = (i + cards.length) % cards.length;
-        reviewTrack.scrollTo({
-          left: cards[idx].offsetLeft - reviewTrack.offsetLeft,
-          behavior: 'smooth'
+      $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
+      $("#goalDesc").textContent = p.goal
+        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket.`
+        : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`;
+
+      const done = state.checkin?.done ? 1 : 0;
+      $("#checkinLabel").textContent = `${done}/1`;
+      $("#barCheckin").style.width = `${done*100}%`;
+    }
+
+    // ========== Week tabs ==========
+    function renderWeekTabs(){
+      const weeks = planMeta.weeks || 4;
+      const tabs = $("#weekTabs");
+      tabs.innerHTML = "";
+      for(let i=0;i<weeks;i++){
+        const b = document.createElement("button");
+        b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
+        b.type = "button";
+        b.textContent = `Hét ${i+1}`;
+        b.addEventListener("click", async ()=>{
+          state.weekIdx = i;
+          await ensureWeekLoaded(i+1);
+          renderProgram();
+          renderHeader();
         });
-        updateDots();
+        tabs.appendChild(b);
       }
-
-      reviewTrack.addEventListener('scroll', () => {
-        clearTimeout(scrollTick);
-        scrollTick = setTimeout(() => {
-          const center = reviewTrack.scrollLeft + reviewTrack.clientWidth * 0.2;
-          let nearest = 0, best = Infinity;
-          cards.forEach((c,i)=>{
-            const dist = Math.abs((c.offsetLeft - reviewTrack.offsetLeft) - center);
-            if(dist < best){ best = dist; nearest = i; }
-          });
-          idx = nearest;
-          updateDots();
-        }, 80);
-      }, {passive:true});
-
-      function start(){
-        if(timer) clearInterval(timer);
-        timer = setInterval(()=>{
-          if(paused) return;
-          scrollToIndex(idx + 1);
-        }, 7000);
-      }
-
-      const carousel = document.getElementById('reviewCarousel');
-      carousel.addEventListener('mouseenter', ()=>paused=true);
-      carousel.addEventListener('mouseleave', ()=>paused=false);
-      carousel.addEventListener('touchstart', ()=>paused=true, {passive:true});
-      carousel.addEventListener('touchend', ()=>paused=false, {passive:true});
-
-      updateDots();
-      start();
-
-      carouselController = {
-        destroy(){
-          if(timer) clearInterval(timer);
-          timer = null;
-        }
-      };
     }
 
-    function renderReviews(items){
-      destroyCarousel();
-      reviewTrack.innerHTML = "";
+    // ========== Load & merge week ==========
+    async function ensureWeekLoaded(weekNo){
+      if(weekCache.has(weekNo)) return weekCache.get(weekNo);
 
-      if(!items.length){
-        reviewTrack.innerHTML = `
-          <article class="review-card">
-            <div class="top"><span>Hamarosan</span><span></span></div>
-            <p class="text">Még nincs jóváhagyott vélemény.</p>
-            <div class="stars">★★★★★</div>
-          </article>
-        `;
-        initCarousel();
+      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      const overridesWeek = await loadOverridesWeek(UID, weekNo);
+
+      const ovWorkouts = overridesWeek?.workouts || {};
+      const ovSlots = overridesWeek?.slots || {};
+
+      const merged = {
+        weekNo,
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+      };
+
+      const pack = { templateWeek, overridesWeek, merged };
+      weekCache.set(weekNo, pack);
+      return pack;
+    }
+
+    // ========== Render Program ==========
+    function renderProgram(){
+      renderWeekTabs();
+
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack){
+        $("#workoutList").innerHTML = `<li class="row"><div><div class="title">Betöltés…</div><div class="desc">Kérlek várj.</div></div></li>`;
+        $("#slotList").innerHTML = "";
         return;
       }
 
-      for(const it of items){
-        const date = it.date ? escapeHtml(it.date) : "";
-        reviewTrack.insertAdjacentHTML('beforeend', `
-          <article class="review-card interactive">
-            <div class="top">
-              <span>${escapeHtml(it.name)}</span>
-              <span>${date}</span>
-            </div>
-            <p class="text">${escapeHtml(it.text)}</p>
-            <div class="stars">${escapeHtml(it.stars)}</div>
-          </article>
-        `);
-      }
+      const { merged } = pack;
 
-      enableTapGlow('.review-card.interactive');
-      initCarousel();
+      const ul = $("#workoutList");
+      ul.innerHTML = "";
+      merged.workouts.forEach(w=>{
+        const key = workoutKey(weekNo, w.id);
+        const done = !!state.done[key];
+
+        const li = document.createElement("li");
+        li.className = "row";
+        li.innerHTML = `
+          <div>
+            <div class="title">${escapeHtml(w._title)} ${done ? ' <span class="chip" style="margin-left:6px;">✅ kész</span>' : ''}</div>
+            <div class="desc">${escapeHtml(w._desc || "")}</div>
+          </div>
+          <div class="actions">
+            <button class="pill ghost tiny" type="button" data-play="${escapeHtml(w.vimeoId || "")}">▶ Lejátszás</button>
+            <button class="pill ${done ? 'danger' : 'primary'} tiny" type="button" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+
+      const sl = $("#slotList");
+      sl.innerHTML = "";
+      merged.slots.forEach((s)=>{
+        const li = document.createElement("li");
+        li.className = "row";
+        li.innerHTML = `
+          <div>
+            <div class="title">${escapeHtml(s._title)}</div>
+            <div class="desc">${escapeHtml(s._desc)}<br><span style="color:rgba(255,255,255,.72); font-size:12.6px;">Megjegyzés: ${escapeHtml(s._note)}</span></div>
+          </div>
+          <div class="actions">
+            <button class="pill ghost tiny" type="button" data-play="${escapeHtml(s.vimeoId || "")}">▶ Lejátszás</button>
+          </div>
+        `;
+        sl.appendChild(li);
+      });
+
+      // play buttons (Vimeo embed)
+      $$("[data-play]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const vimeoId = b.getAttribute("data-play");
+          if(!vimeoId){
+            openInfo("Lejátszás", `<p class="note">Ehhez még nincs Vimeo ID beállítva (admin).</p>`);
+            return;
+          }
+          const src = `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
+          openInfo("Lejátszás", `
+            <p class="note">Ha a videó nem indul: Vimeo domain-lock beállítás ellenőrzés (fitnesslady.ch engedélyezve legyen).</p>
+            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
+              <iframe
+                src="${escapeHtml(src)}"
+                width="100%" height="480"
+                frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture"
+                allowfullscreen
+                style="display:block">
+              </iframe>
+            </div>
+          `);
+        });
+      });
+
+      $$("[data-toggle-done]").forEach(b=>{
+        b.addEventListener("click", ()=>{
+          const key = b.getAttribute("data-toggle-done");
+          state.done[key] = !state.done[key];
+          lsSet(UID, "done", state.done);
+          renderProgram();
+        });
+      });
     }
 
-    async function loadReviews(){
+    // ========== Technika vault ==========
+    function renderTechnika(){
+      const tabs = $("#techTabs");
+      const list = $("#techList");
+      tabs.innerHTML = "";
+      list.innerHTML = `
+        <li class="row">
+          <div>
+            <div class="title">Technika Vault</div>
+            <div class="desc">A technika videók sablonból jönnek. Következő lépés: technika kategóriák + videók admin szerkesztéssel.</div>
+          </div>
+          <div class="actions">
+            <button class="pill ghost tiny" type="button" id="btnTechInfo">ℹ️</button>
+          </div>
+        </li>
+      `;
+      $("#btnTechInfo")?.addEventListener("click", ()=>{
+        openInfo("Technika Vault", `<p class="note">Következő kör: tech sablon + app render.</p>`);
+      });
+    }
+
+    function refreshDietButtons(){
+      const d = state.diet;
+      $$("[data-toggle]").forEach(btn=>{
+        const key = btn.getAttribute("data-toggle");
+        const on = !!d[key];
+        btn.classList.toggle("primary", on);
+        btn.classList.toggle("ghost", !on);
+      });
+    }
+
+    function renderAll(){
+      renderHeader();
+      renderProgram();
+      renderTechnika();
+      refreshDietButtons();
+      enableTapGlow();
+    }
+
+    // ========== Buttons ==========
+    $("#btnLogout").addEventListener("click", async ()=>{
+      await logout();
+      toLogin(state.lang || "hu");
+    });
+
+    $("#btnMarkAll").addEventListener("click", ()=>{
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack) return;
+      pack.merged.workouts.forEach(w => state.done[workoutKey(weekNo, w.id)] = true);
+      lsSet(UID, "done", state.done);
+      renderProgram();
+    });
+
+    $("#btnResetWeek").addEventListener("click", ()=>{
+      const weekNo = state.weekIdx + 1;
+      const pack = weekCache.get(weekNo);
+      if(!pack) return;
+      pack.merged.workouts.forEach(w => delete state.done[workoutKey(weekNo, w.id)]);
+      lsSet(UID, "done", state.done);
+      renderProgram();
+    });
+
+    $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
+      openInfo("Vimeo beágyazás (éles)", `
+        <p class="note"><b>Éles</b> beállítás: Vimeo Embed whitelist: <b>fitnesslady.ch</b></p>
+        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
+          <li>Vimeo: Hide from Vimeo / Private</li>
+          <li>Embed whitelist: fitnesslady.ch</li>
+          <li>Download: OFF</li>
+        </ul>
+      `);
+    });
+
+    // diet toggles
+    $$("[data-toggle]").forEach(btn=>{
+      btn.addEventListener("click", ()=>{
+        const key = btn.getAttribute("data-toggle");
+        state.diet[key] = !state.diet[key];
+        lsSet(UID, "diet", state.diet);
+        refreshDietButtons();
+      });
+    });
+
+    $("#btnDietPlan").addEventListener("click", ()=>{
+      openInfo("Napi terv", `<p class="note">A részletes étrendet a következő körben Firestore-ból hozzuk (adminból állítható).</p>`);
+    });
+    $("#btnDietPrefs").addEventListener("click", ()=>{
+      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, kedvencek, étkezésszám, edzésnap/pihenőnap sablon.</p>`);
+    });
+
+    const MOTS = [
+      "„A rendszer nem nyomás. A rendszer szabadság.”",
+      "„A haladás nem tökéletesség. Hanem következetesség.”",
+      "„Nem csak formát építesz – bizalmat és jövőt.”",
+      "„Amit ma megteszel, az a holnapi önbizalmad.”"
+    ];
+    $("#btnMotivation").addEventListener("click", ()=>{
+      $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
+    });
+
+    $("#btnDoCheckin").addEventListener("click", ()=>{
+      state.checkin = { done: true, at: new Date().toISOString() };
+      lsSet(UID, "checkin", state.checkin);
+      renderHeader();
+      openInfo("Check-in", `<p class="note">Kész ✅ (elmentve neked). Következő körben: admin is látja / check-in űrlap.</p>`);
+    });
+
+    // Settings
+    $("#btnOpenSettings").addEventListener("click", ()=>{
+      $("#setGoal").value = profile.goal || "";
+      $("#setLevel").value = profile.level || 2;
+      $("#setLang").value = profile.lang || "hu";
+      openOverlay(settingsOverlay);
+    });
+
+    $("#btnSaveSettings").addEventListener("click", async ()=>{
+      const goal = ($("#setGoal").value || "").trim();
+      const level = clamp(parseInt($("#setLevel").value || "2", 10), 1, 4);
+      const lang = (($("#setLang").value || "hu").trim().toLowerCase() === "de") ? "de" : "hu";
+
+      await fs.setDoc(fs.doc(db, "users", UID), {
+        goal,
+        level,
+        lang,
+        updatedAt: fs.serverTimestamp()
+      }, { merge:true });
+
+      profile.goal = goal;
+      profile.level = level;
+      profile.lang = lang;
+      state.lang = lang;
+
+      weekCache.clear();
+      await ensureWeekLoaded(state.weekIdx + 1);
+
+      closeOverlay(settingsOverlay);
+      renderAll();
+    });
+
+    // ========== Init ==========
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    onAuth(async (user)=>{
       try{
-        reviewsMeta.textContent = "Betöltés…";
-
-        const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
-        const res = await fetch(url, { cache: 'no-store' });
-        if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
-
-        const csvText = await res.text();
-        const rows = parseCSV(csvText);
-        if(rows.length < 2) throw new Error("Empty CSV");
-
-        const headers = rows.shift();
-
-        const idxText = findHeaderIndex(headers, h => h === 'véleményed' || h === 'vélemény' || h.includes('vélemény'));
-        const idxApprove = findHeaderIndex(headers, h => h === 'megjelenhet?' || h.includes('megjelenhet'));
-        const idxRating = findHeaderIndex(headers, h => h === 'mennyire' || h === 'mennyire v' || h.startsWith('mennyire'));
-        const idxDate = findHeaderIndex(headers, h => h === 'submitted at' || h.includes('submitted'));
-        const idxName = findHeaderIndex(headers, h => h === 'név' || h === 'name' || h.includes('név'));
-
-        if(idxText === -1 || idxApprove === -1){
-          throw new Error("Missing required columns (Vélemény / Megjelenhet?)");
+        if(!user){
+          toLogin("hu");
+          return;
         }
+        UID = user.uid;
 
-        const items = [];
-        let ratingSum = 0;
-        let ratingCount = 0;
+        state.done = lsGet(UID, "done", {});
+        state.diet = lsGet(UID, "diet", {});
+        state.checkin = lsGet(UID, "checkin", null);
 
-        for(const r of rows){
-          const approved = normalize(r[idxApprove]);
-          if(approved !== 'igen') continue;
+        profile = await loadUserProfile(UID);
+        state.lang = (profile.lang === "de") ? "de" : "hu";
 
-          const text = String(r[idxText] ?? "").trim();
-          if(!text) continue;
+        planMeta = await loadPlanMeta(profile.planId);
 
-          const ratingRaw = idxRating !== -1 ? String(r[idxRating] ?? "").trim() : "";
-          const ratingNum = Number(ratingRaw);
-          const starsStr = stars(ratingNum);
+        state.weekIdx = calcWeekIndex(profile);
 
-          if(Number.isFinite(ratingNum)){
-            ratingSum += Math.max(1, Math.min(5, ratingNum));
-            ratingCount += 1;
-          }
+        await ensureWeekLoaded(state.weekIdx + 1);
 
-          const dateRaw = idxDate !== -1 ? String(r[idxDate] ?? "").trim() : "";
-          const date = dateRaw ? dateRaw.replace("T"," ").replace("Z","") : "";
+        renderAll();
 
-          const nameRaw = idxName !== -1 ? String(r[idxName] ?? "").trim() : "";
-          const name = nameRaw || "Vendég";
+        debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
 
-          items.push({ text, stars: starsStr, date, name });
-        }
-
-        items.sort((a,b)=> (b.date || "").localeCompare(a.date || ""));
-
-        if(ratingCount > 0){
-          const avg = Math.round((ratingSum / ratingCount) * 10) / 10;
-          avgText.textContent = `${avg} • ${ratingCount} értékelés`;
-        } else {
-          avgText.textContent = `${items.length} vélemény`;
-        }
-
-        reviewsMeta.textContent = items.length ? `${items.length} jóváhagyott vélemény` : "Nincs még jóváhagyott vélemény";
-        renderReviews(items.slice(0, 12));
       }catch(err){
         console.error(err);
-        avgText.textContent = "—";
-        reviewsMeta.textContent = "Nem sikerült betölteni";
-        renderReviews([]);
+        openInfo("Hiba", `
+          <p class="note">Hiba történt betöltés közben.</p>
+          <div class="row" style="grid-template-columns: 1fr;">
+            <div class="title">Részletek</div>
+            <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
+          </div>
+          <p class="note">Ha ez nem sablon hiba: akkor shared/firebase.js betöltés / Firebase config / CORS probléma.</p>
+        `);
       }
-    }
-
-    refreshBtn?.addEventListener('click', loadReviews);
-    loadReviews();
+    });
   </script>
 </body>
 </html>
