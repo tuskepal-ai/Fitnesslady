@@ -1,0 +1,297 @@
+<!-- FILE: /de/login/index.html -->
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Fitness Lady — Login</title>
+  <meta name="description" content="Login — Fitness Lady Kundenbereich." />
+  <meta name="theme-color" content="#120018" />
+
+  <style>
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --stroke:rgba(255,255,255,.10);
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 980px;
+      --hero-url: none;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: var(--hero-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: translateZ(0);
+      opacity:.92;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+
+    .topbar{
+      position: fixed; top:0; left:0; right:0;
+      z-index: 50;
+      background: rgba(8,6,12,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px; white-space: nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+      white-space: nowrap;
+      gap:8px;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 46px rgba(255,79,216,.26);
+      font-weight: 900;
+    }
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+
+    main{ padding-top: 64px; min-height: 100vh; min-height: 100dvh; }
+    .page{ padding: 18px 0 64px; }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .card{ padding: 16px; }
+    h1{
+      margin: 0 0 8px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.2px;
+      font-size: 26px;
+    }
+    .sub{
+      margin:0 0 14px;
+      color: rgba(255,255,255,.70);
+      line-height: 1.55;
+      font-size: 13.5px;
+    }
+
+    label{
+      display:block;
+      margin: 10px 0 6px;
+      font-size: 13px;
+      color: rgba(255,255,255,.70);
+      font-weight: 750;
+    }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      outline: none;
+    }
+    input:focus{
+      border-color: rgba(255,79,216,.45);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; justify-content:flex-start; }
+    .msg{
+      margin-top: 12px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.24);
+      color: rgba(255,255,255,.86);
+      display:none;
+    }
+    .msg.err{ border-color: rgba(255,91,107,.35); }
+    .msg.ok{ border-color: rgba(46,229,157,.28); }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
+    }
+
+    @media (max-width: 980px){
+      .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+      .pill, .glass{ backdrop-filter:none !important; -webkit-backdrop-filter:none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <header class="topbar">
+    <div class="container topbar-inner">
+      <a class="brand" href="/de/" aria-label="Zur Startseite">
+        <span class="dot"></span><span>Fitness Lady</span>
+      </a>
+
+      <div style="display:flex; align-items:center; gap:10px;">
+        <a class="pill ghost" href="/hu/login/" onclick="localStorage.setItem('lang','hu')">HU</a>
+        <a class="pill ghost" href="/de/login/" onclick="localStorage.setItem('lang','de')">DE</a>
+        <a class="pill ghost" href="/de/" title="Startseite">↩ Start</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div class="container page">
+      <section class="glass card">
+        <h1>Login</h1>
+        <p class="sub">Melde dich an, um deinen persönlichen Trainingsbereich zu öffnen.</p>
+
+        <label for="email">E-Mail</label>
+        <input id="email" type="email" placeholder="name@email.com" autocomplete="email" />
+
+        <label for="pass">Passwort</label>
+        <input id="pass" type="password" placeholder="••••••••" autocomplete="current-password" />
+
+        <div style="height:12px"></div>
+        <div class="row">
+          <button class="pill primary" id="btnLogin" type="button">Einloggen</button>
+          <button class="pill ghost" id="btnToHu" type="button">HU Login</button>
+        </div>
+
+        <div class="msg" id="msgBox"></div>
+
+        <p class="sub" style="margin-top:14px;">
+          Hinweis: Zugangsdaten bekommst du nach dem Kauf / der Freischaltung.
+        </p>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <div class="container footer-inner">
+      <div>© <span id="y"></span> Fitness Lady</div>
+      <div>Tüske web design</div>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { BASE_PREFIX, auth, onAuth, logout, toLogin } from "../../shared/firebase.js";
+    import { signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+    // hero
+    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    const $ = (id)=>document.getElementById(id);
+    const msgBox = $("msgBox");
+
+    function showMsg(text, type="err"){
+      msgBox.className = `msg ${type}`;
+      msgBox.textContent = text;
+      msgBox.style.display = "block";
+    }
+    function clearMsg(){
+      msgBox.style.display = "none";
+      msgBox.textContent = "";
+      msgBox.className = "msg";
+    }
+
+    $("btnToHu").addEventListener("click", ()=>{
+      localStorage.setItem("lang","hu");
+      window.location.href = "/hu/login/";
+    });
+
+    async function doLogin(){
+      clearMsg();
+      const email = ($("email").value || "").trim();
+      const pass  = ($("pass").value || "").trim();
+
+      if(!email || !pass){
+        showMsg("Bitte E-Mail und Passwort eingeben.", "err");
+        return;
+      }
+
+      try{
+        await signInWithEmailAndPassword(auth, email, pass);
+        localStorage.setItem("lang","de");
+        showMsg("Login OK. Weiterleitung…", "ok");
+        window.location.href = "/de/app/";
+      }catch(e){
+        const code = e?.code || "";
+        if(code.includes("auth/invalid-login-credentials") || code.includes("auth/wrong-password")){
+          showMsg("Falsche E-Mail oder Passwort.", "err");
+        }else if(code.includes("auth/user-not-found")){
+          showMsg("Kein Benutzer gefunden.", "err");
+        }else{
+          showMsg(`Login-Fehler: ${e?.message || e}`, "err");
+        }
+      }
+    }
+
+    $("btnLogin").addEventListener("click", doLogin);
+    $("pass").addEventListener("keydown", (e)=>{ if(e.key==="Enter") doLogin(); });
+
+    // ha már be van lépve, irány az app
+    onAuth((user)=>{
+      if(user){
+        localStorage.setItem("lang","de");
+        window.location.href = "/de/app/";
+      }
+    });
+  </script>
+</body>
+</html>
