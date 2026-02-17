@@ -30,6 +30,7 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       color: var(--text);
 
+      /* Admin háttér glow effektekkel */
       background:
         radial-gradient(1200px 700px at 15% 10%, rgba(255,79,216,.10), transparent 60%),
         radial-gradient(1000px 700px at 85% 20%, rgba(177,76,255,.08), transparent 60%),
@@ -390,7 +391,7 @@
             </div>
 
             <p class="note" style="margin-top:10px;">
-              Megjegyzés: a vevő app a <span class="mono">users/{uid}</span> docból olvas (dietText/motivationText/planId/goal/level/lang…).
+              Megjegyzés: a vevő app a <span class="mono">users/{uid}</span> docból olvas.
             </p>
           </div>
         </div>
@@ -567,7 +568,7 @@
     let SEL_UID = null;
     let SEL_USER_DOC = null;
 
-    // --- JSON VALIDÁTOR (ÚJ FUNKCIÓ) ---
+    // --- ✅ JSON VALIDÁTOR (ÚJ FUNKCIÓ) ---
     function isValidJson(text) {
       try {
         JSON.parse(text);
@@ -603,7 +604,7 @@
         .map(d => ({ id:d.id, ...d.data() }))
         .filter(u => !q || String(u.email||"").toLowerCase().includes(q));
 
-      // --- DASHBOARD UPDATE ---
+      // --- ✅ DASHBOARD UPDATE ---
       // Összes
       $("#statTotal").textContent = items.length;
       
@@ -817,7 +818,7 @@
         const rawWorkouts = $("#w_workouts").value;
         const rawSlots = $("#w_slots").value;
 
-        // --- JSON VALIDÁTOR ELLENŐRZÉS ---
+        // --- ✅ JSON VALIDÁTOR ELLENŐRZÉS ---
         if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás! Ellenőrizd a vesszőket/idézőjeleket.");
         if(!isValidJson(rawSlots)) return err("Slots JSON hibás! Ellenőrizd a vesszőket/idézőjeleket.");
 
@@ -870,7 +871,7 @@
         const rawWorkouts = $("#ov_workouts").value;
         const rawSlots = $("#ov_slots").value;
 
-        // --- JSON VALIDÁTOR ELLENŐRZÉS ---
+        // --- ✅ JSON VALIDÁTOR ELLENŐRZÉS ---
         if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás!");
         if(!isValidJson(rawSlots)) return err("Slots JSON hibás!");
 
