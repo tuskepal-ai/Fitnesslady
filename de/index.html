@@ -3,14 +3,14 @@
 <html lang="de">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Fitness Lady — Trainingsprogramme für Frauen</title>
-  <meta name="description" content="Individuelle Trainingsprogramme für Frauen. Nachhaltig, alltagstauglich und auf dich abgestimmt." />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady — Premium Training für Frauen</title>
+  <meta name="description" content="Individuelle Trainings- und Ernährungsprogramme für Frauen. Alltagstauglich, strukturiert, premium." />
   <meta name="theme-color" content="#120018" />
 
   <style>
     :root{
-      --bg: #07060b;
+      --bg:#07060b;
       --panel: rgba(20, 12, 26, .62);
       --panel2: rgba(20, 12, 26, .45);
       --stroke: rgba(255,255,255,.10);
@@ -26,167 +26,117 @@
       --hero-pos-x: 78%;
       --hero-pos-y: 18%;
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
-    html{ scroll-behavior:smooth; }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    html{scroll-behavior:smooth}
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
       background:
         radial-gradient(1200px 600px at 30% 10%, rgba(255,79,216,.14), transparent 60%),
         radial-gradient(900px 500px at 75% 20%, rgba(177,76,255,.12), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
       color:var(--text);
       overflow-x:hidden;
       -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
       text-rendering: geometricPrecision;
     }
-    a{ color:inherit; text-decoration:none; }
-    button{ font:inherit; }
+    a{color:inherit;text-decoration:none}
+    button{font:inherit}
 
-    /* Topbar */
     .topbar{
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 50;
+      position:fixed; inset:0 0 auto 0;
+      z-index:50;
       padding: 14px 14px;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       background: rgba(10, 8, 14, .42);
-      border-bottom: 1px solid rgba(255,255,255,.07);
+      border-bottom:1px solid rgba(255,255,255,.07);
     }
     .topbar-inner{
       max-width: var(--max);
-      margin: 0 auto;
+      margin:0 auto;
       display:flex;
       align-items:center;
-      justify-content: space-between;
-      gap: 12px;
+      justify-content:space-between;
+      gap:12px;
     }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      font-weight: 800;
-      letter-spacing: .2px;
-      white-space:nowrap;
-    }
+    .brand{display:flex;align-items:center;gap:10px;font-weight:800;letter-spacing:.2px}
     .dot{
       width:10px;height:10px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
     }
-    .nav{
-      display:flex; align-items:center; gap: 18px;
-      color: var(--muted);
-      font-size: 14px;
-      font-weight: 750;
-    }
-    .nav a{ opacity:.92; }
-    .nav a:hover{ opacity:1; color: var(--text); }
-
-    .rightbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .nav{display:flex;align-items:center;gap:18px;color:var(--muted);font-size:14px;font-weight:800}
+    .nav a{opacity:.92}
+    .nav a:hover{opacity:1;color:var(--text)}
+    .rightbar{display:flex;align-items:center;gap:10px}
 
     .lang-switch{
-      display:flex;
-      align-items:center;
-      gap:8px;
-      padding:6px 12px;
-      border-radius:999px;
+      display:flex;align-items:center;gap:8px;
+      padding:6px 12px;border-radius:999px;
       background: rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.12);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .lang-switch .lang{
-      font-size:13px;
-      font-weight:800;
-      letter-spacing:.4px;
+      font-size:13px;font-weight:900;letter-spacing:.4px;
       color: rgba(255,255,255,.55);
       transition: color .18s ease, transform .18s ease;
       cursor:pointer;
-      user-select:none;
-      white-space:nowrap;
     }
-    .lang-switch .lang:hover{ color: rgba(255,255,255,.88); transform: translateY(-1px); }
-    .lang-switch .lang.active{ color:#fff; }
-    .lang-switch .sep{ color: rgba(255,255,255,.35); }
+    .lang-switch .lang:hover{color:rgba(255,255,255,.88);transform:translateY(-1px)}
+    .lang-switch .lang.active{color:#fff}
+    .lang-switch .sep{color:rgba(255,255,255,.35)}
 
     .cta-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
+      display:inline-flex;align-items:center;justify-content:center;
+      padding:10px 14px;border-radius:999px;
       background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#120613;
-      font-weight: 900;
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 14px 30px rgba(255,79,216,.22);
-      white-space: nowrap;
+      color:#120613;font-weight:900;
+      border:1px solid rgba(255,255,255,.10);
+      box-shadow:0 14px 30px rgba(255,79,216,.22);
+      white-space:nowrap;
       transition: transform .18s ease, box-shadow .18s ease;
-      cursor:pointer;
-      user-select:none;
     }
-    .cta-pill:hover{ transform: translateY(-1px); box-shadow: 0 18px 46px rgba(255,79,216,.22); }
-
-    .ghost-pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 14px 40px rgba(0,0,0,.30);
-      cursor:pointer;
-      user-select:none;
-      white-space: nowrap;
-      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
-    }
-    .ghost-pill:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.20);
-      box-shadow: 0 18px 60px rgba(0,0,0,.40);
-    }
+    .cta-pill:hover{transform:translateY(-1px);box-shadow:0 18px 46px rgba(255,79,216,.22)}
 
     .menu-btn{
-      width: 40px; height: 40px; border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
+      width:40px;height:40px;border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      color:var(--text);
       display:none;
-      align-items:center; justify-content:center;
+      align-items:center;
+      justify-content:center;
       cursor:pointer;
+      user-select:none;
     }
 
-    /* Hero */
     .hero{
-      position: relative;
-      padding-top: 80px;
+      position:relative;
+      padding-top:80px;
       min-height: clamp(720px, 92svh, 980px);
       display:flex;
-      align-items: stretch;
+      align-items:stretch;
       justify-content:center;
-      isolation: isolate;
-      overflow: hidden;
+      isolation:isolate;
+      overflow:hidden;
     }
     .hero-bg{
-      position:absolute;
-      inset:0;
-      z-index:0;
-      background-image: url("/hero.png");
-      background-size: cover;
-      background-repeat: no-repeat;
+      position:absolute;inset:0;z-index:0;
+      /* HU gold baseline: hero.png a gyökérben */
+      background-image:url("/hero.png");
+      background-size:cover;
+      background-repeat:no-repeat;
       background-position: var(--hero-pos-x) var(--hero-pos-y);
-      filter:none;
-      transform: translateZ(0);
-      will-change: transform;
+      transform:translateZ(0);
+      will-change:transform;
+      opacity:.92;
     }
     .hero-overlay{
-      position:absolute;
-      inset:0;
-      z-index:1;
-      pointer-events:none;
+      position:absolute;inset:0;z-index:1;pointer-events:none;
       background:
         linear-gradient(90deg,
           rgba(10,7,14,.38) 0%,
@@ -200,367 +150,262 @@
           rgba(10,7,14,.18) 100%
         );
     }
-
     .wrap{
-      position: relative;
-      z-index: 2;
-      width: 100%;
-      max-width: var(--max);
-      margin: 0 auto;
-      padding: 46px 14px 56px;
+      position:relative;z-index:2;
+      width:100%;
+      max-width:var(--max);
+      margin:0 auto;
+      padding:46px 14px 56px;
     }
-
     .hero-grid{
       display:grid;
       grid-template-columns: 1.2fr .8fr;
-      gap: 26px;
-      align-items: start;
+      gap:26px;
+      align-items:start;
     }
 
     .badge{
-      display:inline-flex; align-items:center; gap:10px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
+      display:inline-flex;align-items:center;gap:10px;
+      padding:8px 12px;border-radius:999px;
+      background:rgba(255,255,255,.08);
       border:1px solid rgba(255,255,255,.10);
-      color: var(--muted);
-      font-size: 13px;
-      width: fit-content;
+      color:var(--muted);
+      font-size:13px;
+      width:fit-content;
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
-
     h1{
-      margin: 14px 0 12px;
+      margin:14px 0 12px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-weight: 750;
-      line-height: 1.02;
+      font-weight:750;
+      line-height:1.02;
       font-size: clamp(36px, 4.6vw, 64px);
-      letter-spacing: -1.1px;
-      text-shadow: 0 14px 55px rgba(0,0,0,.65);
+      letter-spacing:-1.1px;
+      text-shadow:0 14px 55px rgba(0,0,0,.65);
       max-width: 18ch;
     }
-
     .lead{
-      margin: 0 0 18px;
-      color: rgba(255,255,255,.74);
-      font-size: 16px;
-      line-height: 1.65;
-      max-width: 62ch;
-      text-shadow: 0 10px 30px rgba(0,0,0,.45);
+      margin:0 0 18px;
+      color:rgba(255,255,255,.74);
+      font-size:16px;
+      line-height:1.65;
+      max-width:62ch;
+      text-shadow:0 10px 30px rgba(0,0,0,.45);
     }
-
-    .hero-actions{
-      display:flex;
-      flex-wrap:wrap;
-      gap: 12px;
-      margin: 14px 0 10px;
-      align-items:center;
-    }
-
+    .hero-actions{display:flex;flex-wrap:wrap;gap:12px;margin:14px 0 10px}
     .btn{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      gap:10px;
-      padding: 12px 16px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
+      display:inline-flex;align-items:center;justify-content:center;gap:10px;
+      padding:12px 16px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
       background: rgba(20,12,26,.55);
       backdrop-filter: blur(10px);
-      color: var(--text);
-      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      -webkit-backdrop-filter: blur(10px);
+      color:var(--text);
+      box-shadow:0 14px 40px rgba(0,0,0,.35);
       cursor:pointer;
-      white-space: nowrap;
+      white-space:nowrap;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease, background .18s ease;
       user-select:none;
-      transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-    .btn:hover{
-      transform: translateY(-1px);
-      border-color: rgba(255,255,255,.20);
-      box-shadow: 0 18px 60px rgba(0,0,0,.45);
-    }
+    .btn:hover{transform:translateY(-1px);border-color:rgba(255,255,255,.20);box-shadow:0 18px 60px rgba(0,0,0,.45)}
     .btn.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
       border-color: rgba(255,255,255,.18);
       box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 900;
+      font-weight:900;
     }
-    .btn.primary:hover{ box-shadow: 0 22px 70px rgba(255,79,216,.22); }
-    .btn.ghost{ background: rgba(255,255,255,.06); }
+    .btn.primary:hover{box-shadow:0 22px 70px rgba(255,79,216,.22)}
+    .btn.ghost{background: rgba(255,255,255,.06)}
+    .btn.gold{
+      background: linear-gradient(135deg, rgba(255,211,138,.95), rgba(255,136,230,.85));
+      color:#1a0a15;
+      font-weight:950;
+      border-color: rgba(255,255,255,.22);
+      box-shadow: 0 18px 46px rgba(255,211,138,.12);
+    }
 
-    .meta-row{
-      display:flex; flex-wrap:wrap;
-      gap: 10px;
-      margin-top: 10px;
-      color: var(--muted2);
-      font-size: 13px;
-    }
+    .meta-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;color:var(--muted2);font-size:13px}
     .meta-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
+      display:inline-flex;align-items:center;gap:8px;
+      padding:9px 12px;border-radius:999px;
       background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(10px);
-      white-space:nowrap;
+      -webkit-backdrop-filter: blur(10px);
     }
 
-    /* Cards / sections */
+    section{position:relative;padding:52px 0}
+    .container{max-width:var(--max);padding:0 14px;margin:0 auto}
+    .section-title{
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size:34px;
+      letter-spacing:-.3px;
+      margin:0 0 14px;
+    }
+    .section-sub{color:var(--muted);margin:0 0 24px;max-width:70ch;line-height:1.6}
+
     .card{
       background: var(--panel);
-      border: 1px solid var(--stroke);
+      border:1px solid var(--stroke);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
       overflow:hidden;
-      position: relative;
+      position:relative;
     }
     .card::before{
       content:"";
-      position:absolute; inset:-2px;
+      position:absolute;inset:-2px;
       background:
         radial-gradient(700px 220px at 10% 0%, rgba(255,79,216,.22), transparent 55%),
         radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.18), transparent 60%);
       opacity:.85;
       pointer-events:none;
     }
-    .card-inner{ position:relative; padding: 16px; }
-    .card-head{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 12px;
-      flex-wrap:wrap;
-    }
-    .card-title{ font-weight: 900; letter-spacing: .2px; }
+    .card-inner{position:relative;padding:16px}
+    .card-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+    .card-title{font-weight:950;letter-spacing:.2px}
     .tag{
-      font-size: 12px;
-      padding: 6px 10px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
+      font-size:12px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
       background: rgba(255,255,255,.07);
       color: var(--muted);
-      white-space: nowrap;
+      white-space:nowrap;
     }
 
-    section{ position: relative; padding: 52px 0; }
-    .container{ max-width: var(--max); padding: 0 14px; margin: 0 auto; }
-    .section-title{
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 34px;
-      letter-spacing: -0.3px;
-      margin: 0 0 14px;
-    }
-    .section-sub{
-      color: var(--muted);
-      margin: 0 0 24px;
-      max-width: 70ch;
-      line-height: 1.6;
-    }
-
-    /* About */
-    .about-grid{
-      display:grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 14px;
-      align-items: start;
-    }
-    .about-box{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .about-name{
-      font-family: ui-serif, Georgia, serif;
-      font-size: 20px;
-      margin: 0 0 6px;
-      letter-spacing: -0.2px;
-    }
-    .about-text{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 13.5px;
-    }
-
-    /* Packages */
-    .packages{
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-    }
+    .packages{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
     .pkg{
       background: var(--panel2);
-      border: 1px solid rgba(255,255,255,.10);
+      border:1px solid rgba(255,255,255,.10);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
       backdrop-filter: blur(14px);
-      padding: 18px;
-      position: relative;
+      -webkit-backdrop-filter: blur(14px);
+      padding:18px;
+      position:relative;
       overflow:hidden;
     }
     .pkg::before{
       content:"";
-      position:absolute; inset:-2px;
-      background: radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.18), transparent 55%),
-                  radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.14), transparent 60%);
+      position:absolute;inset:-2px;
+      background:
+        radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.18), transparent 55%),
+        radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.14), transparent 60%);
       opacity:.9;
       pointer-events:none;
     }
-    .pkg-inner{ position:relative; }
-    .pkg-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
-      margin-bottom: 10px;
-      flex-wrap:wrap;
-    }
-    .pkg h4{ margin:0; font-size: 22px; font-family: ui-serif, Georgia, serif; }
+    .pkg-inner{position:relative}
+    .pkg-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px}
+    .pkg h4{margin:0;font-size:22px;font-family: ui-serif, Georgia, serif}
     .tag.hot{
       color:#1b0717;
       background: linear-gradient(135deg, #ffd8a8, #ff88e6);
       border-color: rgba(255,255,255,.25);
       box-shadow: 0 12px 30px rgba(255,136,230,.18);
-      font-weight: 900;
+      font-weight: 950;
     }
-    .pkg p{ margin: 0 0 12px; color: var(--muted); line-height: 1.6; font-size: 13.5px; }
-    .list{ margin: 0; padding: 0; list-style:none; display:grid; gap:8px; }
-    .list li{ display:flex; align-items:flex-start; gap:10px; color: var(--muted); font-size: 13px; }
-    .pkg-actions{
-      display:flex;
-      gap: 10px;
-      justify-content: flex-end;
-      margin-top: 14px;
-      flex-wrap: wrap;
-    }
+    .pkg p{margin:0 0 12px;color:var(--muted);line-height:1.6;font-size:13.5px}
+    .list{margin:0;padding:0;list-style:none;display:grid;gap:8px}
+    .list li{display:flex;gap:10px;color:var(--muted);font-size:13px}
+    .pkg-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
 
-    /* Reviews carousel */
-    .reviews-shell{
+    /* Reviews carousel (same logic as HU, DE labels) */
+    .carousel{
       display:grid;
-      grid-template-columns: 1.15fr .85fr;
-      gap: 14px;
-      align-items: start;
+      gap:12px;
     }
-    .review-card{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
+    .review{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
       border-radius: 18px;
       padding: 14px;
-      min-height: 170px;
-      display:flex;
-      flex-direction:column;
-      gap:10px;
     }
-    .review-top{
-      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
-    }
-    .review-name{
-      font-weight: 900;
-      letter-spacing:.2px;
-    }
-    .stars{
-      display:inline-flex; gap:2px; align-items:center;
-      font-size: 14px;
-      color: rgba(255,211,138,.95);
-      text-shadow: 0 10px 30px rgba(0,0,0,.35);
-      user-select:none;
-    }
-    .review-text{
-      color: rgba(255,255,255,.80);
-      line-height: 1.6;
-      font-size: 13.5px;
-      white-space: pre-wrap;
-    }
-    .review-meta{
-      margin-top:auto;
-      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
-      color: rgba(255,255,255,.55);
-      font-size: 12.5px;
-    }
-    .carousel-actions{
-      display:flex; gap:10px; flex-wrap:wrap;
-      justify-content:flex-end;
-    }
+    .stars{letter-spacing:1px;color:rgba(255,211,138,.95);font-weight:900}
+    .rhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:8px}
+    .rname{font-weight:950}
+    .rtext{color:rgba(255,255,255,.78);line-height:1.6;font-size:13.5px;margin:0}
+    .rmeta{color:rgba(255,255,255,.55);font-size:12.5px;margin-top:10px}
 
-    /* AFSZ modal */
+    /* Modal (AFSZ/AGB) */
     .modal-overlay{
-      position: fixed; inset: 0; z-index: 200;
+      position:fixed;inset:0;z-index:80;
       background: rgba(0,0,0,.58);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 18px;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
     }
-    .modal-overlay.is-open{ display:flex; }
-    .modal{
-      width: min(980px, 94vw);
-      max-height: min(82vh, 760px);
-      border-radius: 22px;
-      overflow: hidden;
-      position: relative;
-    }
+    .modal-overlay.is-open{display:flex}
+    .modal{width:min(980px,94vw);max-height:min(82vh,760px);border-radius:22px;overflow:hidden}
     .modal-header{
-      display:flex; align-items:center; justify-content: space-between; gap: 10px;
-      padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.08);
+      display:flex;align-items:center;justify-content:space-between;gap:10px;
+      padding:14px 16px;
+      border-bottom:1px solid rgba(255,255,255,.08);
       background: rgba(10,8,14,.45);
     }
     .modal-title{
       margin:0;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 20px;
-      letter-spacing: -.2px;
+      font-size:20px;
+      letter-spacing:-.2px;
     }
     .modal-close{
-      width: 40px; height: 40px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
+      width:40px;height:40px;border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
       background: rgba(255,255,255,.06);
       color: rgba(255,255,255,.9);
-      cursor: pointer;
+      cursor:pointer;
       display:inline-flex;
       align-items:center;
       justify-content:center;
       user-select:none;
     }
     .modal-body{
-      padding: 16px;
-      overflow: auto;
+      padding:16px;
+      overflow:auto;
       max-height: calc(min(82vh, 760px) - 64px);
       background: rgba(7,6,11,.38);
-      color: rgba(255,255,255,.82);
-      line-height: 1.65;
-      font-size: 13.5px;
+      color: rgba(255,255,255,.80);
+      line-height:1.65;
+      font-size: 14px;
     }
-    .note{ color: rgba(255,255,255,.65); }
 
     footer{
-      padding: 18px 0 46px;
+      padding:18px 0 46px;
       border-top:1px solid rgba(255,255,255,.08);
       background: rgba(10,8,14,.55);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
     }
     .footer-inner{
-      max-width: var(--max);
+      max-width:var(--max);
       margin:0 auto;
-      padding: 0 14px;
-      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      color:rgba(255,255,255,.70); font-size:13px;
+      padding:0 14px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
     }
 
-    /* Mobile */
     @media (max-width: 980px){
-      :root{ --hero-pos-x: 75%; --hero-pos-y: 10%; }
-      .hero-grid{ grid-template-columns: 1fr; }
-      .nav{ display:none; }
-      .menu-btn{ display:inline-flex; }
-      .packages{ grid-template-columns: 1fr; }
-      .about-grid{ grid-template-columns: 1fr; }
-      .reviews-shell{ grid-template-columns: 1fr; }
-
-      /* Mobil: CTA-k ne torlódjanak */
-      .hero-actions{ gap:10px; }
-      .hero-actions a, .hero-actions button{ flex: 0 0 auto; }
+      :root{--hero-pos-x:75%;--hero-pos-y:10%}
+      .hero-grid{grid-template-columns:1fr}
+      .nav{display:none}
+      .menu-btn{display:inline-flex}
+      .packages{grid-template-columns:1fr}
+    }
+    @media (max-width: 980px){
+      .topbar{backdrop-filter:none;-webkit-backdrop-filter:none}
+      .btn,.cta-pill,.lang-switch,.card,.pkg{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
     }
   </style>
 </head>
@@ -568,14 +413,14 @@
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a class="brand" href="#top" aria-label="Fitness Lady">
+      <a class="brand" href="#top" aria-label="FitnessLady">
         <span class="dot"></span>
-        <span>Fitness Lady</span>
+        <span>FitnessLady</span>
       </a>
 
       <nav class="nav" aria-label="Menü">
         <a href="#pakete">Pakete</a>
-        <a href="#ablauf">Ablauf</a>
+        <a href="#ueber">Über mich</a>
         <a href="#bewertungen">Bewertungen</a>
         <a href="#kontakt">Kontakt</a>
       </nav>
@@ -587,9 +432,10 @@
           <a class="lang active" href="/de/" onclick="localStorage.setItem('lang','de')">DE</a>
         </div>
 
-        <a class="ghost-pill" href="/de/login/" onclick="localStorage.setItem('lang','de')">Mein Bereich</a>
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
-        <a class="cta-pill" href="#kontakt">Kostenlose Beratung</a>
+
+        <!-- ✅ EZ volt a hibád: eddig /de/login/ nem létezett → most létrehoztuk -->
+        <a class="cta-pill" href="/de/login/" onclick="localStorage.setItem('lang','de')">Mein Bereich</a>
       </div>
     </div>
   </header>
@@ -602,7 +448,6 @@
       <div class="hero-grid">
         <div>
           <div class="badge">✨ Premium Training • für Frauen</div>
-
           <h1>Trainingsprogramme für Frauen,<br>die wirklich funktionieren.</h1>
 
           <p class="lead">
@@ -613,68 +458,38 @@
           <div class="hero-actions">
             <a class="btn primary" href="#kontakt">Kostenlose Beratung</a>
             <a class="btn" href="#pakete">Pakete</a>
-            <a class="btn ghost" href="/de/login/" onclick="localStorage.setItem('lang','de')">Login</a>
+            <button class="btn ghost" id="btnOpenAGB" type="button">AGB</button>
           </div>
 
           <div class="meta-row">
             <div class="meta-pill">📍 Schweiz</div>
-            <div class="meta-pill">⏱️ Alltagstauglich</div>
+            <div class="meta-pill">⏱ Alltagstauglich</div>
             <div class="meta-pill">💬 Support & Anpassungen</div>
           </div>
         </div>
         <div></div>
       </div>
 
-      <div class="card" style="margin-top:22px;">
+      <div class="card" style="margin-top:22px;" id="ueber">
         <div class="card-inner">
           <div class="card-head">
-            <div class="card-title">Über Fitness Lady</div>
+            <div class="card-title">Über mich</div>
             <div class="tag">Personal Training</div>
           </div>
-
-          <div class="about-grid">
-            <div class="about-box">
-              <p class="about-name">Edina — Fitness Lady</p>
-              <p class="about-text">
-                Premium Coaching für Frauen: klare Struktur, Routine, und ein Programm,
-                das in deinen Alltag passt — ohne Druck, aber mit Ergebnissen.
-              </p>
+          <div style="display:grid; gap:12px;">
+            <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.18); border-radius:18px; padding:14px;">
+              <div style="font-family: ui-serif, Georgia, serif; font-size:20px; font-weight:800; margin-bottom:6px;">FitnessLady</div>
+              <div style="color:rgba(255,255,255,.74); line-height:1.65; font-size:13.5px;">
+                Premium Begleitung für Frauen: Training, Ernährung, Struktur. Ziel: Ergebnisse ohne Überforderung.
+                Du bekommst einen Plan, den du wirklich durchziehen kannst.
+              </div>
             </div>
-
-            <div class="about-box">
-              <p class="about-name" style="margin-bottom:10px;">Warum es funktioniert</p>
-              <p class="about-text">
-                Kein Overload. Kein Verzichts-Zirkus. Ein Plan, der langfristig tragbar ist:
-                Training + Ernährung + Anpassungen, auf dich abgestimmt.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:14px;">
-        <div class="card-inner">
-          <div class="card-head">
-            <div class="card-title">Was du bekommst</div>
-            <div class="tag">Premium</div>
-          </div>
-
-          <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:14px;" class="hero-cards">
-            <div class="review-card" style="min-height:auto;">
-              <div class="review-name">Training</div>
-              <div class="review-text">Wochenplan + Progression. Klar, realistisch, nachhaltig.</div>
-            </div>
-            <div class="review-card" style="min-height:auto;">
-              <div class="review-name">Ernährung</div>
-              <div class="review-text">Einfaches System, das zu deinem Alltag passt.</div>
-            </div>
-            <div class="review-card" style="min-height:auto;">
-              <div class="review-name">Support</div>
-              <div class="review-text">Feedback, Anpassungen, Begleitung — ohne Chaos.</div>
-            </div>
-            <div class="review-card" style="min-height:auto;">
-              <div class="review-name">Fokus</div>
-              <div class="review-text">Form • Kraft • Wohlbefinden — zielorientiert.</div>
+            <div style="border:1px solid rgba(255,255,255,.10); background:rgba(0,0,0,.18); border-radius:18px; padding:14px;">
+              <div style="font-weight:950; margin-bottom:6px;">Warum es funktioniert</div>
+              <div style="color:rgba(255,255,255,.74); line-height:1.65; font-size:13.5px;">
+                Kein Overload, kein Chaos. Klare Wochenstruktur, nachvollziehbare Progression,
+                und regelmäßige Anpassungen — passend zu deinem Alltag.
+              </div>
             </div>
           </div>
         </div>
@@ -694,13 +509,13 @@
             <div class="pkg-top"><h4>Start</h4><span class="tag">Empfohlen: 4 Wochen</span></div>
             <p>Für einen klaren Plan und Momentum.</p>
             <ul class="list">
-              <li>✓ Individueller Trainingsplan</li>
-              <li>✓ Ernährungs-Grundstruktur</li>
+              <li>✓ Strukturierter Trainingsplan</li>
+              <li>✓ Ernährungs-Grundsystem</li>
               <li>✓ 1× Anpassung</li>
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
@@ -716,107 +531,57 @@
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
 
         <div class="pkg">
           <div class="pkg-inner">
-            <div class="pkg-top"><h4>Pro</h4><span class="tag">Empfohlen: 6–12 Wochen</span></div>
+            <div class="pkg-top"><h4>Pro</h4><span class="tag">Empfohlen: 12 Wochen</span></div>
             <p>Maximale Begleitung, ohne Überforderung.</p>
             <ul class="list">
               <li>✓ Voll personalisiert</li>
               <li>✓ Häufigere Check-ins</li>
-              <li>✓ Performance & Shape Fokus</li>
+              <li>✓ Shape & Performance Fokus</li>
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
       </div>
 
-      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-        <button class="ghost-pill" id="btnAfsz" type="button">AGB / AFSZ</button>
-      </div>
-    </div>
-  </section>
-
-  <section id="ablauf">
-    <div class="container">
-      <div class="section-title">Ablauf</div>
-      <p class="section-sub">Einfach, klar, alltagstauglich — ohne Stress.</p>
-
-      <div class="card">
-        <div class="card-inner">
-          <div class="about-grid">
-            <div class="about-box">
-              <p class="about-name">1) Kurze Beratung</p>
-              <p class="about-text">Ziel, Zeitplan, Alltag. Wir bauen daraus die passende Struktur.</p>
-            </div>
-            <div class="about-box">
-              <p class="about-name">2) Programm & Start</p>
-              <p class="about-text">Du bekommst deinen Plan + klare Schritte, ohne Überforderung.</p>
-            </div>
-            <div class="about-box">
-              <p class="about-name">3) Routine & Anpassung</p>
-              <p class="about-text">Wöchentliche Feinjustierung. Du bleibst dran, weil es machbar ist.</p>
-            </div>
-            <div class="about-box">
-              <p class="about-name">4) Ergebnis</p>
-              <p class="about-text">Form, Kraft, Wohlbefinden — sichtbar und nachhaltig.</p>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 
   <section id="bewertungen">
     <div class="container">
       <div class="section-title">Bewertungen</div>
-      <p class="section-sub">Echte Rückmeldungen. (Die Daten kommen aus Google Sheets – wie auf HU.)</p>
+      <p class="section-sub">Echte Rückmeldungen. (Wird aus derselben Quelle geladen wie HU — falls verfügbar.)</p>
 
-      <div class="reviews-shell">
-        <div class="card">
-          <div class="card-inner">
-            <div class="card-head">
-              <div class="card-title">Kundenstimmen</div>
-              <div class="tag">Live</div>
-            </div>
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-title">Kundenstimmen</div>
+            <div class="tag">Live</div>
+          </div>
 
-            <div class="review-card" id="reviewCard">
-              <div class="review-top">
-                <div class="review-name" id="rvName">Laden…</div>
-                <div class="stars" id="rvStars">★★★★★</div>
+          <div class="carousel" id="reviewsBox">
+            <div class="review">
+              <div class="rhead">
+                <div class="rname">Lädt…</div>
+                <div class="stars">★★★★★</div>
               </div>
-              <div class="review-text" id="rvText">Bitte warten…</div>
-              <div class="review-meta">
-                <span id="rvWhen">—</span>
-                <span id="rvIdx">—</span>
-              </div>
-            </div>
-
-            <div style="height:12px"></div>
-            <div class="carousel-actions">
-              <button class="btn ghost" id="rvPrev" type="button">←</button>
-              <button class="btn ghost" id="rvNext" type="button">→</button>
+              <p class="rtext">Bewertungen werden geladen.</p>
+              <div class="rmeta">—</div>
             </div>
           </div>
-        </div>
 
-        <div class="card">
-          <div class="card-inner">
-            <div class="card-head">
-              <div class="card-title">Bewertung schreiben</div>
-              <div class="tag">Später</div>
-            </div>
-            <p class="section-sub" style="margin:0;">
-              Optional: später jöhet egy modul (pl. Google Form / Giscus).
-              Most a fókusz az éles működésen van.
-            </p>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end; margin-top:12px;">
+            <button class="btn ghost" id="btnPrev" type="button">←</button>
+            <button class="btn ghost" id="btnNext" type="button">→</button>
           </div>
         </div>
       </div>
@@ -830,15 +595,10 @@
 
       <div class="card">
         <div class="card-inner">
-          <div class="about-grid">
-            <div class="about-box">
-              <p class="about-name">WhatsApp</p>
-              <p class="about-text">Schreib mir kurz dein Ziel + Zeitplan.</p>
-            </div>
-            <div class="about-box">
-              <p class="about-name">Instagram</p>
-              <p class="about-text">@fitnesslady</p>
-            </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn gold" href="#top">⬆ Zurück nach oben</a>
+            <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')">Mein Bereich</a>
+            <a class="btn" href="/hu/" onclick="localStorage.setItem('lang','hu')">HU Version</a>
           </div>
         </div>
       </div>
@@ -847,176 +607,157 @@
 
   <footer>
     <div class="footer-inner">
-      <div>© <span id="y"></span> Fitness Lady</div>
-      <div><a href="#pakete" id="footerAfsz">AGB / AFSZ</a> · Tüske web design</div>
+      <div>© <span id="y"></span> FitnessLady</div>
+      <div>Tüske web design</div>
     </div>
   </footer>
 
-  <!-- AFSZ MODAL -->
-  <div class="modal-overlay" id="afszOverlay" role="dialog" aria-modal="true" aria-labelledby="afszTitle" aria-hidden="true">
+  <!-- AGB / ÁSZF MODAL -->
+  <div class="modal-overlay" id="agbOverlay" role="dialog" aria-modal="true" aria-labelledby="agbTitle" aria-hidden="true">
     <div class="card modal" role="document">
       <div class="modal-header">
-        <h2 class="modal-title" id="afszTitle">AGB / AFSZ</h2>
-        <button class="modal-close" id="afszClose" type="button" aria-label="Close">✕</button>
+        <h2 class="modal-title" id="agbTitle">AGB</h2>
+        <button class="modal-close" id="agbClose" type="button" aria-label="Schließen">✕</button>
       </div>
-      <div class="modal-body" id="afszBody">
-        <p class="note"><b>Hinweis:</b> Ide beillesztjük a német ÁFSZ/AGB szöveget. (Ugyanúgy modalban, mint HU-n.)</p>
-        <p>
-          1) Leistung: Online Trainings- und Ernährungsbegleitung.<br>
-          2) Zugang: nach Zahlung / Freischaltung.<br>
-          3) Widerruf/Refund: gemäß individueller Vereinbarung.<br>
-          4) Haftung: Training auf eigene Verantwortung, bei gesundheitlichen Problemen Arzt konsultieren.
-        </p>
-        <p class="note">Ezt a szöveget bármikor cseréljük a végleges DE ÁFSZ-re.</p>
+      <div class="modal-body">
+        <p><b>Allgemeine Geschäftsbedingungen (Kurzfassung)</b></p>
+        <ul>
+          <li>Digitale Inhalte / Trainingspläne. Zugriff nach Kauf.</li>
+          <li>Kein medizinischer Ersatz. Bei Beschwerden: Arzt.</li>
+          <li>Ergebnisse variieren je nach Umsetzung.</li>
+          <li>Widerruf / Rückerstattung nach individueller Vereinbarung.</li>
+        </ul>
+        <p style="opacity:.75">Wenn du die vollständige AGB/Ászf-Version aus HU be akarod húzni ide is, szólj — betesszük 1:1 ugyanazzal a modal struktúrával.</p>
       </div>
     </div>
   </div>
 
   <script>
-    // Year
+    // year
     document.getElementById("y").textContent = new Date().getFullYear();
 
-    // AFSZ modal
-    const afszOverlay = document.getElementById("afszOverlay");
-    const openAfsz = () => { afszOverlay.classList.add("is-open"); afszOverlay.setAttribute("aria-hidden","false"); };
-    const closeAfsz = () => { afszOverlay.classList.remove("is-open"); afszOverlay.setAttribute("aria-hidden","true"); };
-    document.getElementById("btnAfsz")?.addEventListener("click", openAfsz);
-    document.getElementById("footerAfsz")?.addEventListener("click", (e)=>{ e.preventDefault(); openAfsz(); });
-    document.getElementById("afszClose")?.addEventListener("click", closeAfsz);
-    afszOverlay.addEventListener("click",(e)=>{ if(e.target===afszOverlay) closeAfsz(); });
-    document.addEventListener("keydown",(e)=>{ if(e.key==="Escape" && afszOverlay.classList.contains("is-open")) closeAfsz(); });
+    // Mobile menu (simple jump list)
+    const menuBtn = document.getElementById("menuBtn");
+    let menuOpen = false;
+    function closeMobileNav(){ document.getElementById("mobileNav")?.remove(); menuOpen=false; }
+    menuBtn?.addEventListener("click", ()=>{
+      if(menuOpen){ closeMobileNav(); return; }
+      closeMobileNav(); menuOpen=true;
+      const nav=document.createElement("div");
+      nav.id="mobileNav";
+      nav.style.position="fixed";
+      nav.style.top="64px";
+      nav.style.left="14px";
+      nav.style.right="14px";
+      nav.style.zIndex="60";
+      nav.style.background="rgba(20,12,26,.72)";
+      nav.style.border="1px solid rgba(255,255,255,.10)";
+      nav.style.borderRadius="18px";
+      nav.style.boxShadow="0 20px 70px rgba(0,0,0,.55)";
+      nav.style.padding="12px";
+      nav.innerHTML = `
+        <a href="#pakete" style="display:block;padding:10px;color:rgba(255,255,255,.86)">Pakete</a>
+        <a href="#ueber" style="display:block;padding:10px;color:rgba(255,255,255,.86)">Über mich</a>
+        <a href="#bewertungen" style="display:block;padding:10px;color:rgba(255,255,255,.86)">Bewertungen</a>
+        <a href="#kontakt" style="display:block;padding:10px;color:rgba(255,255,255,.86)">Kontakt</a>
+      `;
+      document.body.appendChild(nav);
+    });
+    document.addEventListener("click",(e)=>{
+      const nav=document.getElementById("mobileNav");
+      if(!nav) return;
+      if(e.target===menuBtn) return;
+      if(nav.contains(e.target)){ closeMobileNav(); return; }
+      closeMobileNav();
+    });
 
-    // Reviews carousel (CSV from Google Sheets)
-    // !!! IDE tedd be ugyanazt a CSV linket, ami a HU oldalon már működik !!!
-    const REVIEWS_CSV_URL = window.REVIEWS_CSV_URL || ""; // ha szeretnéd, beállíthatod globálisan is
-    const FALLBACK_CSV_URL = ""; // opcionális: ha üres a fenti, ide is írhatsz
+    // AGB modal
+    const agbOverlay = document.getElementById("agbOverlay");
+    const openAGB = ()=>{ agbOverlay.classList.add("is-open"); agbOverlay.setAttribute("aria-hidden","false"); };
+    const closeAGB = ()=>{ agbOverlay.classList.remove("is-open"); agbOverlay.setAttribute("aria-hidden","true"); };
+    document.getElementById("btnOpenAGB")?.addEventListener("click", openAGB);
+    document.getElementById("agbClose")?.addEventListener("click", closeAGB);
+    agbOverlay?.addEventListener("click",(e)=>{ if(e.target===agbOverlay) closeAGB(); });
+    document.addEventListener("keydown",(e)=>{ if(e.key==="Escape" && agbOverlay.classList.contains("is-open")) closeAGB(); });
+
+    // Reviews loader (próbál 2 helyet: HU és root)
+    const candidates = [
+      "/hu/reviews.csv",
+      "/reviews.csv"
+    ];
 
     function parseCSV(text){
-      // egyszerű CSV parser: kezeli az idézőjeles mezőket és a vesszőt
-      const rows = [];
-      let row = [];
-      let cur = "";
-      let inQ = false;
-      for(let i=0;i<text.length;i++){
-        const c = text[i];
-        const n = text[i+1];
-        if(c === '"' && inQ && n === '"'){ cur += '"'; i++; continue; }
-        if(c === '"'){ inQ = !inQ; continue; }
-        if(c === ',' && !inQ){ row.push(cur); cur=""; continue; }
-        if((c === '\n' || c === '\r') && !inQ){
-          if(cur.length || row.length){ row.push(cur); rows.push(row); }
-          row=[]; cur="";
-          // skip \r\n
-          if(c === '\r' && n === '\n') i++;
-          continue;
-        }
-        cur += c;
+      const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+      if(lines.length < 2) return [];
+      const header = lines[0].split(",").map(s=>s.trim().toLowerCase());
+      const idx = (name)=> header.indexOf(name);
+      const out = [];
+      for(let i=1;i<lines.length;i++){
+        const row = lines[i].split(",").map(s=>s.trim());
+        const name = row[idx("name")] ?? row[idx("nev")] ?? row[0] ?? "—";
+        const stars = Number((row[idx("stars")] ?? row[idx("rating")] ?? "5").replace(/[^\d.]/g,"")) || 5;
+        const textv = row[idx("text")] ?? row[idx("review")] ?? row[idx("velemeny")] ?? row[1] ?? "";
+        const date = row[idx("date")] ?? row[idx("datum")] ?? "";
+        out.push({ name, stars, text: textv, date });
       }
-      if(cur.length || row.length){ row.push(cur); rows.push(row); }
-      return rows;
+      return out.filter(r=>r.text);
     }
-
-    function stars(n){
-      const x = Math.max(1, Math.min(5, Number(n||5)));
-      return "★★★★★".slice(0,x) + "☆☆☆☆☆".slice(0,5-x);
-    }
-
-    const rvName = document.getElementById("rvName");
-    const rvText = document.getElementById("rvText");
-    const rvStars = document.getElementById("rvStars");
-    const rvWhen = document.getElementById("rvWhen");
-    const rvIdx = document.getElementById("rvIdx");
-    const btnPrev = document.getElementById("rvPrev");
-    const btnNext = document.getElementById("rvNext");
 
     let REVIEWS = [];
     let idx = 0;
 
     function renderReview(){
+      const box = document.getElementById("reviewsBox");
       if(!REVIEWS.length){
-        rvName.textContent = "Keine Bewertungen";
-        rvText.textContent = "Noch keine Daten.";
-        rvStars.textContent = "★★★★★";
-        rvWhen.textContent = "—";
-        rvIdx.textContent = "—";
+        box.innerHTML = `
+          <div class="review">
+            <div class="rhead"><div class="rname">Noch keine Bewertungen</div><div class="stars">★★★★★</div></div>
+            <p class="rtext">Sobald Bewertungen verfügbar sind, erscheinen sie hier (gleiche Quelle wie HU).</p>
+            <div class="rmeta">—</div>
+          </div>`;
         return;
       }
-      const r = REVIEWS[idx];
-      rvName.textContent = r.name || "—";
-      rvText.textContent = r.text || "—";
-      rvStars.textContent = stars(r.stars || 5);
-      rvWhen.textContent = r.date || "—";
-      rvIdx.textContent = `${idx+1}/${REVIEWS.length}`;
+      const r = REVIEWS[idx % REVIEWS.length];
+      const stars = "★★★★★".slice(0, Math.max(1, Math.min(5, r.stars)));
+      box.innerHTML = `
+        <div class="review">
+          <div class="rhead">
+            <div class="rname">${escapeHtml(r.name || "—")}</div>
+            <div class="stars">${stars}</div>
+          </div>
+          <p class="rtext">${escapeHtml(r.text || "")}</p>
+          <div class="rmeta">${escapeHtml(r.date || "")}</div>
+        </div>`;
     }
 
-    async function loadReviews(){
-      const url = REVIEWS_CSV_URL || FALLBACK_CSV_URL;
-      if(!url){
-        rvName.textContent = "CSV fehlt";
-        rvText.textContent = "Setze REVIEWS_CSV_URL auf denselben Link wie im HU Index.";
-        rvStars.textContent = "★★★★★";
-        rvWhen.textContent = "—";
-        rvIdx.textContent = "—";
-        return;
-      }
-      try{
-        const res = await fetch(url, { cache:"no-store" });
-        const txt = await res.text();
-        const rows = parseCSV(txt);
-        if(!rows.length){ renderReview(); return; }
-
-        // elvárt oszlopok: name, text, stars, date (ha más a HU sémája, itt igazítjuk)
-        const header = rows[0].map(s => (s||"").trim().toLowerCase());
-        const iName = header.indexOf("name");
-        const iText = header.indexOf("text");
-        const iStars = header.indexOf("stars");
-        const iDate = header.indexOf("date");
-
-        const out = [];
-        for(let i=1;i<rows.length;i++){
-          const r = rows[i];
-          const obj = {
-            name: iName>=0 ? (r[iName]||"").trim() : "",
-            text: iText>=0 ? (r[iText]||"").trim() : "",
-            stars: iStars>=0 ? (r[iStars]||"").trim() : "5",
-            date: iDate>=0 ? (r[iDate]||"").trim() : ""
-          };
-          if(obj.name || obj.text) out.push(obj);
-        }
-
-        REVIEWS = out;
-        idx = 0;
-        renderReview();
-
-        // auto-slide
-        clearInterval(window.__rvTimer);
-        window.__rvTimer = setInterval(()=>{
-          if(!REVIEWS.length) return;
-          idx = (idx + 1) % REVIEWS.length;
-          renderReview();
-        }, 5200);
-
-      }catch(e){
-        rvName.textContent = "Fehler";
-        rvText.textContent = "Reviews konnten nicht geladen werden.";
-        rvStars.textContent = "★★★★★";
-        rvWhen.textContent = "—";
-        rvIdx.textContent = "—";
-      }
+    function escapeHtml(s){
+      return String(s||"").replace(/[&<>"']/g, (c)=>({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[c]));
     }
 
-    btnPrev?.addEventListener("click", ()=>{
-      if(!REVIEWS.length) return;
-      idx = (idx - 1 + REVIEWS.length) % REVIEWS.length;
+    async function tryLoad(){
+      for(const url of candidates){
+        try{
+          const res = await fetch(url, { cache: "no-store" });
+          if(!res.ok) continue;
+          const text = await res.text();
+          const rows = parseCSV(text);
+          if(rows.length){
+            REVIEWS = rows;
+            idx = 0;
+            renderReview();
+            // auto-slide
+            setInterval(()=>{ idx++; renderReview(); }, 6500);
+            return;
+          }
+        }catch(e){}
+      }
       renderReview();
-    });
-    btnNext?.addEventListener("click", ()=>{
-      if(!REVIEWS.length) return;
-      idx = (idx + 1) % REVIEWS.length;
-      renderReview();
-    });
+    }
 
-    loadReviews();
+    document.getElementById("btnPrev")?.addEventListener("click", ()=>{ idx = (idx-1+REVIEWS.length)%REVIEWS.length; renderReview(); });
+    document.getElementById("btnNext")?.addEventListener("click", ()=>{ idx = (idx+1)%REVIEWS.length; renderReview(); });
+
+    tryLoad();
   </script>
 </body>
 </html>
