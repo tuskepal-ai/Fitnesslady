@@ -1,29 +1,30 @@
-// ./hu/shared/firebase.js
-// ÉLES: Firebase CDN (nincs bundler), Hostpoint + GitHub Pages kompatibilis
-// Fontos: Analytics-t direkt NEM inicializálunk (mobilon / webview-ban gyakran dob hibát).
-
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-
+// FILE: /hu/shared/firebase.js
+// Firebase v9 modular (CDN) — ÉLES shared helpers HU
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getAuth,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
   signOut
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
-
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 import {
   getFirestore,
-  doc,
-  getDoc,
-  setDoc,
+  doc, getDoc, setDoc, updateDoc, deleteDoc,
+  collection, getDocs, query, orderBy, limit, where,
   serverTimestamp
-} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// --- Safe prefix (GitHub Pages: /Fitnesslady, Hostpoint: "") ---
-const HOST = (typeof location !== "undefined" && location.hostname) ? String(location.hostname) : "";
-export const BASE_PREFIX = HOST.includes("github.io") ? "/Fitnesslady" : "";
+/**
+ * ÁLLÍTSD BE: admin email(ek)
+ * - ez oldja meg, hogy admin beengedjen akkor is, ha a users/{uid} doc még nincs “admin”-ra állítva
+ * - később bővíthető több emailre
+ */
+export const ADMIN_EMAILS = [
+  // "te@domain.com",
+];
 
-// Firebase config (a tied)
-const firebaseConfig = {
+export const BASE_PREFIX = ""; // GitHub Pages root
+export const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
   projectId: "fitneady-15fd0",
@@ -34,57 +35,120 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Firestore helper export “fs” néven (ahogy a vevő oldal használja)
+// Firestore namespace export (kompatibilitás az app kóddal)
 export const fs = {
-  doc,
-  getDoc,
-  setDoc,
+  doc, getDoc, setDoc, updateDoc, deleteDoc,
+  collection, getDocs, query, orderBy, limit, where,
   serverTimestamp
 };
 
-// ---- helpers ----
+// ---------- Helpers ----------
+export function escapeHtml(str){
+  const s = String(str ?? "");
+  return s
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+export function safeJsonParse(txt, fallback=null){
+  try{ return JSON.parse(txt); }catch{ return fallback; }
+}
+export function clamp(n, a, b){
+  const x = Number(n);
+  return Math.min(b, Math.max(a, x));
+}
+export function todayISO(){
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth()+1).padStart(2,"0");
+  const dd = String(d.getDate()).padStart(2,"0");
+  return `${yyyy}-${mm}-${dd}`;
+}
+export function fmtDate(iso){
+  if(!iso) return "—";
+  try{
+    const d = new Date(iso);
+    return d.toLocaleDateString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit" });
+  }catch{ return String(iso); }
+}
+export function daysBetween(aIso, bIso){
+  try{
+    const a = new Date(aIso);
+    const b = new Date(bIso);
+    const ms = b.getTime() - a.getTime();
+    return Math.floor(ms / (1000*60*60*24));
+  }catch{ return 0; }
+}
+
+// ---------- Navigation ----------
+export function toLogin(lang="hu"){
+  const l = (lang === "de") ? "de" : "hu";
+  window.location.href = `${BASE_PREFIX}/${l}/login/`;
+}
+export function toApp(lang="hu"){
+  const l = (lang === "de") ? "de" : "hu";
+  window.location.href = `${BASE_PREFIX}/${l}/app/`;
+}
+export function toAdmin(lang="hu"){
+  const l = (lang === "de") ? "de" : "hu";
+  window.location.href = `${BASE_PREFIX}/${l}/admin/`;
+}
+
+// ---------- Auth ----------
 export function onAuth(cb){
   return onAuthStateChanged(auth, cb);
 }
-
 export async function logout(){
   await signOut(auth);
 }
-
-export function toLogin(lang="hu"){
-  const l = (lang === "de") ? "de" : "hu";
-  // /hu/login/ (ha nálad máshogy van, itt módosítjuk)
-  location.href = `${BASE_PREFIX}/${l}/login/`;
+export async function loginEmailPassword(email, password){
+  return await signInWithEmailAndPassword(auth, email, password);
 }
 
-export function safeJsonParse(str, fallback){
-  try{
-    if(str === null || str === undefined) return fallback;
-    return JSON.parse(str);
-  }catch{
-    return fallback;
+// ---------- Profile bootstrap & role check ----------
+export function isAdminEmail(email){
+  const e = String(email || "").trim().toLowerCase();
+  return ADMIN_EMAILS.map(x=>String(x).trim().toLowerCase()).includes(e);
+}
+
+export async function ensureUserDoc(uid, email){
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()){
+    const initial = {
+      email: email || "",
+      role: "user",
+      active: true,
+      package: "Start",
+      goal: "Formálás",
+      level: 2,
+      lang: "hu",
+      diet: null,
+      motivation: null,
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    };
+    await setDoc(ref, initial, { merge: true });
+    return initial;
+  }else{
+    // ha régi struktúrából jön, legalább email-t frissítsük
+    const data = snap.data() || {};
+    if(email && data.email !== email){
+      await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
+    }
+    return data;
   }
 }
 
-export function escapeHtml(s){
-  return String(s ?? "").replace(/[&<>"']/g, c => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"
-  }[c]));
-}
-
-export const todayISO = () => new Date().toISOString().slice(0,10);
-export const clamp = (n,min,max)=>Math.max(min,Math.min(max,n));
-export const daysBetween = (a,b)=>Math.round((new Date(b)-new Date(a))/86400000);
-
-export function fmtDate(iso){
-  if(!iso) return "—";
-  const d = new Date(iso+"T00:00:00");
-  const dd = String(d.getDate()).padStart(2,"0");
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const yy = d.getFullYear();
-  return `${yy}.${mm}.${dd}`;
+export async function getUserRole(uid){
+  const ref = doc(db, "users", uid);
+  const snap = await getDoc(ref);
+  if(!snap.exists()) return null;
+  const role = String((snap.data()?.role || "")).toLowerCase();
+  return role || null;
 }
