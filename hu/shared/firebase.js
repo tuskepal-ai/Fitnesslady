@@ -1,8 +1,9 @@
 // ./hu/shared/firebase.js
 // ÉLES: Firebase CDN (nincs bundler), Hostpoint + GitHub Pages kompatibilis
+// Fontos: Analytics-t direkt NEM inicializálunk (mobilon / webview-ban gyakran dob hibát).
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-analytics.js";
+
 import {
   getAuth,
   onAuthStateChanged,
@@ -17,8 +18,9 @@ import {
   serverTimestamp
 } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
 
-// GitHub Pages prefix (repo: /Fitnesslady)
-export const BASE_PREFIX = (location.hostname.endsWith("github.io")) ? "/Fitnesslady" : "";
+// --- Safe prefix (GitHub Pages: /Fitnesslady, Hostpoint: "") ---
+const HOST = (typeof location !== "undefined" && location.hostname) ? String(location.hostname) : "";
+export const BASE_PREFIX = HOST.includes("github.io") ? "/Fitnesslady" : "";
 
 // Firebase config (a tied)
 const firebaseConfig = {
@@ -32,9 +34,6 @@ const firebaseConfig = {
 };
 
 export const app = initializeApp(firebaseConfig);
-
-// Analytics ne tudja elrontani a UI-t
-try { getAnalytics(app); } catch (e) {}
 
 export const auth = getAuth(app);
 export const db = getFirestore(app);
@@ -57,8 +56,8 @@ export async function logout(){
 }
 
 export function toLogin(lang="hu"){
-  // Nálad: /hu/login/ (ha más, itt írd át)
   const l = (lang === "de") ? "de" : "hu";
+  // /hu/login/ (ha nálad máshogy van, itt módosítjuk)
   location.href = `${BASE_PREFIX}/${l}/login/`;
 }
 
