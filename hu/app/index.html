@@ -1,4 +1,3 @@
-<!-- /hu/app/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -12,21 +11,9 @@
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-
       --pink:#ff4fd8;
       --pink2:#b14cff;
-      --gold:#ffd38a;
-
-      --radius:22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
-
-      --glassA: rgba(255,255,255,.06);
-      --glassB: rgba(255,255,255,.02);
-      --stroke: rgba(255,255,255,.10);
-      --stroke2: rgba(255,255,255,.14);
-
       --hero-url: none;
     }
     *{ box-sizing:border-box; }
@@ -38,7 +25,6 @@
       background:
         radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
         radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
       color:var(--text);
       overflow-x:hidden;
@@ -54,13 +40,13 @@
       background-repeat: no-repeat;
       transform: translateZ(0);
       opacity:.92;
+      pointer-events:none;
     }
 
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
     .container{ width: min(var(--max), 92vw); margin: 0 auto; }
 
-    /* Topbar */
     .topbar{
       position: fixed; top:0; left:0; right:0;
       z-index: 50;
@@ -76,34 +62,17 @@
       justify-content: space-between;
       gap: 12px;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:.2px; white-space: nowrap;
-    }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight:800; white-space: nowrap; }
     .dot{
       width:10px;height:10px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
+      flex:0 0 auto;
     }
-    .nav{
-      display:flex; align-items:center; gap: 14px;
-      color: var(--muted); font-size: 13.5px; font-weight: 700;
-    }
+
+    .nav{ display:flex; align-items:center; gap: 14px; color: rgba(255,255,255,.70); font-size: 13.5px; font-weight: 700; }
     .nav a{ position: relative; padding: 10px 6px; opacity:.92; }
-    .nav a:hover{ opacity:1; color: var(--text); }
-    .nav a::after{
-      content:"";
-      position:absolute;
-      left: 8px; right: 8px; bottom: 6px;
-      height: 2px; border-radius: 99px;
-      background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
-      transform: scaleX(0);
-      transform-origin: left;
-      opacity: 0;
-      transition: transform .28s ease, opacity .28s ease;
-    }
-    .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
+    .nav a:hover{ opacity:1; color: rgba(255,255,255,.92); }
 
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
@@ -113,7 +82,7 @@
       background: rgba(20,12,26,.55);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      color: var(--text);
+      color: rgba(255,255,255,.92);
       box-shadow: 0 12px 34px rgba(0,0,0,.35);
       cursor:pointer;
       transition: transform .18s ease, border-color .18s ease, background .18s ease;
@@ -130,13 +99,12 @@
       font-weight: 900;
     }
     .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
 
     .menu-btn{
       width: 40px; height: 40px; border-radius: 999px;
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
+      color: rgba(255,255,255,.92);
       display:none;
       align-items:center; justify-content:center;
       cursor:pointer;
@@ -153,91 +121,17 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .interactive{
-      position: relative;
-      overflow: hidden;
-      transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
-      will-change: transform;
-    }
-    .interactive::before{
-      content:"";
-      position:absolute; inset:-3px;
-      border-radius: inherit;
-      background:
-        radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
-        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
-      opacity: 0;
-      filter: blur(6px);
-      transition: opacity .30s ease;
-      pointer-events:none;
-    }
-    .interactive:hover,
-    .interactive:focus-visible,
-    .interactive.is-active{
-      transform: translateY(-4px);
-      border-color: rgba(255,255,255,.16);
-      box-shadow: 0 22px 70px rgba(0,0,0,.55);
-    }
-    .interactive:hover::before,
-    .interactive:focus-visible::before,
-    .interactive.is-active::before{ opacity: 1; }
-
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .nav{ display:none; }
-      .menu-btn{ display:inline-flex; }
-    }
-
     .card{ padding: 16px; }
-    .card h2, .card h3{
-      margin:0 0 8px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      letter-spacing: -.2px;
-    }
+    .card h2,.card h3{ margin:0 0 8px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; }
     .card h2{ font-size: 22px; }
     .card h3{ font-size: 18px; }
     .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
 
-    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
-    .meta-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-    }
-
-    .progress{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 999px;
-      height: 12px;
-      overflow:hidden;
-      position:relative;
-    }
-    .progress > span{
-      display:block;
-      height:100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
-      border-radius: 999px;
-      transition: width .35s ease;
-    }
-    .progress-label{
-      display:flex;
-      justify-content: space-between;
-      gap: 10px;
-      font-size: 12.5px;
-      color: rgba(255,255,255,.55);
-      margin: 10px 0 8px;
+    .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items:start; }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .nav{ display:none; }
+      .menu-btn{ display:inline-flex; }
     }
 
     .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 12px; }
@@ -269,7 +163,7 @@
       background: rgba(0,0,0,.18);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
+    .row .title{ font-weight: 900; font-size: 13.5px; }
     .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
     .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
     .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
@@ -286,9 +180,42 @@
       font-size: 12px;
     }
 
-    section{ scroll-margin-top: 82px; }
+    .progress{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      height: 12px;
+      overflow:hidden;
+    }
+    .progress > span{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .progress-label{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.55);
+      margin: 10px 0 8px;
+    }
 
-    /* Modal */
+    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
+    .meta-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    /* Modals */
     .modal-overlay{
       position: fixed; inset: 0; z-index: 80;
       background: rgba(0,0,0,.58);
@@ -305,7 +232,6 @@
       max-height: min(82vh, 760px);
       border-radius: 22px;
       overflow: hidden;
-      position: relative;
     }
     .modal-header{
       display:flex; align-items:center; justify-content: space-between; gap: 10px;
@@ -313,12 +239,7 @@
       border-bottom: 1px solid rgba(255,255,255,.08);
       background: rgba(10,8,14,.45);
     }
-    .modal-title{
-      margin:0;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 20px;
-      letter-spacing: -.2px;
-    }
+    .modal-title{ margin:0; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; font-size: 20px; }
     .modal-close{
       width: 40px; height: 40px;
       border-radius: 999px;
@@ -326,9 +247,7 @@
       background: rgba(255,255,255,.06);
       color: rgba(255,255,255,.9);
       cursor: pointer;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
+      display:inline-flex; align-items:center; justify-content:center;
     }
     .modal-body{
       padding: 16px;
@@ -337,6 +256,19 @@
       background: rgba(7,6,11,.38);
     }
     .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
+
+    .field{ display:grid; gap:6px; margin: 10px 0; }
+    .field label{ color: rgba(255,255,255,.70); font-size: 12.5px; font-weight: 800; }
+    .field input{
+      height: 44px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.92);
+      padding: 0 12px;
+      outline: none;
+    }
+    .field input:focus{ border-color: rgba(255,79,216,.35); box-shadow: 0 0 0 3px rgba(255,79,216,.12); }
 
     footer{
       padding: 18px 0 46px;
@@ -349,7 +281,6 @@
       color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    /* Debug strip */
     .debug{
       position: fixed;
       bottom: 10px;
@@ -367,19 +298,13 @@
       backdrop-filter: blur(10px);
     }
     .debug.is-on{ display:block; }
-
-    @media (prefers-reduced-motion: reduce){
-      html{ scroll-behavior:auto; }
-      .interactive, .pill{ transition:none; }
-      .progress > span{ transition:none; }
-    }
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a class="brand" id="homeLink" href="#" aria-label="Vissza a főoldalra">
+      <a class="brand" id="homeLink" href="/hu/" aria-label="Vissza a főoldalra">
         <span class="dot"></span><span>Fitness Lady</span>
       </a>
 
@@ -391,7 +316,7 @@
       </nav>
 
       <div style="display:flex; align-items:center; gap:10px;">
-        <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
+        <button class="menu-btn" id="menuBtn" aria-label="Menü" type="button">☰</button>
         <button class="pill ghost" id="btnLogout" type="button" title="Kijelentkezés">⎋ Kilépés</button>
       </div>
     </div>
@@ -399,14 +324,13 @@
 
   <main>
     <div class="container page">
-      <section id="top" class="glass interactive card" style="margin-bottom:14px;">
+      <section class="glass card" style="margin-bottom:14px;">
         <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
           <div>
             <div class="chip" id="chipPackage">Csomag: —</div>
-            <h2 style="margin-top:10px;" id="titleProgram">Saját programom</h2>
+            <h2 style="margin-top:10px;">Saját programom</h2>
             <p class="sub" id="subStatus">Betöltés…</p>
           </div>
-
           <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
             <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
           </div>
@@ -416,9 +340,7 @@
           <span id="lblWeek">Hét: —</span>
           <span id="lblDays">Státusz: —</span>
         </div>
-        <div class="progress" aria-label="Haladás">
-          <span id="barCycle"></span>
-        </div>
+        <div class="progress"><span id="barCycle"></span></div>
 
         <div class="meta-row">
           <div class="meta-pill" id="pillGoal">🎯 Cél: —</div>
@@ -428,11 +350,11 @@
       </section>
 
       <div class="grid">
-        <section id="program" class="glass interactive card">
-          <h3 id="hWorkouts">Heti edzések</h3>
-          <p class="sub" id="pWorkouts">Heti bontásban látod az edzéseidet. A személyre szabás slotokat Edina frissíti.</p>
+        <section id="program" class="glass card">
+          <h3>Heti edzések</h3>
+          <p class="sub">Heti bontásban látod az edzéseidet. A személyre szabás slotokat Edina frissíti.</p>
 
-          <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
+          <div class="tabs" id="weekTabs"></div>
 
           <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 0 0 10px;">
             <button class="pill ghost tiny" id="btnMarkAll" type="button">✅ Heti edzések kipipálása</button>
@@ -444,30 +366,21 @@
 
           <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
 
-          <h3 id="hSlots">Személyre szabás</h3>
-          <p class="sub" id="pSlots">A slotok csak a te programodhoz tartozó videókat mutatják.</p>
+          <h3>Személyre szabás</h3>
+          <p class="sub">A slotok csak a te programodhoz tartozó videókat mutatják.</p>
           <ul class="list" id="slotList"></ul>
         </section>
 
         <div style="display:grid; gap:14px;">
-          <section id="etrend" class="glass interactive card">
+          <section id="etrend" class="glass card">
             <h3>Étrend</h3>
             <p class="sub">Itt most gyors jelölők vannak. A részletes étrend az adminból állítható lesz (következő lépés).</p>
 
-            <div class="row" style="grid-template-columns: 1fr; gap:8px;">
-              <div>
-                <div class="title">Mai keret</div>
-                <div class="desc">Pipáld ki, ami megvan — ritmus és következetesség.</div>
-              </div>
-              <div style="display:grid; gap:8px;">
-                <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                  <button class="pill ghost tiny" data-toggle="diet_water" type="button">💧 2L víz</button>
-                  <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje megvolt</button>
-                  <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
-                  <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
-                </div>
-                <div class="note" id="dietNote">A részletes étrend (napokra bontva) a következő körben jön, adminból szerkeszthetően.</div>
-              </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+              <button class="pill ghost tiny" data-toggle="diet_water" type="button">💧 2L víz</button>
+              <button class="pill ghost tiny" data-toggle="diet_protein" type="button">🥚 Fehérje megvolt</button>
+              <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
+              <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
@@ -476,45 +389,29 @@
             </div>
           </section>
 
-          <section id="checkin" class="glass interactive card">
+          <section id="checkin" class="glass card">
             <h3>Célom & Check-in</h3>
             <p class="sub">A check-in státusz elmentődik neked. Később admin is látni fogja.</p>
 
-            <div class="row" style="grid-template-columns: 1fr; gap:10px;">
-              <div>
-                <div class="title" id="goalTitle">🎯 Cél: —</div>
-                <div class="desc" id="goalDesc">—</div>
-              </div>
-
-              <div style="display:grid; gap:8px;">
-                <div class="progress-label" style="margin:0;">
-                  <span>Heti check-in</span>
-                  <span id="checkinLabel">0/1</span>
-                </div>
-                <div class="progress"><span id="barCheckin"></span></div>
-
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
-                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kész</button>
-                  <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
-                </div>
-
-                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
-              </div>
+            <div class="progress-label" style="margin:0;">
+              <span>Heti check-in</span>
+              <span id="checkinLabel">0/1</span>
             </div>
+            <div class="progress"><span id="barCheckin"></span></div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:10px;">
+              <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kész</button>
+              <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
+            </div>
+
+            <div class="note" id="motivationBox" style="margin-top:10px;">„A rendszer nem nyomás. A rendszer szabadság.”</div>
           </section>
         </div>
       </div>
 
-      <section id="technika" class="glass interactive card" style="margin-top:14px;">
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div>
-            <h3>Technika Vault</h3>
-            <p class="sub">Technika videók kategóriákban. (Sablonból jön, admin kezeli.)</p>
-          </div>
-          <button class="pill ghost tiny" id="btnAddTechDone" type="button">✅ Technikák kipipálása</button>
-        </div>
-
-        <div class="tabs" id="techTabs" aria-label="Technika kategóriák"></div>
+      <section id="technika" class="glass card" style="margin-top:14px;">
+        <h3>Technika Vault</h3>
+        <p class="sub">Technika videók kategóriákban. (Sablonból jön, admin kezeli.)</p>
         <ul class="list" id="techList"></ul>
       </section>
     </div>
@@ -528,11 +425,11 @@
   </footer>
 
   <!-- SETTINGS MODAL -->
-  <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
+  <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
-        <h2 class="modal-title" id="settingsTitle">Beállítások</h2>
-        <button class="modal-close interactive" id="settingsClose" type="button" aria-label="Bezárás">✕</button>
+        <h2 class="modal-title">Beállítások</h2>
+        <button class="modal-close" id="settingsClose" type="button" aria-label="Bezárás">✕</button>
       </div>
       <div class="modal-body">
         <p class="note">Itt csak a saját cél/szint/nyelv módosítható. Csomagot és személyre szabást admin állít.</p>
@@ -555,20 +452,16 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="pill primary" id="btnSaveSettings" type="button">Mentés</button>
         </div>
-
-        <p class="note" style="margin-top:10px;">
-          Ha admin vagy és mindent állítani akarsz: az admin oldalon csinálod.
-        </p>
       </div>
     </div>
   </div>
 
   <!-- INFO MODAL -->
-  <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
+  <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
         <h2 class="modal-title" id="infoTitle">Info</h2>
-        <button class="modal-close interactive" id="infoClose" type="button" aria-label="Bezárás">✕</button>
+        <button class="modal-close" id="infoClose" type="button" aria-label="Bezárás">✕</button>
       </div>
       <div class="modal-body" id="infoBody"></div>
     </div>
@@ -577,43 +470,23 @@
   <div class="debug" id="debugBox">debug</div>
 
   <script type="module">
+    /**
+     * ✅ KRITIKUS FIX:
+     * - ne relatív ../shared/firebase.js legyen (az /hu/shared-re menne)
+     * - hanem ROOT abszolút: /shared/firebase.js
+     */
     import {
-      BASE_PREFIX, auth, db, fs,
+      auth, db, fs,
       onAuth, logout, toLogin,
       escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
-    } from "../shared/firebase.js";
+    } from "/shared/firebase.js";
 
-    // ========== HERO + home link ==========
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
-    const homeLink = document.getElementById("homeLink");
-    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+    // hero mindig rootból
+    document.documentElement.style.setProperty("--hero-url", `url("/hero.png")`);
 
-    // ========== UI helpers ==========
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-    function enableTapGlow(selector=".interactive"){
-      $$(selector).forEach(el=>{
-        el.addEventListener("touchstart", ()=>{
-          el.classList.add("is-active");
-          window.clearTimeout(el.__t);
-          el.__t = window.setTimeout(()=>el.classList.remove("is-active"), 650);
-        }, {passive:true});
-      });
-    }
-    enableTapGlow();
-
-    // Debug toggle: add ?debug=1
-    const debugOn = new URLSearchParams(location.search).get("debug") === "1";
-    const debugBox = $("#debugBox");
-    if(debugOn) debugBox.classList.add("is-on");
-    const debug = (msg) => {
-      if(!debugOn) return;
-      debugBox.textContent = msg;
-      console.log("[APP]", msg);
-    };
-
-    // Modals
     const settingsOverlay = $("#settingsOverlay");
     const infoOverlay = $("#infoOverlay");
     const infoBody = $("#infoBody");
@@ -637,13 +510,6 @@
     $("#infoClose").addEventListener("click", ()=>closeOverlay(infoOverlay));
     settingsOverlay.addEventListener("click",(e)=>{ if(e.target===settingsOverlay) closeOverlay(settingsOverlay); });
     infoOverlay.addEventListener("click",(e)=>{ if(e.target===infoOverlay) closeOverlay(infoOverlay); });
-    document.addEventListener("keydown",(e)=>{
-      if(e.key==="Escape"){
-        [settingsOverlay, infoOverlay].forEach(ov=>{
-          if(ov.classList.contains("is-open")) closeOverlay(ov);
-        });
-      }
-    });
 
     // Mobile menu
     const menuBtn = $("#menuBtn");
@@ -682,57 +548,18 @@
       closeMobileNav();
     });
 
-    // Active nav underline
-    (()=> {
-      const links = $$('[data-nav]');
-      const sections = links.map(a => document.querySelector(a.getAttribute('href'))).filter(Boolean);
-      const setActive = (id) => links.forEach(a => a.classList.toggle('is-active', a.getAttribute('href') === `#${id}`));
-      const io = new IntersectionObserver((entries)=>{
-        const visible = entries.filter(e=>e.isIntersecting).sort((a,b)=>b.intersectionRatio-a.intersectionRatio)[0];
-        if(visible?.target?.id) setActive(visible.target.id);
-      }, { threshold: [0.18, 0.28, 0.4] });
-      sections.forEach(s=>io.observe(s));
-    })();
-
-    // ========== user-scoped localStorage (done/diet/checkin) ==========
+    // user-scoped localStorage
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
-    // ========== FALLBACK template (ha Firestore-ban hiányzik) ==========
-    function buildFallbackTemplate(planId="start_v1"){
-      const weeks = 4;
-      const makeWeek = (weekNo) => ({
-        workouts: [
-          { id: `w${weekNo}_1`, title:{hu:`Hét ${weekNo} — Edzés 1`, de:`Woche ${weekNo} — Training 1`}, desc:{hu:"(Fallback) Admin még nem töltött fel sablont.", de:"(Fallback) Admin hat noch kein Template hochgeladen."}, vimeoId:"" },
-          { id: `w${weekNo}_2`, title:{hu:`Hét ${weekNo} — Edzés 2`, de:`Woche ${weekNo} — Training 2`}, desc:{hu:"(Fallback) A végleges edzések adminból jönnek.", de:"(Fallback) Finales Training kommt aus dem Admin."}, vimeoId:"" },
-          { id: `w${weekNo}_3`, title:{hu:`Hét ${weekNo} — Edzés 3`, de:`Woche ${weekNo} — Training 3`}, desc:{hu:"(Fallback) Kérd meg az admint a sablon feltöltésére.", de:"(Fallback) Bitte Admin um das Template."}, vimeoId:"" }
-        ],
-        slots: [
-          { slotIndex: 1, title:{hu:"Személyre szabás 1", de:"Personalisierung 1"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
-          { slotIndex: 2, title:{hu:"Személyre szabás 2", de:"Personalisierung 2"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
-          { slotIndex: 3, title:{hu:"Személyre szabás 3", de:"Personalisierung 3"}, desc:{hu:"(Fallback) Admin állítja.", de:"(Fallback) Admin setzt."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" }
-        ]
-      });
-
-      const byWeek = new Map();
-      for(let w=1; w<=weeks; w++) byWeek.set(w, makeWeek(w));
-
-      return {
-        meta: { id: planId, name:{hu:"Start", de:"Start"}, weeks, active:true, __fallback:true },
-        week: (weekNo) => byWeek.get(weekNo)
-      };
-    }
-
-    // ========== Firestore loaders ==========
+    // Firestore
     async function loadUserProfile(uid){
       const ref = fs.doc(db, "users", uid);
       const snap = await fs.getDoc(ref);
-
       if(!snap.exists()){
         const initial = {
           email: auth.currentUser?.email || "",
-          displayName: "",
           lang: "hu",
           role: "user",
           status: "active",
@@ -748,90 +575,65 @@
         await fs.setDoc(ref, initial, { merge: true });
         return initial;
       }
-
-      const data = snap.data() || {};
-      // Biztosítsuk, hogy mindig legyen planId
-      if(!data.planId) data.planId = "start_v1";
-      if(!data.lang) data.lang = "hu";
-      if(!data.level) data.level = 2;
-      if(!data.goal) data.goal = "Formálás";
-      return data;
+      return snap.data();
     }
 
     async function loadPlanMeta(planId){
       const ref = fs.doc(db, "planTemplates", planId);
       const snap = await fs.getDoc(ref);
-      if(!snap.exists()) return null;
+      if(!snap.exists()) throw new Error(`Nincs ilyen planTemplates/${planId}. (Adminból fel kell tölteni a sablont)`);
       return snap.data();
     }
 
     async function loadPlanWeek(planId, weekNo){
       const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
       const snap = await fs.getDoc(ref);
-      if(!snap.exists()) return null;
+      if(!snap.exists()) throw new Error(`Hiányzik: planTemplates/${planId}/weeks/${weekNo}`);
       return snap.data();
     }
 
+    // ✅ overrides: users/{uid}/overrides/{weekNo}
     async function loadOverridesWeek(uid, weekNo){
-      const ref = fs.doc(db, "users", uid, "overrides", "weeks", String(weekNo));
+      const ref = fs.doc(db, "users", uid, "overrides", String(weekNo));
       const snap = await fs.getDoc(ref);
       return snap.exists() ? snap.data() : null;
     }
 
-    // Merge helpers (HU/DE mezők)
     function pickLang(obj, lang, fallback="—"){
-      if(obj == null) return fallback;
+      if(!obj) return fallback;
       if(typeof obj === "string") return obj;
       if(obj[lang]) return obj[lang];
-      if(obj["hu"]) return obj["hu"];
-      if(obj["de"]) return obj["de"];
+      if(obj.hu) return obj.hu;
+      if(obj.de) return obj.de;
       return fallback;
     }
 
     function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
       if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
-
       const tTitle = pickLang(templateW.title, lang, "");
       const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
       w._title = oTitle || tTitle || "—";
-
       const tDesc = pickLang(templateW.desc, lang, "");
       const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
       w._desc = oDesc || tDesc || "";
-
       return w;
     }
 
     function mergeSlot(templateS, ovS, lang){
       const s = { ...templateS };
-      s.vimeoId = (ovS?.vimeoId) ? ovS.vimeoId : (templateS.defaultVimeoId || "");
-      const tTitle = pickLang(templateS.title, lang, "");
-      s._title = tTitle || "—";
-      const tDesc = pickLang(templateS.desc, lang, "");
-      s._desc = tDesc || "";
+      s.vimeoId = ovS?.vimeoId ? ovS.vimeoId : (templateS.defaultVimeoId || "");
+      s._title = pickLang(templateS.title, lang, "—");
+      s._desc = pickLang(templateS.desc, lang, "");
       const tNote = pickLang(templateS.defaultNote, lang, "—");
       const oNote = ovS?.note ? pickLang(ovS.note, lang, "") : "";
       s._note = oNote || tNote || "—";
       return s;
     }
 
-    // ========== App state ==========
-    let UID = null;
-    let profile = null;
-    let planMeta = null;
-    let fallback = null; // ha nincs Firestore template
-
-    // week cache for fast tab switching
-    const weekCache = new Map(); // weekNo -> { templateWeek, overridesWeek, merged }
-
-    const state = {
-      weekIdx: 0,
-      done: {},
-      diet: {},
-      checkin: null,
-      lang: "hu"
-    };
+    let UID=null, profile=null, planMeta=null;
+    const weekCache = new Map();
+    const state = { weekIdx:0, done:{}, diet:{}, checkin:null, lang:"hu" };
 
     function calcWeekIndex(p){
       if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
@@ -844,72 +646,51 @@
 
     function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
 
-    // ========== Render header ==========
+    async function ensureWeekLoaded(weekNo){
+      if(weekCache.has(weekNo)) return weekCache.get(weekNo);
+
+      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      const overridesWeek = await loadOverridesWeek(UID, weekNo);
+      const ovWorkouts = overridesWeek?.workouts || {};
+      const ovSlots = overridesWeek?.slots || {};
+
+      const merged = {
+        weekNo,
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+      };
+
+      const pack = { merged };
+      weekCache.set(weekNo, pack);
+      return pack;
+    }
+
     function renderHeader(){
-      const p = profile;
-
-      const planName = pickLang(planMeta?.name, state.lang, p.planId || "—");
-      $("#chipPackage").textContent = `Csomag: ${planName}${planMeta?.__fallback ? " (fallback)" : ""}`;
-
-      $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
-      $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
+      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, profile.planId || "—")}`;
+      $("#pillGoal").textContent = `🎯 Cél: ${profile.goal || "—"}`;
+      $("#pillIntensity").textContent = `⚡ Szint: ${profile.level ? `${profile.level}/4` : "—"}`;
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
-      const weeks = planMeta?.weeks || 4;
-
-      if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
-        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${weeks}`;
+      if(profile.lifetimeAccess || !profile.cycleStart || !profile.cycleEnd){
+        $("#lblWeek").textContent = `Hét: ${state.weekIdx+1}/${planMeta.weeks||4}`;
         $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
-        $("#barCycle").style.width = `100%`;
-        $("#subStatus").textContent = `Üdv, ${p.email || "!"} • A programod aktív. A heti edzéseket a füleken választod.`;
+        $("#barCycle").style.width = "100%";
+        $("#subStatus").textContent = `Üdv, ${profile.email || ""} • A programod aktív.`;
       }else{
-        const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-        const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
-        const leftDays = clamp(totalDays - passedDays, 0, totalDays);
-        const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
-
-        $("#lblWeek").textContent = `Hét: ${week}/${weeks}`;
-        $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
-        const pct = Math.round((passedDays / totalDays) * 100);
+        const totalDays = Math.max(1, daysBetween(profile.cycleStart, profile.cycleEnd));
+        const passedDays = clamp(daysBetween(profile.cycleStart, todayISO()), 0, totalDays);
+        const pct = Math.round((passedDays/totalDays)*100);
         $("#barCycle").style.width = `${pct}%`;
-        $("#subStatus").textContent = `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)}`;
+        $("#subStatus").textContent = `Aktív időszak: ${fmtDate(profile.cycleStart)} — ${fmtDate(profile.cycleEnd)}`;
       }
-
-      $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
-      $("#goalDesc").textContent = p.goal
-        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket.`
-        : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`;
 
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
-
-      // Ha fallback: írjuk ki, hogy adminnak fel kell tölteni a sablont
-      if(planMeta?.__fallback){
-        const msg = `
-          <div class="row" style="grid-template-columns:1fr;">
-            <div>
-              <div class="title">⚠️ Admin teendő</div>
-              <div class="desc">
-                Hiányzik a Firestore sablon: <b>planTemplates/${escapeHtml(profile.planId)}</b>.
-                Most a vevő oldal <b>fallback</b> adatokkal fut, hogy minden gomb működjön.
-              </div>
-            </div>
-          </div>
-        `;
-        // csak egyszer dobjuk fel
-        if(!window.__fl_fallback_notified){
-          window.__fl_fallback_notified = true;
-          openInfo("Hiányzó sablon (Firestore)", msg + `
-            <p class="note">Megoldás: töltsd fel adminból a planTemplates/${escapeHtml(profile.planId)} sablont + weeks/1..N.</p>
-          `);
-        }
-      }
     }
 
-    // ========== Week tabs ==========
     function renderWeekTabs(){
-      const weeks = planMeta?.weeks || 4;
+      const weeks = planMeta.weeks || 4;
       const tabs = $("#weekTabs");
       tabs.innerHTML = "";
       for(let i=0;i<weeks;i++){
@@ -927,60 +708,21 @@
       }
     }
 
-    // ========== Load & merge week ==========
-    async function ensureWeekLoaded(weekNo){
-      if(weekCache.has(weekNo)) return weekCache.get(weekNo);
-
-      let templateWeek = null;
-
-      if(planMeta?.__fallback && fallback){
-        templateWeek = fallback.week(weekNo);
-      }else{
-        templateWeek = await loadPlanWeek(profile.planId, weekNo);
-        if(!templateWeek){
-          // ha meta megvan, de a week hiányzik: essünk vissza fallback-re, ne álljon meg
-          fallback = fallback || buildFallbackTemplate(profile.planId);
-          planMeta = { ...fallback.meta, __fallback:true };
-          templateWeek = fallback.week(weekNo);
-        }
-      }
-
-      const overridesWeek = await loadOverridesWeek(UID, weekNo);
-
-      const ovWorkouts = overridesWeek?.workouts || {};
-      const ovSlots = overridesWeek?.slots || {};
-
-      const merged = {
-        weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
-      };
-
-      const pack = { templateWeek, overridesWeek, merged };
-      weekCache.set(weekNo, pack);
-      return pack;
-    }
-
-    // ========== Render Program ==========
     function renderProgram(){
       renderWeekTabs();
-
       const weekNo = state.weekIdx + 1;
       const pack = weekCache.get(weekNo);
       if(!pack){
-        $("#workoutList").innerHTML = `<li class="row"><div><div class="title">Betöltés…</div><div class="desc">Kérlek várj.</div></div></li>`;
+        $("#workoutList").innerHTML = `<li class="row"><div><div class="title">Betöltés…</div></div></li>`;
         $("#slotList").innerHTML = "";
         return;
       }
 
-      const { merged } = pack;
-
       const ul = $("#workoutList");
       ul.innerHTML = "";
-      merged.workouts.forEach(w=>{
+      pack.merged.workouts.forEach(w=>{
         const key = workoutKey(weekNo, w.id);
         const done = !!state.done[key];
-
         const li = document.createElement("li");
         li.className = "row";
         li.innerHTML = `
@@ -990,7 +732,7 @@
           </div>
           <div class="actions">
             <button class="pill ghost tiny" type="button" data-play="${escapeHtml(w.vimeoId || "")}">▶ Lejátszás</button>
-            <button class="pill ${done ? 'danger' : 'primary'} tiny" type="button" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
+            <button class="pill ${done ? 'ghost' : 'primary'} tiny" type="button" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
           </div>
         `;
         ul.appendChild(li);
@@ -998,7 +740,7 @@
 
       const sl = $("#slotList");
       sl.innerHTML = "";
-      merged.slots.forEach((s)=>{
+      pack.merged.slots.forEach(s=>{
         const li = document.createElement("li");
         li.className = "row";
         li.innerHTML = `
@@ -1013,34 +755,26 @@
         sl.appendChild(li);
       });
 
-      // play buttons (Vimeo embed)
-      $$("[data-play]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const vimeoId = b.getAttribute("data-play");
-          if(!vimeoId){
+      $$("[data-play]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const id = btn.getAttribute("data-play");
+          if(!id){
             openInfo("Lejátszás", `<p class="note">Ehhez még nincs Vimeo ID beállítva (admin).</p>`);
             return;
           }
-          const src = `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
+          const src = `https://player.vimeo.com/video/${encodeURIComponent(id)}`;
           openInfo("Lejátszás", `
-            <p class="note">Ha a videó nem indul: Vimeo embed domain whitelist (fitnesslady.ch).</p>
             <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
-              <iframe
-                src="${escapeHtml(src)}"
-                width="100%" height="480"
-                frameborder="0"
-                allow="autoplay; fullscreen; picture-in-picture"
-                allowfullscreen
-                style="display:block">
-              </iframe>
+              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0"
+                allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
             </div>
           `);
         });
       });
 
-      $$("[data-toggle-done]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const key = b.getAttribute("data-toggle-done");
+      $$("[data-toggle-done]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const key = btn.getAttribute("data-toggle-done");
           state.done[key] = !state.done[key];
           lsSet(UID, "done", state.done);
           renderProgram();
@@ -1048,81 +782,67 @@
       });
     }
 
-    // ========== Technika vault ==========
+    function refreshDietButtons(){
+      $$("[data-toggle]").forEach(btn=>{
+        const key = btn.getAttribute("data-toggle");
+        const on = !!state.diet[key];
+        btn.classList.toggle("primary", on);
+        btn.classList.toggle("ghost", !on);
+      });
+    }
+
     function renderTechnika(){
-      const tabs = $("#techTabs");
-      const list = $("#techList");
-      tabs.innerHTML = "";
-      list.innerHTML = `
+      $("#techList").innerHTML = `
         <li class="row">
           <div>
             <div class="title">Technika Vault</div>
-            <div class="desc">A technika videók sablonból jönnek. Következő lépés: technika kategóriák + videók admin szerkesztéssel.</div>
+            <div class="desc">Következő lépés: technika kategóriák + videók adminból.</div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" type="button" id="btnTechInfo">ℹ️</button>
+            <button class="pill ghost tiny" id="btnTechInfo" type="button">ℹ️</button>
           </div>
         </li>
       `;
       $("#btnTechInfo")?.addEventListener("click", ()=>{
-        openInfo("Technika Vault", `<p class="note">Következő kör: technika sablon + app render.</p>`);
-      });
-    }
-
-    function refreshDietButtons(){
-      const d = state.diet;
-      $$("[data-toggle]").forEach(btn=>{
-        const key = btn.getAttribute("data-toggle");
-        const on = !!d[key];
-        btn.classList.toggle("primary", on);
-        btn.classList.toggle("ghost", !on);
+        openInfo("Technika", `<p class="note">Következő körben jön a technika sablon + kategóriák.</p>`);
       });
     }
 
     function renderAll(){
       renderHeader();
       renderProgram();
-      renderTechnika();
       refreshDietButtons();
-      enableTapGlow();
+      renderTechnika();
     }
 
-    // ========== Buttons ==========
+    // Buttons
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
       toLogin(state.lang || "hu");
     });
 
-    $("#btnMarkAll").addEventListener("click", ()=>{
-      const weekNo = state.weekIdx + 1;
-      const pack = weekCache.get(weekNo);
-      if(!pack) return;
-      pack.merged.workouts.forEach(w => state.done[workoutKey(weekNo, w.id)] = true);
-      lsSet(UID, "done", state.done);
-      renderProgram();
+    $("#btnOpenSettings").addEventListener("click", ()=>{
+      $("#setGoal").value = profile.goal || "";
+      $("#setLevel").value = profile.level || 2;
+      $("#setLang").value = profile.lang || "hu";
+      openOverlay(settingsOverlay);
     });
 
-    $("#btnResetWeek").addEventListener("click", ()=>{
-      const weekNo = state.weekIdx + 1;
-      const pack = weekCache.get(weekNo);
-      if(!pack) return;
-      pack.merged.workouts.forEach(w => delete state.done[workoutKey(weekNo, w.id)]);
-      lsSet(UID, "done", state.done);
-      renderProgram();
+    $("#btnSaveSettings").addEventListener("click", async ()=>{
+      const goal = ($("#setGoal").value || "").trim();
+      const level = clamp(parseInt($("#setLevel").value || "2",10), 1, 4);
+      const lang = (($("#setLang").value || "hu").trim().toLowerCase() === "de") ? "de" : "hu";
+
+      await fs.setDoc(fs.doc(db, "users", UID), { goal, level, lang, updatedAt: fs.serverTimestamp() }, { merge:true });
+      profile.goal = goal; profile.level = level; profile.lang = lang; state.lang = lang;
+
+      weekCache.clear();
+      await ensureWeekLoaded(state.weekIdx + 1);
+
+      closeOverlay(settingsOverlay);
+      renderAll();
     });
 
-    $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
-      openInfo("Vimeo beágyazás (éles)", `
-        <p class="note"><b>Éles</b> beállítás: Vimeo videók legyenek Private/Hide, és Embed csak a te domainjeiden.</p>
-        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
-          <li>Vimeo: Hide from Vimeo / Private</li>
-          <li>Embed whitelist: fitnesslady.ch</li>
-          <li>Download: OFF</li>
-        </ul>
-      `);
-    });
-
-    // diet toggles
     $$("[data-toggle]").forEach(btn=>{
       btn.addEventListener("click", ()=>{
         const key = btn.getAttribute("data-toggle");
@@ -1132,12 +852,8 @@
       });
     });
 
-    $("#btnDietPlan").addEventListener("click", ()=>{
-      openInfo("Napi terv", `<p class="note">A részletes étrendet a következő körben Firestore-ból hozzuk (adminból állítható).</p>`);
-    });
-    $("#btnDietPrefs").addEventListener("click", ()=>{
-      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, kedvencek, étkezésszám, edzésnap/pihenőnap sablon.</p>`);
-    });
+    $("#btnDietPlan").addEventListener("click", ()=>openInfo("Napi terv", `<p class="note">Következő körben Firestore-ból jön (admin szerkeszti).</p>`));
+    $("#btnDietPrefs").addEventListener("click", ()=>openInfo("Preferenciák", `<p class="note">Következő kör: preferenciák sablon.</p>`));
 
     const MOTS = [
       "„A rendszer nem nyomás. A rendszer szabadság.”",
@@ -1150,53 +866,18 @@
     });
 
     $("#btnDoCheckin").addEventListener("click", ()=>{
-      state.checkin = { done: true, at: new Date().toISOString() };
+      state.checkin = { done:true, at: new Date().toISOString() };
       lsSet(UID, "checkin", state.checkin);
       renderHeader();
-      openInfo("Check-in", `<p class="note">Kész ✅ (elmentve neked). Következő körben: admin is látja / check-in űrlap.</p>`);
+      openInfo("Check-in", `<p class="note">Kész ✅ (elmentve).</p>`);
     });
 
-    // Settings
-    $("#btnOpenSettings").addEventListener("click", ()=>{
-      $("#setGoal").value = profile.goal || "";
-      $("#setLevel").value = profile.level || 2;
-      $("#setLang").value = profile.lang || "hu";
-      openOverlay(settingsOverlay);
-    });
-
-    $("#btnSaveSettings").addEventListener("click", async ()=>{
-      const goal = ($("#setGoal").value || "").trim();
-      const level = clamp(parseInt($("#setLevel").value || "2", 10), 1, 4);
-      const lang = (($("#setLang").value || "hu").trim().toLowerCase() === "de") ? "de" : "hu";
-
-      await fs.setDoc(fs.doc(db, "users", UID), {
-        goal,
-        level,
-        lang,
-        updatedAt: fs.serverTimestamp()
-      }, { merge:true });
-
-      profile.goal = goal;
-      profile.level = level;
-      profile.lang = lang;
-      state.lang = lang;
-
-      weekCache.clear();
-      await ensureWeekLoaded(state.weekIdx + 1);
-
-      closeOverlay(settingsOverlay);
-      renderAll();
-    });
-
-    // ========== Init ==========
-    document.getElementById("y").textContent = new Date().getFullYear();
+    // Init
+    $("#y").textContent = new Date().getFullYear();
 
     onAuth(async (user)=>{
       try{
-        if(!user){
-          toLogin("hu");
-          return;
-        }
+        if(!user){ toLogin("hu"); return; }
         UID = user.uid;
 
         state.done = lsGet(UID, "done", {});
@@ -1206,31 +887,21 @@
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
-        // ---- PLAN META: Firestore -> ha nincs, fallback ----
-        const meta = await loadPlanMeta(profile.planId);
-        if(!meta){
-          fallback = buildFallbackTemplate(profile.planId);
-          planMeta = { ...fallback.meta, __fallback:true };
-        }else{
-          planMeta = meta;
-        }
-
+        planMeta = await loadPlanMeta(profile.planId);
         state.weekIdx = calcWeekIndex(profile);
 
         await ensureWeekLoaded(state.weekIdx + 1);
         renderAll();
 
-        debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang} fallback=${!!planMeta.__fallback}`);
-
       }catch(err){
         console.error(err);
         openInfo("Hiba", `
           <p class="note">Hiba történt betöltés közben.</p>
-          <div class="row" style="grid-template-columns: 1fr;">
+          <div class="row" style="grid-template-columns:1fr;">
             <div class="title">Részletek</div>
             <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
           </div>
-          <p class="note">Ha Firestore sablon hiányzik, az app most már fallback-kel is tud futni. Ha mégis itt áll meg: shared/firebase.js betöltés / Firebase config / CORS probléma.</p>
+          <p class="note">Ha a gombok se reagálnak: 99% hogy a /shared/firebase.js nem tölt be.</p>
         `);
       }
     });
