@@ -53,9 +53,20 @@ export function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#39;");
 }
+
+/**
+ * ✅ FIX: ha a localStorage-ban "null" van, JSON.parse("null") -> null
+ * Ilyenkor vissza kell adni a fallback-ot, különben state.done = null lesz és borul a kód.
+ */
 export function safeJsonParse(txt, fallback=null){
-  try{ return JSON.parse(txt); }catch{ return fallback; }
+  try{
+    const v = JSON.parse(txt);
+    return (v === null || typeof v === "undefined") ? fallback : v;
+  }catch{
+    return fallback;
+  }
 }
+
 export function clamp(n, a, b){
   const x = Number(n);
   return Math.min(b, Math.max(a, x));
@@ -148,13 +159,12 @@ export async function ensureUserDoc(uid, email){
     return initial;
   }
 
-  // ha régi struktúrából jön: frissítsük minimálisan
   const data = snap.data() || {};
   const patch = {};
 
   if(email && data.email !== email) patch.email = email;
 
-  // ha legacy mezők vannak, de az új hiányzik → másoljuk át, hogy az app lássa
+  // legacy -> új mezők sync
   if((data.dietText == null || data.dietText === "") && data.diet) patch.dietText = String(data.diet || "");
   if((data.motivationText == null || data.motivationText === "") && data.motivation) patch.motivationText = String(data.motivation || "");
 
