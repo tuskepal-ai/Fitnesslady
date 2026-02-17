@@ -1,3 +1,4 @@
+<!-- FILE: /hu/app/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -6,7 +7,376 @@
   <title>Fitness Lady — Saját programom</title>
   <meta name="description" content="Fitness Lady — Saját programom: csomag, heti edzések, személyre szabás slotok, étrend, check-in/cél, technika vault." />
 
-  <link rel="stylesheet" href="./style.css" />
+  <style>
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
+
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --gold:#ffd38a;
+
+      --radius:22px;
+      --shadow: 0 18px 55px rgba(0,0,0,.55);
+      --max: 1180px;
+
+      --glassA: rgba(255,255,255,.06);
+      --glassB: rgba(255,255,255,.02);
+      --stroke: rgba(255,255,255,.10);
+
+      --hero-url: none;
+    }
+    *{ box-sizing:border-box; }
+    html,body{ height:100%; }
+    html{ scroll-behavior:smooth; }
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Apple Color Emoji","Segoe UI Emoji";
+      background:
+        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
+        var(--bg);
+      color:var(--text);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background-image: var(--hero-url);
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      transform: translateZ(0);
+      opacity:.92;
+    }
+
+    a{ color:inherit; text-decoration:none; }
+    button{ font:inherit; }
+    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
+
+    .topbar{
+      position: fixed; top:0; left:0; right:0;
+      z-index: 50;
+      background: rgba(8,6,12,.55);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .topbar-inner{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px; white-space: nowrap;
+    }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+      flex: 0 0 auto;
+    }
+    .nav{
+      display:flex; align-items:center; gap: 14px;
+      color: var(--muted); font-size: 13.5px; font-weight: 700;
+    }
+    .nav a{ position: relative; padding: 10px 6px; opacity:.92; }
+    .nav a:hover{ opacity:1; color: var(--text); }
+    .nav a::after{
+      content:"";
+      position:absolute;
+      left: 8px; right: 8px; bottom: 6px;
+      height: 2px; border-radius: 99px;
+      background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
+      transform: scaleX(0);
+      transform-origin: left;
+      opacity: 0;
+      transition: transform .28s ease, opacity .28s ease;
+    }
+    .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
+
+    .pill{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding: 9px 12px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 12px 34px rgba(0,0,0,.35);
+      cursor:pointer;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      user-select:none;
+      white-space: nowrap;
+      gap:8px;
+    }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 18px 46px rgba(255,79,216,.26);
+      font-weight: 900;
+    }
+    .pill.ghost{ background: rgba(255,255,255,.06); }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
+
+    .menu-btn{
+      width: 40px; height: 40px; border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      display:none;
+      align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+
+    main{ padding-top: 64px; min-height: 100vh; min-height: 100dvh; }
+    .page{ padding: 18px 0 64px; }
+
+    .glass{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 22px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .interactive{
+      position: relative;
+      overflow: hidden;
+      transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
+      will-change: transform;
+    }
+    .interactive::before{
+      content:"";
+      position:absolute; inset:-3px;
+      border-radius: inherit;
+      background:
+        radial-gradient(700px 240px at 12% 0%, rgba(255,79,216,.32), transparent 55%),
+        radial-gradient(700px 260px at 90% 20%, rgba(177,76,255,.26), transparent 60%);
+      opacity: 0;
+      filter: blur(6px);
+      transition: opacity .30s ease;
+      pointer-events:none;
+    }
+    .interactive:hover,
+    .interactive:focus-visible,
+    .interactive.is-active{
+      transform: translateY(-4px);
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 70px rgba(0,0,0,.55);
+    }
+    .interactive:hover::before,
+    .interactive:focus-visible::before,
+    .interactive.is-active::before{ opacity: 1; }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 14px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: 1fr; }
+      .nav{ display:none; }
+      .menu-btn{ display:inline-flex; }
+    }
+
+    .card{ padding: 16px; }
+    .card h2, .card h3{
+      margin:0 0 8px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.2px;
+    }
+    .card h2{ font-size: 22px; }
+    .card h3{ font-size: 18px; }
+    .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
+
+    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
+    .meta-pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+
+    .progress{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 999px;
+      height: 12px;
+      overflow:hidden;
+      position:relative;
+    }
+    .progress > span{
+      display:block;
+      height:100%;
+      width: 0%;
+      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
+      border-radius: 999px;
+      transition: width .35s ease;
+    }
+    .progress-label{
+      display:flex;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 12.5px;
+      color: rgba(255,255,255,.55);
+      margin: 10px 0 8px;
+    }
+
+    .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 12px; }
+    .tab{
+      padding: 8px 11px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      cursor:pointer;
+      font-size: 13px;
+      font-weight: 850;
+      user-select:none;
+    }
+    .tab.is-active{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+    }
+
+    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+    .row{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
+    .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+    .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
+    .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
+
+    .chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.70);
+      white-space: nowrap;
+      font-weight: 850;
+      font-size: 12px;
+    }
+
+    section{ scroll-margin-top: 82px; }
+
+    .modal-overlay{
+      position: fixed; inset: 0; z-index: 80;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-overlay.is-open{ display:flex; }
+    .modal{
+      width: min(980px, 94vw);
+      max-height: min(82vh, 760px);
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-header{
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.45);
+    }
+    .modal-title{
+      margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+    .modal-close{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .modal-body{
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(min(82vh, 760px) - 64px);
+      background: rgba(7,6,11,.38);
+    }
+    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
+    }
+
+    .debug{
+      position: fixed;
+      bottom: 10px;
+      left: 10px;
+      right: 10px;
+      z-index: 90;
+      background: rgba(0,0,0,.45);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 14px;
+      padding: 10px 12px;
+      color: rgba(255,255,255,.85);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12px;
+      display:none;
+      backdrop-filter: blur(10px);
+    }
+    .debug.is-on{ display:block; }
+
+    @media (max-width: 980px){
+      .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
+      .pill, .glass, .meta-pill{
+        backdrop-filter:none !important;
+        -webkit-backdrop-filter:none !important;
+      }
+    }
+    @media (prefers-reduced-motion: reduce){
+      html{ scroll-behavior:auto; }
+      .interactive, .pill{ transition:none; }
+      .progress > span{ transition:none; }
+    }
+  </style>
 </head>
 
 <body>
@@ -85,7 +455,7 @@
         <div style="display:grid; gap:14px;">
           <section id="etrend" class="glass interactive card">
             <h3>Étrend</h3>
-            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend az adminból állítható lesz (következő lépés).</p>
+            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend adminból lesz szerkeszthető.</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:8px;">
               <div>
@@ -99,7 +469,7 @@
                   <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
                   <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
                 </div>
-                <div class="note" id="dietNote">A részletes étrend (napokra bontva) a következő körben jön, adminból szerkeszthetően.</div>
+                <div class="note" id="dietNote">A részletes étrend a következő körben jön (admin szerkesztéssel).</div>
               </div>
             </div>
 
@@ -142,7 +512,7 @@
         <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
           <div>
             <h3>Technika Vault</h3>
-            <p class="sub">Technika videók kategóriákban. (Sablonból jön, admin kezeli.)</p>
+            <p class="sub">Technika videók kategóriákban. (Admin kezeli.)</p>
           </div>
           <button class="pill ghost tiny" id="btnAddTechDone" type="button">✅ Technikák kipipálása</button>
         </div>
@@ -190,7 +560,7 @@
         </div>
 
         <p class="note" style="margin-top:10px;">
-          Ha admin vagy és mégis mindent állítani akarsz: az admin oldalon csinálod.
+          Admin módosítások: az admin oldalon.
         </p>
       </div>
     </div>
@@ -216,12 +586,11 @@
       escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
     } from "../shared/firebase.js";
 
-    // HERO + home link
+    // HERO + home link (éles)
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
 
-    // UI helpers
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
@@ -236,7 +605,6 @@
     }
     enableTapGlow();
 
-    // Debug toggle: ?debug=1
     const debugOn = new URLSearchParams(location.search).get("debug") === "1";
     const debugBox = $("#debugBox");
     if(debugOn) debugBox.classList.add("is-on");
@@ -246,7 +614,6 @@
       console.log("[APP]", msg);
     };
 
-    // Modals
     const settingsOverlay = $("#settingsOverlay");
     const infoOverlay = $("#infoOverlay");
     const infoBody = $("#infoBody");
@@ -327,7 +694,7 @@
       sections.forEach(s=>io.observe(s));
     })();
 
-    // user-scoped localStorage (done/diet/checkin)
+    // localStorage user-scoped
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
@@ -358,30 +725,82 @@
       return snap.data();
     }
 
+    // ✅ ÉLES FALLBACK: ha még nincs planTemplates, nem dől el a UI.
+    function defaultPlanMeta(planId){
+      return {
+        id: planId || "start_v1",
+        name: { hu: "Start", de: "Start" },
+        weeks: 4
+      };
+    }
+
+    function defaultWeek(weekNo){
+      return {
+        workouts: [
+          { id: "w1", title: {hu:`Hét ${weekNo} • Edzés 1`, de:`Woche ${weekNo} • Workout 1`}, desc:{hu:"Tartalom feltöltés alatt (admin).", de:"Inhalt wird geladen (Admin)."}, vimeoId:"" },
+          { id: "w2", title: {hu:`Hét ${weekNo} • Edzés 2`, de:`Woche ${weekNo} • Workout 2`}, desc:{hu:"Tartalom feltöltés alatt (admin).", de:"Inhalt wird geladen (Admin)."}, vimeoId:"" },
+          { id: "w3", title: {hu:`Hét ${weekNo} • Edzés 3`, de:`Woche ${weekNo} • Workout 3`}, desc:{hu:"Tartalom feltöltés alatt (admin).", de:"Inhalt wird geladen (Admin)."}, vimeoId:"" },
+          { id: "w4", title: {hu:`Hét ${weekNo} • Edzés 4`, de:`Woche ${weekNo} • Workout 4`}, desc:{hu:"Tartalom feltöltés alatt (admin).", de:"Inhalt wird geladen (Admin)."}, vimeoId:"" }
+        ],
+        slots: [
+          { slotIndex: 1, title:{hu:"Személyre szabás 1", de:"Personalisierung 1"}, desc:{hu:"Admin tölti ki.", de:"Admin füllt aus."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
+          { slotIndex: 2, title:{hu:"Személyre szabás 2", de:"Personalisierung 2"}, desc:{hu:"Admin tölti ki.", de:"Admin füllt aus."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" },
+          { slotIndex: 3, title:{hu:"Személyre szabás 3", de:"Personalisierung 3"}, desc:{hu:"Admin tölti ki.", de:"Admin füllt aus."}, defaultNote:{hu:"—", de:"—"}, defaultVimeoId:"" }
+        ]
+      };
+    }
+
     async function loadPlanMeta(planId){
-      const ref = fs.doc(db, "planTemplates", planId);
-      const snap = await fs.getDoc(ref);
-      if(!snap.exists()){
-        throw new Error(`Nincs ilyen planTemplates/${planId}. (Adminban hozd létre: planTemplates/start_v1 + weeks/1..N)`);
+      try{
+        const ref = fs.doc(db, "planTemplates", planId);
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          // nem dobunk hard hibát, hanem fallback + info modal
+          openInfo("Program feltöltés alatt", `
+            <p class="note"><b>Nincs ilyen:</b> planTemplates/${escapeHtml(planId)}.</p>
+            <p class="note">Adminban hozd létre a sablont: <b>planTemplates/${escapeHtml(planId)}</b> + <b>weeks/1..N</b>.</p>
+            <p class="note">A vevő oldal ettől még működik, csak a programlista placeholder.</p>
+          `);
+          return defaultPlanMeta(planId);
+        }
+        return snap.data();
+      }catch(err){
+        openInfo("Hiba", `<p class="note">Plan betöltés hiba: <code>${escapeHtml(err.message || String(err))}</code></p>`);
+        return defaultPlanMeta(planId);
       }
-      return snap.data();
     }
 
     async function loadPlanWeek(planId, weekNo){
-      const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
-      const snap = await fs.getDoc(ref);
-      if(!snap.exists()){
-        throw new Error(`Hiányzik: planTemplates/${planId}/weeks/${weekNo}`);
+      try{
+        const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          return defaultWeek(weekNo);
+        }
+        return snap.data();
+      }catch(err){
+        return defaultWeek(weekNo);
       }
-      return snap.data();
     }
 
+    // ✅ FIX: helyes doc útvonal + kompatibilitás (2 variáns)
     async function loadOverridesWeek(uid, weekNo){
-      const ref = fs.doc(db, "users", uid, "overrides", "weeks", String(weekNo));
-      const snap = await fs.getDoc(ref);
-      return snap.exists() ? snap.data() : null;
+      const tryPaths = [
+        ["users", uid, "overridesWeeks", String(weekNo)],  // ajánlott
+        ["users", uid, "overrides", String(weekNo)],       // fallback
+      ];
+
+      for(const segs of tryPaths){
+        try{
+          const ref = fs.doc(db, ...segs);
+          const snap = await fs.getDoc(ref);
+          if(snap.exists()) return snap.data();
+        }catch(_){}
+      }
+      return null;
     }
 
+    // Merge helpers
     function pickLang(obj, lang, fallback="—"){
       if(!obj) return fallback;
       if(typeof obj === "string") return obj;
@@ -419,12 +838,13 @@
       return s;
     }
 
-    // App state
+    // State
     let UID = null;
     let profile = null;
     let planMeta = null;
 
     const weekCache = new Map();
+
     const state = {
       weekIdx: 0,
       done: {},
@@ -447,23 +867,27 @@
     function renderHeader(){
       const p = profile;
 
-      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
+      const planName = pickLang(planMeta?.name, state.lang, p.planId || "—");
+      $("#chipPackage").textContent = `Csomag: ${planName}`;
+
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
       $("#pillUpdated").textContent = `✨ Frissítés: —`;
 
+      const weeks = planMeta?.weeks || 4;
+
       if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
-        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta.weeks || 4}`;
+        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${weeks}`;
         $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
         $("#barCycle").style.width = `100%`;
-        $("#subStatus").textContent = `Üdv, ${p.email || ""} • A programod aktív. A heti edzéseket a füleken választod.`;
+        $("#subStatus").textContent = `Üdv, ${p.email || "!"} • A programod aktív.`;
       }else{
         const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
         const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
         const leftDays = clamp(totalDays - passedDays, 0, totalDays);
-        const week = clamp(Math.floor((passedDays / totalDays) * (planMeta.weeks||4)) + 1, 1, (planMeta.weeks||4));
+        const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
 
-        $("#lblWeek").textContent = `Hét: ${week}/${planMeta.weeks||4}`;
+        $("#lblWeek").textContent = `Hét: ${week}/${weeks}`;
         $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
         const pct = Math.round((passedDays / totalDays) * 100);
         $("#barCycle").style.width = `${pct}%`;
@@ -472,12 +896,31 @@
 
       $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#goalDesc").textContent = p.goal
-        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni a következő edzéseket.`
-        : `Állíts be célt, hogy a program még pontosabban illeszkedjen hozzád.`;
+        ? `Fókusz: ${p.goal}. Heti check-in segít finomhangolni.`
+        : `Állíts be célt, hogy a program jobban illeszkedjen.`;
 
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
+    }
+
+    function renderWeekTabs(){
+      const weeks = planMeta.weeks || 4;
+      const tabs = $("#weekTabs");
+      tabs.innerHTML = "";
+      for(let i=0;i<weeks;i++){
+        const b = document.createElement("button");
+        b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
+        b.type = "button";
+        b.textContent = `Hét ${i+1}`;
+        b.addEventListener("click", async ()=>{
+          state.weekIdx = i;
+          await ensureWeekLoaded(i+1);
+          renderProgram();
+          renderHeader();
+        });
+        tabs.appendChild(b);
+      }
     }
 
     async function ensureWeekLoaded(weekNo){
@@ -500,30 +943,11 @@
       return pack;
     }
 
-    function renderWeekTabs(){
-      const weeks = planMeta.weeks || 4;
-      const tabs = $("#weekTabs");
-      tabs.innerHTML = "";
-      for(let i=0;i<weeks;i++){
-        const b = document.createElement("button");
-        b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
-        b.type = "button";
-        b.textContent = `Hét ${i+1}`;
-        b.addEventListener("click", async ()=>{
-          state.weekIdx = i;
-          await ensureWeekLoaded(i+1);
-          renderProgram();
-          renderHeader();
-        });
-        tabs.appendChild(b);
-      }
-    }
-
     function renderProgram(){
       renderWeekTabs();
+
       const weekNo = state.weekIdx + 1;
       const pack = weekCache.get(weekNo);
-
       if(!pack){
         $("#workoutList").innerHTML = `<li class="row"><div><div class="title">Betöltés…</div><div class="desc">Kérlek várj.</div></div></li>`;
         $("#slotList").innerHTML = "";
@@ -579,6 +1003,7 @@
           }
           const src = `https://player.vimeo.com/video/${encodeURIComponent(vimeoId)}`;
           openInfo("Lejátszás", `
+            <p class="note">Ha a videó nem indul: Vimeo embed whitelist (fitnesslady.ch) ellenőrzés.</p>
             <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
               <iframe
                 src="${escapeHtml(src)}"
@@ -604,15 +1029,23 @@
     }
 
     function renderTechnika(){
-      $("#techTabs").innerHTML = "";
-      $("#techList").innerHTML = `
+      const tabs = $("#techTabs");
+      const list = $("#techList");
+      tabs.innerHTML = "";
+      list.innerHTML = `
         <li class="row">
           <div>
             <div class="title">Technika Vault</div>
-            <div class="desc">A technika videók sablonból jönnek. Következő lépés: kategóriák + videók admin szerkesztéssel.</div>
+            <div class="desc">A technika videók adminból jönnek. Következő lépés: kategóriák + videók.</div>
+          </div>
+          <div class="actions">
+            <button class="pill ghost tiny" type="button" id="btnTechInfo">ℹ️</button>
           </div>
         </li>
       `;
+      $("#btnTechInfo")?.addEventListener("click", ()=>{
+        openInfo("Technika Vault", `<p class="note">Következő kör: technika kategóriák admin szerkesztéssel.</p>`);
+      });
     }
 
     function refreshDietButtons(){
@@ -659,7 +1092,12 @@
 
     $("#btnOpenPlayerHelp").addEventListener("click", ()=>{
       openInfo("Vimeo beágyazás (éles)", `
-        <p class="note"><b>Éles</b>: Vimeo videók Private/Hide + Embed whitelist: <b>fitnesslady.ch</b>.</p>
+        <p class="note"><b>Éles</b> beállítás: Vimeo embed whitelist: <b>fitnesslady.ch</b></p>
+        <ul style="color:rgba(255,255,255,.78); line-height:1.65; font-size:13.5px;">
+          <li>Hide from Vimeo / Private</li>
+          <li>Embed whitelist: fitnesslady.ch</li>
+          <li>Download: OFF</li>
+        </ul>
       `);
     });
 
@@ -673,10 +1111,10 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      openInfo("Napi terv", `<p class="note">Következő kör: étrend Firestore-ból, adminból állítható.</p>`);
+      openInfo("Napi terv", `<p class="note">A részletes étrend adminból jön (következő kör).</p>`);
     });
     $("#btnDietPrefs").addEventListener("click", ()=>{
-      openInfo("Preferenciák", `<p class="note">Következő kör: allergia, étkezésszám, sablonok.</p>`);
+      openInfo("Preferenciák", `<p class="note">Következő kör: allergia/kedvencek/étkezésszám.</p>`);
     });
 
     const MOTS = [
@@ -736,7 +1174,6 @@
           toLogin("hu");
           return;
         }
-
         UID = user.uid;
 
         state.done = lsGet(UID, "done", {});
@@ -747,9 +1184,11 @@
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
         planMeta = await loadPlanMeta(profile.planId);
+
         state.weekIdx = calcWeekIndex(profile);
 
         await ensureWeekLoaded(state.weekIdx + 1);
+
         renderAll();
 
         debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
@@ -762,7 +1201,7 @@
             <div class="title">Részletek</div>
             <div class="desc"><code style="white-space:pre-wrap; word-break:break-word;">${escapeHtml(err.message || String(err))}</code></div>
           </div>
-          <p class="note">Leggyakoribb ok: hiányzik a planTemplates sablon a Firestore-ban (pl. start_v1).</p>
+          <p class="note">Ha hiányzik a planTemplates sablon, a rendszer most már nem dől el — placeholderrel fut.</p>
         `);
       }
     });
