@@ -5,24 +5,120 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>FitnessLady — Mein Bereich</title>
-  <meta name="robots" content="noindex" />
+  <meta name="description" content="FitnessLady — Mein Bereich (Weiterleitung zur App)." />
+  <meta name="robots" content="noindex,nofollow" />
+  <meta name="theme-color" content="#120018" />
+
   <style>
-    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial}
-    body{display:flex;align-items:center;justify-content:center;background:#07060b;color:#fff}
-    .box{max-width:560px;padding:18px 16px;border:1px solid rgba(255,255,255,.12);border-radius:18px;background:rgba(255,255,255,.06)}
-    .muted{opacity:.75;font-size:14px;line-height:1.5}
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --stroke:rgba(255,255,255,.12);
+      --glassA:rgba(255,255,255,.07);
+      --glassB:rgba(255,255,255,.02);
+      --radius:22px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
+        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
+        var(--bg);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+    }
+    .card{
+      width:min(640px, 92vw);
+      border-radius: var(--radius);
+      border:1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glassA), var(--glassB));
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      padding:18px;
+      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+    }
+    .title{
+      font-weight:950;
+      letter-spacing:.2px;
+      font-size:18px;
+      margin:0 0 6px;
+    }
+    .muted{
+      margin:0;
+      color:var(--muted);
+      line-height:1.55;
+      font-size:14px;
+    }
+    .row{display:flex; gap:10px; flex-wrap:wrap; margin-top:14px}
+    .btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(20,12,26,.55);
+      color:var(--text);
+      cursor:pointer;
+      font-weight:850;
+      text-decoration:none;
+      user-select:none;
+    }
+    .btn.primary{
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      border-color: rgba(255,255,255,.18);
+    }
   </style>
 </head>
+
 <body>
-  <div class="box">
-    <div style="font-weight:900;font-size:18px;margin-bottom:6px;">Weiterleitung…</div>
-    <div class="muted">Du wirst zu deinem Programm weitergeleitet.</div>
+  <div class="card">
+    <h1 class="title">Weiterleitung…</h1>
+    <p class="muted" id="msg">Du wirst zu deinem Programm weitergeleitet.</p>
+
+    <div class="row">
+      <a class="btn primary" id="btnGo" href="/hu/app/?lang=de">Jetzt öffnen</a>
+      <a class="btn" href="/de/" id="btnBack">Zurück zur Startseite</a>
+    </div>
+
+    <p class="muted" style="margin-top:12px; font-size:12.8px;">
+      Hinweis: Aktuell ist die App unter <b>/hu/app/</b> gehostet. Diese Seite setzt die Sprache auf <b>DE</b> und leitet dorthin weiter.
+    </p>
   </div>
 
   <script>
-    try{ localStorage.setItem("lang","de"); }catch(e){}
-    // Az app jelenleg /hu/app/ alatt él, az kezeli a lang-ot.
-    location.replace("/hu/app/?lang=de");
+    // 1) nyelv beállítás
+    try { localStorage.setItem("lang", "de"); } catch(e) {}
+
+    // 2) query összerakás: megtartjuk ami jött, csak rákényszerítjük a lang=de-t
+    const url = new URL(window.location.href);
+    url.searchParams.set("lang", "de");
+
+    // 3) cél: a HU app, de a query-t átvisszük (pl. ?debug=1)
+    const target = new URL("/hu/app/", window.location.origin);
+    url.searchParams.forEach((v,k)=>target.searchParams.set(k,v));
+
+    // 4) “Most megnyitom” gombot is a pontos targetre állítjuk
+    const btnGo = document.getElementById("btnGo");
+    if(btnGo) btnGo.href = target.pathname + "?" + target.searchParams.toString();
+
+    // 5) automatikus átirányítás (gyors)
+    setTimeout(() => {
+      window.location.replace(btnGo.href);
+    }, 180);
   </script>
 </body>
 </html>
+```0
