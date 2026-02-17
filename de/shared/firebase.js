@@ -15,7 +15,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * ADMIN email(ek) — ugyanaz, mint HU-ban
+ * ADMIN email(ek)
  */
 export const ADMIN_EMAILS = [
   // "te@domain.com",
@@ -51,9 +51,21 @@ export function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#39;");
 }
+
+/**
+ * FIX: ha a localStorage-ban "null" van, JSON.parse -> null
+ * és az app később objektumnak várja.
+ */
 export function safeJsonParse(txt, fallback=null){
-  try{ return JSON.parse(txt); }catch{ return fallback; }
+  try{
+    const v = JSON.parse(txt);
+    if (v === null || v === undefined) return fallback;
+    return v;
+  }catch{
+    return fallback;
+  }
 }
+
 export function clamp(n, a, b){
   const x = Number(n);
   return Math.min(b, Math.max(a, x));
