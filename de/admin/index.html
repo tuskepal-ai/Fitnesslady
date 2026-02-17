@@ -1,0 +1,916 @@
+<!-- FILE: /de/admin/index.html -->
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>FitnessLady — Admin</title>
+
+  <meta name="theme-color" content="#120018" />
+
+  <style>
+    :root{
+      --bg:#07000b;
+      --card:rgba(30,8,45,.68);
+      --card2:rgba(40,10,60,.55);
+      --stroke:rgba(255,255,255,.10);
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.66);
+      --pink:#ff4fd8;
+      --pink2:#c64bff;
+      --ok:#2ee59d;
+      --warn:#ffcc66;
+      --err:#ff5b6b;
+      --shadow: 0 18px 45px rgba(0,0,0,.55);
+      --radius: 20px;
+      --radius2: 26px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+      color:var(--text);
+      min-height:100vh;
+      background:
+        radial-gradient(900px 420px at 20% 15%, rgba(198,75,255,.18), transparent 55%),
+        radial-gradient(800px 380px at 80% 25%, rgba(255,79,216,.16), transparent 55%),
+        radial-gradient(1000px 480px at 55% 85%, rgba(255,79,216,.10), transparent 60%),
+        linear-gradient(180deg, #050008, #040007 55%, #030006);
+      overflow-x:hidden;
+    }
+
+    .bg {
+      position:fixed; inset:0;
+      background:
+        radial-gradient(1200px 600px at 35% 35%, rgba(255,79,216,.14), transparent 60%),
+        radial-gradient(1000px 520px at 70% 55%, rgba(198,75,255,.12), transparent 62%);
+      pointer-events:none;
+      opacity:.9;
+    }
+
+    header{
+      position:sticky;
+      top:0;
+      z-index:10;
+      backdrop-filter: blur(14px);
+      background: rgba(10,0,15,.55);
+      border-bottom: 1px solid var(--stroke);
+    }
+    .topbar{
+      max-width:1100px;
+      margin:0 auto;
+      padding:14px 14px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .dot{
+      width:10px; height:10px; border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #fff, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.55);
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:10px;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.06);
+      box-shadow: 0 10px 28px rgba(0,0,0,.25);
+      font-size:14px;
+      white-space:nowrap;
+    }
+    .actions{display:flex; gap:10px; align-items:center; flex-wrap:wrap; justify-content:flex-end;}
+    .btn{
+      cursor:pointer;
+      user-select:none;
+      border:1px solid var(--stroke);
+      border-radius:999px;
+      padding:10px 14px;
+      background: rgba(255,255,255,.06);
+      color:var(--text);
+      font-weight:700;
+      transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
+    }
+    .btn:hover{ transform: translateY(-1px); box-shadow: 0 18px 38px rgba(0,0,0,.30); border-color: rgba(255,255,255,.18); }
+    .btn.primary{
+      background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 22px 50px rgba(255,79,216,.18);
+    }
+    .btn.danger{
+      background: rgba(255,91,107,.14);
+      border-color: rgba(255,91,107,.30);
+    }
+
+    main{
+      max-width:1100px;
+      margin: 22px auto 80px;
+      padding: 0 14px;
+    }
+
+    .card{
+      border:1px solid var(--stroke);
+      border-radius: var(--radius2);
+      background: linear-gradient(180deg, rgba(25,7,40,.75), rgba(20,5,35,.55));
+      box-shadow: var(--shadow);
+      overflow:hidden;
+    }
+    .cardHeader{ padding:16px 16px 0; }
+    h1{ margin:0 0 6px; font-size: 34px; letter-spacing:.2px; }
+    .sub{ margin:0 0 14px; color: var(--muted); line-height:1.45; }
+
+    .tabs{
+      display:flex; gap:10px;
+      padding: 0 16px 16px;
+      flex-wrap:wrap;
+    }
+    .tab{
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid var(--stroke);
+      background: rgba(255,255,255,.05);
+      cursor:pointer;
+      font-weight:800;
+      color: var(--text);
+      transition:.12s;
+    }
+    .tab.active{
+      background: linear-gradient(135deg, rgba(255,79,216,.95), rgba(198,75,255,.95));
+      box-shadow: 0 18px 42px rgba(255,79,216,.14);
+      border-color: rgba(255,255,255,.16);
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1.1fr .9fr;
+      gap: 14px;
+      padding: 14px 16px 16px;
+    }
+    @media (max-width: 900px){
+      .grid{ grid-template-columns: 1fr; }
+      h1{ font-size: 30px; }
+    }
+
+    .panel{
+      border:1px solid var(--stroke);
+      border-radius: var(--radius);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      padding: 14px;
+    }
+    .panel h2{margin:0 0 6px; font-size: 22px;}
+    .panel p{margin:0 0 12px; color:var(--muted); line-height:1.45;}
+
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .field{
+      width:100%;
+      padding:12px 12px;
+      border-radius: 14px;
+      border:1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.22);
+      color: var(--text);
+      outline:none;
+    }
+    .field:focus{
+      border-color: rgba(255,79,216,.45);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+    label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
+
+    .list{
+      display:flex; flex-direction:column; gap:10px;
+      max-height: 520px;
+      overflow:auto;
+      padding-right: 2px;
+    }
+    .item{
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+      border-radius: 16px;
+      padding: 12px;
+      cursor:pointer;
+      transition:.12s;
+    }
+    .item:hover{
+      border-color: rgba(255,255,255,.18);
+      box-shadow: 0 16px 34px rgba(0,0,0,.25);
+      transform: translateY(-1px);
+    }
+    .item .t{ font-weight:900; }
+    .item .m{ color:var(--muted); font-size:13px; margin-top:4px; }
+    .badge{
+      display:inline-flex; align-items:center; gap:6px;
+      font-size:12px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.85);
+      margin-left:8px;
+    }
+    .badge.ok{ border-color: rgba(46,229,157,.30); background: rgba(46,229,157,.10); }
+    .badge.err{ border-color: rgba(255,91,107,.30); background: rgba(255,91,107,.12); }
+    .badge.warn{ border-color: rgba(255,204,102,.30); background: rgba(255,204,102,.10); }
+
+    textarea.field{
+      min-height: 140px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .log{
+      margin: 14px 16px 16px;
+      border:1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius);
+      background: rgba(0,0,0,.18);
+      padding: 12px 14px;
+      color: rgba(255,255,255,.80);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      line-height: 1.4;
+    }
+
+    footer{
+      max-width:1100px;
+      margin: 24px auto 30px;
+      padding: 0 14px;
+      color: rgba(255,255,255,.60);
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      font-size: 13px;
+    }
+
+    .toast{
+      position: fixed;
+      top: 74px;
+      right: 14px;
+      z-index: 50;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 40px rgba(0,0,0,.35);
+      max-width: 92vw;
+      display:none;
+      color: rgba(255,255,255,.92);
+      font-weight: 700;
+    }
+    .toast.ok{ border-color: rgba(46,229,157,.28); }
+    .toast.err{ border-color: rgba(255,91,107,.30); }
+    .toast.warn{ border-color: rgba(255,204,102,.28); }
+  </style>
+</head>
+
+<body>
+  <div class="bg"></div>
+
+  <header>
+    <div class="topbar">
+      <div class="brand">
+        <span class="dot"></span>
+        <span>FitnessLady <span style="opacity:.85">Admin</span></span>
+      </div>
+
+      <div class="actions">
+        <span class="pill" id="statusPill">Prüfung…</span>
+        <button class="btn" id="btnApp" title="App">↗ App</button>
+        <button class="btn danger" id="btnLogout" title="Logout">↩ Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="card">
+      <div class="cardHeader">
+        <h1>Admin panel</h1>
+        <p class="sub">
+          <b>Admin-Login erforderlich</b> (users/{uid}.role = "admin").
+        </p>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" data-tab="customers">Customers</div>
+        <div class="tab" data-tab="plans">Plans</div>
+        <div class="tab" data-tab="overrides">Overrides</div>
+      </div>
+
+      <div class="grid">
+        <div class="panel">
+          <h2 id="leftTitle">Kunden</h2>
+          <p id="leftDesc">Klicke links einen Kunden → rechts bearbeiten → Speichern → Firestore.</p>
+
+          <div id="customersBlock">
+            <label>Suche (E-Mail / uid / docId)</label>
+            <input class="field" id="search" placeholder="z.B. test@email.com" />
+
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnReload">⟳ Liste aktualisieren</button>
+              <button class="btn primary" id="btnNewUser">＋ Neuer Kunde (doc)</button>
+            </div>
+
+            <div style="height:12px"></div>
+            <div class="list" id="list"></div>
+          </div>
+
+          <div id="plansBlock" style="display:none">
+            <p style="color:var(--muted);margin:0 0 12px">
+              Plan Templates (planTemplates) — JSON Schnell-Editor (live).
+            </p>
+            <label>Plan ID</label>
+            <input class="field" id="planId" placeholder="z.B. Start / Balance / Pro" />
+            <label>Weeks JSON (planTemplates/{planId}/weeks/{weekNo})</label>
+            <textarea class="field" id="planWeeksJson" placeholder='{"base":{...},"weeks":[...]} ...'></textarea>
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnLoadPlan">Laden</button>
+              <button class="btn primary" id="btnSavePlan">Speichern</button>
+            </div>
+          </div>
+
+          <div id="overridesBlock" style="display:none">
+            <p style="color:var(--muted);margin:0 0 12px">
+              Overrides: users/{uid}/overrides/{doc}
+            </p>
+            <label>Kunden UID</label>
+            <input class="field" id="ovUid" placeholder="z.B. mOBrBrPlycPJb..." />
+            <label>Override Doc ID</label>
+            <input class="field" id="ovDoc" placeholder="z.B. slot1 / 2026-02-15 / customA" />
+            <label>Override JSON</label>
+            <textarea class="field" id="ovJson" placeholder='{"title":"Custom 1","vimeoUrl":"...","active":true}'></textarea>
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnLoadOv">Laden</button>
+              <button class="btn primary" id="btnSaveOv">Speichern</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Editor</h2>
+          <p>Wähle links einen Kunden.</p>
+
+          <div id="editorEmpty" style="color:var(--muted)">Kein Kunde ausgewählt.</div>
+
+          <div id="editor" style="display:none">
+            <div class="row" style="justify-content:space-between; align-items:flex-start;">
+              <div>
+                <div style="font-weight:900;font-size:16px" id="edTitle">—</div>
+                <div style="color:var(--muted);font-size:12px;margin-top:4px" id="edMeta">—</div>
+              </div>
+              <div class="row">
+                <button class="btn" id="btnOpenDoc">↗ Firestore</button>
+                <button class="btn danger" id="btnDeleteUser">Löschen</button>
+              </div>
+            </div>
+
+            <label>Active</label>
+            <select class="field" id="edActive">
+              <option value="true">true</option>
+              <option value="false">false</option>
+            </select>
+
+            <label>Role</label>
+            <select class="field" id="edRole">
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+
+            <label>Email</label>
+            <input class="field" id="edEmail" placeholder="kunde@email.com" />
+
+            <label>Package</label>
+            <select class="field" id="edPackage">
+              <option value="Start">Start</option>
+              <option value="Balance">Balance</option>
+              <option value="Pro">Pro</option>
+            </select>
+
+            <label>Goal</label>
+            <input class="field" id="edGoal" placeholder="z.B. Form" />
+
+            <label>Level</label>
+            <input class="field" id="edLevel" inputmode="numeric" placeholder="z.B. 2" />
+
+            <label>Diet (JSON) — Quick edit</label>
+            <textarea class="field" id="edDiet" placeholder='{"kcal":1800,"protein":140,"note":"..."}'></textarea>
+
+            <div style="height:12px"></div>
+            <div class="row">
+              <button class="btn" id="btnReloadUser">Reload</button>
+              <button class="btn primary" id="btnSaveUser">Save → Firestore</button>
+            </div>
+
+            <div style="height:14px"></div>
+            <div style="color:var(--muted);font-size:12px">
+              Tipp: App nutzt users/{uid} + users/{uid}/overrides.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="log" id="log">Log: loading…</div>
+    </section>
+  </main>
+
+  <footer>
+    <div>© 2026 FitnessLady — Admin</div>
+    <div>Tüske web design</div>
+  </footer>
+
+  <div class="toast" id="toast"></div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import {
+      getFirestore,
+      doc, getDoc, setDoc, updateDoc, deleteDoc,
+      collection, getDocs, query, orderBy, limit, serverTimestamp
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
+      authDomain: "fitneady-15fd0.firebaseapp.com",
+      projectId: "fitneady-15fd0",
+      storageBucket: "fitneady-15fd0.firebasestorage.app",
+      messagingSenderId: "480597492603",
+      appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
+      measurementId: "G-MH1YK9C2YF"
+    };
+
+    const $ = (id)=>document.getElementById(id);
+    const logEl = $("log");
+    const toastEl = $("toast");
+
+    function log(msg){
+      const t = (new Date()).toLocaleString();
+      logEl.textContent = `Log: ${t}\n${msg}`;
+      console.log(msg);
+    }
+    function toast(msg, type="ok"){
+      toastEl.className = `toast ${type}`;
+      toastEl.textContent = msg;
+      toastEl.style.display = "block";
+      clearTimeout(window.__toastTimer);
+      window.__toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
+    }
+
+    const statusPill = $("statusPill");
+    const btnApp = $("btnApp");
+    const btnLogout = $("btnLogout");
+
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const customersBlock = $("customersBlock");
+    const plansBlock = $("plansBlock");
+    const overridesBlock = $("overridesBlock");
+    const leftTitle = $("leftTitle");
+    const leftDesc = $("leftDesc");
+
+    const listEl = $("list");
+    const searchEl = $("search");
+    const btnReload = $("btnReload");
+    const btnNewUser = $("btnNewUser");
+
+    const editorEmpty = $("editorEmpty");
+    const editor = $("editor");
+    const edTitle = $("edTitle");
+    const edMeta = $("edMeta");
+    const btnOpenDoc = $("btnOpenDoc");
+    const btnDeleteUser = $("btnDeleteUser");
+
+    const edActive = $("edActive");
+    const edRole = $("edRole");
+    const edEmail = $("edEmail");
+    const edPackage = $("edPackage");
+    const edGoal = $("edGoal");
+    const edLevel = $("edLevel");
+    const edDiet = $("edDiet");
+    const btnReloadUser = $("btnReloadUser");
+    const btnSaveUser = $("btnSaveUser");
+
+    const planIdEl = $("planId");
+    const planWeeksJsonEl = $("planWeeksJson");
+    const btnLoadPlan = $("btnLoadPlan");
+    const btnSavePlan = $("btnSavePlan");
+
+    const ovUidEl = $("ovUid");
+    const ovDocEl = $("ovDoc");
+    const ovJsonEl = $("ovJson");
+    const btnLoadOv = $("btnLoadOv");
+    const btnSaveOv = $("btnSaveOv");
+
+    let app, auth, db;
+    let currentUser = null;
+    let currentProfile = null;
+    let selectedUid = null;
+    let selectedDoc = null;
+
+    // init
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // ✅ DE útvonalak (ez volt a lényeg)
+    const LOGIN_URL = "/de/login/?next=/de/admin/";
+    const APP_URL   = "/de/app/";
+
+    btnApp.addEventListener("click", ()=>{ window.location.href = APP_URL; });
+
+    btnLogout.addEventListener("click", async ()=>{
+      try{
+        await signOut(auth);
+        toast("Logout.", "ok");
+        window.location.href = LOGIN_URL;
+      }catch(e){
+        log(`Logout error: ${e?.message || e}`);
+        toast("Logout error!", "err");
+      }
+    });
+
+    function setTab(name){
+      tabs.forEach(t=> t.classList.toggle("active", t.dataset.tab===name));
+      customersBlock.style.display = (name==="customers") ? "block" : "none";
+      plansBlock.style.display     = (name==="plans")     ? "block" : "none";
+      overridesBlock.style.display = (name==="overrides") ? "block" : "none";
+
+      if(name==="customers"){
+        leftTitle.textContent = "Customers";
+        leftDesc.textContent = "Links wählen → rechts editieren → Save → Firestore.";
+      }
+      if(name==="plans"){
+        leftTitle.textContent = "Plans";
+        leftDesc.textContent = "planTemplates JSON edit (live).";
+      }
+      if(name==="overrides"){
+        leftTitle.textContent = "Overrides";
+        leftDesc.textContent = "users/{uid}/overrides.";
+      }
+      log(`Tab: ${name}`);
+    }
+    tabs.forEach(t=> t.addEventListener("click", ()=> setTab(t.dataset.tab)));
+
+    // ✅ Auth guard + admin role check
+    onAuthStateChanged(auth, async (u)=>{
+      currentUser = u;
+
+      if(!u){
+        statusPill.textContent = "Nicht eingeloggt";
+        log("No auth → redirect login");
+        window.location.href = LOGIN_URL;
+        return;
+      }
+
+      statusPill.textContent = `Eingeloggt: ${u.email || u.uid} • prüfen…`;
+
+      try{
+        const pRef = doc(db, "users", u.uid);
+        const pSnap = await getDoc(pRef);
+
+        if(!pSnap.exists()){
+          statusPill.textContent = "Fehler / Kein Profil";
+          log(`Missing users/${u.uid}. Create role='admin'.`);
+          toast("Kein Profil (users/{uid})!", "err");
+          return;
+        }
+
+        currentProfile = pSnap.data();
+        const role = (currentProfile.role || "user").toLowerCase();
+
+        if(role !== "admin"){
+          statusPill.textContent = "Keine Berechtigung";
+          log(`Not admin. role=${role}`);
+          toast("Keine Admin-Rechte!", "err");
+          return;
+        }
+
+        statusPill.textContent = `Eingeloggt: ${u.email} • role=admin`;
+        log("Admin OK → load users");
+        toast("Admin OK", "ok");
+
+        await loadUsers();
+      }catch(e){
+        statusPill.textContent = "Fehler";
+        log(`Admin check error: ${e?.message || e}`);
+        toast("Admin check error!", "err");
+      }
+    });
+
+    // Customers list
+    let usersCache = [];
+
+    async function loadUsers(){
+      listEl.innerHTML = "";
+      selectedUid = null;
+      selectedDoc = null;
+      editor.style.display = "none";
+      editorEmpty.style.display = "block";
+
+      try{
+        const qy = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(200));
+        const snap = await getDocs(qy);
+        usersCache = [];
+        snap.forEach(d=> usersCache.push({ id:d.id, ...d.data() }));
+        renderList(usersCache);
+        log(`Users loaded: ${usersCache.length}`);
+      }catch(e){
+        log(`Users load error: ${e?.message || e}`);
+        toast("Cannot load users (Rules?)", "err");
+      }
+    }
+
+    function renderList(items){
+      const term = (searchEl.value || "").trim().toLowerCase();
+      const filtered = !term ? items : items.filter(u=>{
+        const id = (u.id || "").toLowerCase();
+        const email = (u.email || "").toLowerCase();
+        return id.includes(term) || email.includes(term);
+      });
+
+      listEl.innerHTML = "";
+      if(filtered.length === 0){
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `<div class="t">No results</div><div class="m">Try another search.</div>`;
+        listEl.appendChild(d);
+        return;
+      }
+
+      filtered.forEach(u=>{
+        const active = !!u.active;
+        const role = (u.role || "user").toLowerCase();
+        const pkg = u.package || "—";
+        const goal = u.goal || "—";
+        const level = (u.level ?? "—");
+
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="t">
+            ${(u.email || "(no email)")}
+            <span class="badge ${active ? "ok" : "err"}">${active ? "active" : "inactive"}</span>
+            <span class="badge ${role==="admin" ? "warn" : ""}">${role}</span>
+          </div>
+          <div class="m">
+            uid/docId: <b>${u.id}</b><br>
+            package: <b>${pkg}</b> • goal: <b>${goal}</b> • level: <b>${level}</b>
+          </div>
+        `;
+        el.addEventListener("click", ()=> selectUser(u.id));
+        listEl.appendChild(el);
+      });
+    }
+
+    searchEl.addEventListener("input", ()=> renderList(usersCache));
+    btnReload.addEventListener("click", ()=> loadUsers());
+    btnNewUser.addEventListener("click", ()=> createNewUserDoc());
+
+    async function createNewUserDoc(){
+      const email = prompt("New customer email:");
+      if(!email) return;
+
+      const docId = email.trim().toLowerCase().replace(/[^a-z0-9@._-]/g, "_");
+
+      try{
+        await setDoc(doc(db,"users",docId),{
+          email: email.trim(),
+          role: "user",
+          active: true,
+          package: "Start",
+          goal: "Form",
+          level: 1,
+          diet: null,
+          createdAt: serverTimestamp(),
+          updatedAt: serverTimestamp()
+        }, { merge:true });
+
+        toast("Created.", "ok");
+        await loadUsers();
+      }catch(e){
+        log(`New user doc error: ${e?.message || e}`);
+        toast("Create failed.", "err");
+      }
+    }
+
+    async function selectUser(uid){
+      selectedUid = uid;
+      editorEmpty.style.display = "none";
+      editor.style.display = "block";
+      edTitle.textContent = "Loading…";
+      edMeta.textContent = uid;
+
+      try{
+        const uRef = doc(db, "users", uid);
+        const uSnap = await getDoc(uRef);
+        if(!uSnap.exists()){
+          selectedDoc = null;
+          edTitle.textContent = "Doc not found";
+          toast("Doc not found.", "err");
+          return;
+        }
+
+        selectedDoc = uSnap.data();
+        const email = selectedDoc.email || "(no email)";
+        edTitle.textContent = email;
+        edMeta.textContent = `docId/uid: ${uid}`;
+
+        edActive.value = String(!!selectedDoc.active);
+        edRole.value = (selectedDoc.role || "user");
+        edEmail.value = selectedDoc.email || "";
+        edPackage.value = selectedDoc.package || "Start";
+        edGoal.value = selectedDoc.goal || "";
+        edLevel.value = String(selectedDoc.level ?? "");
+
+        if(selectedDoc.diet == null){
+          edDiet.value = "";
+        }else{
+          try{
+            edDiet.value = (typeof selectedDoc.diet === "string")
+              ? selectedDoc.diet
+              : JSON.stringify(selectedDoc.diet, null, 2);
+          }catch{
+            edDiet.value = "";
+          }
+        }
+
+        btnOpenDoc.onclick = ()=>{
+          const url = `https://console.firebase.google.com/project/${firebaseConfig.projectId}/firestore/databases/-default-/data/~2Fusers~2F${encodeURIComponent(uid)}`;
+          window.open(url, "_blank");
+        };
+
+        log(`Selected: ${uid}`);
+      }catch(e){
+        log(`selectUser error: ${e?.message || e}`);
+        toast("Load error.", "err");
+      }
+    }
+
+    btnReloadUser.addEventListener("click", ()=>{
+      if(!selectedUid) return;
+      selectUser(selectedUid);
+    });
+
+    btnSaveUser.addEventListener("click", async ()=>{
+      if(!selectedUid) return;
+
+      let dietValue = null;
+      const dietText = (edDiet.value || "").trim();
+      if(dietText){
+        try{ dietValue = JSON.parse(dietText); }
+        catch{
+          toast("Diet JSON invalid.", "err");
+          return;
+        }
+      }
+
+      const payload = {
+        active: (edActive.value === "true"),
+        role: edRole.value,
+        email: (edEmail.value || "").trim(),
+        package: edPackage.value,
+        goal: (edGoal.value || "").trim(),
+        level: Number(String(edLevel.value || "").trim() || 0),
+        diet: dietValue,
+        updatedAt: serverTimestamp()
+      };
+
+      try{
+        await updateDoc(doc(db, "users", selectedUid), payload);
+        toast("Saved.", "ok");
+        log(`Saved: users/${selectedUid}`);
+        await loadUsers();
+        await selectUser(selectedUid);
+      }catch(e){
+        log(`Save error: ${e?.message || e}`);
+        toast("Save error (Rules?)", "err");
+      }
+    });
+
+    btnDeleteUser.addEventListener("click", async ()=>{
+      if(!selectedUid) return;
+      const ok = confirm(`Delete? users/${selectedUid}`);
+      if(!ok) return;
+
+      try{
+        await deleteDoc(doc(db, "users", selectedUid));
+        toast("Deleted.", "ok");
+        selectedUid = null;
+        selectedDoc = null;
+        editor.style.display = "none";
+        editorEmpty.style.display = "block";
+        await loadUsers();
+      }catch(e){
+        log(`Delete error: ${e?.message || e}`);
+        toast("Delete error (Rules?)", "err");
+      }
+    });
+
+    // Plans
+    btnLoadPlan.addEventListener("click", async ()=>{
+      const planId = (planIdEl.value || "").trim();
+      if(!planId){ toast("Enter Plan ID.", "warn"); return; }
+
+      try{
+        const s = await getDoc(doc(db, "planTemplates", planId));
+        const base = s.exists() ? s.data() : null;
+
+        const weeksSnap = await getDocs(query(collection(db, "planTemplates", planId, "weeks"), orderBy("weekNo","asc"), limit(50)));
+        const weeks = [];
+        weeksSnap.forEach(d=> weeks.push({ id:d.id, ...d.data() }));
+
+        planWeeksJsonEl.value = JSON.stringify({ base, weeks }, null, 2);
+        toast("Loaded.", "ok");
+      }catch(e){
+        log(`Plan load error: ${e?.message || e}`);
+        toast("Plan load error.", "err");
+      }
+    });
+
+    btnSavePlan.addEventListener("click", async ()=>{
+      const planId = (planIdEl.value || "").trim();
+      if(!planId){ toast("Enter Plan ID.", "warn"); return; }
+
+      const txt = (planWeeksJsonEl.value || "").trim();
+      if(!txt){ toast("Empty JSON.", "warn"); return; }
+
+      let data;
+      try{ data = JSON.parse(txt); }
+      catch{ toast("Invalid JSON.", "err"); return; }
+
+      try{
+        if(data.base){
+          await setDoc(doc(db, "planTemplates", planId), { ...data.base, updatedAt: serverTimestamp() }, { merge:true });
+        }else{
+          await setDoc(doc(db, "planTemplates", planId), { updatedAt: serverTimestamp() }, { merge:true });
+        }
+
+        if(Array.isArray(data.weeks)){
+          for(const w of data.weeks){
+            const weekNo = Number(w.weekNo ?? w.id ?? 0);
+            if(!weekNo) continue;
+            const id = String(weekNo);
+            const payload = { ...w, weekNo, updatedAt: serverTimestamp() };
+            delete payload.id;
+            await setDoc(doc(db, "planTemplates", planId, "weeks", id), payload, { merge:true });
+          }
+        }
+
+        toast("Saved.", "ok");
+      }catch(e){
+        log(`Plan save error: ${e?.message || e}`);
+        toast("Plan save error (Rules?)", "err");
+      }
+    });
+
+    // Overrides
+    btnLoadOv.addEventListener("click", async ()=>{
+      const uid = (ovUidEl.value || "").trim();
+      const docId = (ovDocEl.value || "").trim();
+      if(!uid || !docId){ toast("Need UID + Doc ID.", "warn"); return; }
+
+      try{
+        const s = await getDoc(doc(db, "users", uid, "overrides", docId));
+        if(!s.exists()){
+          ovJsonEl.value = "";
+          toast("Override not found.", "warn");
+          return;
+        }
+        ovJsonEl.value = JSON.stringify(s.data(), null, 2);
+        toast("Loaded.", "ok");
+      }catch(e){
+        log(`Override load error: ${e?.message || e}`);
+        toast("Override load error.", "err");
+      }
+    });
+
+    btnSaveOv.addEventListener("click", async ()=>{
+      const uid = (ovUidEl.value || "").trim();
+      const docId = (ovDocEl.value || "").trim();
+      if(!uid || !docId){ toast("Need UID + Doc ID.", "warn"); return; }
+
+      const txt = (ovJsonEl.value || "").trim();
+      if(!txt){ toast("Empty JSON.", "warn"); return; }
+
+      let data;
+      try{ data = JSON.parse(txt); }
+      catch{ toast("Invalid JSON.", "err"); return; }
+
+      try{
+        await setDoc(doc(db, "users", uid, "overrides", docId), { ...data, updatedAt: serverTimestamp() }, { merge:true });
+        toast("Saved.", "ok");
+      }catch(e){
+        log(`Override save error: ${e?.message || e}`);
+        toast("Override save error (Rules?)", "err");
+      }
+    });
+
+    setTab("customers");
+    log("Admin loaded. Waiting auth…");
+  </script>
+</body>
+</html>
