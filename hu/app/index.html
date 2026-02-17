@@ -333,7 +333,13 @@
       max-height: calc(min(82vh, 760px) - 64px);
       background: rgba(7,6,11,.38);
     }
-    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
+    .note{
+      color: rgba(255,255,255,.55);
+      font-size: 12.6px;
+      line-height: 1.55;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
 
     footer{
       padding: 18px 0 46px;
@@ -455,7 +461,7 @@
         <div style="display:grid; gap:14px;">
           <section id="etrend" class="glass interactive card">
             <h3>Étrend</h3>
-            <p class="sub">Itt most gyors jelölők vannak. A részletes étrend adminból lesz szerkeszthető.</p>
+            <p class="sub">A részletes étrendet az admin frissíti. Itt látod a legutóbbi verziót + a napi jelölőket.</p>
 
             <div class="row" style="grid-template-columns: 1fr; gap:8px;">
               <div>
@@ -469,13 +475,16 @@
                   <button class="pill ghost tiny" data-toggle="diet_steps" type="button">👟 8k lépés</button>
                   <button class="pill ghost tiny" data-toggle="diet_sleep" type="button">🌙 Alvás rendben</button>
                 </div>
-                <div class="note" id="dietNote">A részletes étrend a következő körben jön (admin szerkesztéssel).</div>
+
+                <!-- ✅ IDE jön a Firestore dietText -->
+                <div class="note" id="dietNote">Betöltés…</div>
               </div>
             </div>
 
             <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:12px;">
               <button class="pill ghost tiny" id="btnDietPlan" type="button">Napi terv</button>
               <button class="pill ghost tiny" id="btnDietPrefs" type="button">Preferenciák</button>
+              <button class="pill ghost tiny" id="btnDietMore" type="button">📄 Részletek</button>
             </div>
           </section>
 
@@ -501,7 +510,8 @@
                   <button class="pill ghost tiny" id="btnMotivation" type="button">Motiváció</button>
                 </div>
 
-                <div class="note" id="motivationBox">„A rendszer nem nyomás. A rendszer szabadság.”</div>
+                <!-- ✅ IDE jön a Firestore motivationText -->
+                <div class="note" id="motivationBox">Betöltés…</div>
               </div>
             </div>
           </section>
@@ -716,6 +726,9 @@
           lifetimeAccess: true,
           cycleStart: null,
           cycleEnd: null,
+          // ✅ új mezők (szabad szöveg)
+          dietText: "",
+          motivationText: "",
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         };
@@ -755,7 +768,6 @@
         const ref = fs.doc(db, "planTemplates", planId);
         const snap = await fs.getDoc(ref);
         if(!snap.exists()){
-          // nem dobunk hard hibát, hanem fallback + info modal
           openInfo("Program feltöltés alatt", `
             <p class="note"><b>Nincs ilyen:</b> planTemplates/${escapeHtml(planId)}.</p>
             <p class="note">Adminban hozd létre a sablont: <b>planTemplates/${escapeHtml(planId)}</b> + <b>weeks/1..N</b>.</p>
@@ -783,11 +795,10 @@
       }
     }
 
-    // ✅ FIX: helyes doc útvonal + kompatibilitás (2 variáns)
     async function loadOverridesWeek(uid, weekNo){
       const tryPaths = [
-        ["users", uid, "overridesWeeks", String(weekNo)],  // ajánlott
-        ["users", uid, "overrides", String(weekNo)],       // fallback
+        ["users", uid, "overridesWeeks", String(weekNo)],
+        ["users", uid, "overrides", String(weekNo)],
       ];
 
       for(const segs of tryPaths){
@@ -800,7 +811,6 @@
       return null;
     }
 
-    // Merge helpers
     function pickLang(obj, lang, fallback="—"){
       if(!obj) return fallback;
       if(typeof obj === "string") return obj;
@@ -838,6 +848,13 @@
       return s;
     }
 
+    // ✅ Firestore -> UI (szabad szöveg)
+    function normalizeTextAny(v){
+      if(v == null) return "";
+      if(typeof v === "string") return v;
+      try{ return JSON.stringify(v, null, 2); }catch{ return String(v); }
+    }
+
     // State
     let UID = null;
     let profile = null;
@@ -850,7 +867,9 @@
       done: {},
       diet: {},
       checkin: null,
-      lang: "hu"
+      lang: "hu",
+      dietText: "",
+      motivationText: ""
     };
 
     function calcWeekIndex(p){
@@ -863,6 +882,14 @@
     }
 
     function workoutKey(weekNo, id){ return `w${weekNo}_${id}`; }
+
+    function renderTextBlocks(){
+      const dietText = state.dietText?.trim();
+      $("#dietNote").textContent = dietText ? dietText : "Nincs részletes étrend még beállítva (admin).";
+
+      const motText = state.motivationText?.trim();
+      $("#motivationBox").textContent = motText ? motText : "„A rendszer nem nyomás. A rendszer szabadság.”";
+    }
 
     function renderHeader(){
       const p = profile;
@@ -902,6 +929,8 @@
       const done = state.checkin?.done ? 1 : 0;
       $("#checkinLabel").textContent = `${done}/1`;
       $("#barCheckin").style.width = `${done*100}%`;
+
+      renderTextBlocks();
     }
 
     function renderWeekTabs(){
@@ -1111,12 +1140,18 @@
     });
 
     $("#btnDietPlan").addEventListener("click", ()=>{
-      openInfo("Napi terv", `<p class="note">A részletes étrend adminból jön (következő kör).</p>`);
+      openInfo("Napi terv", `<p class="note">A részletes étrend az adminból jön (szabad szöveg).</p>`);
     });
     $("#btnDietPrefs").addEventListener("click", ()=>{
       openInfo("Preferenciák", `<p class="note">Következő kör: allergia/kedvencek/étkezésszám.</p>`);
     });
 
+    // ✅ Részletek modal (Firestore dietText)
+    $("#btnDietMore").addEventListener("click", ()=>{
+      openInfo("Étrend — részletek", `<pre class="note">${escapeHtml(state.dietText || "Nincs beállítva még.")}</pre>`);
+    });
+
+    // ✅ Motiváció gomb: Firestore szöveg megnyitása + fallback random
     const MOTS = [
       "„A rendszer nem nyomás. A rendszer szabadság.”",
       "„A haladás nem tökéletesség. Hanem következetesség.”",
@@ -1124,7 +1159,12 @@
       "„Amit ma megteszel, az a holnapi önbizalmad.”"
     ];
     $("#btnMotivation").addEventListener("click", ()=>{
-      $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
+      const txt = (state.motivationText || "").trim();
+      if(txt){
+        openInfo("Motiváció", `<pre class="note">${escapeHtml(txt)}</pre>`);
+      }else{
+        $("#motivationBox").textContent = MOTS[Math.floor(Math.random()*MOTS.length)];
+      }
     });
 
     $("#btnDoCheckin").addEventListener("click", ()=>{
@@ -1183,14 +1223,17 @@
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
+        // ✅ diet/motiváció Firestore-ból
+        // Preferált: dietText + motivationText
+        // Kompatibilis: régi diet mező (string/object)
+        state.dietText = normalizeTextAny(profile.dietText ?? profile.diet ?? "");
+        state.motivationText = normalizeTextAny(profile.motivationText ?? profile.motivation ?? "");
+
         planMeta = await loadPlanMeta(profile.planId);
-
         state.weekIdx = calcWeekIndex(profile);
-
         await ensureWeekLoaded(state.weekIdx + 1);
 
         renderAll();
-
         debug(`OK uid=${UID} plan=${profile.planId} lang=${state.lang}`);
 
       }catch(err){
