@@ -15,14 +15,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * Admin email whitelist opcionális (ha akarod).
- * Ha üres, akkor csak users/{uid}.role === "admin" enged adminba.
+ * ÁLLÍTSD BE: admin email(ek)
  */
 export const ADMIN_EMAILS = [
   // "te@domain.com",
 ];
 
 export const BASE_PREFIX = ""; // GitHub Pages root
+
 export const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -54,9 +54,21 @@ export function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#39;");
 }
+
+/**
+ * ✅ FIX: ha a localStorage-ban "null" van, JSON.parse -> null
+ * és ez borítja a state.done[key]-t.
+ * Itt most: null -> fallback.
+ */
 export function safeJsonParse(txt, fallback=null){
-  try{ return JSON.parse(txt); }catch{ return fallback; }
+  try{
+    const v = JSON.parse(txt);
+    return (v === null || v === undefined) ? fallback : v;
+  }catch{
+    return fallback;
+  }
 }
+
 export function clamp(n, a, b){
   const x = Number(n);
   return Math.min(b, Math.max(a, x));
@@ -73,7 +85,9 @@ export function fmtDate(iso){
   try{
     const d = new Date(iso);
     return d.toLocaleDateString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit" });
-  }catch{ return String(iso); }
+  }catch{
+    return String(iso);
+  }
 }
 export function daysBetween(aIso, bIso){
   try{
@@ -81,7 +95,9 @@ export function daysBetween(aIso, bIso){
     const b = new Date(bIso);
     const ms = b.getTime() - a.getTime();
     return Math.floor(ms / (1000*60*60*24));
-  }catch{ return 0; }
+  }catch{
+    return 0;
+  }
 }
 
 // ---------- Navigation ----------
@@ -115,29 +131,20 @@ export function isAdminEmail(email){
   return ADMIN_EMAILS.map(x=>String(x).trim().toLowerCase()).includes(e);
 }
 
-/**
- * ✅ FONTOS: itt dietText + motivationText van (nem diet/motivation),
- * hogy az admin és az app ugyanazt olvassa/írja.
- */
 export async function ensureUserDoc(uid, email){
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
-
   if(!snap.exists()){
     const initial = {
       email: email || "",
       role: "user",
       active: true,
       package: "Start",
-      planId: "start_v1",
       goal: "Formálás",
       level: 2,
       lang: "hu",
-
-      // ✅ szabad szöveg mezők
-      dietText: "",
-      motivationText: "",
-
+      diet: null,
+      motivation: null,
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -145,17 +152,8 @@ export async function ensureUserDoc(uid, email){
     return initial;
   }else{
     const data = snap.data() || {};
-    const patch = {};
-    if(email && data.email !== email) patch.email = email;
-
-    // ✅ ha régi doc volt diet/motivation mezőkkel, migráljuk át egyszer
-    if(data.dietText == null && typeof data.diet === "string") patch.dietText = data.diet;
-    if(data.motivationText == null && typeof data.motivation === "string") patch.motivationText = data.motivation;
-
-    if(Object.keys(patch).length){
-      patch.updatedAt = serverTimestamp();
-      await setDoc(ref, patch, { merge:true });
-      return { ...data, ...patch };
+    if(email && data.email !== email){
+      await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
     }
     return data;
   }
