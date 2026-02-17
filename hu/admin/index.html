@@ -534,7 +534,7 @@
                 vagy <b>Személyre szabás</b> alatt (overrides) tudod kezelni.
               </div>
 
-              <label>Plan gyors megnyitás (bal oldali Videók fül)</label>
+              <label>Plan gyors megnyitás</label>
               <div class="row">
                 <button class="btn" id="btnGoPlans">🎥 Videók szerkesztése</button>
                 <button class="btn" id="btnGoOverrides">✨ Személyre szabás</button>
@@ -550,7 +550,7 @@
               <label>Étrend — szabad szerkesztés (bármi)</label>
               <textarea class="field" id="edDiet" placeholder="Ide írhatsz recepteket, listát, heti tervet, bármit. Nem kell JSON!"></textarea>
               <div class="hint">
-                Itt <b>bármit</b> írhatsz, nincs JSON ellenőrzés. Mentéskor sima szövegként kerül a Firestore-ba: <code>users/{uid}.diet</code>.
+                Mentéskor sima szövegként kerül a Firestore-ba: <code>users/{uid}.diet</code>.
               </div>
             </div>
 
@@ -567,7 +567,6 @@
             <div class="section" id="sec_personal">
               <div class="hint" style="margin-top:0">
                 Személyre szabott videók/elemek: <code>users/{uid}/overrides/{doc}</code>.
-                <br>Menj a bal oldali <b>Személyre szabás</b> fülre és ott kezeld.
               </div>
               <div class="row">
                 <button class="btn primary" id="btnPrefillOv">✨ UID betöltése Overrides-hoz</button>
@@ -607,7 +606,6 @@
       collection, getDocs, query, orderBy, limit, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // ===== Firebase config (a tiéd) =====
     const firebaseConfig = {
       apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
       authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -635,7 +633,6 @@
       window.__toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
     }
 
-    // UI
     const statusPill = $("statusPill");
     const btnApp = $("btnApp");
     const btnLogout = $("btnLogout");
@@ -659,19 +656,17 @@
     const btnOpenDoc = $("btnOpenDoc");
     const btnDeleteUser = $("btnDeleteUser");
 
-    // Editor fields
     const edActive = $("edActive");
     const edRole = $("edRole");
     const edEmail = $("edEmail");
     const edPackage = $("edPackage");
     const edGoal = $("edGoal");
     const edLevel = $("edLevel");
-    const edDiet = $("edDiet");                 // FREE TEXT
-    const edMotivation = $("edMotivation");     // FREE TEXT
+    const edDiet = $("edDiet");
+    const edMotivation = $("edMotivation");
     const btnReloadUser = $("btnReloadUser");
     const btnSaveUser = $("btnSaveUser");
 
-    // Editor seg tabs
     const segs = Array.from(document.querySelectorAll(".seg"));
     const sec_base = $("sec_base");
     const sec_videos = $("sec_videos");
@@ -683,27 +678,23 @@
     const btnGoOverrides = $("btnGoOverrides");
     const btnPrefillOv = $("btnPrefillOv");
 
-    // Plans
     const planIdEl = $("planId");
     const planWeeksJsonEl = $("planWeeksJson");
     const btnLoadPlan = $("btnLoadPlan");
     const btnSavePlan = $("btnSavePlan");
 
-    // Overrides
     const ovUidEl = $("ovUid");
     const ovDocEl = $("ovDoc");
     const ovJsonEl = $("ovJson");
     const btnLoadOv = $("btnLoadOv");
     const btnSaveOv = $("btnSaveOv");
 
-    // State
     let app, auth, db;
     let currentUser = null;
     let currentProfile = null;
     let selectedUid = null;
     let selectedDoc = null;
 
-    // Init
     try{
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
@@ -714,7 +705,6 @@
       toast("Firebase init hiba!", "err");
     }
 
-    // Buttons
     btnApp.addEventListener("click", ()=> window.location.href = "/hu/app/");
     btnLogout.addEventListener("click", async ()=>{
       try{
@@ -727,7 +717,6 @@
       }
     });
 
-    // Tabs
     function setTab(name){
       tabs.forEach(t=> t.classList.toggle("active", t.dataset.tab===name));
       customersBlock.style.display = (name==="customers") ? "block" : "none";
@@ -750,7 +739,6 @@
     }
     tabs.forEach(t=> t.addEventListener("click", ()=> setTab(t.dataset.tab)));
 
-    // Editor segment switching
     function setSeg(name){
       segs.forEach(s=> s.classList.toggle("active", s.dataset.seg===name));
       [sec_base, sec_videos, sec_diet, sec_motivation, sec_personal].forEach(x=> x.classList.remove("active"));
@@ -771,7 +759,6 @@
       toast("UID beállítva az Overrides-hoz.", "ok");
     });
 
-    // Auth guard + admin check
     onAuthStateChanged(auth, async (u)=>{
       currentUser = u;
 
@@ -816,7 +803,6 @@
       }
     });
 
-    // Customers list
     let usersCache = [];
 
     async function loadUsers(){
@@ -899,11 +885,8 @@
           package: "Start",
           goal: "Formálás",
           level: 1,
-
-          // FREE TEXT fields:
           diet: "",
           motivation: "",
-
           createdAt: serverTimestamp(),
           updatedAt: serverTimestamp()
         }, { merge:true });
@@ -916,8 +899,13 @@
       }
     }
 
-    // Editor load user
     async function selectUser(uid){
+      if(!uid){
+        log("selectUser: uid üres/null → skip");
+        toast("Vevő kiválasztás hiba (uid üres).", "warn");
+        return;
+      }
+
       selectedUid = uid;
       editorEmpty.style.display = "none";
       editor.style.display = "block";
@@ -947,7 +935,6 @@
         edGoal.value = selectedDoc.goal || "";
         edLevel.value = String(selectedDoc.level ?? "");
 
-        // diet (FREE TEXT) - handle legacy object -> stringify preview
         const d = selectedDoc.diet;
         if(d == null){
           edDiet.value = "";
@@ -958,7 +945,6 @@
           catch{ edDiet.value = ""; }
         }
 
-        // motivation (FREE TEXT)
         const m = selectedDoc.motivation;
         edMotivation.value = (m == null) ? "" : String(m);
 
@@ -967,9 +953,7 @@
           window.open(url, "_blank");
         };
 
-        // default editor seg
         setSeg("base");
-
         log(`User kiválasztva: ${uid}`);
       }catch(e){
         log(`selectUser hiba: ${e?.message || e}`);
@@ -982,10 +966,12 @@
       selectUser(selectedUid);
     });
 
+    // ✅ FIX ITT: uid mentése loadUsers() előtt
     btnSaveUser.addEventListener("click", async ()=>{
       if(!selectedUid) return;
 
-      // ✅ diet/motivation: FREE TEXT (NO JSON parsing)
+      const uid = selectedUid; // <-- FIX: mentsük el, mert loadUsers lenullázza a selectedUid-ot
+
       const dietText = (edDiet.value || "").trim();
       const motText  = (edMotivation.value || "").trim();
 
@@ -996,19 +982,17 @@
         package: edPackage.value,
         goal: (edGoal.value || "").trim(),
         level: Number(String(edLevel.value || "").trim() || 0),
-
         diet: dietText ? dietText : "",
         motivation: motText ? motText : "",
-
         updatedAt: serverTimestamp()
       };
 
       try{
-        await updateDoc(doc(db, "users", selectedUid), payload);
+        await updateDoc(doc(db, "users", uid), payload);
         toast("Mentve.", "ok");
-        log(`Mentés OK: users/${selectedUid}`);
+        log(`Mentés OK: users/${uid}`);
         await loadUsers();
-        await selectUser(selectedUid);
+        await selectUser(uid); // <-- FIX: a mentett uid-ot töltjük vissza
       }catch(e){
         log(`Mentés hiba: ${e?.message || e}`);
         toast("Mentés hiba (Rules?)", "err");
@@ -1017,11 +1001,12 @@
 
     btnDeleteUser.addEventListener("click", async ()=>{
       if(!selectedUid) return;
-      const ok = confirm(`Biztos törlöd? users/${selectedUid}`);
+      const uid = selectedUid;
+      const ok = confirm(`Biztos törlöd? users/${uid}`);
       if(!ok) return;
 
       try{
-        await deleteDoc(doc(db, "users", selectedUid));
+        await deleteDoc(doc(db, "users", uid));
         toast("Törölve.", "ok");
         selectedUid = null;
         selectedDoc = null;
@@ -1034,7 +1019,6 @@
       }
     });
 
-    // Plans (planTemplates)
     btnLoadPlan.addEventListener("click", async ()=>{
       const planId = (planIdEl.value || "").trim();
       if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
@@ -1092,7 +1076,6 @@
       }
     });
 
-    // Overrides
     btnLoadOv.addEventListener("click", async ()=>{
       const uid = (ovUidEl.value || "").trim();
       const docId = (ovDocEl.value || "").trim();
@@ -1134,7 +1117,6 @@
       }
     });
 
-    // Start
     setTab("customers");
     log("Admin UI V3 betöltve. Várjuk az auth állapotot…");
   </script>
