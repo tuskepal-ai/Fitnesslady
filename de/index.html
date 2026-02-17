@@ -19,6 +19,7 @@
       --muted2: rgba(255,255,255,.55);
       --pink: #ff4fd8;
       --pink2:#b14cff;
+      --gold:#ffd38a;
       --radius: 22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1120px;
@@ -34,6 +35,7 @@
       background:
         radial-gradient(1200px 600px at 30% 10%, rgba(255,79,216,.14), transparent 60%),
         radial-gradient(900px 500px at 75% 20%, rgba(177,76,255,.12), transparent 60%),
+        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
         var(--bg);
       color:var(--text);
       overflow-x:hidden;
@@ -44,6 +46,7 @@
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
 
+    /* Topbar */
     .topbar{
       position: fixed;
       top: 0; left: 0; right: 0;
@@ -67,7 +70,7 @@
       gap: 10px;
       font-weight: 800;
       letter-spacing: .2px;
-      white-space: nowrap;
+      white-space:nowrap;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
@@ -79,11 +82,12 @@
       display:flex; align-items:center; gap: 18px;
       color: var(--muted);
       font-size: 14px;
+      font-weight: 750;
     }
     .nav a{ opacity:.92; }
     .nav a:hover{ opacity:1; color: var(--text); }
 
-    .rightbar{ display:flex; align-items:center; gap:10px; }
+    .rightbar{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 
     .lang-switch{
       display:flex;
@@ -102,6 +106,8 @@
       color: rgba(255,255,255,.55);
       transition: color .18s ease, transform .18s ease;
       cursor:pointer;
+      user-select:none;
+      white-space:nowrap;
     }
     .lang-switch .lang:hover{ color: rgba(255,255,255,.88); transform: translateY(-1px); }
     .lang-switch .lang.active{ color:#fff; }
@@ -118,6 +124,8 @@
       box-shadow: 0 14px 30px rgba(255,79,216,.22);
       white-space: nowrap;
       transition: transform .18s ease, box-shadow .18s ease;
+      cursor:pointer;
+      user-select:none;
     }
     .cta-pill:hover{ transform: translateY(-1px); box-shadow: 0 18px 46px rgba(255,79,216,.22); }
 
@@ -125,15 +133,21 @@
       display:inline-flex; align-items:center; justify-content:center;
       padding: 10px 14px;
       border-radius: 999px;
-      background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.12);
-      color: rgba(255,255,255,.90);
-      font-weight: 850;
-      box-shadow: 0 14px 30px rgba(0,0,0,.22);
+      background: rgba(20,12,26,.55);
+      backdrop-filter: blur(10px);
+      color: var(--text);
+      box-shadow: 0 14px 40px rgba(0,0,0,.30);
+      cursor:pointer;
+      user-select:none;
       white-space: nowrap;
-      transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-    .ghost-pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); box-shadow: 0 18px 46px rgba(0,0,0,.30); }
+    .ghost-pill:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 18px 60px rgba(0,0,0,.40);
+    }
 
     .menu-btn{
       width: 40px; height: 40px; border-radius: 999px;
@@ -145,6 +159,7 @@
       cursor:pointer;
     }
 
+    /* Hero */
     .hero{
       position: relative;
       padding-top: 80px;
@@ -159,7 +174,7 @@
       position:absolute;
       inset:0;
       z-index:0;
-      background-image: url("/hero.png"); /* ✅ root hero.png */
+      background-image: url("/hero.png");
       background-size: cover;
       background-repeat: no-repeat;
       background-position: var(--hero-pos-x) var(--hero-pos-y);
@@ -239,6 +254,7 @@
       flex-wrap:wrap;
       gap: 12px;
       margin: 14px 0 10px;
+      align-items:center;
     }
 
     .btn{
@@ -255,6 +271,7 @@
       box-shadow: 0 14px 40px rgba(0,0,0,.35);
       cursor:pointer;
       white-space: nowrap;
+      user-select:none;
       transition: transform .18s ease, background .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
     .btn:hover{
@@ -286,8 +303,10 @@
       background: rgba(255,255,255,.06);
       border: 1px solid rgba(255,255,255,.10);
       backdrop-filter: blur(10px);
+      white-space:nowrap;
     }
 
+    /* Cards / sections */
     .card{
       background: var(--panel);
       border: 1px solid var(--stroke);
@@ -310,6 +329,7 @@
     .card-head{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 12px;
+      flex-wrap:wrap;
     }
     .card-title{ font-weight: 900; letter-spacing: .2px; }
     .tag{
@@ -322,6 +342,22 @@
       white-space: nowrap;
     }
 
+    section{ position: relative; padding: 52px 0; }
+    .container{ max-width: var(--max); padding: 0 14px; margin: 0 auto; }
+    .section-title{
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 34px;
+      letter-spacing: -0.3px;
+      margin: 0 0 14px;
+    }
+    .section-sub{
+      color: var(--muted);
+      margin: 0 0 24px;
+      max-width: 70ch;
+      line-height: 1.6;
+    }
+
+    /* About */
     .about-grid{
       display:grid;
       grid-template-columns: 1fr 1.2fr;
@@ -347,35 +383,7 @@
       font-size: 13.5px;
     }
 
-    .hero-cards{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-    .mini{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .mini h3{ margin:0 0 8px; font-size: 14px; letter-spacing: .2px; }
-    .mini p{ margin:0; color: var(--muted); font-size: 12.8px; line-height: 1.5; }
-
-    section{ position: relative; padding: 52px 0; }
-    .container{ max-width: var(--max); padding: 0 14px; margin: 0 auto; }
-    .section-title{
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      font-size: 34px;
-      letter-spacing: -0.3px;
-      margin: 0 0 14px;
-    }
-    .section-sub{
-      color: var(--muted);
-      margin: 0 0 24px;
-      max-width: 70ch;
-      line-height: 1.6;
-    }
-
+    /* Packages */
     .packages{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -394,9 +402,8 @@
     .pkg::before{
       content:"";
       position:absolute; inset:-2px;
-      background:
-        radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.18), transparent 55%),
-        radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.14), transparent 60%);
+      background: radial-gradient(800px 260px at 15% 0%, rgba(255,79,216,.18), transparent 55%),
+                  radial-gradient(700px 260px at 85% 15%, rgba(177,76,255,.14), transparent 60%);
       opacity:.9;
       pointer-events:none;
     }
@@ -404,6 +411,7 @@
     .pkg-top{
       display:flex; align-items:center; justify-content:space-between; gap:10px;
       margin-bottom: 10px;
+      flex-wrap:wrap;
     }
     .pkg h4{ margin:0; font-size: 22px; font-family: ui-serif, Georgia, serif; }
     .tag.hot{
@@ -424,17 +432,135 @@
       flex-wrap: wrap;
     }
 
+    /* Reviews carousel */
+    .reviews-shell{
+      display:grid;
+      grid-template-columns: 1.15fr .85fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .review-card{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 14px;
+      min-height: 170px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .review-top{
+      display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;
+    }
+    .review-name{
+      font-weight: 900;
+      letter-spacing:.2px;
+    }
+    .stars{
+      display:inline-flex; gap:2px; align-items:center;
+      font-size: 14px;
+      color: rgba(255,211,138,.95);
+      text-shadow: 0 10px 30px rgba(0,0,0,.35);
+      user-select:none;
+    }
+    .review-text{
+      color: rgba(255,255,255,.80);
+      line-height: 1.6;
+      font-size: 13.5px;
+      white-space: pre-wrap;
+    }
+    .review-meta{
+      margin-top:auto;
+      display:flex; justify-content:space-between; gap:10px; flex-wrap:wrap;
+      color: rgba(255,255,255,.55);
+      font-size: 12.5px;
+    }
+    .carousel-actions{
+      display:flex; gap:10px; flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    /* AFSZ modal */
+    .modal-overlay{
+      position: fixed; inset: 0; z-index: 200;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+    }
+    .modal-overlay.is-open{ display:flex; }
+    .modal{
+      width: min(980px, 94vw);
+      max-height: min(82vh, 760px);
+      border-radius: 22px;
+      overflow: hidden;
+      position: relative;
+    }
+    .modal-header{
+      display:flex; align-items:center; justify-content: space-between; gap: 10px;
+      padding: 14px 16px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.45);
+    }
+    .modal-title{
+      margin:0;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size: 20px;
+      letter-spacing: -.2px;
+    }
+    .modal-close{
+      width: 40px; height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.9);
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      user-select:none;
+    }
+    .modal-body{
+      padding: 16px;
+      overflow: auto;
+      max-height: calc(min(82vh, 760px) - 64px);
+      background: rgba(7,6,11,.38);
+      color: rgba(255,255,255,.82);
+      line-height: 1.65;
+      font-size: 13.5px;
+    }
+    .note{ color: rgba(255,255,255,.65); }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.55);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      max-width: var(--max);
+      margin:0 auto;
+      padding: 0 14px;
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
+    }
+
+    /* Mobile */
     @media (max-width: 980px){
       :root{ --hero-pos-x: 75%; --hero-pos-y: 10%; }
       .hero-grid{ grid-template-columns: 1fr; }
       .nav{ display:none; }
       .menu-btn{ display:inline-flex; }
-      .hero-cards{ grid-template-columns: repeat(2, 1fr); }
       .packages{ grid-template-columns: 1fr; }
       .about-grid{ grid-template-columns: 1fr; }
-    }
-    @media (max-width: 520px){
-      .hero-cards{ grid-template-columns: 1fr; }
+      .reviews-shell{ grid-template-columns: 1fr; }
+
+      /* Mobil: CTA-k ne torlódjanak */
+      .hero-actions{ gap:10px; }
+      .hero-actions a, .hero-actions button{ flex: 0 0 auto; }
     }
   </style>
 </head>
@@ -450,6 +576,7 @@
       <nav class="nav" aria-label="Menü">
         <a href="#pakete">Pakete</a>
         <a href="#ablauf">Ablauf</a>
+        <a href="#bewertungen">Bewertungen</a>
         <a href="#kontakt">Kontakt</a>
       </nav>
 
@@ -460,7 +587,7 @@
           <a class="lang active" href="/de/" onclick="localStorage.setItem('lang','de')">DE</a>
         </div>
 
-        <a class="ghost-pill" href="/de/login/" title="Login / Mein Bereich">Mein Bereich</a>
+        <a class="ghost-pill" href="/de/login/" onclick="localStorage.setItem('lang','de')">Mein Bereich</a>
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
         <a class="cta-pill" href="#kontakt">Kostenlose Beratung</a>
       </div>
@@ -486,7 +613,7 @@
           <div class="hero-actions">
             <a class="btn primary" href="#kontakt">Kostenlose Beratung</a>
             <a class="btn" href="#pakete">Pakete</a>
-            <a class="btn ghost" href="/de/login/">Login</a>
+            <a class="btn ghost" href="/de/login/" onclick="localStorage.setItem('lang','de')">Login</a>
           </div>
 
           <div class="meta-row">
@@ -507,18 +634,18 @@
 
           <div class="about-grid">
             <div class="about-box">
-              <p class="about-name">Fokus: Form • Kraft • Wohlbefinden</p>
+              <p class="about-name">Edina — Fitness Lady</p>
               <p class="about-text">
-                Du bekommst einen klaren Plan, der in dein Leben passt. Ohne Chaos, ohne Overload — dafür mit System,
-                Progression und Motivation, die dich wirklich trägt.
+                Premium Coaching für Frauen: klare Struktur, Routine, und ein Programm,
+                das in deinen Alltag passt — ohne Druck, aber mit Ergebnissen.
               </p>
             </div>
 
             <div class="about-box">
               <p class="about-name" style="margin-bottom:10px;">Warum es funktioniert</p>
               <p class="about-text">
-                Wir bauen zuerst Routine und Technik auf, dann Intensität und Feinschliff. Du weißt immer,
-                was als Nächstes kommt — und warum.
+                Kein Overload. Kein Verzichts-Zirkus. Ein Plan, der langfristig tragbar ist:
+                Training + Ernährung + Anpassungen, auf dich abgestimmt.
               </p>
             </div>
           </div>
@@ -529,17 +656,30 @@
         <div class="card-inner">
           <div class="card-head">
             <div class="card-title">Was du bekommst</div>
-            <div class="tag">Premium Struktur</div>
+            <div class="tag">Premium</div>
           </div>
 
-          <div class="hero-cards">
-            <div class="mini"><h3>Training</h3><p>Wochenplan + Progression — klar und umsetzbar.</p></div>
-            <div class="mini"><h3>Ernährung</h3><p>Ein System, das du langfristig durchziehst.</p></div>
-            <div class="mini"><h3>Support</h3><p>Feedback, Anpassungen und Begleitung.</p></div>
-            <div class="mini"><h3>Fokus</h3><p>Zielorientiert: Shape, Kraft, Energie.</p></div>
+          <div style="display:grid; grid-template-columns: repeat(4,1fr); gap:14px;" class="hero-cards">
+            <div class="review-card" style="min-height:auto;">
+              <div class="review-name">Training</div>
+              <div class="review-text">Wochenplan + Progression. Klar, realistisch, nachhaltig.</div>
+            </div>
+            <div class="review-card" style="min-height:auto;">
+              <div class="review-name">Ernährung</div>
+              <div class="review-text">Einfaches System, das zu deinem Alltag passt.</div>
+            </div>
+            <div class="review-card" style="min-height:auto;">
+              <div class="review-name">Support</div>
+              <div class="review-text">Feedback, Anpassungen, Begleitung — ohne Chaos.</div>
+            </div>
+            <div class="review-card" style="min-height:auto;">
+              <div class="review-name">Fokus</div>
+              <div class="review-text">Form • Kraft • Wohlbefinden — zielorientiert.</div>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </main>
 
@@ -551,16 +691,16 @@
       <div class="packages">
         <div class="pkg">
           <div class="pkg-inner">
-            <div class="pkg-top"><h4>Start</h4><span class="tag">4 Wochen</span></div>
+            <div class="pkg-top"><h4>Start</h4><span class="tag">Empfohlen: 4 Wochen</span></div>
             <p>Für einen klaren Plan und Momentum.</p>
             <ul class="list">
-              <li>✓ Trainingsstruktur</li>
-              <li>✓ Ernährungs-Basis</li>
+              <li>✓ Individueller Trainingsplan</li>
+              <li>✓ Ernährungs-Grundstruktur</li>
               <li>✓ 1× Anpassung</li>
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Starten</a>
+              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
@@ -568,34 +708,38 @@
         <div class="pkg" style="border-color: rgba(255,79,216,.26); box-shadow: 0 22px 70px rgba(255,79,216,.14), var(--shadow);">
           <div class="pkg-inner">
             <div class="pkg-top"><h4>Balance</h4><span class="tag hot">Beliebt</span></div>
-            <p>Form + Kraft, mit mehr Begleitung.</p>
+            <p>Form + Kraft, mit regelmäßiger Betreuung.</p>
             <ul class="list">
               <li>✓ Training + Ernährung</li>
-              <li>✓ Regelmäßige Anpassung</li>
+              <li>✓ Wöchentliche Anpassung</li>
               <li>✓ Mini-Ziele & Gewohnheiten</li>
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Starten</a>
+              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
 
         <div class="pkg">
           <div class="pkg-inner">
-            <div class="pkg-top"><h4>Pro</h4><span class="tag">6–12 Wochen</span></div>
-            <p>Maximale Betreuung, ohne Überforderung.</p>
+            <div class="pkg-top"><h4>Pro</h4><span class="tag">Empfohlen: 6–12 Wochen</span></div>
+            <p>Maximale Begleitung, ohne Überforderung.</p>
             <ul class="list">
               <li>✓ Voll personalisiert</li>
               <li>✓ Häufigere Check-ins</li>
-              <li>✓ Shape & Performance Fokus</li>
+              <li>✓ Performance & Shape Fokus</li>
             </ul>
             <div class="pkg-actions">
               <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Starten</a>
+              <a class="btn primary" href="/de/login/" onclick="localStorage.setItem('lang','de')" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
+      </div>
+
+      <div style="margin-top:14px; display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+        <button class="ghost-pill" id="btnAfsz" type="button">AGB / AFSZ</button>
       </div>
     </div>
   </section>
@@ -603,63 +747,276 @@
   <section id="ablauf">
     <div class="container">
       <div class="section-title">Ablauf</div>
-      <p class="section-sub">
-        1) Kurzer Austausch → 2) Plan & Zugang → 3) Umsetzung → 4) Anpassungen & Fortschritt.
-      </p>
+      <p class="section-sub">Einfach, klar, alltagstauglich — ohne Stress.</p>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="about-grid">
+            <div class="about-box">
+              <p class="about-name">1) Kurze Beratung</p>
+              <p class="about-text">Ziel, Zeitplan, Alltag. Wir bauen daraus die passende Struktur.</p>
+            </div>
+            <div class="about-box">
+              <p class="about-name">2) Programm & Start</p>
+              <p class="about-text">Du bekommst deinen Plan + klare Schritte, ohne Überforderung.</p>
+            </div>
+            <div class="about-box">
+              <p class="about-name">3) Routine & Anpassung</p>
+              <p class="about-text">Wöchentliche Feinjustierung. Du bleibst dran, weil es machbar ist.</p>
+            </div>
+            <div class="about-box">
+              <p class="about-name">4) Ergebnis</p>
+              <p class="about-text">Form, Kraft, Wohlbefinden — sichtbar und nachhaltig.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="bewertungen">
+    <div class="container">
+      <div class="section-title">Bewertungen</div>
+      <p class="section-sub">Echte Rückmeldungen. (Die Daten kommen aus Google Sheets – wie auf HU.)</p>
+
+      <div class="reviews-shell">
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-head">
+              <div class="card-title">Kundenstimmen</div>
+              <div class="tag">Live</div>
+            </div>
+
+            <div class="review-card" id="reviewCard">
+              <div class="review-top">
+                <div class="review-name" id="rvName">Laden…</div>
+                <div class="stars" id="rvStars">★★★★★</div>
+              </div>
+              <div class="review-text" id="rvText">Bitte warten…</div>
+              <div class="review-meta">
+                <span id="rvWhen">—</span>
+                <span id="rvIdx">—</span>
+              </div>
+            </div>
+
+            <div style="height:12px"></div>
+            <div class="carousel-actions">
+              <button class="btn ghost" id="rvPrev" type="button">←</button>
+              <button class="btn ghost" id="rvNext" type="button">→</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-inner">
+            <div class="card-head">
+              <div class="card-title">Bewertung schreiben</div>
+              <div class="tag">Später</div>
+            </div>
+            <p class="section-sub" style="margin:0;">
+              Optional: später jöhet egy modul (pl. Google Form / Giscus).
+              Most a fókusz az éles működésen van.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
   <section id="kontakt">
     <div class="container">
       <div class="section-title">Kontakt</div>
-      <p class="section-sub">
-        Für eine kostenlose Beratung: Schreib mir kurz — du bekommst schnell Rückmeldung und eine klare Empfehlung,
-        welches Paket zu dir passt.
-      </p>
+      <p class="section-sub">Für eine kostenlose Beratung: WhatsApp oder Instagram.</p>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="about-grid">
+            <div class="about-box">
+              <p class="about-name">WhatsApp</p>
+              <p class="about-text">Schreib mir kurz dein Ziel + Zeitplan.</p>
+            </div>
+            <div class="about-box">
+              <p class="about-name">Instagram</p>
+              <p class="about-text">@fitnesslady</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </section>
 
+  <footer>
+    <div class="footer-inner">
+      <div>© <span id="y"></span> Fitness Lady</div>
+      <div><a href="#pakete" id="footerAfsz">AGB / AFSZ</a> · Tüske web design</div>
+    </div>
+  </footer>
+
+  <!-- AFSZ MODAL -->
+  <div class="modal-overlay" id="afszOverlay" role="dialog" aria-modal="true" aria-labelledby="afszTitle" aria-hidden="true">
+    <div class="card modal" role="document">
+      <div class="modal-header">
+        <h2 class="modal-title" id="afszTitle">AGB / AFSZ</h2>
+        <button class="modal-close" id="afszClose" type="button" aria-label="Close">✕</button>
+      </div>
+      <div class="modal-body" id="afszBody">
+        <p class="note"><b>Hinweis:</b> Ide beillesztjük a német ÁFSZ/AGB szöveget. (Ugyanúgy modalban, mint HU-n.)</p>
+        <p>
+          1) Leistung: Online Trainings- und Ernährungsbegleitung.<br>
+          2) Zugang: nach Zahlung / Freischaltung.<br>
+          3) Widerruf/Refund: gemäß individueller Vereinbarung.<br>
+          4) Haftung: Training auf eigene Verantwortung, bei gesundheitlichen Problemen Arzt konsultieren.
+        </p>
+        <p class="note">Ezt a szöveget bármikor cseréljük a végleges DE ÁFSZ-re.</p>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // mobil menü (minimal)
-    const menuBtn = document.getElementById("menuBtn");
-    let open = false;
-    function closeNav(){
-      const n = document.getElementById("mobileNav");
-      if(n) n.remove();
-      open = false;
+    // Year
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    // AFSZ modal
+    const afszOverlay = document.getElementById("afszOverlay");
+    const openAfsz = () => { afszOverlay.classList.add("is-open"); afszOverlay.setAttribute("aria-hidden","false"); };
+    const closeAfsz = () => { afszOverlay.classList.remove("is-open"); afszOverlay.setAttribute("aria-hidden","true"); };
+    document.getElementById("btnAfsz")?.addEventListener("click", openAfsz);
+    document.getElementById("footerAfsz")?.addEventListener("click", (e)=>{ e.preventDefault(); openAfsz(); });
+    document.getElementById("afszClose")?.addEventListener("click", closeAfsz);
+    afszOverlay.addEventListener("click",(e)=>{ if(e.target===afszOverlay) closeAfsz(); });
+    document.addEventListener("keydown",(e)=>{ if(e.key==="Escape" && afszOverlay.classList.contains("is-open")) closeAfsz(); });
+
+    // Reviews carousel (CSV from Google Sheets)
+    // !!! IDE tedd be ugyanazt a CSV linket, ami a HU oldalon már működik !!!
+    const REVIEWS_CSV_URL = window.REVIEWS_CSV_URL || ""; // ha szeretnéd, beállíthatod globálisan is
+    const FALLBACK_CSV_URL = ""; // opcionális: ha üres a fenti, ide is írhatsz
+
+    function parseCSV(text){
+      // egyszerű CSV parser: kezeli az idézőjeles mezőket és a vesszőt
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQ = false;
+      for(let i=0;i<text.length;i++){
+        const c = text[i];
+        const n = text[i+1];
+        if(c === '"' && inQ && n === '"'){ cur += '"'; i++; continue; }
+        if(c === '"'){ inQ = !inQ; continue; }
+        if(c === ',' && !inQ){ row.push(cur); cur=""; continue; }
+        if((c === '\n' || c === '\r') && !inQ){
+          if(cur.length || row.length){ row.push(cur); rows.push(row); }
+          row=[]; cur="";
+          // skip \r\n
+          if(c === '\r' && n === '\n') i++;
+          continue;
+        }
+        cur += c;
+      }
+      if(cur.length || row.length){ row.push(cur); rows.push(row); }
+      return rows;
     }
-    menuBtn?.addEventListener("click", ()=>{
-      if(open){ closeNav(); return; }
-      closeNav();
-      open = true;
-      const nav = document.createElement("div");
-      nav.id = "mobileNav";
-      nav.style.position = "fixed";
-      nav.style.top = "66px";
-      nav.style.left = "14px";
-      nav.style.right = "14px";
-      nav.style.zIndex = "60";
-      nav.style.background = "rgba(20,12,26,.72)";
-      nav.style.border = "1px solid rgba(255,255,255,.10)";
-      nav.style.borderRadius = "18px";
-      nav.style.backdropFilter = "blur(14px)";
-      nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-      nav.style.padding = "12px";
-      nav.innerHTML = `
-        <a href="#pakete" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Pakete</a>
-        <a href="#ablauf" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Ablauf</a>
-        <a href="#kontakt" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Kontakt</a>
-        <a href="/de/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Mein Bereich</a>
-      `;
-      document.body.appendChild(nav);
+
+    function stars(n){
+      const x = Math.max(1, Math.min(5, Number(n||5)));
+      return "★★★★★".slice(0,x) + "☆☆☆☆☆".slice(0,5-x);
+    }
+
+    const rvName = document.getElementById("rvName");
+    const rvText = document.getElementById("rvText");
+    const rvStars = document.getElementById("rvStars");
+    const rvWhen = document.getElementById("rvWhen");
+    const rvIdx = document.getElementById("rvIdx");
+    const btnPrev = document.getElementById("rvPrev");
+    const btnNext = document.getElementById("rvNext");
+
+    let REVIEWS = [];
+    let idx = 0;
+
+    function renderReview(){
+      if(!REVIEWS.length){
+        rvName.textContent = "Keine Bewertungen";
+        rvText.textContent = "Noch keine Daten.";
+        rvStars.textContent = "★★★★★";
+        rvWhen.textContent = "—";
+        rvIdx.textContent = "—";
+        return;
+      }
+      const r = REVIEWS[idx];
+      rvName.textContent = r.name || "—";
+      rvText.textContent = r.text || "—";
+      rvStars.textContent = stars(r.stars || 5);
+      rvWhen.textContent = r.date || "—";
+      rvIdx.textContent = `${idx+1}/${REVIEWS.length}`;
+    }
+
+    async function loadReviews(){
+      const url = REVIEWS_CSV_URL || FALLBACK_CSV_URL;
+      if(!url){
+        rvName.textContent = "CSV fehlt";
+        rvText.textContent = "Setze REVIEWS_CSV_URL auf denselben Link wie im HU Index.";
+        rvStars.textContent = "★★★★★";
+        rvWhen.textContent = "—";
+        rvIdx.textContent = "—";
+        return;
+      }
+      try{
+        const res = await fetch(url, { cache:"no-store" });
+        const txt = await res.text();
+        const rows = parseCSV(txt);
+        if(!rows.length){ renderReview(); return; }
+
+        // elvárt oszlopok: name, text, stars, date (ha más a HU sémája, itt igazítjuk)
+        const header = rows[0].map(s => (s||"").trim().toLowerCase());
+        const iName = header.indexOf("name");
+        const iText = header.indexOf("text");
+        const iStars = header.indexOf("stars");
+        const iDate = header.indexOf("date");
+
+        const out = [];
+        for(let i=1;i<rows.length;i++){
+          const r = rows[i];
+          const obj = {
+            name: iName>=0 ? (r[iName]||"").trim() : "",
+            text: iText>=0 ? (r[iText]||"").trim() : "",
+            stars: iStars>=0 ? (r[iStars]||"").trim() : "5",
+            date: iDate>=0 ? (r[iDate]||"").trim() : ""
+          };
+          if(obj.name || obj.text) out.push(obj);
+        }
+
+        REVIEWS = out;
+        idx = 0;
+        renderReview();
+
+        // auto-slide
+        clearInterval(window.__rvTimer);
+        window.__rvTimer = setInterval(()=>{
+          if(!REVIEWS.length) return;
+          idx = (idx + 1) % REVIEWS.length;
+          renderReview();
+        }, 5200);
+
+      }catch(e){
+        rvName.textContent = "Fehler";
+        rvText.textContent = "Reviews konnten nicht geladen werden.";
+        rvStars.textContent = "★★★★★";
+        rvWhen.textContent = "—";
+        rvIdx.textContent = "—";
+      }
+    }
+
+    btnPrev?.addEventListener("click", ()=>{
+      if(!REVIEWS.length) return;
+      idx = (idx - 1 + REVIEWS.length) % REVIEWS.length;
+      renderReview();
     });
-    document.addEventListener("click",(e)=>{
-      const nav = document.getElementById("mobileNav");
-      if(!nav) return;
-      if(e.target === menuBtn) return;
-      if(nav.contains(e.target)) { closeNav(); return; }
-      closeNav();
+    btnNext?.addEventListener("click", ()=>{
+      if(!REVIEWS.length) return;
+      idx = (idx + 1) % REVIEWS.length;
+      renderReview();
     });
+
+    loadReviews();
   </script>
 </body>
 </html>
