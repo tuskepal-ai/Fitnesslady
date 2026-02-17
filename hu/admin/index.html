@@ -43,7 +43,6 @@
       background:
         radial-gradient(1200px 600px at 35% 35%, rgba(255,79,216,.14), transparent 60%),
         radial-gradient(1000px 520px at 70% 55%, rgba(198,75,255,.12), transparent 62%);
-      filter: blur(0px);
       pointer-events:none;
       opacity:.9;
     }
@@ -93,7 +92,7 @@
       padding:10px 14px;
       background: rgba(255,255,255,.06);
       color:var(--text);
-      font-weight:700;
+      font-weight:800;
       transition: transform .12s ease, box-shadow .12s ease, background .12s ease, border-color .12s ease;
     }
     .btn:hover{ transform: translateY(-1px); box-shadow: 0 18px 38px rgba(0,0,0,.30); border-color: rgba(255,255,255,.18); }
@@ -102,10 +101,15 @@
       border-color: rgba(255,255,255,.16);
       box-shadow: 0 22px 50px rgba(255,79,216,.18);
     }
+    .btn.ghost{
+      background: rgba(255,255,255,.04);
+    }
     .btn.danger{
       background: rgba(255,91,107,.14);
       border-color: rgba(255,91,107,.30);
     }
+    .btn.small{ padding:8px 12px; font-size:13px; }
+    .btn:disabled{ opacity:.55; cursor:not-allowed; transform:none; box-shadow:none; }
 
     main{
       max-width:1100px;
@@ -145,7 +149,7 @@
       border:1px solid var(--stroke);
       background: rgba(255,255,255,.05);
       cursor:pointer;
-      font-weight:800;
+      font-weight:900;
       color: var(--text);
       transition:.12s;
     }
@@ -176,6 +180,15 @@
     .panel p{margin:0 0 12px; color:var(--muted); line-height:1.45;}
 
     .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center;}
+    .split{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+    }
+    @media (max-width: 520px){
+      .split{ grid-template-columns: 1fr; }
+    }
+
     .field{
       width:100%;
       padding:12px 12px;
@@ -190,6 +203,13 @@
       box-shadow: 0 0 0 4px rgba(255,79,216,.12);
     }
     label{ display:block; font-size:13px; color:var(--muted); margin:10px 0 6px; }
+
+    .hint{
+      margin-top:8px;
+      color: rgba(255,255,255,.70);
+      font-size:12px;
+      line-height:1.45;
+    }
 
     .list{
       display:flex; flex-direction:column; gap:10px;
@@ -226,7 +246,35 @@
     .badge.err{ border-color: rgba(255,91,107,.30); background: rgba(255,91,107,.12); }
     .badge.warn{ border-color: rgba(255,204,102,.30); background: rgba(255,204,102,.10); }
 
-    textarea.field{ min-height: 140px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; font-size: 12px; }
+    textarea.field{
+      min-height: 140px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      font-size: 12px;
+    }
+
+    .table{
+      width:100%;
+      border-collapse:separate;
+      border-spacing:0;
+      overflow:hidden;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+    .table th,.table td{
+      padding:10px 10px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      vertical-align:top;
+      font-size:13px;
+    }
+    .table th{
+      text-align:left;
+      color: rgba(255,255,255,.82);
+      font-weight:900;
+      background: rgba(255,255,255,.04);
+    }
+    .table tr:last-child td{ border-bottom:none; }
+    .cell-actions{ width: 120px; white-space:nowrap; }
 
     .log{
       margin: 14px 16px 16px;
@@ -264,7 +312,7 @@
       max-width: 92vw;
       display:none;
       color: rgba(255,255,255,.92);
-      font-weight: 700;
+      font-weight: 800;
     }
     .toast.ok{ border-color: rgba(46,229,157,.28); }
     .toast.err{ border-color: rgba(255,91,107,.30); }
@@ -295,8 +343,7 @@
       <div class="cardHeader">
         <h1>Admin panel</h1>
         <p class="sub">
-          Itt látod a vevőket, és be tudod állítani: csomag, cél, szint, aktív státusz, étrend (JSON),
-          valamint a “személyre szabás” (overrides).
+          Éles admin felület: vevők kezelése, plan sablonok (videók), és személyre szabás (overrides).
           <br><b>Belépés csak adminnak</b> (users/{uid}.role = "admin").
         </p>
       </div>
@@ -308,11 +355,12 @@
       </div>
 
       <div class="grid">
-        <!-- BAL: lista / tab tartalom -->
+        <!-- BAL -->
         <div class="panel">
           <h2 id="leftTitle">Vevők</h2>
           <p id="leftDesc">Kattints egy vevőre. Jobbra szerkesztesz, majd Mentés → Firestore.</p>
 
+          <!-- Customers -->
           <div id="customersBlock">
             <label>Keresés (e-mail / uid / docId)</label>
             <input class="field" id="search" placeholder="pl. teszt@email.com" />
@@ -327,43 +375,126 @@
             <div class="list" id="list"></div>
           </div>
 
+          <!-- Plans PRO -->
           <div id="plansBlock" style="display:none">
             <p style="color:var(--muted);margin:0 0 12px">
-              Plan sablonok (planTemplates) — jelenleg JSON gyors szerkesztés (profi/éles).
+              Plan sablonok (planTemplates/{planId}/weeks/{weekNo}) — PRO szerkesztő (nem JSON).
             </p>
-            <label>Plan ID</label>
-            <input class="field" id="planId" placeholder="pl. Start / Balance / Pro" />
-            <label>Weeks JSON (planTemplates/{planId}/weeks/{weekNo})</label>
-            <textarea class="field" id="planWeeksJson" placeholder='{"weekNo":1,"videos":[...]} ...'></textarea>
+
+            <div class="split">
+              <div>
+                <label>Plan</label>
+                <select class="field" id="planPick">
+                  <option value="Start">Start</option>
+                  <option value="Balance">Balance</option>
+                  <option value="Pro">Pro</option>
+                </select>
+                <div class="hint">Választhatsz előre definiáltat, vagy írd be kézzel lent.</div>
+              </div>
+              <div>
+                <label>Plan ID (kézi)</label>
+                <input class="field" id="planIdManual" placeholder="pl. start_v1 / Balance_v1 / Pro_v1" />
+                <div class="hint">Ha üres, a fenti Plan választót használjuk.</div>
+              </div>
+            </div>
+
+            <div class="split">
+              <div>
+                <label>Hét (weekNo)</label>
+                <input class="field" id="planWeekNo" inputmode="numeric" placeholder="pl. 1" />
+              </div>
+              <div>
+                <label>Hét cím (title)</label>
+                <input class="field" id="planWeekTitle" placeholder='pl. "1. hét"' />
+              </div>
+            </div>
+
             <div style="height:12px"></div>
             <div class="row">
-              <button class="btn" id="btnLoadPlan">Betöltés</button>
-              <button class="btn primary" id="btnSavePlan">Mentés</button>
+              <button class="btn" id="btnPlanLoad">Betöltés</button>
+              <button class="btn primary" id="btnPlanSave">Mentés</button>
+              <button class="btn ghost" id="btnPlanClear">Ürítés</button>
+              <button class="btn" id="btnWorkoutAdd">＋ Új edzés sor</button>
+            </div>
+
+            <div style="height:12px"></div>
+            <table class="table" id="workoutsTable">
+              <thead>
+                <tr>
+                  <th style="width:34%">Edzés cím</th>
+                  <th style="width:40%">Vimeo link (üres is lehet)</th>
+                  <th style="width:14%">Perc</th>
+                  <th class="cell-actions">Művelet</th>
+                </tr>
+              </thead>
+              <tbody id="workoutsBody">
+                <tr><td colspan="4" style="color:var(--muted)">Nincs betöltött hét. Nyomj Betöltést vagy adj hozzá sort.</td></tr>
+              </tbody>
+            </table>
+
+            <div class="hint">
+              Mentés formátum (week doc): <b>{ weekNo, title, workouts:[{title, video, duration}], updatedAt }</b><br>
+              <b>Ha még nincs videó:</b> a <code>video</code> mező legyen <code>""</code>.
             </div>
           </div>
 
+          <!-- Overrides PRO -->
           <div id="overridesBlock" style="display:none">
             <p style="color:var(--muted);margin:0 0 12px">
-              Overrides = személyre szabott videók/elemek a user alá: users/{uid}/overrides/{doc}
+              Személyre szabások (users/{uid}/overrides/{docId}) — PRO szerkesztő.
             </p>
-            <label>Vevő UID</label>
-            <input class="field" id="ovUid" placeholder="pl. mOBrBrPlycPJb..." />
+
+            <label>Vevő kiválasztása</label>
+            <select class="field" id="ovUserPick">
+              <option value="">— betöltés…</option>
+            </select>
+
+            <div style="height:10px"></div>
+            <div class="row">
+              <button class="btn" id="btnOvRefresh">⟳ Overrides lista</button>
+              <button class="btn primary" id="btnOvNew">＋ Új override</button>
+            </div>
+
+            <div style="height:12px"></div>
+            <div class="list" id="ovList"></div>
+
+            <div style="height:12px"></div>
             <label>Override Doc ID</label>
-            <input class="field" id="ovDoc" placeholder="pl. slot1 / 2026-02-15 / customA" />
-            <label>Override JSON</label>
-            <textarea class="field" id="ovJson" placeholder='{"title":"Személyre szabás 1","vimeoUrl":"...","active":true}'></textarea>
+            <input class="field" id="ovDocId" placeholder="pl. slot1 / 2026-02-15 / customA" />
+
+            <div class="split">
+              <div>
+                <label>Cím (title)</label>
+                <input class="field" id="ovTitle" placeholder='pl. "Személyre szabás 1"' />
+              </div>
+              <div>
+                <label>Aktív</label>
+                <select class="field" id="ovActive">
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </div>
+            </div>
+
+            <label>Vimeo URL</label>
+            <input class="field" id="ovVimeoUrl" placeholder="https://vimeo.com/xxxx vagy https://player.vimeo.com/video/xxxx" />
+
+            <label>Megjegyzés (opcionális)</label>
+            <textarea class="field" id="ovNote" placeholder="pl. fókusz: farizom / mobilitás / térd-kímélő"></textarea>
+
             <div style="height:12px"></div>
             <div class="row">
-              <button class="btn" id="btnLoadOv">Betöltés</button>
-              <button class="btn primary" id="btnSaveOv">Mentés</button>
+              <button class="btn" id="btnOvLoad">Betöltés</button>
+              <button class="btn primary" id="btnOvSave">Mentés</button>
+              <button class="btn danger" id="btnOvDelete">Törlés</button>
             </div>
           </div>
         </div>
 
-        <!-- JOBB: szerkesztő -->
+        <!-- JOBB: editor -->
         <div class="panel">
           <h2>Szerkesztő</h2>
-          <p>Válassz egy vevőt bal oldalt.</p>
+          <p id="rightDesc">Válassz egy vevőt bal oldalt.</p>
 
           <div id="editorEmpty" style="color:var(--muted)">Nincs kiválasztott vevő.</div>
 
@@ -407,8 +538,8 @@
             <label>Szint (level)</label>
             <input class="field" id="edLevel" inputmode="numeric" placeholder="pl. 2" />
 
-            <label>Étrend (diet JSON) — gyors szerkesztés</label>
-            <textarea class="field" id="edDiet" placeholder='{"kcal":1800,"protein":140,"carb":170,"fat":55,"note":"...","weekPlan":{...}}'></textarea>
+            <label>Étrend (diet JSON) — validálva</label>
+            <textarea class="field" id="edDiet" placeholder='{"kcal":1800,"protein":140,"carb":170,"fat":55,"note":"..."}'></textarea>
 
             <div style="height:12px"></div>
             <div class="row">
@@ -417,8 +548,8 @@
             </div>
 
             <div style="height:14px"></div>
-            <div style="color:var(--muted);font-size:12px">
-              Tipp: a vevő oldalon a program az users/{uid} + users/{uid}/overrides alapján épül.
+            <div class="hint">
+              A vevő oldal a <b>users/{uid}</b> + <b>users/{uid}/overrides</b> alapján épül.
             </div>
           </div>
         </div>
@@ -435,23 +566,15 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- Firebase v9 (modular) -->
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-    import {
-      getAuth,
-      onAuthStateChanged,
-      signOut
-    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
     import {
       getFirestore,
       doc, getDoc, setDoc, updateDoc, deleteDoc,
       collection, getDocs, query, orderBy, limit, serverTimestamp
     } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-    // =========================
-    // A TE Firebase web configod
-    // =========================
     const firebaseConfig = {
       apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
       authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -463,8 +586,67 @@
     };
 
     const $ = (id)=>document.getElementById(id);
+
     const logEl = $("log");
     const toastEl = $("toast");
+    const statusPill = $("statusPill");
+    const btnApp = $("btnApp");
+    const btnLogout = $("btnLogout");
+
+    const tabs = Array.from(document.querySelectorAll(".tab"));
+    const customersBlock = $("customersBlock");
+    const plansBlock = $("plansBlock");
+    const overridesBlock = $("overridesBlock");
+    const leftTitle = $("leftTitle");
+    const leftDesc = $("leftDesc");
+
+    // Customers
+    const listEl = $("list");
+    const searchEl = $("search");
+    const btnReload = $("btnReload");
+    const btnNewUser = $("btnNewUser");
+
+    // Right editor
+    const editorEmpty = $("editorEmpty");
+    const editor = $("editor");
+    const edTitle = $("edTitle");
+    const edMeta = $("edMeta");
+    const btnOpenDoc = $("btnOpenDoc");
+    const btnDeleteUser = $("btnDeleteUser");
+    const edActive = $("edActive");
+    const edRole = $("edRole");
+    const edEmail = $("edEmail");
+    const edPackage = $("edPackage");
+    const edGoal = $("edGoal");
+    const edLevel = $("edLevel");
+    const edDiet = $("edDiet");
+    const btnReloadUser = $("btnReloadUser");
+    const btnSaveUser = $("btnSaveUser");
+
+    // Plans PRO
+    const planPick = $("planPick");
+    const planIdManual = $("planIdManual");
+    const planWeekNo = $("planWeekNo");
+    const planWeekTitle = $("planWeekTitle");
+    const btnPlanLoad = $("btnPlanLoad");
+    const btnPlanSave = $("btnPlanSave");
+    const btnPlanClear = $("btnPlanClear");
+    const btnWorkoutAdd = $("btnWorkoutAdd");
+    const workoutsBody = $("workoutsBody");
+
+    // Overrides PRO
+    const ovUserPick = $("ovUserPick");
+    const btnOvRefresh = $("btnOvRefresh");
+    const btnOvNew = $("btnOvNew");
+    const ovList = $("ovList");
+    const ovDocId = $("ovDocId");
+    const ovTitle = $("ovTitle");
+    const ovActive = $("ovActive");
+    const ovVimeoUrl = $("ovVimeoUrl");
+    const ovNote = $("ovNote");
+    const btnOvLoad = $("btnOvLoad");
+    const btnOvSave = $("btnOvSave");
+    const btnOvDelete = $("btnOvDelete");
 
     function log(msg){
       const t = (new Date()).toLocaleString();
@@ -479,63 +661,22 @@
       window.__toastTimer = setTimeout(()=> toastEl.style.display="none", 2600);
     }
 
-    // UI refs
-    const statusPill = $("statusPill");
-    const btnApp = $("btnApp");
-    const btnLogout = $("btnLogout");
-
-    const tabs = Array.from(document.querySelectorAll(".tab"));
-    const customersBlock = $("customersBlock");
-    const plansBlock = $("plansBlock");
-    const overridesBlock = $("overridesBlock");
-    const leftTitle = $("leftTitle");
-    const leftDesc = $("leftDesc");
-
-    const listEl = $("list");
-    const searchEl = $("search");
-    const btnReload = $("btnReload");
-    const btnNewUser = $("btnNewUser");
-
-    const editorEmpty = $("editorEmpty");
-    const editor = $("editor");
-    const edTitle = $("edTitle");
-    const edMeta = $("edMeta");
-    const btnOpenDoc = $("btnOpenDoc");
-    const btnDeleteUser = $("btnDeleteUser");
-
-    const edActive = $("edActive");
-    const edRole = $("edRole");
-    const edEmail = $("edEmail");
-    const edPackage = $("edPackage");
-    const edGoal = $("edGoal");
-    const edLevel = $("edLevel");
-    const edDiet = $("edDiet");
-    const btnReloadUser = $("btnReloadUser");
-    const btnSaveUser = $("btnSaveUser");
-
-    // Plans
-    const planIdEl = $("planId");
-    const planWeeksJsonEl = $("planWeeksJson");
-    const btnLoadPlan = $("btnLoadPlan");
-    const btnSavePlan = $("btnSavePlan");
-
-    // Overrides
-    const ovUidEl = $("ovUid");
-    const ovDocEl = $("ovDoc");
-    const ovJsonEl = $("ovJson");
-    const btnLoadOv = $("btnLoadOv");
-    const btnSaveOv = $("btnSaveOv");
-
-    // State
     let app, auth, db;
-    let currentUser = null;      // firebase auth user
-    let currentProfile = null;   // users/{uid} doc
-    let selectedUid = null;      // editor user uid
-    let selectedDoc = null;      // user doc data
+    let currentUser = null;
+    let currentProfile = null;
 
-    // =========================
-    // Init
-    // =========================
+    // Customers state
+    let usersCache = [];
+    let selectedUid = null;
+    let selectedDoc = null;
+
+    // Plans state
+    let planCurrentWorkouts = [];
+
+    // Overrides state
+    let overridesCache = [];
+    let ovSelectedDocId = null;
+
     try{
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
@@ -546,13 +687,7 @@
       toast("Firebase init hiba!", "err");
     }
 
-    // =========================
-    // Navigation buttons
-    // =========================
-    btnApp.addEventListener("click", ()=>{
-      window.location.href = "/hu/app/";
-    });
-
+    btnApp.addEventListener("click", ()=> window.location.href = "/hu/app/");
     btnLogout.addEventListener("click", async ()=>{
       try{
         await signOut(auth);
@@ -564,12 +699,8 @@
       }
     });
 
-    // =========================
-    // Tabs
-    // =========================
     function setTab(name){
       tabs.forEach(t=> t.classList.toggle("active", t.dataset.tab===name));
-
       customersBlock.style.display = (name==="customers") ? "block" : "none";
       plansBlock.style.display     = (name==="plans")     ? "block" : "none";
       overridesBlock.style.display = (name==="overrides") ? "block" : "none";
@@ -580,20 +711,17 @@
       }
       if(name==="plans"){
         leftTitle.textContent = "Plans";
-        leftDesc.textContent = "Plan sablonok (planTemplates) gyors szerkesztése.";
+        leftDesc.textContent = "Plan sablonok (videók) szerkesztése — PRO felület.";
       }
       if(name==="overrides"){
         leftTitle.textContent = "Overrides";
-        leftDesc.textContent = "Személyre szabások kezelése (users/{uid}/overrides).";
+        leftDesc.textContent = "Személyre szabások kezelése — PRO felület.";
       }
       log(`Tab: ${name}`);
     }
-
     tabs.forEach(t=> t.addEventListener("click", ()=> setTab(t.dataset.tab)));
 
-    // =========================
-    // Auth guard + Admin check
-    // =========================
+    // ===== Auth + Admin check
     onAuthStateChanged(auth, async (u)=>{
       currentUser = u;
 
@@ -606,7 +734,6 @@
 
       statusPill.textContent = `Belépve: ${u.email || u.uid} • ellenőrzés…`;
 
-      // Admin jog: users/{uid}.role === "admin"
       try{
         const pRef = doc(db, "users", u.uid);
         const pSnap = await getDoc(pRef);
@@ -629,10 +756,11 @@
         }
 
         statusPill.textContent = `Belépve: ${u.email} • role=admin`;
-        log("Admin OK. Betöltés…");
         toast("Admin belépés OK", "ok");
+        log("Admin OK. Betöltés…");
 
         await loadUsers();
+        await refreshOverridesUserPick();
       }catch(e){
         statusPill.textContent = "Hiba / Firebase";
         log(`Admin check hiba: ${e?.message || e}`);
@@ -640,11 +768,7 @@
       }
     });
 
-    // =========================
-    // Customers list (cached)
-    // =========================
-    let usersCache = [];
-
+    // ===== Customers list
     async function loadUsers(){
       listEl.innerHTML = "";
       selectedUid = null;
@@ -653,12 +777,14 @@
       editorEmpty.style.display = "block";
 
       try{
-        const qy = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(200));
+        const qy = query(collection(db, "users"), orderBy("createdAt", "desc"), limit(300));
         const snap = await getDocs(qy);
         usersCache = [];
         snap.forEach(d=> usersCache.push({ id:d.id, ...d.data() }));
         renderList(usersCache);
         log(`Users betöltve: ${usersCache.length} db`);
+
+        await refreshOverridesUserPick();
       }catch(e){
         log(`Users load hiba: ${e?.message || e}`);
         toast("Nem tudom betölteni a users listát (Rules?)", "err");
@@ -738,9 +864,7 @@
       }
     }
 
-    // =========================
-    // Editor
-    // =========================
+    // ===== Right editor
     async function selectUser(uid){
       selectedUid = uid;
       editorEmpty.style.display = "none";
@@ -813,13 +937,19 @@
         }
       }
 
+      const levelNum = Number(String(edLevel.value || "").trim() || 0);
+      if(Number.isNaN(levelNum) || levelNum < 0){
+        toast("Szint (level) hibás szám.", "err");
+        return;
+      }
+
       const payload = {
         active: (edActive.value === "true"),
         role: edRole.value,
         email: (edEmail.value || "").trim(),
         package: edPackage.value,
         goal: (edGoal.value || "").trim(),
-        level: Number(String(edLevel.value || "").trim() || 0),
+        level: levelNum,
         diet: dietValue,
         updatedAt: serverTimestamp()
       };
@@ -855,82 +985,283 @@
       }
     });
 
-    // =========================
-    // Plans (planTemplates)
-    // =========================
-    btnLoadPlan.addEventListener("click", async ()=>{
-      const planId = (planIdEl.value || "").trim();
-      if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
+    // ===== Plans PRO helpers
+    function getPlanId(){
+      const manual = (planIdManual.value || "").trim();
+      if(manual) return manual;
+      return (planPick.value || "").trim();
+    }
+
+    function renderWorkoutsTable(){
+      workoutsBody.innerHTML = "";
+      if(!Array.isArray(planCurrentWorkouts) || planCurrentWorkouts.length === 0){
+        const tr = document.createElement("tr");
+        tr.innerHTML = `<td colspan="4" style="color:var(--muted)">Nincs edzés. Nyomj: “＋ Új edzés sor”.</td>`;
+        workoutsBody.appendChild(tr);
+        return;
+      }
+
+      planCurrentWorkouts.forEach((w, idx)=>{
+        const tr = document.createElement("tr");
+
+        const title = (w.title ?? "");
+        const video = (w.video ?? "");
+        const duration = (w.duration ?? "");
+
+        tr.innerHTML = `
+          <td><input class="field" data-k="title" data-i="${idx}" value="${escapeHtml(title)}" placeholder="pl. Alsótest edzés"></td>
+          <td><input class="field" data-k="video" data-i="${idx}" value="${escapeHtml(video)}" placeholder='"" vagy https://vimeo.com/....'></td>
+          <td><input class="field" data-k="duration" data-i="${idx}" inputmode="numeric" value="${escapeHtml(String(duration))}" placeholder="pl. 30"></td>
+          <td class="cell-actions">
+            <button class="btn small danger" data-del="${idx}">Törlés</button>
+          </td>
+        `;
+        workoutsBody.appendChild(tr);
+      });
+
+      // wire inputs
+      workoutsBody.querySelectorAll("input.field").forEach(inp=>{
+        inp.addEventListener("input", ()=>{
+          const i = Number(inp.dataset.i);
+          const k = inp.dataset.k;
+          if(!planCurrentWorkouts[i]) return;
+          planCurrentWorkouts[i][k] = inp.value;
+        });
+      });
+
+      // wire deletes
+      workoutsBody.querySelectorAll("button[data-del]").forEach(btn=>{
+        btn.addEventListener("click", ()=>{
+          const i = Number(btn.dataset.del);
+          planCurrentWorkouts.splice(i,1);
+          renderWorkoutsTable();
+        });
+      });
+    }
+
+    function normalizeWorkouts(){
+      // convert to clean array of maps: {title, video, duration}
+      const clean = [];
+      for(const raw of (planCurrentWorkouts || [])){
+        const title = String(raw.title || "").trim();
+        const video = String(raw.video ?? "").trim(); // may be ""
+        const dur = Number(String(raw.duration ?? "").trim() || 0);
+
+        if(!title){
+          // skip empty rows
+          continue;
+        }
+        if(Number.isNaN(dur) || dur < 0){
+          throw new Error(`Hibás duration: "${raw.duration}" (csak number)`);
+        }
+
+        clean.push({
+          title,
+          video,       // "" is allowed
+          duration: dur
+        });
+      }
+      return clean;
+    }
+
+    btnWorkoutAdd.addEventListener("click", ()=>{
+      planCurrentWorkouts = Array.isArray(planCurrentWorkouts) ? planCurrentWorkouts : [];
+      planCurrentWorkouts.push({ title:"", video:"", duration: 30 });
+      renderWorkoutsTable();
+    });
+
+    btnPlanClear.addEventListener("click", ()=>{
+      planWeekTitle.value = "";
+      planCurrentWorkouts = [];
+      renderWorkoutsTable();
+      toast("Ürítve.", "ok");
+    });
+
+    btnPlanLoad.addEventListener("click", async ()=>{
+      const planId = getPlanId();
+      const weekNo = Number(String(planWeekNo.value || "").trim() || 0);
+      if(!planId){ toast("Hiányzik Plan ID.", "warn"); return; }
+      if(!weekNo || Number.isNaN(weekNo) || weekNo < 1){ toast("Adj meg hét számot (>=1).", "warn"); return; }
 
       try{
-        const s = await getDoc(doc(db, "planTemplates", planId));
-        const base = s.exists() ? s.data() : null;
+        const wRef = doc(db, "planTemplates", planId, "weeks", String(weekNo));
+        const wSnap = await getDoc(wRef);
+        if(!wSnap.exists()){
+          planWeekTitle.value = `${weekNo}. hét`;
+          planCurrentWorkouts = [];
+          renderWorkoutsTable();
+          toast("Nincs ilyen hét doc — üresen létrehozhatod.", "warn");
+          log(`Plan load: nincs doc planTemplates/${planId}/weeks/${weekNo}`);
+          return;
+        }
 
-        const weeksSnap = await getDocs(query(collection(db, "planTemplates", planId, "weeks"), orderBy("weekNo","asc"), limit(50)));
-        const weeks = [];
-        weeksSnap.forEach(d=> weeks.push({ id:d.id, ...d.data() }));
-
-        const out = { base, weeks };
-        planWeeksJsonEl.value = JSON.stringify(out, null, 2);
-        toast("Plan betöltve.", "ok");
+        const data = wSnap.data();
+        planWeekTitle.value = data.title || `${weekNo}. hét`;
+        planCurrentWorkouts = Array.isArray(data.workouts) ? data.workouts.map(x=>({ ...x })) : [];
+        renderWorkoutsTable();
+        toast("Hét betöltve.", "ok");
+        log(`Plan load OK: planTemplates/${planId}/weeks/${weekNo}`);
       }catch(e){
         log(`Plan load hiba: ${e?.message || e}`);
         toast("Plan betöltés hiba.", "err");
       }
     });
 
-    btnSavePlan.addEventListener("click", async ()=>{
-      const planId = (planIdEl.value || "").trim();
-      if(!planId){ toast("Adj meg Plan ID-t.", "warn"); return; }
+    btnPlanSave.addEventListener("click", async ()=>{
+      const planId = getPlanId();
+      const weekNo = Number(String(planWeekNo.value || "").trim() || 0);
+      const title = String(planWeekTitle.value || "").trim() || `${weekNo}. hét`;
 
-      const txt = (planWeeksJsonEl.value || "").trim();
-      if(!txt){ toast("Üres JSON.", "warn"); return; }
+      if(!planId){ toast("Hiányzik Plan ID.", "warn"); return; }
+      if(!weekNo || Number.isNaN(weekNo) || weekNo < 1){ toast("Adj meg hét számot (>=1).", "warn"); return; }
 
-      let data;
-      try{ data = JSON.parse(txt); }
-      catch{ toast("JSON hibás.", "err"); return; }
+      let workouts;
+      try{
+        workouts = normalizeWorkouts();
+      }catch(err){
+        toast(err.message || "Edzés lista hibás.", "err");
+        return;
+      }
 
       try{
-        if(data.base){
-          await setDoc(doc(db, "planTemplates", planId), { ...data.base, updatedAt: serverTimestamp() }, { merge:true });
-        }else{
-          await setDoc(doc(db, "planTemplates", planId), { updatedAt: serverTimestamp() }, { merge:true });
-        }
+        // Ensure planTemplates/{planId} exists as meta
+        await setDoc(doc(db, "planTemplates", planId), {
+          planId,
+          updatedAt: serverTimestamp()
+        }, { merge:true });
 
-        if(Array.isArray(data.weeks)){
-          for(const w of data.weeks){
-            const weekNo = Number(w.weekNo ?? w.id ?? 0);
-            if(!weekNo) continue;
-            const id = String(weekNo);
-            const payload = { ...w, weekNo, updatedAt: serverTimestamp() };
-            delete payload.id;
-            await setDoc(doc(db, "planTemplates", planId, "weeks", id), payload, { merge:true });
-          }
-        }
+        // Save week doc
+        await setDoc(doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
+          weekNo,
+          title,
+          workouts,
+          updatedAt: serverTimestamp()
+        }, { merge:true });
 
-        toast("Plan mentve.", "ok");
+        toast("Plan hét mentve.", "ok");
+        log(`Plan save OK: planTemplates/${planId}/weeks/${weekNo} workouts=${workouts.length}`);
       }catch(e){
         log(`Plan save hiba: ${e?.message || e}`);
         toast("Plan mentés hiba (Rules?)", "err");
       }
     });
 
-    // =========================
-    // Overrides
-    // =========================
-    btnLoadOv.addEventListener("click", async ()=>{
-      const uid = (ovUidEl.value || "").trim();
-      const docId = (ovDocEl.value || "").trim();
-      if(!uid || !docId){ toast("UID + Doc ID kell.", "warn"); return; }
+    // ===== Overrides PRO
+    async function refreshOverridesUserPick(){
+      // fill dropdown from usersCache
+      const current = ovUserPick.value;
+      ovUserPick.innerHTML = "";
+      const opt0 = document.createElement("option");
+      opt0.value = "";
+      opt0.textContent = "— válassz vevőt —";
+      ovUserPick.appendChild(opt0);
+
+      // Prefer active first, then email sort
+      const arr = [...usersCache].sort((a,b)=>{
+        const aa = (!!a.active === !!b.active) ? 0 : (a.active ? -1 : 1);
+        if(aa !== 0) return aa;
+        return String(a.email||"").localeCompare(String(b.email||""), "hu");
+      });
+
+      for(const u of arr){
+        const opt = document.createElement("option");
+        opt.value = u.id;
+        opt.textContent = `${u.email || u.id} • ${u.package || "—"} • ${u.active ? "active" : "inactive"}`;
+        ovUserPick.appendChild(opt);
+      }
+
+      if(current){
+        ovUserPick.value = current;
+      }
+    }
+
+    function renderOverridesList(){
+      ovList.innerHTML = "";
+      if(!Array.isArray(overridesCache) || overridesCache.length === 0){
+        const d = document.createElement("div");
+        d.className = "item";
+        d.innerHTML = `<div class="t">Nincs override</div><div class="m">Nyomj: “＋ Új override”.</div>`;
+        ovList.appendChild(d);
+        return;
+      }
+
+      overridesCache.forEach(o=>{
+        const active = !!o.active;
+        const el = document.createElement("div");
+        el.className = "item";
+        el.innerHTML = `
+          <div class="t">
+            ${escapeHtml(o.title || o.id)}
+            <span class="badge ${active ? "ok" : "err"}">${active ? "active" : "inactive"}</span>
+          </div>
+          <div class="m">
+            docId: <b>${escapeHtml(o.id)}</b><br>
+            vimeo: <span style="opacity:.85">${escapeHtml((o.vimeoUrl || "").slice(0,60))}${(o.vimeoUrl||"").length>60 ? "…" : ""}</span>
+          </div>
+        `;
+        el.addEventListener("click", ()=>{
+          ovDocId.value = o.id;
+          ovTitle.value = o.title || "";
+          ovActive.value = String(!!o.active);
+          ovVimeoUrl.value = o.vimeoUrl || "";
+          ovNote.value = o.note || "";
+          ovSelectedDocId = o.id;
+          toast("Override kiválasztva.", "ok");
+        });
+        ovList.appendChild(el);
+      });
+    }
+
+    async function loadOverrides(){
+      const uid = (ovUserPick.value || "").trim();
+      if(!uid){ toast("Válassz vevőt.", "warn"); return; }
+
+      try{
+        const snap = await getDocs(query(collection(db, "users", uid, "overrides"), orderBy("updatedAt","desc"), limit(200)));
+        overridesCache = [];
+        snap.forEach(d=> overridesCache.push({ id:d.id, ...d.data() }));
+        renderOverridesList();
+        toast("Overrides betöltve.", "ok");
+        log(`Overrides load OK: users/${uid}/overrides (${overridesCache.length})`);
+      }catch(e){
+        log(`Overrides load hiba: ${e?.message || e}`);
+        toast("Overrides betöltés hiba (Rules?)", "err");
+      }
+    }
+
+    btnOvRefresh.addEventListener("click", ()=> loadOverrides());
+
+    btnOvNew.addEventListener("click", ()=>{
+      const uid = (ovUserPick.value || "").trim();
+      if(!uid){ toast("Előbb válassz vevőt.", "warn"); return; }
+      const id = prompt("Új override Doc ID (pl. slot1 / customA / 2026-02-15):");
+      if(!id) return;
+      ovDocId.value = id.trim();
+      ovTitle.value = "";
+      ovVimeoUrl.value = "";
+      ovActive.value = "true";
+      ovNote.value = "";
+      ovSelectedDocId = ovDocId.value;
+      toast("Add meg a mezőket, majd Mentés.", "ok");
+    });
+
+    btnOvLoad.addEventListener("click", async ()=>{
+      const uid = (ovUserPick.value || "").trim();
+      const docId = (ovDocId.value || "").trim();
+      if(!uid || !docId){ toast("Vevő + Doc ID kell.", "warn"); return; }
 
       try{
         const s = await getDoc(doc(db, "users", uid, "overrides", docId));
         if(!s.exists()){
-          ovJsonEl.value = "";
           toast("Nincs ilyen override doc.", "warn");
           return;
         }
-        ovJsonEl.value = JSON.stringify(s.data(), null, 2);
+        const d = s.data();
+        ovTitle.value = d.title || "";
+        ovActive.value = String(!!d.active);
+        ovVimeoUrl.value = d.vimeoUrl || "";
+        ovNote.value = d.note || "";
+        ovSelectedDocId = docId;
         toast("Override betöltve.", "ok");
       }catch(e){
         log(`Override load hiba: ${e?.message || e}`);
@@ -938,30 +1269,80 @@
       }
     });
 
-    btnSaveOv.addEventListener("click", async ()=>{
-      const uid = (ovUidEl.value || "").trim();
-      const docId = (ovDocEl.value || "").trim();
-      if(!uid || !docId){ toast("UID + Doc ID kell.", "warn"); return; }
+    btnOvSave.addEventListener("click", async ()=>{
+      const uid = (ovUserPick.value || "").trim();
+      const docId = (ovDocId.value || "").trim();
+      if(!uid || !docId){ toast("Vevő + Doc ID kell.", "warn"); return; }
 
-      const txt = (ovJsonEl.value || "").trim();
-      if(!txt){ toast("Üres JSON.", "warn"); return; }
-
-      let data;
-      try{ data = JSON.parse(txt); }
-      catch{ toast("JSON hibás.", "err"); return; }
+      const payload = {
+        title: (ovTitle.value || "").trim() || docId,
+        vimeoUrl: (ovVimeoUrl.value || "").trim(), // can be ""
+        active: (ovActive.value === "true"),
+        note: (ovNote.value || "").trim() || null,
+        updatedAt: serverTimestamp()
+      };
 
       try{
-        await setDoc(doc(db, "users", uid, "overrides", docId), { ...data, updatedAt: serverTimestamp() }, { merge:true });
+        await setDoc(doc(db, "users", uid, "overrides", docId), payload, { merge:true });
         toast("Override mentve.", "ok");
+        log(`Override save OK: users/${uid}/overrides/${docId}`);
+        await loadOverrides();
       }catch(e){
         log(`Override save hiba: ${e?.message || e}`);
         toast("Override mentés hiba (Rules?)", "err");
       }
     });
 
+    btnOvDelete.addEventListener("click", async ()=>{
+      const uid = (ovUserPick.value || "").trim();
+      const docId = (ovDocId.value || "").trim();
+      if(!uid || !docId){ toast("Vevő + Doc ID kell.", "warn"); return; }
+      const ok = confirm(`Biztos törlöd? users/${uid}/overrides/${docId}`);
+      if(!ok) return;
+
+      try{
+        await deleteDoc(doc(db, "users", uid, "overrides", docId));
+        toast("Override törölve.", "ok");
+        ovDocId.value = "";
+        ovTitle.value = "";
+        ovVimeoUrl.value = "";
+        ovActive.value = "true";
+        ovNote.value = "";
+        ovSelectedDocId = null;
+        await loadOverrides();
+      }catch(e){
+        log(`Override delete hiba: ${e?.message || e}`);
+        toast("Override törlés hiba.", "err");
+      }
+    });
+
+    ovUserPick.addEventListener("change", ()=>{
+      overridesCache = [];
+      ovList.innerHTML = "";
+      ovDocId.value = "";
+      ovTitle.value = "";
+      ovVimeoUrl.value = "";
+      ovActive.value = "true";
+      ovNote.value = "";
+      ovSelectedDocId = null;
+      if(ovUserPick.value){
+        loadOverrides();
+      }
+    });
+
+    // ===== Utils
+    function escapeHtml(s){
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
     // First tab
     setTab("customers");
-    log("Admin UI betöltve. Várjuk az auth állapotot…");
+    log("Admin UI (PRO) betöltve. Várjuk az auth állapotot…");
   </script>
 </body>
 </html>
