@@ -44,7 +44,7 @@
       backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
       transform: translateZ(0); 
     }
-    .topbar-inner{ height: 64px; display:flex; align-items:center; justify-content: space-between; gap: 12px; }
+    .topbar-inner{ height: 64px; display:flex; align-items:center; justify-content: space-between; gap: 12px; padding: 0 4%; }
     .brand{ display:flex; align-items:center; gap:10px; font-weight:800; letter-spacing:.2px; white-space: nowrap; }
     .dot{ width:10px;height:10px;border-radius:999px; background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink)); box-shadow: 0 0 18px rgba(255,79,216,.7); flex: 0 0 auto; }
     .nav{ display:flex; align-items:center; gap: 14px; color: var(--muted); font-size: 13.5px; font-weight: 800; }
@@ -57,7 +57,6 @@
     }
     .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); }
 
-    /* Buttons */
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12);
@@ -71,7 +70,6 @@
     .pill.danger{ background: rgba(255,255,255,.15); color: #fff; }
     .menu-btn{ width: 40px; height: 40px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); display:none; align-items:center; justify-content:center; cursor:pointer; }
 
-    /* Layout */
     main{ padding-top: 64px; min-height: 100vh; }
     .page{ padding: 18px 0 64px; }
     .glass{
@@ -83,25 +81,21 @@
     .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items:start; }
     @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } .nav{ display:none; } .menu-btn{ display:inline-flex; } }
 
-    /* Typo & Meta */
     h2, h3{ margin:0 0 6px; font-family: ui-serif, Georgia, serif; letter-spacing: -.2px; }
     .sub{ margin:0 0 12px; color: var(--muted); line-height: 1.5; font-size: 13.5px; }
     .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; font-size: 12.8px; }
     .meta-pill{ display:inline-flex; align-items:center; gap:8px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
 
-    /* Progress */
     .progress{ background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; height: 12px; overflow:hidden; position:relative; }
     .progress > span{ display:block; height:100%; width: 0%; background: linear-gradient(90deg, rgba(255,79,216,.9), rgba(177,76,255,.9)); border-radius: 999px; transition: width .4s ease; }
     .progress.blue > span { background: linear-gradient(90deg, #4facfe, #00f2fe); }
     .progress.green > span { background: linear-gradient(90deg, #43e97b, #38f9d7); }
     .progress-label{ display:flex; justify-content: space-between; font-size: 12.5px; color: rgba(255,255,255,.6); margin: 10px 0 6px; font-weight: 600; }
 
-    /* Tabs */
     .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 14px; }
     .tab{ padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); color: rgba(255,255,255,.85); cursor:pointer; font-size: 13px; font-weight: 800; transition: all .2s; }
     .tab.is-active{ background: linear-gradient(135deg, var(--pink), var(--pink2)); color:#140813; border-color:transparent; box-shadow: 0 4px 12px rgba(255,79,216,.25); }
 
-    /* List & Cards */
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .row{ display:grid; grid-template-columns: 1fr auto; gap: 10px; align-items:center; padding: 12px; border-radius: 16px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.06); }
     .row .title{ font-weight: 800; font-size: 14px; }
@@ -110,11 +104,9 @@
     .tiny{ padding: 6px 10px; font-size: 12px; }
     .chip{ display:inline-flex; align-items:center; gap:8px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.07); color: rgba(255,255,255,.8); font-weight: 800; font-size: 12px; }
     
-    /* Interactive Cards */
     .interactive{ transition: transform .2s, border-color .2s; }
     .interactive:hover{ transform: translateY(-3px); border-color: rgba(255,255,255,.16); }
 
-    /* Modals */
     .modal-overlay{ position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 18px; }
     .modal-overlay.is-open{ display:flex; }
     .modal{ width: min(980px, 94vw); max-height: min(85vh, 760px); border-radius: 22px; overflow: hidden; position: relative; }
@@ -172,7 +164,7 @@
       <section id="program" class="glass card">
         <h3>Heti edzések</h3>
         <p class="sub">Heti bontásban látod az edzéseidet.</p>
-        <div class="tabs" id="weekTabs"></div>
+        <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
         <ul class="list" id="workoutList"></ul>
         <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 18px 0;" />
         <h3>Személyre szabás</h3>
@@ -182,15 +174,23 @@
       <div style="display:grid; gap:14px;">
         <section id="etrend" class="glass card">
           <h3>Napi Étrend</h3>
-          <div class="tabs" id="dietDays"></div>
+          <div class="tabs" id="dietDays" style="margin-bottom:12px;"></div>
           <div id="dietDetails"></div>
         </section>
 
         <section id="checkin" class="glass card">
           <h3>Napi Célok & Check-in</h3>
           <div style="display:grid; gap:14px;">
-            <div><div class="progress-label"><span>💧 Víz</span><span id="lblWater">0/8</span></div><div class="progress blue"><span id="barWater"></span></div><button class="pill ghost tiny" id="btnAddWater" style="margin-top:8px;">+1</button></div>
-            <div><div class="progress-label"><span>🌙 Alvás</span><span id="lblSleep">0/8</span></div><div class="progress green"><span id="barSleep"></span></div><button class="pill ghost tiny" id="btnAddSleep" style="margin-top:8px;">+1</button></div>
+            <div>
+              <div class="progress-label"><span>💧 Víz</span><span id="lblWater">0/8</span></div>
+              <div class="progress blue"><span id="barWater"></span></div>
+              <button class="pill ghost tiny" id="btnAddWater" style="margin-top:8px;">+1 Pohár</button>
+            </div>
+            <div>
+              <div class="progress-label"><span>🌙 Alvás</span><span id="lblSleep">0/8</span></div>
+              <div class="progress green"><span id="barSleep"></span></div>
+              <button class="pill ghost tiny" id="btnAddSleep" style="margin-top:8px;">+1 Óra</button>
+            </div>
             <div class="interactive" style="padding:16px; background:rgba(255,79,216,.08); border-radius:18px;">
               <strong id="motivationTitle" style="color:#fff; display:block; margin-bottom:6px;">—</strong>
               <span id="motivationBox" style="font-size:13px; line-height:1.6; white-space:pre-wrap;">—</span>
@@ -202,7 +202,7 @@
 
     <section id="technika" class="glass card" style="margin-top:14px;">
       <h3>Technika Vault</h3>
-      <p class="sub">Helyes kivitelezés.</p>
+      <p class="sub">Gyakorlatok helyes kivitelezése.</p>
       <ul class="list" id="techList"></ul>
     </section>
   </main>
@@ -223,7 +223,6 @@
     const $ = (s) => document.querySelector(s);
     const $$ = (s) => Array.from(document.querySelectorAll(s));
 
-    // 🔥 GLOBÁLIS VIDEO LEJÁTSZÓ 🔥
     window.playVideo = (vid, title = "Lejátszás") => {
       const src = vimeoEmbedSrc(vid);
       if(!src) return;
@@ -233,12 +232,12 @@
     }
     $("#infoClose").onclick = () => $("#infoOverlay").classList.remove("is-open");
 
-    // LocalStorage
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
 
     let UID = null; let profile = null; let planMeta = null;
+    const weekCache = new Map();
     const state = { weekIdx: 0, selectedDay: "mon", done: {}, water: 0, sleep: 0 };
     const DAYS = [{id:"mon",name:"Hé"},{id:"tue",name:"Ke"},{id:"wed",name:"Sze"},{id:"thu",name:"Cs"},{id:"fri",name:"Pé"},{id:"sat",name:"Szo"},{id:"sun",name:"Va"}];
 
@@ -249,7 +248,6 @@
       return m ? `https://player.vimeo.com/video/${m[1]}` : v;
     }
 
-    // 🔥 AI ÜDVÖZLÉS 🔥
     function getAiGreeting(name) {
       const h = new Date().getHours(); const n = name ? `, ${name}` : "";
       if(h >= 5 && h < 10) return `Jó reggelt${n}! Induljon jól a napod!`;
@@ -264,19 +262,23 @@
       $("#techList").innerHTML = videos.map(v => `
         <li class="row interactive" onclick="playVideo('${v.vimeoId}', '${escapeHtml(v.title)}')">
           <div class="title">${escapeHtml(v.title)}</div><button class="pill ghost tiny">Megnyitás</button>
-        </li>`).join("") || "Hamarosan...";
+        </li>`).join("") || "Hamarosan érkeznek a videók.";
     }
 
     function renderHeader(){
       $("#chipPackage").textContent = `Csomag: ${profile.planId || "—"}`;
       $("#greetingHeader").textContent = getAiGreeting(profile.firstName);
       $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}`;
-      $("#subStatus").textContent = "Aktív program";
+      $("#pillGoal").textContent = `🎯 Cél: ${profile.goal || "—"}`;
+      $("#pillIntensity").textContent = `⚡ Szint: ${profile.level ? `${profile.level}/4` : "—"}`;
+      $("#subStatus").textContent = "Program betöltve.";
     }
 
     function renderTrackers(){
       $("#barWater").style.width = `${(state.water/8)*100}%`;
+      $("#lblWater").textContent = `${state.water}/8 pohár`;
       $("#barSleep").style.width = `${(state.sleep/8)*100}%`;
+      $("#lblSleep").textContent = `${state.sleep}/8 óra`;
     }
 
     function renderDiet(){
@@ -300,8 +302,8 @@
       
       renderHeader(); renderTrackers(); renderDiet();
       await loadVault();
-      $("#motivationTitle").textContent = profile.motivationCard?.title || "";
-      $("#motivationBox").textContent = profile.motivationCard?.text || "";
+      $("#motivationTitle").textContent = profile.motivationCard?.title || "Szia!";
+      $("#motivationBox").textContent = profile.motivationCard?.text || "Kezdjük el a napot!";
     });
 
     $("#btnAddWater").onclick = () => { state.water = Math.min(8, state.water + 1); lsSet(UID, "water", state.water); renderTrackers(); };
