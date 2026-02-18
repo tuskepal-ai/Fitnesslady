@@ -1,5 +1,5 @@
 // FILE: /hu/shared/firebase.js
-// Firebase v9 modular (CDN) — ÉLES shared helpers HU
+// Firebase v9 modular (CDN) — shared helpers
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getAuth,
@@ -15,14 +15,14 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * ÁLLÍTSD BE: admin email(ek)
+ * Admin email(ek) — ide tedd be a saját admin email címedet!
+ * (így akkor is admin maradsz, ha a role field még nem admin)
  */
 export const ADMIN_EMAILS = [
-  // "te@domain.com",
+  "tuskepal@gmail.com",
 ];
 
 export const BASE_PREFIX = ""; // GitHub Pages root
-
 export const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -37,7 +37,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Firestore namespace export (kompatibilitás az app kóddal)
+// Firestore namespace export
 export const fs = {
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, getDocs, query, orderBy, limit, where,
@@ -54,21 +54,9 @@ export function escapeHtml(str){
     .replaceAll('"',"&quot;")
     .replaceAll("'","&#39;");
 }
-
-/**
- * ✅ FIX: ha a localStorage-ban "null" van, JSON.parse -> null
- * és ez borítja a state.done[key]-t.
- * Itt most: null -> fallback.
- */
 export function safeJsonParse(txt, fallback=null){
-  try{
-    const v = JSON.parse(txt);
-    return (v === null || v === undefined) ? fallback : v;
-  }catch{
-    return fallback;
-  }
+  try{ return JSON.parse(txt); }catch{ return fallback; }
 }
-
 export function clamp(n, a, b){
   const x = Number(n);
   return Math.min(b, Math.max(a, x));
@@ -85,9 +73,7 @@ export function fmtDate(iso){
   try{
     const d = new Date(iso);
     return d.toLocaleDateString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit" });
-  }catch{
-    return String(iso);
-  }
+  }catch{ return String(iso); }
 }
 export function daysBetween(aIso, bIso){
   try{
@@ -95,9 +81,7 @@ export function daysBetween(aIso, bIso){
     const b = new Date(bIso);
     const ms = b.getTime() - a.getTime();
     return Math.floor(ms / (1000*60*60*24));
-  }catch{
-    return 0;
-  }
+  }catch{ return 0; }
 }
 
 // ---------- Navigation ----------
@@ -134,17 +118,33 @@ export function isAdminEmail(email){
 export async function ensureUserDoc(uid, email){
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
+
   if(!snap.exists()){
     const initial = {
       email: email || "",
       role: "user",
-      active: true,
-      package: "Start",
+      status: "active",
+      planId: "start_v1",
       goal: "Formálás",
       level: 2,
       lang: "hu",
-      diet: null,
-      motivation: null,
+      lifetimeAccess: true,
+      cycleStart: null,
+      cycleEnd: null,
+
+      // ✅ ÚJ: prémium étrend struktúra (admin tölti)
+      dietPlan: null,
+
+      // ✅ ÚJ: fix motiváció kártya (admin tölti)
+      motivationCard: {
+        title: "A rendszer szabadság.",
+        text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
+      },
+
+      // backward compat (ha régi)
+      dietText: "",
+      motivationText: "",
+
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
@@ -155,7 +155,16 @@ export async function ensureUserDoc(uid, email){
     if(email && data.email !== email){
       await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
     }
-    return data;
+    // ha régi doc, biztosítsuk az új mezőket
+    if(!data.motivationCard){
+      await setDoc(ref, {
+        motivationCard: {
+          title: "A rendszer szabadság.",
+          text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
+        }
+      }, { merge:true });
+    }
+    return (await getDoc(ref)).data();
   }
 }
 
