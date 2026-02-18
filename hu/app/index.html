@@ -3,60 +3,41 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Fitness Lady — Saját programom</title>
-  <meta name="description" content="Fitness Lady — Saját programom: csomag, heti edzések, személyre szabás slotok, étrend, check-in/cél, technika vault." />
+  <title>FitnessLady — Admin</title>
 
   <style>
     :root{
-      --bg:#07060b;
-      --text:rgba(255,255,255,.92);
-      --muted:rgba(255,255,255,.70);
-      --muted2:rgba(255,255,255,.55);
-
+      --bg:#05050a;
+      --text: rgba(255,255,255,.92);
+      --muted: rgba(255,255,255,.70);
       --pink:#ff4fd8;
       --pink2:#b14cff;
       --gold:#ffd38a;
-
-      --radius:22px;
+      --radius: 22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
-
-      --hero-url: none;
     }
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
-    html{ scroll-behavior:smooth; }
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      color: var(--text);
       background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
-        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        radial-gradient(1000px 700px at 60% 90%, rgba(255,211,138,.06), transparent 55%),
+        radial-gradient(1200px 700px at 15% 10%, rgba(255,79,216,.10), transparent 60%),
+        radial-gradient(1000px 700px at 85% 20%, rgba(177,76,255,.08), transparent 60%),
+        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px),
         var(--bg);
-      color:var(--text);
+      background-size: auto,auto, 60px 60px, 60px 60px, auto;
       overflow-x:hidden;
     }
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image: var(--hero-url);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      transform: translateZ(0);
-      opacity:.92;
-    }
-
     a{ color:inherit; text-decoration:none; }
-    button{ font:inherit; }
-    .container{ width: min(var(--max), 92vw); margin: 0 auto; }
+    button,input,textarea,select{ font:inherit; }
 
-    /* Topbar */
+    .container{ width:min(var(--max), 92vw); margin:0 auto; }
     .topbar{
-      position: fixed; top:0; left:0; right:0;
+      position: sticky; top:0;
       z-index: 50;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
@@ -65,40 +46,15 @@
     }
     .topbar-inner{
       height: 64px;
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
+      display:flex; align-items:center; justify-content: space-between;
       gap: 12px;
     }
-    .brand{
-      display:flex; align-items:center; gap:10px;
-      font-weight:800; letter-spacing:.2px; white-space: nowrap;
-    }
+    .brand{ display:flex; align-items:center; gap:10px; font-weight: 900; letter-spacing:.2px; }
     .dot{
       width:10px;height:10px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
-      flex: 0 0 auto;
     }
-    .nav{
-      display:flex; align-items:center; gap: 14px;
-      color: var(--muted); font-size: 13.5px; font-weight: 700;
-    }
-    .nav a{ position: relative; padding: 10px 6px; opacity:.92; }
-    .nav a:hover{ opacity:1; color: var(--text); }
-    .nav a::after{
-      content:"";
-      position:absolute;
-      left: 8px; right: 8px; bottom: 6px;
-      height: 2px; border-radius: 99px;
-      background: linear-gradient(90deg, rgba(255,215,140,0), rgba(255,215,140,.9), rgba(255,215,140,0));
-      transform: scaleX(0);
-      transform-origin: left;
-      opacity: 0;
-      transition: transform .28s ease, opacity .28s ease;
-    }
-    .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); opacity: 1; }
-
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px;
@@ -110,106 +66,44 @@
       color: var(--text);
       box-shadow: 0 12px 34px rgba(0,0,0,.35);
       cursor:pointer;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
       user-select:none;
       white-space: nowrap;
       gap:8px;
+      transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); box-shadow: 0 16px 44px rgba(0,0,0,.45); }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
       border-color: rgba(255,255,255,.18);
       box-shadow: 0 18px 46px rgba(255,79,216,.26);
-      font-weight: 900;
+      font-weight: 950;
     }
     .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.14); }
-
-    .menu-btn{
-      width: 40px; height: 40px; border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      color: var(--text);
-      display:none;
-      align-items:center; justify-content:center;
-      cursor:pointer;
-    }
-
-    main{ padding-top: 64px; min-height: 100vh; }
-    .page{ padding: 18px 0 64px; }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); }
 
     .glass{
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
       border: 1px solid rgba(255,255,255,.10);
-      border-radius: 22px;
-      box-shadow: 0 18px 55px rgba(0,0,0,.55);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .interactive{
-      position: relative;
-      overflow: hidden;
-      transition: transform .30s cubic-bezier(.2,.8,.2,1), box-shadow .30s ease, border-color .30s ease;
-    }
-    .interactive:hover{
-      transform: translateY(-4px);
-      border-color: rgba(255,255,255,.16);
-      box-shadow: 0 22px 70px rgba(0,0,0,.55);
-    }
 
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 14px;
-      align-items:start;
-    }
-    @media (max-width: 980px){
-      .grid{ grid-template-columns: 1fr; }
-      .nav{ display:none; }
-      .menu-btn{ display:inline-flex; }
-    }
-
+    main{ padding: 16px 0 54px; }
+    .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
     .card{ padding: 16px; }
     .card h2, .card h3{
-      margin:0 0 8px;
+      margin: 0 0 8px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
       letter-spacing: -.2px;
     }
     .card h2{ font-size: 22px; }
     .card h3{ font-size: 18px; }
-    .sub{ margin:0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
+    .sub{ margin: 0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
 
-    .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; color: rgba(255,255,255,.55); font-size: 12.8px; }
-    .meta-pill{
-      display:inline-flex; align-items:center; gap:8px;
-      padding: 9px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-    }
-
-    .progress{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 999px;
-      height: 12px;
-      overflow:hidden;
-      position:relative;
-    }
-    .progress > span{
-      display:block;
-      height:100%;
-      width: 0%;
-      background: linear-gradient(90deg, rgba(255,79,216,.95), rgba(177,76,255,.90));
-      border-radius: 999px;
-      transition: width .35s ease;
-    }
-    .progress-label{
-      display:flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: rgba(255,255,255,.55); margin: 10px 0 8px;
-    }
-
-    .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 12px; }
+    .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin: 8px 0 0; }
     .tab{
       padding: 8px 11px;
       border-radius: 999px;
@@ -218,7 +112,7 @@
       color: rgba(255,255,255,.86);
       cursor:pointer;
       font-size: 13px;
-      font-weight: 850;
+      font-weight: 900;
       user-select:none;
     }
     .tab.is-active{
@@ -227,507 +121,875 @@
       border-color: rgba(255,255,255,.18);
     }
 
-    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
-    .row{
-      display:grid; grid-template-columns: 1fr auto; gap: 10px; align-items:center;
-      padding: 12px; border-radius: 18px; background: rgba(0,0,0,.18); border: 1px solid rgba(255,255,255,.10);
-    }
-    .row .title{ font-weight: 900; letter-spacing:.2px; font-size: 13.5px; }
-    .row .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
-    .row .actions{ display:flex; gap: 8px; justify-content:flex-end; flex-wrap:wrap; }
-    .tiny{ padding: 8px 10px; font-size: 12.5px; border-radius: 999px; }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    @media (max-width: 980px){ .row{ grid-template-columns: 1fr; } }
 
-    .chip{
-      display:inline-flex; align-items:center; gap:8px; padding: 6px 10px;
-      border-radius: 999px; border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.07); color: rgba(255,255,255,.70); font-weight: 850; font-size: 12px;
+    .box{
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 12px;
     }
-
-    section{ scroll-margin-top: 82px; }
-
-    /* Modal */
-    .modal-overlay{
-      position: fixed; inset: 0; z-index: 80;
-      background: rgba(0,0,0,.58); backdrop-filter: blur(10px);
-      display: none; align-items: center; justify-content: center; padding: 18px;
-    }
-    .modal-overlay.is-open{ display:flex; }
-    .modal{ width: min(980px, 94vw); max-height: min(82vh, 760px); border-radius: 22px; overflow: hidden; position: relative; }
-    .modal-header{
-      display:flex; align-items:center; justify-content: space-between; gap: 10px; padding: 14px 16px;
-      border-bottom: 1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.45);
-    }
-    .modal-title{ margin:0; font-family: ui-serif; font-size: 20px; letter-spacing: -.2px; }
-    .modal-close{
-      width: 40px; height: 40px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12);
-      background: rgba(255,255,255,.06); color: rgba(255,255,255,.9); cursor: pointer;
-    }
-    .modal-body{ padding: 16px; overflow: auto; max-height: calc(min(82vh, 760px) - 64px); background: rgba(7,6,11,.38); }
-    .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
-
     .field{ display:grid; gap:6px; margin: 10px 0; }
-    .field label{ color: rgba(255,255,255,.70); font-size: 12.5px; font-weight: 800; }
-    .field input{
-      height: 44px; border-radius: 14px; border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.22); color: rgba(255,255,255,.92); padding: 0 12px; outline: none;
+    label{ color: rgba(255,255,255,.70); font-size: 12.8px; font-weight: 800; letter-spacing:.2px; }
+    input, select, textarea{
+      width: 100%;
+      padding: 11px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      outline: none;
     }
+    textarea{ min-height: 96px; resize: vertical; line-height: 1.55; }
 
-    footer{ padding: 18px 0 46px; border-top:1px solid rgba(255,255,255,.08); background: rgba(10,8,14,.55); backdrop-filter: blur(10px); }
-    .footer-inner{ display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color:rgba(255,255,255,.70); font-size:13px; }
+    .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
+
+    .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+    .li{
+      display:grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items:center;
+      padding: 12px;
+      border-radius: 18px;
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+    }
+    .li .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
+    .li .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+
+    .toast{
+      position: fixed;
+      right: 14px;
+      bottom: 14px;
+      z-index: 99;
+      width: min(520px, calc(100vw - 28px));
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.45);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      display:none;
+    }
+    .toast.is-on{ display:block; }
+    .toast b{ font-weight: 950; }
+
+    footer{
+      padding: 18px 0 46px;
+      border-top:1px solid rgba(255,255,255,.08);
+      background: rgba(10,8,14,.35);
+      backdrop-filter: blur(10px);
+    }
+    .footer-inner{
+      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
+      color:rgba(255,255,255,.70); font-size:13px;
+    }
   </style>
 </head>
 
 <body>
   <header class="topbar">
     <div class="container topbar-inner">
-      <a class="brand" id="homeLink" href="#" aria-label="Vissza a főoldalra">
-        <span class="dot"></span><span>Fitness Lady</span>
-      </a>
-      <nav class="nav" aria-label="Vevő menü">
-        <a href="#program" data-nav>Programom</a>
-        <a href="#etrend" data-nav>Étrend</a>
-        <a href="#checkin" data-nav>Célom & Check-in</a>
-        <a href="#technika" data-nav>Technika</a>
-      </nav>
-      <div style="display:flex; align-items:center; gap:10px;">
-        <button class="menu-btn" id="menuBtn" type="button">☰</button>
-        <button class="pill ghost" id="btnLogout" type="button" title="Kijelentkezés">⎋ Kilépés</button>
+      <div class="brand">
+        <span class="dot"></span>
+        <span>FitnessLady Admin</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+        <span class="pill ghost mono" id="whoami">…</span>
+        <button class="pill ghost" id="btnToApp" type="button">↩ App</button>
+        <button class="pill danger" id="btnLogout" type="button">⎋ Kilépés</button>
       </div>
     </div>
   </header>
 
   <main>
-    <div class="container page">
-      <section id="top" class="glass interactive card" style="margin-bottom:14px;">
-        <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div>
-            <div class="chip" id="chipPackage">Csomag: —</div>
-            <h2 style="margin-top:10px;" id="titleProgram">Saját programom</h2>
-            <p class="sub" id="subStatus">Betöltés…</p>
-          </div>
-          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-            <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
-          </div>
-        </div>
+    <div class="container grid">
+      <section class="glass card">
+        <h2>Admin központ</h2>
+        <p class="sub">Ügyfelek, tervek, overide-ok, étrend és motiváció kezelés.</p>
 
-        <div class="progress-label">
-          <span id="lblWeek">Hét: —</span>
-          <span id="lblDays">Státusz: —</span>
-        </div>
-        <div class="progress" aria-label="Haladás"><span id="barCycle"></span></div>
-
-        <div class="meta-row">
-          <div class="meta-pill" id="pillGoal">🎯 Cél: —</div>
-          <div class="meta-pill" id="pillIntensity">⚡ Szint: —</div>
-          <div class="meta-pill" id="pillUpdated">✨ Frissítés: —</div>
+        <div class="tabs">
+          <button class="tab is-active" data-tab="customers" type="button">Customers</button>
+          <button class="tab" data-tab="plans" type="button">Plans</button>
+          <button class="tab" data-tab="overrides" type="button">Overrides</button>
         </div>
       </section>
 
-      <div class="grid">
-        <section id="program" class="glass interactive card">
-          <h3 id="hWorkouts">Heti edzések</h3>
-          <p class="sub" id="pWorkouts">Heti bontásban látod az edzéseidet. A személyre szabás slotokat Edina frissíti.</p>
+      <section class="glass card" id="tab-customers">
+        <h3>Customers</h3>
+        <p class="sub">User kiválasztás → profil / étrend / motiváció mentés.</p>
 
-          <div class="tabs" id="weekTabs" aria-label="Hét választó"></div>
+        <div class="row">
+          <div class="box">
+            <div class="field">
+              <label for="userSearch">Keresés (email)</label>
+              <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
+            </div>
+            <div class="actions">
+              <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
+            </div>
 
-          <div style="display:flex; gap:10px; flex-wrap:wrap; margin: 0 0 10px;">
-            <button class="pill ghost tiny" id="btnMarkAll" type="button">✅ Heti edzések kipipálása</button>
-            <button class="pill ghost tiny" id="btnResetWeek" type="button">↺ Hét újraindítása</button>
+            <div class="sub" style="margin-top:10px;">Találatok:</div>
+            <ul class="list" id="usersList"></ul>
           </div>
 
-          <ul class="list" id="workoutList"></ul>
+          <div class="box">
+            <div class="sub">Kiválasztott user:</div>
+            <div class="pill ghost mono" id="selUser">—</div>
 
-          <hr style="border:none; height:1px; background:rgba(255,255,255,.08); margin: 14px 0;" />
-          <h3 id="hSlots">Személyre szabás</h3>
-          <p class="sub" id="pSlots">A slotok csak a te programodhoz tartozó egyedi videókat mutatják.</p>
-          <ul class="list" id="slotList"></ul>
-        </section>
+            <div class="field">
+              <label for="u_email">Email</label>
+              <input id="u_email" type="text" placeholder="—" />
+            </div>
 
-        <div style="display:grid; gap:14px;">
-          
-          <section id="etrend" class="glass interactive card">
-            <h3>Napi Étrend</h3>
-            <p class="sub">A kiválasztott héthez tartozó, napokra bontott étkezéseid.</p>
-
-            <div class="tabs" id="dietDays" style="margin-bottom:12px;"></div>
-
-            <div id="dietDetails" style="display:grid; gap:8px;">
-               </div>
-          </section>
-
-          <section id="checkin" class="glass interactive card">
-            <h3>Célom & Check-in</h3>
-            <p class="sub">Heti check-in és motiváció.</p>
-
-            <div class="row" style="grid-template-columns: 1fr; gap:10px;">
-              <div>
-                <div class="title" id="goalTitle">🎯 Cél: —</div>
-                <div class="desc" id="goalDesc">—</div>
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="u_role">Role</label>
+                <select id="u_role">
+                  <option value="user">user</option>
+                  <option value="admin">admin</option>
+                </select>
               </div>
-
-              <div style="display:grid; gap:8px;">
-                <div class="progress-label" style="margin:0;">
-                  <span>Heti check-in</span>
-                  <span id="checkinLabel">0/1</span>
-                </div>
-                <div class="progress"><span id="barCheckin"></span></div>
-
-                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:4px;">
-                  <button class="pill primary tiny" id="btnDoCheckin" type="button">Check-in kész</button>
-                </div>
-
-                <div class="note" style="margin-top:14px; padding:12px; background:rgba(255,79,216,.1); border-left:4px solid var(--pink); border-radius:8px;">
-                  <strong id="motivationTitle" style="color:var(--text); display:block; margin-bottom:4px; font-size:14px;">—</strong>
-                  <span id="motivationBox" style="color:rgba(255,255,255,.85);">—</span>
-                </div>
+              <div class="field">
+                <label for="u_status">Status</label>
+                <select id="u_status">
+                  <option value="active">active</option>
+                  <option value="paused">paused</option>
+                  <option value="disabled">disabled</option>
+                </select>
               </div>
             </div>
-          </section>
-        </div>
-      </div>
 
-      <section id="technika" class="glass interactive card" style="margin-top:14px;">
-        <div style="display:flex; align-items:flex-end; justify-content:space-between; gap:12px; flex-wrap:wrap;">
-          <div>
-            <h3>Technika Vault</h3>
-            <p class="sub">Hamarosan érkeznek a technika videók!</p>
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="u_lang">Nyelv</label>
+                <select id="u_lang">
+                  <option value="hu">hu</option>
+                  <option value="de">de</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="u_level">Szint (1–4)</label>
+                <input id="u_level" type="number" min="1" max="4" value="2" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="u_goal">Cél</label>
+              <input id="u_goal" type="text" placeholder="pl. Formálás" />
+            </div>
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="u_planId">planId</label>
+                <input id="u_planId" type="text" placeholder="start_v1" />
+              </div>
+              <div class="field">
+                <label for="u_lifetime">Lifetime access</label>
+                <select id="u_lifetime">
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="u_cycleStart">cycleStart (YYYY-MM-DD / üres)</label>
+                <input id="u_cycleStart" type="text" placeholder="2026-02-01" />
+              </div>
+              <div class="field">
+                <label for="u_cycleEnd">cycleEnd (YYYY-MM-DD / üres)</label>
+                <input id="u_cycleEnd" type="text" placeholder="2026-03-01" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés (Profil)</button>
+            </div>
+
+            <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:14px 0;" />
+
+            <h3>Étrend — 4 hét / napi</h3>
+            <p class="sub">Itt írod a napi étkezéseket. A vevő app prémium kártyákban mutatja.</p>
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="d_week">Hét</label>
+                <select id="d_week">
+                  <option value="1">Hét 1</option>
+                  <option value="2">Hét 2</option>
+                  <option value="3">Hét 3</option>
+                  <option value="4">Hét 4</option>
+                </select>
+              </div>
+              <div class="field">
+                <label for="d_day">Nap</label>
+                <select id="d_day">
+                  <option value="mon">Hétfő</option>
+                  <option value="tue">Kedd</option>
+                  <option value="wed">Szerda</option>
+                  <option value="thu">Csütörtök</option>
+                  <option value="fri">Péntek</option>
+                  <option value="sat">Szombat</option>
+                  <option value="sun">Vasárnap</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="field"><label for="d_breakfast">Reggeli</label><textarea id="d_breakfast" placeholder="pl. Zabkása gyümölccsel"></textarea></div>
+            <div class="field"><label for="d_snack1">Tízórai</label><textarea id="d_snack1" placeholder="pl. Natúr joghurt + pár szem dió"></textarea></div>
+            <div class="field"><label for="d_lunch">Ebéd</label><textarea id="d_lunch" placeholder="pl. Csirke + rizs + saláta"></textarea></div>
+            <div class="field"><label for="d_snack2">Uzsonna</label><textarea id="d_snack2" placeholder="pl. Gyümölcs / smoothie"></textarea></div>
+            <div class="field"><label for="d_dinner">Vacsora</label><textarea id="d_dinner" placeholder="pl. Tojásos saláta"></textarea></div>
+
+            <div class="actions">
+              <button class="pill ghost" id="btnLoadDietDay" type="button">↻ Betöltés (nap)</button>
+              <button class="pill primary" id="btnSaveDietDay" type="button">💾 Mentés (nap)</button>
+              <button class="pill danger" id="btnClearDietDay" type="button">🗑 Törlés (nap)</button>
+            </div>
+
+            <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:14px 0;" />
+
+            <h3>Fix motiváció kártya</h3>
+            <p class="sub">Mindig látszik a vevőnél.</p>
+
+            <div class="field"><label for="m_title">Cím</label><input id="m_title" type="text" placeholder="pl. A rendszer szabadság." /></div>
+            <div class="field"><label for="m_text">Szöveg</label><textarea id="m_text" placeholder="pl. Nem kell tökéletesnek lenned..."></textarea></div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveMotivation" type="button">💾 Mentés (motiváció)</button>
+            </div>
+
           </div>
         </div>
-        <ul class="list" id="techList"></ul>
       </section>
+
+      <section class="glass card" id="tab-plans" style="display:none;">
+        <h3>Plans</h3>
+        <p class="sub">planTemplates/{planId} + weeks/{weekNo} szerkesztés.</p>
+
+        <div class="row">
+          <div class="box">
+            <div class="field">
+              <label for="p_planId">Plan ID</label>
+              <input id="p_planId" type="text" value="start_v1" />
+            </div>
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="p_weeks">Weeks</label>
+                <input id="p_weeks" type="number" min="1" max="24" value="4" />
+              </div>
+              <div class="field">
+                <label for="p_name_hu">Name HU</label>
+                <input id="p_name_hu" type="text" value="Start Program" />
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="p_name_de">Name DE</label>
+              <input id="p_name_de" type="text" value="Start Programm" />
+            </div>
+
+            <div class="actions">
+              <button class="pill ghost" id="btnLoadPlan" type="button">↻ Plan betöltés</button>
+              <button class="pill primary" id="btnSavePlan" type="button">💾 Plan mentés</button>
+            </div>
+
+            <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:14px 0;" />
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="p_weekNo">Week</label>
+                <input id="p_weekNo" type="number" min="1" max="24" value="1" />
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <button class="pill ghost" id="btnLoadWeek" type="button">↻ Week betöltés</button>
+              </div>
+            </div>
+
+            <p class="note">A week doc formátum: <span class="mono">{ weekNo, workouts:[], slots:[] }</span></p>
+          </div>
+
+          <div class="box">
+            <h3 style="margin-top:0;">Week editor</h3>
+
+            <div class="field">
+              <label for="w_workouts">workouts (JSON array)</label>
+              <textarea id="w_workouts" class="mono" placeholder='[{"id":"w1","title":"...","desc":"...","vimeoId":""}]'></textarea>
+            </div>
+
+            <div class="field">
+              <label for="w_slots">slots (JSON array)</label>
+              <textarea id="w_slots" class="mono" placeholder='[{"slotIndex":1,"title":"...","desc":"...","defaultNote":"—","defaultVimeoId":""}]'></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveWeek" type="button">💾 Week mentés</button>
+            </div>
+
+            <p class="note" style="margin-top:10px;">
+              Tipp: ha hibás a JSON, a rendszer most már szól és nem engedi menteni!
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section class="glass card" id="tab-overrides" style="display:none;">
+        <h3>Overrides</h3>
+        <p class="sub">User kiválasztás → hét → felülírások mentése (users/{uid}/overridesWeeks/{weekNo}).</p>
+
+        <div class="row">
+          <div class="box">
+            <div class="note">Kiválasztott user:</div>
+            <div class="pill ghost mono" id="ovUser">—</div>
+
+            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+              <div class="field">
+                <label for="ov_weekNo">Week</label>
+                <input id="ov_weekNo" type="number" min="1" max="24" value="1" />
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <button class="pill ghost" id="btnLoadOverride" type="button">↻ Override betöltés</button>
+              </div>
+            </div>
+
+            <p class="note">Formátum: <span class="mono">{ workouts:{ [id]:{title,desc,vimeoId} }, slots:{ [slotIndex]:{note,vimeoId} } }</span></p>
+          </div>
+
+          <div class="box">
+            <div class="field">
+              <label for="ov_workouts">workouts (JSON object)</label>
+              <textarea id="ov_workouts" class="mono" placeholder='{"w1":{"title":"...","desc":"...","vimeoId":""}}'></textarea>
+            </div>
+
+            <div class="field">
+              <label for="ov_slots">slots (JSON object)</label>
+              <textarea id="ov_slots" class="mono" placeholder='{"1":{"note":"...","vimeoId":""}}'></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveOverride" type="button">💾 Override mentés</button>
+              <button class="pill danger" id="btnDeleteOverride" type="button">🗑 Override törlés</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
     </div>
   </main>
 
   <footer>
     <div class="container footer-inner">
-      <div>© <span id="y"></span> Fitness Lady</div>
+      <div>© <span id="y"></span> FitnessLady</div>
       <div>Tüske web design</div>
     </div>
   </footer>
 
-  <div class="modal-overlay" id="settingsOverlay">
-    <div class="glass modal">
-      <div class="modal-header">
-        <h2 class="modal-title" id="settingsTitle">Beállítások</h2>
-        <button class="modal-close" id="settingsClose" type="button">✕</button>
-      </div>
-      <div class="modal-body">
-        <p class="note">Itt csak a saját cél/szint/nyelv módosítható. A csomagot az admin állítja.</p>
-        <div class="field"><label>Cél</label><input id="setGoal" type="text" /></div>
-        <div class="field"><label>Szint (1–4)</label><input id="setLevel" type="number" min="1" max="4" /></div>
-        <div class="field"><label>Nyelv (hu / de)</label><input id="setLang" type="text" /></div>
-        <div style="margin-top:10px;"><button class="pill primary" id="btnSaveSettings" type="button">Mentés</button></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="modal-overlay" id="infoOverlay">
-    <div class="glass modal">
-      <div class="modal-header">
-        <h2 class="modal-title" id="infoTitle">Info</h2>
-        <button class="modal-close" id="infoClose" type="button">✕</button>
-      </div>
-      <div class="modal-body" id="infoBody"></div>
-    </div>
-  </div>
+  <div class="toast" id="toast"></div>
 
   <script type="module">
     import {
-      BASE_PREFIX, auth, db, fs,
-      onAuth, logout, toLogin,
-      escapeHtml, safeJsonParse, todayISO, clamp, fmtDate, daysBetween
+      auth, db, fs,
+      onAuth, logout, toLogin, toApp,
+      escapeHtml, safeJsonParse, clamp,
+      ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
-    const homeLink = document.getElementById("homeLink");
-    if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+    const $ = (s, r=document) => r.querySelector(s);
+    const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-    const $ = (sel, root=document) => root.querySelector(sel);
-    const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+    const toast = $("#toast");
+    function showToast(html, ms=2400){
+      toast.innerHTML = html;
+      toast.classList.add("is-on");
+      window.clearTimeout(toast.__t);
+      toast.__t = window.setTimeout(()=>toast.classList.remove("is-on"), ms);
+    }
+    function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
+    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 3800); }
 
-    // Modal kezelés
-    const settingsOverlay = $("#settingsOverlay");
-    const infoOverlay = $("#infoOverlay");
-    const infoBody = $("#infoBody");
-    const infoTitle = $("#infoTitle");
-
-    function openOverlay(ov){ ov.classList.add("is-open"); }
-    function closeOverlay(ov){ ov.classList.remove("is-open"); }
-    function openInfo(title, html){
-      infoTitle.textContent = title;
-      infoBody.innerHTML = html;
-      openOverlay(infoOverlay);
+    // --- JSON Validátor ---
+    function isValidJson(text) {
+      try {
+        JSON.parse(text);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+    function prettyJson(x){ return JSON.stringify(x, null, 2); }
+    function parseJson(text, fallback){
+      const t = (text || "").trim();
+      if(!t) return fallback;
+      const v = safeJsonParse(t, null);
+      if(v === null) throw new Error("Érvénytelen JSON.");
+      return v;
     }
 
-    $("#settingsClose").addEventListener("click", ()=>closeOverlay(settingsOverlay));
-    $("#infoClose").addEventListener("click", ()=>{ closeOverlay(infoOverlay); infoBody.innerHTML = ""; });
-
-    const k = (uid, key) => `fl_${uid}_${key}_v1`;
-    const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
-    const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
-
-    // Firebase adatok betöltése
-    async function loadUserProfile(uid){
-      const ref = fs.doc(db, "users", uid);
-      const snap = await fs.getDoc(ref);
-      return snap.exists() ? snap.data() : null;
-    }
-    async function loadPlanMeta(planId){
-      const ref = fs.doc(db, "planTemplates", planId);
-      const snap = await fs.getDoc(ref);
-      return snap.exists() ? snap.data() : {};
-    }
-    async function loadPlanWeek(planId, weekNo){
-      const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
-      const snap = await fs.getDoc(ref);
-      return snap.exists() ? snap.data() : {};
+    // --- Tabs Kezelés ---
+    function setTab(name){
+      $$("[data-tab]").forEach(b=>b.classList.toggle("is-active", b.getAttribute("data-tab")===name));
+      
+      const tC = document.getElementById("tab-customers");
+      const tP = document.getElementById("tab-plans");
+      const tO = document.getElementById("tab-overrides");
+      
+      if(tC) tC.style.display = (name==="customers") ? "" : "none";
+      if(tP) tP.style.display = (name==="plans") ? "" : "none";
+      if(tO) tO.style.display = (name==="overrides") ? "" : "none";
+      
+      localStorage.setItem("fl_admin_tab", name);
     }
     
-    // ✅ JAVÍTÁS: Itt volt a hiba, az overridesWeeks mappa a jó!
-    async function loadOverridesWeek(uid, weekNo){
-      const ref = fs.doc(db, "users", uid, "overridesWeeks", String(weekNo));
-      const snap = await fs.getDoc(ref);
-      return snap.exists() ? snap.data() : null;
-    }
-
-    function mergeWorkout(templateW, ovW){
-      const w = { ...templateW };
-      if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
-      w._title = ovW?.title || templateW?.title || "—";
-      w._desc = ovW?.desc || templateW?.desc || "";
-      return w;
-    }
-    function mergeSlot(templateS, ovS){
-      const s = { ...templateS };
-      s.vimeoId = ovS?.vimeoId || templateS?.defaultVimeoId || "";
-      s._title = templateS?.title || "—";
-      s._desc = templateS?.desc || "";
-      s._note = ovS?.note || templateS?.defaultNote || "—";
-      return s;
-    }
-
-    let UID = null;
-    let profile = null;
-    let planMeta = null;
-    const weekCache = new Map();
-
-    const state = {
-      weekIdx: 0,
-      selectedDay: "mon",
-      done: {},
-      checkin: null,
-      lang: "hu"
-    };
-
-    const DAYS = [
-      { id:"mon", name:"Hé" }, { id:"tue", name:"Ke" }, { id:"wed", name:"Sze" },
-      { id:"thu", name:"Csü" }, { id:"fri", name:"Pé" }, { id:"sat", name:"Szo" }, { id:"sun", name:"Va" }
-    ];
-
-    function calcWeekIndex(p){
-      if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
-      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
-      const weeks = planMeta?.weeks ?? 4;
-      const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
-      return week - 1;
-    }
-
-    function renderHeader(){
-      const p = profile;
-      $("#chipPackage").textContent = `Csomag: ${planMeta?.name?.hu || p.planId || "—"}`;
-      $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
-      $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
-
-      if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
-        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
-        $("#lblDays").textContent = `Státusz: Aktív (lejárat nélkül)`;
-        $("#barCycle").style.width = `100%`;
-        $("#subStatus").textContent = `Üdv az appban! Válaszd ki a hetet a videókhoz.`;
-      }else{
-        const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-        const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
-        const leftDays = clamp(totalDays - passedDays, 0, totalDays);
-        $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
-        $("#lblDays").textContent = `Hátralévő napok: ${leftDays}`;
-        $("#barCycle").style.width = `${Math.round((passedDays / totalDays) * 100)}%`;
-      }
-
-      $("#goalTitle").textContent = `🎯 Cél: ${p.goal || "—"}`;
-      $("#goalDesc").textContent = p.goal ? `Fókusz: ${p.goal}.` : `Állíts be célt.`;
-
-      const done = state.checkin?.done ? 1 : 0;
-      $("#checkinLabel").textContent = `${done}/1`;
-      $("#barCheckin").style.width = `${done*100}%`;
-    }
-
-    // ✅ ÚJ: Étrend betöltése a UI-ra
-    function renderDiet(){
-      const weekKey = `w${state.weekIdx + 1}`;
-      const dietDaysContainer = $("#dietDays");
-      dietDaysContainer.innerHTML = "";
-
-      // Nap választó gombok
-      DAYS.forEach(d => {
-        const btn = document.createElement("button");
-        btn.className = "tab" + (state.selectedDay === d.id ? " is-active" : "");
-        btn.textContent = d.name;
-        btn.onclick = () => {
-          state.selectedDay = d.id;
-          renderDiet(); // Újratöltjük, ha rákattint egy másik napra
-        };
-        dietDaysContainer.appendChild(btn);
-      });
-
-      // Adat kiolvasása a profilból (ezt menti az admin)
-      const dayPlan = profile?.dietPlan?.[weekKey]?.[state.selectedDay] || {};
-
-      const meals = [
-        { label:"Reggeli", val: dayPlan.breakfast },
-        { label:"Tízórai", val: dayPlan.snack1 },
-        { label:"Ebéd", val: dayPlan.lunch },
-        { label:"Uzsonna", val: dayPlan.snack2 },
-        { label:"Vacsora", val: dayPlan.dinner }
-      ];
-
-      const html = meals.map(m => {
-        if(!m.val) return `<div class="row" style="opacity:0.4;"><div><div class="title">${m.label}</div><div class="desc">Nincs adat</div></div></div>`;
-        return `<div class="row"><div><div class="title">${m.label}</div><div class="desc">${escapeHtml(m.val)}</div></div></div>`;
-      }).join("");
-
-      $("#dietDetails").innerHTML = html;
-    }
-
-    // ✅ ÚJ: Motiváció betöltése
-    function renderMotivation(){
-      const mc = profile?.motivationCard;
-      $("#motivationTitle").textContent = mc?.title || "A rendszer szabadság.";
-      $("#motivationBox").textContent = mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.";
-    }
-
-    async function ensureWeekLoaded(weekNo){
-      if(weekCache.has(weekNo)) return weekCache.get(weekNo);
-      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
-      const overridesWeek = await loadOverridesWeek(UID, weekNo);
-
-      const ovWorkouts = overridesWeek?.workouts || {};
-      const ovSlots = overridesWeek?.slots || {};
-
-      const merged = {
-        weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id])),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)]))
-      };
-      weekCache.set(weekNo, { merged });
-      return weekCache.get(weekNo);
-    }
-
-    function renderProgram(){
-      const weeks = planMeta?.weeks || 4;
-      const tabs = $("#weekTabs");
-      tabs.innerHTML = "";
-      for(let i=0;i<weeks;i++){
-        const b = document.createElement("button");
-        b.className = "tab" + (i===state.weekIdx ? " is-active" : "");
-        b.textContent = `Hét ${i+1}`;
-        b.addEventListener("click", async ()=>{
-          state.weekIdx = i;
-          await ensureWeekLoaded(i+1);
-          renderProgram();
-          renderDiet(); // Hétváltáskor az étrend hetet is frissítjük!
-          renderHeader();
-        });
-        tabs.appendChild(b);
-      }
-
-      const weekNo = state.weekIdx + 1;
-      const pack = weekCache.get(weekNo);
-      if(!pack) return;
-
-      const ul = $("#workoutList");
-      ul.innerHTML = "";
-      pack.merged.workouts.forEach(w=>{
-        const key = `w${weekNo}_${w.id}`;
-        const done = !!state.done[key];
-        ul.innerHTML += `
-          <li class="row">
-            <div>
-              <div class="title">${escapeHtml(w._title)} ${done ? '✅' : ''}</div>
-              <div class="desc">${escapeHtml(w._desc)}</div>
-            </div>
-            <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(w.vimeoId || "")}">▶</button>
-              <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}">${done?'Visszavon':'Kész'}</button>
-            </div>
-          </li>`;
-      });
-
-      const sl = $("#slotList");
-      sl.innerHTML = "";
-      pack.merged.slots.forEach(s=>{
-        sl.innerHTML += `
-          <li class="row">
-            <div>
-              <div class="title">${escapeHtml(s._title)}</div>
-              <div class="desc">${escapeHtml(s._desc)}<br><span style="color:#aaa;">Jegyzet: ${escapeHtml(s._note)}</span></div>
-            </div>
-            <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(s.vimeoId || "")}">▶</button>
-            </div>
-          </li>`;
-      });
-
-      // Vimeo lejátszás
-      $$("[data-play]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const vId = b.getAttribute("data-play");
-          if(!vId) return openInfo("Info", "Ehhez még nincs videó beállítva.");
-          const src = `https://player.vimeo.com/video/${encodeURIComponent(vId)}`;
-          openInfo("Lejátszás", `<iframe src="${src}" width="100%" height="400" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`);
-        });
-      });
-
-      // Kész gombok
-      $$("[data-toggle-done]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const key = b.getAttribute("data-toggle-done");
-          state.done[key] = !state.done[key];
-          lsSet(UID, "done", state.done);
-          renderProgram();
-        });
-      });
-    }
+    $$("[data-tab]").forEach(b=>{
+      b.addEventListener("click", ()=>setTab(b.getAttribute("data-tab")));
+    });
 
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
-      toLogin(state.lang);
+      toLogin("hu");
+    });
+    $("#btnToApp").addEventListener("click", ()=>toApp("hu"));
+    $("#y").textContent = new Date().getFullYear();
+
+    let ME = null;
+    let SEL_UID = null;
+
+    function fillProfileForm(doc){
+      $("#u_email").value = doc?.email || "";
+      $("#u_role").value = (doc?.role === "admin") ? "admin" : "user";
+      $("#u_status").value = doc?.status || "active";
+      $("#u_lang").value = (doc?.lang === "de") ? "de" : "hu";
+      $("#u_level").value = clamp(parseInt(doc?.level ?? 2, 10) || 2, 1, 4);
+      $("#u_goal").value = doc?.goal || "";
+      $("#u_planId").value = doc?.planId || "start_v1";
+      $("#u_lifetime").value = String(!!doc?.lifetimeAccess);
+      $("#u_cycleStart").value = doc?.cycleStart || "";
+      $("#u_cycleEnd").value = doc?.cycleEnd || "";
+
+      const mc = doc?.motivationCard || null;
+      $("#m_title").value = mc?.title || "";
+      $("#m_text").value = mc?.text || "";
+    }
+
+    async function loadUsersList(){
+      const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
+      const col = fs.collection(db, "users");
+      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(80)));
+
+      const items = snap.docs
+        .map(d => ({ id:d.id, ...d.data() }))
+        .filter(u => !qtxt || String(u.email||"").toLowerCase().includes(qtxt));
+
+      const ul = $("#usersList");
+      ul.innerHTML = "";
+
+      if(items.length === 0){
+        ul.innerHTML = `<li class="li"><div><div class="title">Nincs találat</div><div class="desc">Próbálj másik keresést.</div></div></li>`;
+        return;
+      }
+
+      items.forEach(u=>{
+        const li = document.createElement("li");
+        li.className = "li";
+        li.innerHTML = `
+          <div>
+            <div class="title">${escapeHtml(u.email || u.id)}</div>
+            <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: ${escapeHtml(u.planId||"—")}</div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+            <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
+          </div>
+        `;
+        ul.appendChild(li);
+      });
+
+      $$("[data-pick]").forEach(b=>{
+        b.addEventListener("click", async ()=>{
+          const uid = b.getAttribute("data-pick");
+          await pickUser(uid);
+        });
+      });
+    }
+
+    async function pickUser(uid){
+      SEL_UID = uid;
+      $("#selUser").textContent = uid ? `uid=${uid}` : "—";
+      const ovU = $("#ovUser"); 
+      if(ovU) ovU.textContent = uid ? `uid=${uid}` : "—";
+
+      const ref = fs.doc(db, "users", uid);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        await fs.setDoc(ref, {
+          email: "",
+          role: "user",
+          status: "active",
+          planId: "start_v1",
+          goal: "Formálás",
+          level: 2,
+          lang: "hu",
+          lifetimeAccess: true,
+          cycleStart: null,
+          cycleEnd: null,
+          dietPlan: null,
+          motivationCard: { title:"A rendszer szabadság.", text:"Nem kell tökéletesnek lenned. Elég, ha következetes vagy." },
+          createdAt: fs.serverTimestamp(),
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+      }
+
+      const snap2 = await fs.getDoc(ref);
+      const doc = snap2.data() || {};
+      fillProfileForm(doc);
+
+      await loadDietDay(); // Étrend automatikus betöltése
+
+      ok("User kiválasztva");
+    }
+
+    $("#btnRefreshUsers").addEventListener("click", loadUsersList);
+    $("#userSearch").addEventListener("input", ()=>{
+      window.clearTimeout(window.__su);
+      window.__su = window.setTimeout(loadUsersList, 220);
     });
 
-    $("#btnDoCheckin").addEventListener("click", ()=>{
-      state.checkin = { done: true, at: new Date().toISOString() };
-      lsSet(UID, "checkin", state.checkin);
-      renderHeader();
+    // --- Profil Mentés ---
+    $("#btnSaveUser").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+
+        const payload = {
+          email: ($("#u_email").value || "").trim(),
+          role: ($("#u_role").value === "admin") ? "admin" : "user",
+          status: ($("#u_status").value || "active").trim(),
+          lang: ($("#u_lang").value === "de") ? "de" : "hu",
+          level: clamp(parseInt($("#u_level").value || "2", 10), 1, 4),
+          goal: ($("#u_goal").value || "").trim(),
+          planId: ($("#u_planId").value || "start_v1").trim(),
+          lifetimeAccess: ($("#u_lifetime").value === "true"),
+          cycleStart: ($("#u_cycleStart").value || "").trim() || null,
+          cycleEnd: ($("#u_cycleEnd").value || "").trim() || null,
+          updatedAt: fs.serverTimestamp()
+        };
+
+        await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
+        ok("Profil mentve");
+        await loadUsersList();
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
     });
 
+    // --- Étrend Mentés (Customers fül) ---
+    function dietRefs(){
+      const week = ($("#d_week").value || "1").trim();
+      const day = ($("#d_day").value || "mon").trim();
+      const wKey = `w${week}`;
+      return { week, day, wKey };
+    }
+
+    function setDietFields(obj){
+      $("#d_breakfast").value = obj?.breakfast || "";
+      $("#d_snack1").value = obj?.snack1 || "";
+      $("#d_lunch").value = obj?.lunch || "";
+      $("#d_snack2").value = obj?.snack2 || "";
+      $("#d_dinner").value = obj?.dinner || "";
+    }
+
+    async function loadDietDay(){
+      if(!SEL_UID) return err("Nincs user kiválasztva.");
+      const { wKey, day } = dietRefs();
+      const ref = fs.doc(db, "users", SEL_UID);
+      const snap = await fs.getDoc(ref);
+      const doc = snap.data() || {};
+      const dayObj = doc?.dietPlan?.[wKey]?.[day] || null;
+      setDietFields(dayObj);
+      ok("Étrend nap betöltve");
+    }
+
+    $("#btnLoadDietDay").addEventListener("click", loadDietDay);
+    $("#d_week").addEventListener("change", loadDietDay);
+    $("#d_day").addEventListener("change", loadDietDay);
+
+    $("#btnSaveDietDay").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const { wKey, day } = dietRefs();
+
+        const payload = {
+          breakfast: ($("#d_breakfast").value || "").toString(),
+          snack1: ($("#d_snack1").value || "").toString(),
+          lunch: ($("#d_lunch").value || "").toString(),
+          snack2: ($("#d_snack2").value || "").toString(),
+          dinner: ($("#d_dinner").value || "").toString()
+        };
+
+        const ref = fs.doc(db, "users", SEL_UID);
+        await fs.updateDoc(ref, {
+          [`dietPlan.${wKey}.${day}`]: payload,
+          updatedAt: fs.serverTimestamp()
+        });
+
+        ok("Étrend (nap) mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnClearDietDay").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const { wKey, day } = dietRefs();
+        const ref = fs.doc(db, "users", SEL_UID);
+
+        await fs.updateDoc(ref, {
+          [`dietPlan.${wKey}.${day}`]: {
+            breakfast:"", snack1:"", lunch:"", snack2:"", dinner:""
+          },
+          updatedAt: fs.serverTimestamp()
+        });
+
+        setDietFields(null);
+        ok("Étrend (nap) törölve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnSaveMotivation").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const title = ($("#m_title").value || "").trim();
+        const text = ($("#m_text").value || "").toString();
+
+        await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
+          motivationCard: { title, text },
+          updatedAt: fs.serverTimestamp()
+        });
+
+        ok("Motiváció kártya mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    // --- PLANS TAB LOGIKA ---
+    $("#btnLoadPlan").addEventListener("click", async ()=>{
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        if(!planId) return err("Plan ID üres.");
+
+        const ref = fs.doc(db, "planTemplates", planId);
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          err(`Nincs ilyen planTemplates/${planId} (még).`);
+          return;
+        }
+        const d = snap.data() || {};
+        $("#p_weeks").value = d.weeks ?? 4;
+        $("#p_name_hu").value = d.name?.hu ?? d.name ?? "Start Program";
+        $("#p_name_de").value = d.name?.de ?? "Start Programm";
+        ok("Plan betöltve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnSavePlan").addEventListener("click", async ()=>{
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        if(!planId) return err("Plan ID üres.");
+
+        const weeks = clamp(parseInt($("#p_weeks").value || "4", 10), 1, 24);
+        const nameHu = ($("#p_name_hu").value || "").trim() || planId;
+        const nameDe = ($("#p_name_de").value || "").trim() || nameHu;
+
+        await fs.setDoc(fs.doc(db, "planTemplates", planId), {
+          id: planId,
+          name: { hu:nameHu, de:nameDe },
+          weeks,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        ok("Plan mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnLoadWeek").addEventListener("click", async ()=>{
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
+        if(!planId) return err("Plan ID üres.");
+
+        const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          $("#w_workouts").value = prettyJson([
+            { id:"w1", title:"Teljes test átmozgatás", desc:"Edző szintű átmozgató edzés.", vimeoId:"" }
+          ]);
+          $("#w_slots").value = prettyJson([
+            { slotIndex:1, title:"Személyre szabott kardió", desc:"A célodnak megfelelő kardió edzés.", defaultNote:"30 perc séta", defaultVimeoId:"" }
+          ]);
+          ok("Week még nem létezik → alap JSON betöltve.");
+          return;
+        }
+
+        const d = snap.data() || {};
+        $("#w_workouts").value = prettyJson(d.workouts ?? []);
+        $("#w_slots").value = prettyJson(d.slots ?? []);
+        ok("Week betöltve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnSaveWeek").addEventListener("click", async ()=>{
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
+        if(!planId) return err("Plan ID üres.");
+
+        const rawWorkouts = $("#w_workouts").value;
+        const rawSlots = $("#w_slots").value;
+
+        // Validálás
+        if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás!");
+        if(!isValidJson(rawSlots)) return err("Slots JSON hibás!");
+
+        const workouts = parseJson(rawWorkouts, []);
+        const slots = parseJson(rawSlots, []);
+
+        await fs.setDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
+          weekNo,
+          workouts,
+          slots,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        ok("Week mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    // --- OVERRIDES TAB LOGIKA ---
+    $("#btnLoadOverride").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const weekNo = clamp(parseInt($("#ov_weekNo").value || "1", 10), 1, 24);
+
+        const ref = fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo));
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          $("#ov_workouts").value = prettyJson({});
+          $("#ov_slots").value = prettyJson({});
+          ok("Nincs override → üres JSON.");
+          return;
+        }
+        const d = snap.data() || {};
+        $("#ov_workouts").value = prettyJson(d.workouts ?? {});
+        $("#ov_slots").value = prettyJson(d.slots ?? {});
+        ok("Override betöltve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnSaveOverride").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const weekNo = clamp(parseInt($("#ov_weekNo").value || "1", 10), 1, 24);
+
+        const rawWorkouts = $("#ov_workouts").value;
+        const rawSlots = $("#ov_slots").value;
+
+        // Validálás
+        if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás!");
+        if(!isValidJson(rawSlots)) return err("Slots JSON hibás!");
+
+        const workouts = parseJson(rawWorkouts, {});
+        const slots = parseJson(rawSlots, {});
+
+        await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
+          weekNo,
+          workouts,
+          slots,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        ok("Override mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnDeleteOverride").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const weekNo = clamp(parseInt($("#ov_weekNo").value || "1", 10), 1, 24);
+        await fs.deleteDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)));
+        $("#ov_workouts").value = prettyJson({});
+        $("#ov_slots").value = prettyJson({});
+        ok("Override törölve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    // --- Rendszer indulása ---
     onAuth(async (user)=>{
-      if(!user) return toLogin("hu");
-      UID = user.uid;
+      try{
+        if(!user){
+          toLogin("hu");
+          return;
+        }
 
-      state.done = lsGet(UID, "done", {});
-      state.checkin = lsGet(UID, "checkin", null);
-      
-      profile = await loadUserProfile(UID) || {};
-      planMeta = await loadPlanMeta(profile.planId || "start_v1");
-      state.weekIdx = calcWeekIndex(profile);
+        const ud = await ensureUserDoc(user.uid, user.email || "");
+        const role = (await getUserRole(user.uid)) || ud?.role || "user";
 
-      await ensureWeekLoaded(state.weekIdx + 1);
+        const adminOk = (String(role).toLowerCase() === "admin") || isAdminEmail(user.email || "");
+        if(!adminOk){
+          toApp("hu");
+          return;
+        }
 
-      renderHeader();
-      renderProgram();
-      renderDiet();
-      renderMotivation();
+        ME = user;
+        $("#whoami").textContent = `${user.email || "admin"} • uid=${user.uid}`;
+        ok("Admin belépés OK");
 
-      document.getElementById("y").textContent = new Date().getFullYear();
+        const savedTab = localStorage.getItem("fl_admin_tab") || "customers";
+        setTab(savedTab);
+
+        await loadUsersList();
+        await pickUser(user.uid);
+
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
     });
   </script>
 </body>
