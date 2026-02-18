@@ -283,7 +283,6 @@
   </div>
 
   <script type="module">
-    // 🔥 JAVÍTÁS: HOZZÁADVA A HIÁNYZÓ fmtDate IMPORT! 🔥
     import {
       BASE_PREFIX, auth, db, fs,
       onAuth, logout, toLogin,
@@ -296,7 +295,6 @@
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
 
-    // Modals
     const settingsOverlay = $("#settingsOverlay");
     const infoOverlay = $("#infoOverlay");
     function openOverlay(ov){ ov.classList.add("is-open"); }
@@ -333,8 +331,6 @@
       { id:"thu", name:"Cs" }, { id:"fri", name:"Pé" }, { id:"sat", name:"Szo" }, { id:"sun", name:"Va" }
     ];
 
-    // --- ADATOLVASÓ FUNKCIÓK ---
-
     function vimeoEmbedSrc(raw){
       const v = String(raw || "").trim();
       if(!v) return "";
@@ -361,8 +357,6 @@
         if (!t) return "";
         return t.split("\n").map(line => escapeHtml(line.trim())).join("<br>");
     }
-
-    // --- ADAT BETÖLTÉS ---
 
     async function loadUserProfile(uid){
       const snap = await fs.getDoc(fs.doc(db, "users", uid));
@@ -421,8 +415,6 @@
       return week - 1;
     }
 
-    // --- RENDER ---
-
     function renderHeader(){
       const p = profile;
       $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
@@ -440,8 +432,6 @@
         $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
         $("#lblDays").textContent = `Hátra: ${tDays - pDays} nap`;
         $("#barCycle").style.width = `${Math.round((pDays / tDays) * 100)}%`;
-        
-        // Emiatt az egy sor miatt állt le az egész! Most már működik:
         $("#subStatus").textContent = `Aktív időszak: ${fmtDate(p.cycleStart)} — ${fmtDate(p.cycleEnd)}`;
       }
     }
@@ -558,7 +548,8 @@
       ul.innerHTML = "";
       pack.merged.workouts.forEach(w=>{
         const key = `w${weekNo}_${w.id}`;
-        const done = !!state.done[key];
+        // Biztonságos ellenőrzés a hibás memória ellen!
+        const done = !!(state.done && state.done[key]);
         ul.innerHTML += `
           <li class="row">
             <div>
@@ -603,6 +594,7 @@
       $$("[data-toggle-done]").forEach(b=>{
         b.addEventListener("click", ()=>{
           const key = b.getAttribute("data-toggle-done");
+          if(!state.done) state.done = {};
           state.done[key] = !state.done[key];
           lsSet(UID, "done", state.done);
           renderProgram();
@@ -610,7 +602,6 @@
       });
     }
 
-    // --- ACTIONS ---
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
       toLogin(state.lang || "hu");
@@ -618,6 +609,7 @@
 
     $("#btnResetWeek").addEventListener("click", ()=>{
       const weekNo = state.weekIdx + 1;
+      if(!state.done) state.done = {};
       Object.keys(state.done).forEach(k => {
         if(k.startsWith(`w${weekNo}_`)) delete state.done[k];
       });
@@ -626,12 +618,12 @@
     });
 
     $("#btnAddWater").addEventListener("click", ()=>{
-      state.water = Math.min(8, state.water + 1);
+      state.water = Math.min(8, (state.water || 0) + 1);
       lsSet(UID, "water", state.water);
       renderTrackers();
     });
     $("#btnAddSleep").addEventListener("click", ()=>{
-      state.sleep = Math.min(8, state.sleep + 1);
+      state.sleep = Math.min(8, (state.sleep || 0) + 1);
       lsSet(UID, "sleep", state.sleep);
       renderTrackers();
     });
@@ -652,10 +644,11 @@
         if(!user) return toLogin("hu");
         UID = user.uid;
 
-        state.done = lsGet(UID, "done", {});
+        // 🔥 GOLYÓÁLLÓ MEMÓRIA BETÖLTÉS 🔥
+        state.done = lsGet(UID, "done", {}) || {};
         state.checkin = lsGet(UID, "checkin", null);
-        state.water = lsGet(UID, "water", 0);
-        state.sleep = lsGet(UID, "sleep", 0);
+        state.water = parseInt(lsGet(UID, "water", 0)) || 0;
+        state.sleep = parseInt(lsGet(UID, "sleep", 0)) || 0;
         
         profile = await loadUserProfile(UID) || {};
         state.lang = profile.lang || "hu"; 
