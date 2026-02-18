@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady Admin — Éles Központ</title>
+  <title>FitnessLady — Admin</title>
 
   <style>
     :root{
@@ -103,7 +103,7 @@
     .card h3{ font-size: 18px; }
     .sub{ margin: 0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
 
-    .row{ display:grid; grid-template-columns: 1fr 1.2fr; gap: 14px; }
+    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 980px){ .row{ grid-template-columns: 1fr; } }
 
     .box{
@@ -179,6 +179,7 @@
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
+    @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
   </style>
 </head>
 
@@ -200,56 +201,74 @@
   <main>
     <div class="container grid">
       <section class="glass card">
-        <h2>Kezelőpult</h2>
-        <p class="sub">Ügyfelek kezelése, csomag sablonok és a Technika Vault beállítása.</p>
+        <h2>Customers</h2>
+        <p class="sub">User kiválasztás → profil / étrend / motiváció + edzések (template) + személyre szabás (override) mentés.</p>
 
         <div class="row">
           <div class="box">
-            <h3>Technika Vault</h3>
-            <p class="sub">Oktató videók, amik mindenkinél megjelennek a Vault részben.</p>
-            <div id="vault_editor">
-              <div class="box" style="margin-bottom:10px; border-color: rgba(255,255,255,.05);">
-                <input id="v1_title" type="text" placeholder="1. Videó címe (pl. Guggolás)">
-                <input id="v1_vid" type="text" placeholder="Vimeo ID vagy Link" style="margin-top:5px;">
-              </div>
-              <div class="box" style="margin-bottom:10px; border-color: rgba(255,255,255,.05);">
-                <input id="v2_title" type="text" placeholder="2. Videó címe">
-                <input id="v2_vid" type="text" placeholder="Vimeo ID vagy Link" style="margin-top:5px;">
-              </div>
+            <div class="field">
+              <label for="userSearch">Keresés (email)</label>
+              <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
             </div>
-            <button class="pill primary" id="btnSaveVault" style="width:100%;">Mentés: Technika Vault</button>
+            <div class="actions">
+              <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
+            </div>
+
+            <div class="sub" style="margin-top:10px;">Találatok:</div>
+            <ul class="list" id="usersList"></ul>
+
+            <hr class="hr" />
+
+            <h3>Technika Vault (Központi)</h3>
+            <p class="sub">Videók, amik mindenkinél megjelennek a Vaultban.</p>
+            <div class="box">
+                <div class="field">
+                    <label>1. Videó címe</label>
+                    <input id="v1_title" type="text" placeholder="pl. Guggolás">
+                    <label style="margin-top:5px;">Vimeo Link vagy ID</label>
+                    <input id="v1_vid" type="text" placeholder="pl. 123456789">
+                </div>
+                <div class="field" style="margin-top:15px;">
+                    <label>2. Videó címe</label>
+                    <input id="v2_title" type="text" placeholder="pl. Fekvőtámasz">
+                    <label style="margin-top:5px;">Vimeo Link vagy ID</label>
+                    <input id="v2_vid" type="text" placeholder="pl. 123456789">
+                </div>
+            </div>
+            <button class="pill primary" id="btnSaveVault" style="width:100%;">💾 Technika Vault Mentése</button>
 
             <hr class="hr" />
 
             <h3>Plan template (Csomag beállítások)</h3>
             <div class="miniRow">
               <div class="field">
-                <label>Csomag neve</label>
+                <label for="p_planId">Csomag neve</label>
                 <input id="p_planId" type="text" value="start_v1" />
               </div>
               <div class="field">
-                <label>Hetek száma</label>
-                <input id="p_weeks" type="number" value="4" />
+                <label for="p_weeks">Hány hetes?</label>
+                <input id="p_weeks" type="number" min="1" max="24" value="4" />
               </div>
             </div>
+
             <div class="actions">
-              <button class="pill ghost" id="btnLoadPlanMeta">Betöltés</button>
-              <button class="pill primary" id="btnSavePlanMeta">Mentés (meta)</button>
+              <button class="pill ghost" id="btnLoadPlanMeta" type="button">↻ Betöltés</button>
+              <button class="pill primary" id="btnSavePlanMeta" type="button">💾 Mentés (meta)</button>
             </div>
 
             <div class="miniRow" style="margin-top:14px;">
               <div class="field">
-                <label>Szerkesztett hét</label>
-                <input id="p_weekNo" type="number" value="1" />
+                <label for="p_weekNo">Szerkesztett hét</label>
+                <input id="p_weekNo" type="number" min="1" max="24" value="1" />
               </div>
               <div class="field">
                 <label>&nbsp;</label>
-                <button class="pill ghost" id="btnLoadTemplateWeek">Betöltés (hét)</button>
+                <button class="pill ghost" id="btnLoadTemplateWeek" type="button">↻ Betöltés (hét)</button>
               </div>
             </div>
 
             <div class="field">
-              <label>Személyre szabott slotok száma</label>
+              <label for="t_slots_count">Hány személyre szabott videó hely legyen?</label>
               <select id="t_slots_count">
                 <option value="0">0</option>
                 <option value="1">1</option>
@@ -258,48 +277,39 @@
               </select>
             </div>
 
+            <h4 style="margin-top:20px; color:var(--gold);">Heti fix edzések</h4>
             <div id="workouts_container"></div>
-            <button class="pill primary" id="btnSaveTemplateWeek" style="width:100%; margin-top:10px;">Mentés: Heti fix edzések</button>
+
+            <div class="actions" style="margin-top:16px;">
+              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (sablon hét)</button>
+            </div>
           </div>
 
           <div class="box">
-            <div class="field">
-              <label>Keresés (email)</label>
-              <input id="userSearch" type="text" placeholder="Keresés..." />
-            </div>
-            <ul class="list" id="usersList" style="max-height: 150px; overflow-y: auto; margin-bottom: 15px;"></ul>
-
-            <div class="pill ghost mono" id="selUser" style="display:block; margin-bottom:15px; text-align:center;">—</div>
+            <div class="sub">Kiválasztott user:</div>
+            <div class="pill ghost mono" id="selUser">—</div>
 
             <div class="miniRow">
-              <div class="field">
-                <label>Keresztnév (AI üdvözléshez)</label>
-                <input id="u_firstname" type="text" placeholder="pl. Anna" />
-              </div>
-              <div class="field">
-                <label>Email</label>
-                <input id="u_email" type="text" readonly />
-              </div>
+                <div class="field">
+                    <label for="u_firstname">Keresztnév (Üdvözléshez)</label>
+                    <input id="u_firstname" type="text" placeholder="pl. Anna" />
+                </div>
+                <div class="field">
+                    <label for="u_email">Email</label>
+                    <input id="u_email" type="text" readonly />
+                </div>
             </div>
 
             <div class="miniRow">
               <div class="field">
-                <label>Cél</label>
-                <input id="u_goal" type="text" />
+                <label for="u_role">Role</label>
+                <select id="u_role">
+                  <option value="user">user</option>
+                  <option value="admin">admin</option>
+                </select>
               </div>
               <div class="field">
-                <label>Szint (1-4)</label>
-                <input id="u_level" type="number" />
-              </div>
-            </div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label>Csomag ID</label>
-                <input id="u_planId" type="text" />
-              </div>
-              <div class="field">
-                <label>Státusz</label>
+                <label for="u_status">Status</label>
                 <select id="u_status">
                   <option value="active">active</option>
                   <option value="paused">paused</option>
@@ -307,11 +317,49 @@
               </div>
             </div>
 
-            <button class="pill primary" id="btnSaveUser" style="width:100%;">Mentés: Ügyfél profil</button>
+            <div class="miniRow">
+              <div class="field">
+                <label for="u_goal">Cél</label>
+                <input id="u_goal" type="text" />
+              </div>
+              <div class="field">
+                <label for="u_level">Szint (1–4)</label>
+                <input id="u_level" type="number" />
+              </div>
+            </div>
+
+            <div class="miniRow">
+              <div class="field">
+                <label for="u_planId">Kiosztott Csomag</label>
+                <input id="u_planId" type="text" />
+              </div>
+              <div class="field">
+                <label for="u_lifetime">Lifetime access</label>
+                <select id="u_lifetime">
+                  <option value="true">true</option>
+                  <option value="false">false</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="miniRow">
+              <div class="field">
+                <label for="u_cycleStart">Kezdés</label>
+                <input id="u_cycleStart" type="text" placeholder="YYYY-MM-DD" />
+              </div>
+              <div class="field">
+                <label for="u_cycleEnd">Vége</label>
+                <input id="u_cycleEnd" type="text" placeholder="YYYY-MM-DD" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés (Profil)</button>
+            </div>
 
             <hr class="hr" />
 
-            <h3>Étrend (Heti / Napi)</h3>
+            <h3>Étrend (Napi - Emoji nélkül)</h3>
             <div class="miniRow">
               <select id="d_week"><option value="1">Hét 1</option><option value="2">Hét 2</option><option value="3">Hét 3</option><option value="4">Hét 4</option></select>
               <select id="d_day"><option value="mon">Hétfő</option><option value="tue">Kedd</option><option value="wed">Szerda</option><option value="thu">Csütörtök</option><option value="fri">Péntek</option><option value="sat">Szombat</option><option value="sun">Vasárnap</option></select>
@@ -326,7 +374,7 @@
 
             <hr class="hr" />
 
-            <h3>Személyre szabott Overrides</h3>
+            <h3>Személyre szabott videók (Overrides)</h3>
             <div class="miniRow">
               <input id="ov_week" type="number" value="1" />
               <button class="pill ghost" id="btnLoadOverride">Betöltés</button>
@@ -334,9 +382,16 @@
             <div class="box" style="margin-top:10px; border-color: rgba(255,79,216,.2);">
               <label>1. Slot Videó & Üzenet</label>
               <input id="ov_slot1_vid" type="text" placeholder="Link">
-              <textarea id="ov_slot1_note" placeholder="Üzenet" style="margin-top:5px; min-height:60px;"></textarea>
+              <textarea id="ov_slot1_note" placeholder="Üzenet..." style="margin-top:5px; min-height:60px;"></textarea>
             </div>
             <button class="pill primary" id="btnSaveOverride" style="width:100%; margin-top:10px;">Mentés: Személyre szabás</button>
+
+            <hr class="hr" />
+
+            <h3>Motiváció</h3>
+            <div class="field"><label>Cím</label><input id="m_title" type="text" /></div>
+            <div class="field"><label>Szöveg</label><textarea id="m_text"></textarea></div>
+            <button class="pill primary" id="btnSaveMotivation" style="width:100%;">💾 Mentés (Motiváció)</button>
           </div>
         </div>
       </section>
@@ -346,12 +401,22 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { auth, db, fs, onAuth, logout, toLogin, toApp, escapeHtml, clamp } from "../shared/firebase.js";
+    import { auth, db, fs, onAuth, logout, toLogin, toApp, escapeHtml, clamp, ensureUserDoc, getUserRole, isAdminEmail } from "../shared/firebase.js";
 
     const $ = (s) => document.querySelector(s);
+    const $$ = (s) => Array.from(document.querySelectorAll(s));
+
     const toast = $("#toast");
     function ok(msg){ toast.innerHTML = `<b>OK</b> — ${msg}`; toast.classList.add("is-on"); setTimeout(()=>toast.classList.remove("is-on"), 2500); }
     function err(msg){ toast.innerHTML = `<b>HIBA</b> — ${msg}`; toast.classList.add("is-on"); setTimeout(()=>toast.classList.remove("is-on"), 3500); }
+
+    // 🔥 JAVÍTOTT ÁTLÉPÉS AZ APP-BA 🔥
+    $("#btnToApp").onclick = () => {
+        window.location.href = "/hu/app/"; 
+    };
+
+    $("#btnLogout").onclick = async () => { await logout(); toLogin("hu"); };
+    $("#y").textContent = new Date().getFullYear();
 
     let SEL_UID = null;
 
@@ -367,74 +432,69 @@
         </div>`;
     }
 
-    // --- VAULT ---
+    const getStr = (v) => (typeof v === 'string') ? v : (v?.hu || '');
+
+    // 🔥 TECHNIKA VAULT MENTÉS 🔥
     $("#btnSaveVault").onclick = async () => {
-      const v = [];
-      if($("#v1_title").value) v.push({ title: $("#v1_title").value, vimeoId: $("#v1_vid").value });
-      if($("#v2_title").value) v.push({ title: $("#v2_title").value, vimeoId: $("#v2_vid").value });
-      await fs.setDoc(fs.doc(db, "settings", "vault"), { videos: v });
-      ok("Technika Vault mentve");
+      try {
+          const v = [];
+          if($("#v1_title").value) v.push({ title: $("#v1_title").value, vimeoId: $("#v1_vid").value });
+          if($("#v2_title").value) v.push({ title: $("#v2_title").value, vimeoId: $("#v2_vid").value });
+          await fs.setDoc(fs.doc(db, "settings", "vault"), { videos: v });
+          ok("Vault mentve");
+      } catch (e) { err(e.message); }
     };
 
-    // --- USER LIST & PICK ---
-    async function loadUsers(){
+    // User lista betöltés
+    async function loadUsersList(){
       const snap = await fs.getDocs(fs.collection(db, "users"));
-      const list = $("#usersList"); list.innerHTML = "";
+      $("#usersList").innerHTML = "";
       snap.forEach(d => {
         const u = d.data();
         const li = document.createElement("li"); li.className = "li";
-        li.innerHTML = `<div class="title">${u.email}</div><button class="pill ghost tiny" data-id="${d.id}">Kiválaszt</button>`;
-        list.appendChild(li);
+        li.innerHTML = `<span>${u.email}</span><button class="pill ghost tiny" data-id="${d.id}">Kiválaszt</button>`;
+        $("#usersList").appendChild(li);
       });
       document.querySelectorAll("[data-id]").forEach(b => b.onclick = () => pickUser(b.dataset.id));
     }
 
     async function pickUser(uid){
-      SEL_UID = uid;
-      $("#selUser").textContent = uid;
+      SEL_UID = uid; $("#selUser").textContent = uid;
       const snap = await fs.getDoc(fs.doc(db, "users", uid));
       const d = snap.data();
+      // 🔥 KERESZTNÉV MEZŐ BETÖLTÉSE 🔥
       $("#u_firstname").value = d.firstName || "";
       $("#u_email").value = d.email || "";
       $("#u_goal").value = d.goal || "";
       $("#u_level").value = d.level || 2;
       $("#u_planId").value = d.planId || "";
       $("#u_status").value = d.status || "active";
+      $("#u_lifetime").value = String(!!d.lifetimeAccess);
+      $("#u_cycleStart").value = d.cycleStart || "";
+      $("#u_cycleEnd").value = d.cycleEnd || "";
+      $("#m_title").value = d.motivationCard?.title || "";
+      $("#m_text").value = d.motivationCard?.text || "";
       loadDietDay();
       ok("User betöltve");
     }
 
     $("#btnSaveUser").onclick = async () => {
-      if(!SEL_UID) return;
+      if(!SEL_UID) return err("Válassz usert!");
       await fs.setDoc(fs.doc(db, "users", SEL_UID), {
-        firstName: $("#u_firstname").value,
+        firstName: $("#u_firstname").value, // 🔥 KERESZTNÉV MENTÉSE 🔥
         goal: $("#u_goal").value,
-        level: $("#u_level").value,
+        level: parseInt($("#u_level").value),
         planId: $("#u_planId").value,
         status: $("#u_status").value,
+        lifetimeAccess: ($("#u_lifetime").value === "true"),
+        cycleStart: $("#u_cycleStart").value,
+        cycleEnd: $("#u_cycleEnd").value,
         updatedAt: fs.serverTimestamp()
       }, { merge: true });
       ok("Profil mentve");
     };
 
-    // --- Sablon mentés ---
-    $("#btnSaveTemplateWeek").onclick = async () => {
-      const pId = $("#p_planId").value;
-      const wNo = $("#p_weekNo").value;
-      const workouts = [];
-      for(let i=1; i<=5; i++){
-        const t = $(`#t_w${i}_title`).value;
-        const v = $(`#t_w${i}_vid`).value;
-        if(t || v) workouts.push({ title: {hu:t, de:t}, vimeoId: v, desc: {hu:$(`#t_w${i}_desc`).value, de:$(`#t_w${i}_desc`).value} });
-      }
-      const slots = [];
-      for(let i=1; i<=$("#t_slots_count").value; i++) slots.push({ slotIndex: i, title: {hu: `${i}. Személyes feladat`} });
-      
-      await fs.setDoc(fs.doc(db, "planTemplates", pId, "weeks", String(wNo)), { workouts, slots });
-      ok("Heti sablon mentve");
-    };
-
-    // --- ÉTREND ---
+    // Étrend kezelés
     async function loadDietDay(){
       if(!SEL_UID) return;
       const w = $("#d_week").value; const d = $("#d_day").value;
@@ -444,7 +504,9 @@
       $("#d_lunch").value = dayData.lunch || "";
       $("#d_dinner").value = dayData.dinner || "";
     }
+    $("#btnLoadDietDay").onclick = loadDietDay;
     $("#btnSaveDietDay").onclick = async () => {
+      if(!SEL_UID) return;
       const w = $("#d_week").value; const d = $("#d_day").value;
       await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
         [`dietPlan.w${w}.${d}`]: { breakfast: $("#d_breakfast").value, lunch: $("#d_lunch").value, dinner: $("#d_dinner").value }
@@ -452,8 +514,34 @@
       ok("Étrend mentve");
     };
 
-    onAuth(u => { if(u) loadUsers(); });
-    $("#btnLogout").onclick = async () => { await logout(); toLogin("hu"); };
+    // Sablon mentés
+    $("#btnSaveTemplateWeek").onclick = async () => {
+      try {
+          const pId = $("#p_planId").value;
+          const wNo = $("#p_weekNo").value;
+          const workouts = [];
+          for(let i=1; i<=5; i++){
+            const t = $(`#t_w${i}_title`).value;
+            const v = $(`#t_w${i}_vid`).value;
+            if(t || v) workouts.push({ id:`w${i}`, title:{hu:t}, vimeoId: v, desc:{hu:$(`#t_w${i}_desc`).value} });
+          }
+          const slots = [];
+          for(let i=1; i<=$("#t_slots_count").value; i++) slots.push({ slotIndex: i, title: {hu: `${i}. Személyes feladat`} });
+          await fs.setDoc(fs.doc(db, "planTemplates", pId, "weeks", String(wNo)), { weekNo: parseInt(wNo), workouts, slots });
+          ok("Sablon mentve");
+      } catch (e) { err(e.message); }
+    };
+
+    // Motiváció mentés
+    $("#btnSaveMotivation").onclick = async () => {
+      if(!SEL_UID) return;
+      await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
+          motivationCard: { title: $("#m_title").value, text: $("#m_text").value }
+      });
+      ok("Motiváció mentve");
+    };
+
+    onAuth(u => { if(u) { loadUsersList(); } else toLogin("hu"); });
   </script>
 </body>
 </html>
