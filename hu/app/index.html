@@ -27,7 +27,6 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color: var(--text);
       background-color: var(--bg);
-      /* ✅ OPTIMALIZÁLT HÁTTÉR: Nem szaggat görgetésnél! */
       background-image: 
         radial-gradient(circle at 15% 10%, rgba(255,79,216,.15) 0%, transparent 40%),
         radial-gradient(circle at 85% 80%, rgba(177,76,255,.12) 0%, transparent 45%);
@@ -49,7 +48,7 @@
       border-bottom: 1px solid rgba(255,255,255,.06);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
-      transform: translateZ(0); /* Hardveres gyorsítás */
+      transform: translateZ(0); 
     }
     .topbar-inner {
       height: 64px;
@@ -85,7 +84,6 @@
       background: rgba(20,12,26,.65); color: var(--text);
       cursor: pointer; user-select: none; gap: 8px; white-space: nowrap;
       transition: transform .2s, border-color .2s, background .2s;
-      /* Hardveres gyorsítás gomboknál is */
       transform: translateZ(0);
       will-change: transform;
     }
@@ -106,7 +104,6 @@
     main { padding-top: 64px; min-height: 100vh; }
     .page { padding: 18px 0 64px; }
 
-    /* ✅ ÜVEGHATÁS OPTIMALIZÁLVA (Sokkal simább görgetés) */
     .glass {
       background: rgba(18, 12, 26, 0.55);
       border: 1px solid rgba(255, 255, 255, 0.08);
@@ -114,7 +111,7 @@
       box-shadow: 0 16px 40px rgba(0,0,0,.3);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
-      transform: translateZ(0); /* Megállítja a szaggatást */
+      transform: translateZ(0); 
     }
 
     .grid { display: grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items: start; }
@@ -432,7 +429,6 @@
       const snap = await fs.getDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)));
       return snap.exists() ? snap.data() : {};
     }
-    // ✅ Hibajavítás beépítve: overridesWeeks mappa!
     async function loadOverridesWeek(uid, weekNo){
       const snap = await fs.getDoc(fs.doc(db, "users", uid, "overridesWeeks", String(weekNo)));
       return snap.exists() ? snap.data() : null;
@@ -538,9 +534,13 @@
       $("#motivationBox").textContent = mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.";
     }
 
+    // ✅ JAVÍTÁS: Nem fagy ki a betöltés üres csomag esetén
     async function ensureWeekLoaded(weekNo){
       if(weekCache.has(weekNo)) return weekCache.get(weekNo);
-      const templateWeek = await loadPlanWeek(profile.planId, weekNo);
+      
+      const pId = profile?.planId || "start_v1"; 
+      const templateWeek = await loadPlanWeek(pId, weekNo);
+      
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
       const ovWorkouts = overridesWeek?.workouts || {};
       const ovSlots = overridesWeek?.slots || {};
