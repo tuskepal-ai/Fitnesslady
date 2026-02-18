@@ -258,23 +258,6 @@
 
   <main>
     <div class="container grid">
-      
-      <section class="glass card" style="margin-bottom:14px;">
-        <div class="row" style="gap:20px; text-align:center;">
-          <div>
-            <h3 style="margin:0; font-size:32px; color:var(--pink);" id="statTotal">—</h3>
-            <div class="sub">Összes (betöltött)</div>
-          </div>
-          <div>
-            <h3 style="margin:0; font-size:32px; color:var(--gold);" id="statNew">—</h3>
-            <div class="sub">Új a héten</div>
-          </div>
-          <div>
-            <h3 style="margin:0; font-size:32px; color:#2ee59d;" id="statActive">—</h3>
-            <div class="sub">Aktív státusz</div>
-          </div>
-        </div>
-      </section>
 
       <section class="glass card">
         <h2>Admin központ</h2>
@@ -568,7 +551,7 @@
     let SEL_UID = null;
     let SEL_USER_DOC = null;
 
-    // --- ✅ JSON VALIDÁTOR (ÚJ FUNKCIÓ) ---
+    // --- JSON VALIDÁTOR (Hiba megelőzéshez) ---
     function isValidJson(text) {
       try {
         JSON.parse(text);
@@ -603,26 +586,6 @@
       const items = snap.docs
         .map(d => ({ id:d.id, ...d.data() }))
         .filter(u => !q || String(u.email||"").toLowerCase().includes(q));
-
-      // --- ✅ DASHBOARD UPDATE ---
-      // Összes
-      $("#statTotal").textContent = items.length;
-      
-      // Új a héten
-      const oneWeekAgo = new Date();
-      oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
-      const newCount = items.filter(u => {
-        if(!u.createdAt) return false;
-        // Firestore Timestamp vagy String dátum kezelése
-        const d = u.createdAt.toDate ? u.createdAt.toDate() : new Date(u.createdAt);
-        return d > oneWeekAgo;
-      }).length;
-      $("#statNew").textContent = newCount;
-
-      // Aktív státusz
-      const activeCount = items.filter(u => u.status === 'active').length;
-      $("#statActive").textContent = activeCount;
-      // ------------------------
 
       const ul = $("#usersList");
       ul.innerHTML = "";
@@ -818,7 +781,7 @@
         const rawWorkouts = $("#w_workouts").value;
         const rawSlots = $("#w_slots").value;
 
-        // --- ✅ JSON VALIDÁTOR ELLENŐRZÉS ---
+        // --- JSON VALIDÁTOR ELLENŐRZÉS ---
         if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás! Ellenőrizd a vesszőket/idézőjeleket.");
         if(!isValidJson(rawSlots)) return err("Slots JSON hibás! Ellenőrizd a vesszőket/idézőjeleket.");
 
@@ -871,7 +834,7 @@
         const rawWorkouts = $("#ov_workouts").value;
         const rawSlots = $("#ov_slots").value;
 
-        // --- ✅ JSON VALIDÁTOR ELLENŐRZÉS ---
+        // --- JSON VALIDÁTOR ELLENŐRZÉS ---
         if(!isValidJson(rawWorkouts)) return err("Workouts JSON hibás!");
         if(!isValidJson(rawSlots)) return err("Slots JSON hibás!");
 
