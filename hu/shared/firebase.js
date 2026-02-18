@@ -1,5 +1,5 @@
 // FILE: /hu/shared/firebase.js
-// Firebase v9 modular (CDN) — shared helpers
+// Firebase v9 modular (CDN) — ÉLES shared helpers HU
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
   getAuth,
@@ -15,11 +15,10 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * Admin email(ek) — ide tedd be a saját admin email címedet!
- * (így akkor is admin maradsz, ha a role field még nem admin)
+ * ÁLLÍTSD BE: admin email(ek)
  */
 export const ADMIN_EMAILS = [
-  "tuskepal@gmail.com",
+  // "te@domain.com",
 ];
 
 export const BASE_PREFIX = ""; // GitHub Pages root
@@ -37,7 +36,7 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
 
-// Firestore namespace export
+// Firestore namespace export (kompatibilitás)
 export const fs = {
   doc, getDoc, setDoc, updateDoc, deleteDoc,
   collection, getDocs, query, orderBy, limit, where,
@@ -115,6 +114,11 @@ export function isAdminEmail(email){
   return ADMIN_EMAILS.map(x=>String(x).trim().toLowerCase()).includes(e);
 }
 
+/**
+ * ✅ FONTOS:
+ * - nem írunk felül meglévő mezőket
+ * - új mezők: dietPlan + motivationCard
+ */
 export async function ensureUserDoc(uid, email){
   const ref = doc(db, "users", uid);
   const snap = await getDoc(ref);
@@ -132,40 +136,40 @@ export async function ensureUserDoc(uid, email){
       cycleStart: null,
       cycleEnd: null,
 
-      // ✅ ÚJ: prémium étrend struktúra (admin tölti)
-      dietPlan: null,
+      // ✅ új struktúra
+      dietPlan: {},
 
-      // ✅ ÚJ: fix motiváció kártya (admin tölti)
       motivationCard: {
-        title: "A rendszer szabadság.",
-        text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
+        title: "Fókusz",
+        text: "Tartsd egyszerűen. Kicsi lépések – stabil ritmus."
       },
-
-      // backward compat (ha régi)
-      dietText: "",
-      motivationText: "",
 
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
     };
     await setDoc(ref, initial, { merge: true });
     return initial;
-  }else{
-    const data = snap.data() || {};
-    if(email && data.email !== email){
-      await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
-    }
-    // ha régi doc, biztosítsuk az új mezőket
-    if(!data.motivationCard){
-      await setDoc(ref, {
-        motivationCard: {
-          title: "A rendszer szabadság.",
-          text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
-        }
-      }, { merge:true });
-    }
-    return (await getDoc(ref)).data();
   }
+
+  // meglévő doc: csak email + hiányzó mezők pótlása
+  const data = snap.data() || {};
+  const patch = {};
+  if(email && data.email !== email) patch.email = email;
+
+  // hiányzó új mezők pótlása
+  if(typeof data.dietPlan !== "object" || data.dietPlan === null) patch.dietPlan = {};
+  if(typeof data.motivationCard !== "object" || data.motivationCard === null){
+    patch.motivationCard = {
+      title: "Fókusz",
+      text: "Tartsd egyszerűen. Kicsi lépések – stabil ritmus."
+    };
+  }
+
+  if(Object.keys(patch).length){
+    patch.updatedAt = serverTimestamp();
+    await setDoc(ref, patch, { merge:true });
+  }
+  return { ...data, ...patch };
 }
 
 export async function getUserRole(uid){
