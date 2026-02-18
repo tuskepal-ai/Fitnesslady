@@ -226,16 +226,16 @@
 
             <hr class="hr" />
 
-            <h3>Plan template</h3>
-            <p class="sub">Itt a csomag “alap” heti videói. Ezt minden user megkapja, aki ezt a planId-t használja.</p>
+            <h3>Plan template (Alap csomagok)</h3>
+            <p class="sub">Itt a csomag “alap” beállításai. Ezt minden user megkapja, aki ezt a planId-t használja.</p>
 
             <div class="miniRow">
               <div class="field">
-                <label for="p_planId">Plan ID (template)</label>
+                <label for="p_planId">Csomag neve (Plan ID)</label>
                 <input id="p_planId" type="text" value="start_v1" />
               </div>
               <div class="field">
-                <label for="p_weeks">Hány hét</label>
+                <label for="p_weeks">Hány hetes a program?</label>
                 <input id="p_weeks" type="number" min="1" max="24" value="4" />
               </div>
             </div>
@@ -256,24 +256,25 @@
               </div>
             </div>
 
-            <div class="help">
-              workouts: <span class="mono">[{ "id":"w1","title":{"hu":"..."},"desc":{"hu":"..."},"vimeoId":"(Vimeo ID vagy link)","duration":"12p" }]</span><br/>
-              slots: <span class="mono">[{ "slotIndex":1,"title":{"hu":"..."},"desc":{"hu":"..."},"defaultVimeoId":"(Vimeo ID vagy link)" }]</span>
-              <br/><br/>
-              <b>Fontos:</b> régi adat esetén a <span class="mono">video</span> mezőt is elfogadja a vevő app, de innen már <span class="mono">vimeoId</span>-t használj.
+            <div class="field" style="margin-top: 14px; padding: 12px; background: rgba(255,79,216,.08); border: 1px solid rgba(255,79,216,.2); border-radius: 14px;">
+              <label for="t_slots_count" style="color:#fff;">Hány darab "Személyre szabott" kártya legyen ezen a héten?</label>
+              <select id="t_slots_count" style="margin-top: 8px; font-weight: 800; color: var(--pink);">
+                <option value="0">0 (Nincs extra videó)</option>
+                <option value="1">1 darab videó / feladat</option>
+                <option value="2">2 darab videó / feladat</option>
+                <option value="3" selected>3 darab videó / feladat</option>
+              </select>
+              <div class="help" style="color: rgba(255,255,255,.8);">Ez automatikusan létrehozza a vevőnél az üres kereteket. Nem kell többé kódot írnod!</div>
             </div>
 
-            <div class="field">
-              <label for="t_workouts">Template — workouts (JSON tömb)</label>
-              <textarea id="t_workouts" class="mono" placeholder='[{"id":"w1","title":{"hu":"Edzés 1"},"desc":{"hu":""},"vimeoId":"","duration":"12p"}]'></textarea>
-            </div>
-            <div class="field">
-              <label for="t_slots">Template — slots (JSON tömb)</label>
-              <textarea id="t_slots" class="mono" placeholder='[{"slotIndex":1,"title":{"hu":"Extra 1"},"desc":{"hu":""},"defaultVimeoId":""}]'></textarea>
-            </div>
-
+            <details style="margin-top: 14px; margin-bottom: 14px; cursor: pointer;">
+              <summary style="color: var(--muted); font-size: 13px; outline:none;">Haladó: Heti fix edzések (Workouts) JSON kódja</summary>
+              <div class="field" style="margin-top: 10px;">
+                <textarea id="t_workouts" class="mono" placeholder='[{"id":"w1","title":{"hu":"Edzés 1"},"desc":{"hu":""},"vimeoId":"","duration":"12p"}]'></textarea>
+              </div>
+            </details>
             <div class="actions">
-              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (template week)</button>
+              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (hét & kártyák)</button>
             </div>
           </div>
 
@@ -457,6 +458,7 @@
               <button class="pill primary" id="btnSaveOverride" type="button">💾 Mentés (Személyre szabás)</button>
               <button class="pill danger" id="btnDeleteOverride" type="button">🗑 Törlés</button>
             </div>
+
             <hr class="hr" />
 
             <h3>Fix motiváció kártya</h3>
@@ -785,6 +787,7 @@
       }
     }
 
+    // 🔥 JAVÍTOTT, AUTOMATIKUS TEMPLATE BETÖLTŐ 🔥
     async function loadTemplateWeek(){
       try{
         const planId = ($("#p_planId").value || "").trim();
@@ -794,32 +797,39 @@
         const snap = await fs.getDoc(ref);
         if(!snap.exists()){
           $("#t_workouts").value = pretty([]);
-          $("#t_slots").value = pretty([]);
-          ok("Template week nincs → üres JSON.");
+          $("#t_slots_count").value = "3"; // Alapértelmezett 3
+          ok("Template week nincs → alap beállítás betöltve.");
           return;
         }
         const d = snap.data() || {};
         $("#t_workouts").value = pretty(d.workouts ?? []);
-        $("#t_slots").value = pretty(d.slots ?? []);
-        ok("Template week betöltve");
+        const sc = Array.isArray(d.slots) ? d.slots.length : 0;
+        $("#t_slots_count").value = clamp(sc, 0, 3).toString();
+        
+        ok("Csomag hét beállításai betöltve");
       }catch(e){
         console.error(e);
         err(e.message || String(e));
       }
     }
 
+    // 🔥 JAVÍTOTT, AUTOMATIKUS TEMPLATE MENTŐ (NINCS TÖBB JSON!) 🔥
     async function saveTemplateWeek(){
       try{
         const planId = ($("#p_planId").value || "").trim();
         const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
         if(!planId) return err("Plan ID üres.");
 
-        let workouts = parseJson($("#t_workouts").value, []);
-        let slots = parseJson($("#t_slots").value, []);
+        let workouts = parseJson($("#t_workouts").value || "[]", []);
         if(!Array.isArray(workouts)) throw new Error("Template workouts: JSON tömb kell.");
-        if(!Array.isArray(slots)) throw new Error("Template slots: JSON tömb kell.");
-
         workouts = normalizeWorkoutsArray(workouts);
+
+        // A program automatikusan legenerálja a kódot a háttérben a legördülő menü alapján!
+        const slotCount = parseInt($("#t_slots_count").value || "3", 10);
+        const slots = [];
+        for(let i=1; i<=slotCount; i++){
+          slots.push({ slotIndex: i, title: { hu: `${i}. Személyes feladat` } });
+        }
 
         await fs.setDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
           weekNo,
@@ -828,7 +838,7 @@
           updatedAt: fs.serverTimestamp()
         }, { merge:true });
 
-        ok("Template week mentve");
+        ok(`Sablon elmentve. A vevőnél mostantól ${slotCount} üres kártya jelenik meg!`);
       }catch(e){
         console.error(e);
         err(e.message || String(e));
@@ -840,7 +850,6 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    // 🔥 ÚJ, EMBERBARÁT BETÖLTŐ RENDSZER 🔥
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -848,7 +857,6 @@
         const ref = fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo));
         const snap = await fs.getDoc(ref);
 
-        // Dobozok ürítése
         $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
@@ -859,7 +867,6 @@
         const d = snap.data() || {};
         const slots = d.slots || {};
 
-        // Segédfüggvény a többnyelvű szövegek kiolvasására
         const getStr = (val) => {
             if(!val) return "";
             if(typeof val === "string") return val;
@@ -889,15 +896,12 @@
     $("#btnLoadOverride").addEventListener("click", async ()=>{ await loadOverride(); ok("Személyre szabott rész betöltve"); });
     $("#ov_week").addEventListener("change", loadOverride);
 
-    // 🔥 ÚJ, EMBERBARÁT MENTŐ RENDSZER 🔥
     $("#btnSaveOverride").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
         const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
 
-        // A háttérben itt rakjuk össze a programozói kódot, hogy neked ne kelljen!
         const slots = {};
-        
         const s1_vid = $("#ov_slot1_vid").value.trim();
         const s1_note = $("#ov_slot1_note").value.trim();
         if(s1_vid || s1_note) slots["1"] = { vimeoId: s1_vid, note: { hu: s1_note, de: s1_note } };
