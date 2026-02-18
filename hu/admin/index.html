@@ -144,6 +144,13 @@
 
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
+    .help{
+      color: rgba(255,255,255,.62);
+      font-size: 12.8px;
+      line-height: 1.55;
+      margin-top: 8px;
+    }
+
     .toast{
       position: fixed;
       right: 14px;
@@ -172,6 +179,31 @@
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color:rgba(255,255,255,.70); font-size:13px;
     }
+
+    /* mini divider */
+    .hr{ border:none; height:1px; background:rgba(255,255,255,.08); margin:14px 0; }
+
+    /* compact row inside box */
+    .miniRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
+
+    .tag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.78);
+      font-weight: 850;
+      font-size: 12px;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
@@ -194,9 +226,10 @@
     <div class="container grid">
       <section class="glass card">
         <h2>Customers</h2>
-        <p class="sub">User kiválasztás → profil / étrend / motiváció mentés.</p>
+        <p class="sub">User kiválasztás → profil / étrend / motiváció + edzések (template) + személyre szabás (override) mentés.</p>
 
         <div class="row">
+          <!-- LEFT -->
           <div class="box">
             <div class="field">
               <label for="userSearch">Keresés (email)</label>
@@ -208,8 +241,57 @@
 
             <div class="sub" style="margin-top:10px;">Találatok:</div>
             <ul class="list" id="usersList"></ul>
+
+            <hr class="hr" />
+
+            <h3>Plan template</h3>
+            <p class="sub">Itt a csomag “alap” heti videói. Ezt minden user megkapja, aki ezt a planId-t használja.</p>
+
+            <div class="miniRow">
+              <div class="field">
+                <label for="p_planId">Plan ID (template)</label>
+                <input id="p_planId" type="text" value="start_v1" />
+              </div>
+              <div class="field">
+                <label for="p_weeks">Hány hét</label>
+                <input id="p_weeks" type="number" min="1" max="24" value="4" />
+              </div>
+            </div>
+
+            <div class="actions">
+              <button class="pill ghost" id="btnLoadPlanMeta" type="button">↻ Betöltés (meta)</button>
+              <button class="pill primary" id="btnSavePlanMeta" type="button">💾 Mentés (meta)</button>
+            </div>
+
+            <div class="miniRow">
+              <div class="field">
+                <label for="p_weekNo">Szerkesztett hét</label>
+                <input id="p_weekNo" type="number" min="1" max="24" value="1" />
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <button class="pill ghost" id="btnLoadTemplateWeek" type="button">↻ Betöltés (week)</button>
+              </div>
+            </div>
+
+            <div class="help">workouts: <span class="mono">[{ "id":"w1_1","title":{"hu":"..."},"video":"(vimeo id vagy link)","duration":"12p" }]</span><br/>
+            slots: <span class="mono">[{ "slotIndex":1,"title":{"hu":"Személyre szabás 1"},"desc":{"hu":"..."},"defaultVimeoId":"" }]</span></div>
+
+            <div class="field">
+              <label for="t_workouts">Template — workouts (JSON tömb)</label>
+              <textarea id="t_workouts" class="mono" placeholder='[{"id":"w1","title":{"hu":"Edzés 1"},"desc":{"hu":""},"video":"","duration":"12p"}]'></textarea>
+            </div>
+            <div class="field">
+              <label for="t_slots">Template — slots (JSON tömb)</label>
+              <textarea id="t_slots" class="mono" placeholder='[{"slotIndex":1,"title":{"hu":"Extra 1"},"desc":{"hu":""},"defaultVimeoId":""}]'></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (template week)</button>
+            </div>
           </div>
 
+          <!-- RIGHT -->
           <div class="box">
             <div class="sub">Kiválasztott user:</div>
             <div class="pill ghost mono" id="selUser">—</div>
@@ -219,7 +301,7 @@
               <input id="u_email" type="text" placeholder="—" />
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="miniRow">
               <div class="field">
                 <label for="u_role">Role</label>
                 <select id="u_role">
@@ -237,7 +319,7 @@
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="miniRow">
               <div class="field">
                 <label for="u_lang">Nyelv</label>
                 <select id="u_lang">
@@ -256,9 +338,9 @@
               <input id="u_goal" type="text" placeholder="pl. Formálás" />
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="miniRow">
               <div class="field">
-                <label for="u_planId">planId</label>
+                <label for="u_planId">planId (user)</label>
                 <input id="u_planId" type="text" placeholder="start_v1" />
               </div>
               <div class="field">
@@ -270,7 +352,7 @@
               </div>
             </div>
 
-            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="miniRow">
               <div class="field">
                 <label for="u_cycleStart">cycleStart (YYYY-MM-DD / üres)</label>
                 <input id="u_cycleStart" type="text" placeholder="2026-02-01" />
@@ -285,12 +367,12 @@
               <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés (Profil)</button>
             </div>
 
-            <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:14px 0;" />
+            <hr class="hr" />
 
             <h3>Étrend — 4 hét / napi</h3>
             <p class="sub">Itt írod a napi étkezéseket. A vevő app prémium kártyákban mutatja.</p>
 
-            <div class="row" style="grid-template-columns:1fr 1fr; gap:10px;">
+            <div class="miniRow">
               <div class="field">
                 <label for="d_week">Hét</label>
                 <select id="d_week">
@@ -326,7 +408,37 @@
               <button class="pill danger" id="btnClearDietDay" type="button">🗑 Törlés (nap)</button>
             </div>
 
-            <hr style="border:none;height:1px;background:rgba(255,255,255,.08);margin:14px 0;" />
+            <hr class="hr" />
+
+            <h3>Személyre szabott videók (Overrides)</h3>
+            <p class="sub">Userenként, hetenként felülírod / hozzáadsz videót + címet + leírást. Ez az appban azonnal látszik.</p>
+
+            <div class="miniRow">
+              <div class="field">
+                <label for="ov_week">Hét (override)</label>
+                <input id="ov_week" type="number" min="1" max="24" value="1" />
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <button class="pill ghost" id="btnLoadOverride" type="button">↻ Betöltés (override)</button>
+              </div>
+            </div>
+
+            <div class="field">
+              <label for="ov_workouts">workouts override (JSON objektum)</label>
+              <textarea id="ov_workouts" class="mono" placeholder='{"w1_1":{"title":{"hu":"Más cím"},"desc":{"hu":"Más leírás"},"vimeoId":"123"}}'></textarea>
+            </div>
+            <div class="field">
+              <label for="ov_slots">slots override (JSON objektum)</label>
+              <textarea id="ov_slots" class="mono" placeholder='{"1":{"vimeoId":"123","note":{"hu":"Megjegyzés"}}}'></textarea>
+            </div>
+
+            <div class="actions">
+              <button class="pill primary" id="btnSaveOverride" type="button">💾 Mentés (override)</button>
+              <button class="pill danger" id="btnDeleteOverride" type="button">🗑 Törlés (override)</button>
+            </div>
+
+            <hr class="hr" />
 
             <h3>Fix motiváció kártya</h3>
             <p class="sub">Mindig látszik a vevőnél.</p>
@@ -357,7 +469,7 @@
     import {
       auth, db, fs,
       onAuth, logout, toLogin, toApp,
-      escapeHtml, clamp,
+      escapeHtml, safeJsonParse, clamp,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
@@ -381,9 +493,19 @@
     $("#btnToApp").addEventListener("click", ()=>toApp("hu"));
     $("#y").textContent = new Date().getFullYear();
 
-    let ME = null;
     let SEL_UID = null;
 
+    // ---------- JSON helpers ----------
+    function parseJson(text, fallback){
+      const t = String(text || "").trim();
+      if(!t) return fallback;
+      const v = safeJsonParse(t, null);
+      if(v === null) throw new Error("Érvénytelen JSON.");
+      return v;
+    }
+    function pretty(v){ return JSON.stringify(v, null, 2); }
+
+    // ---------- Profile ----------
     function fillProfileForm(doc){
       $("#u_email").value = doc?.email || "";
       $("#u_role").value = (doc?.role === "admin") ? "admin" : "user";
@@ -459,7 +581,7 @@
           lifetimeAccess: true,
           cycleStart: null,
           cycleEnd: null,
-          dietPlan: null,
+          dietPlan: {},
           motivationCard: { title:"A rendszer szabadság.", text:"Nem kell tökéletesnek lenned. Elég, ha következetes vagy." },
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
@@ -470,7 +592,13 @@
       const doc = snap2.data() || {};
       fillProfileForm(doc);
 
+      // planId sync: template oldalon is álljon arra
+      $("#p_planId").value = doc?.planId || $("#p_planId").value || "start_v1";
+
       ok("User kiválasztva");
+
+      await loadDietDay();
+      await loadOverride();
     }
 
     $("#btnRefreshUsers").addEventListener("click", loadUsersList);
@@ -506,6 +634,7 @@
       }
     });
 
+    // ---------- Diet (per day) ----------
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -522,17 +651,16 @@
     }
 
     async function loadDietDay(){
-      if(!SEL_UID) return err("Nincs user kiválasztva.");
+      if(!SEL_UID) return;
       const { wKey, day } = dietRefs();
       const ref = fs.doc(db, "users", SEL_UID);
       const snap = await fs.getDoc(ref);
       const doc = snap.data() || {};
       const dayObj = doc?.dietPlan?.[wKey]?.[day] || null;
       setDietFields(dayObj);
-      ok("Étrend nap betöltve");
     }
 
-    $("#btnLoadDietDay").addEventListener("click", loadDietDay);
+    $("#btnLoadDietDay").addEventListener("click", async ()=>{ await loadDietDay(); ok("Étrend nap betöltve"); });
     $("#d_week").addEventListener("change", loadDietDay);
     $("#d_day").addEventListener("change", loadDietDay);
 
@@ -570,11 +698,8 @@
         const { wKey, day } = dietRefs();
         const ref = fs.doc(db, "users", SEL_UID);
 
-        // Firestore field delete-hez külön import kéne, ezért “üresre” állítjuk:
         await fs.updateDoc(ref, {
-          [`dietPlan.${wKey}.${day}`]: {
-            breakfast:"", snack1:"", lunch:"", snack2:"", dinner:""
-          },
+          [`dietPlan.${wKey}.${day}`]: { breakfast:"", snack1:"", lunch:"", snack2:"", dinner:"" },
           updatedAt: fs.serverTimestamp()
         });
 
@@ -586,6 +711,7 @@
       }
     });
 
+    // ---------- Motivation card ----------
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -604,6 +730,156 @@
       }
     });
 
+    // ---------- Template plan meta + weeks ----------
+    async function loadPlanMeta(){
+      const planId = ($("#p_planId").value || "").trim();
+      if(!planId) return err("Plan ID üres.");
+      const ref = fs.doc(db, "planTemplates", planId);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        $("#p_weeks").value = $("#p_weeks").value || 4;
+        ok("Nincs meta — beállíthatod és mentheted.");
+        return;
+      }
+      const d = snap.data() || {};
+      $("#p_weeks").value = d.weeks ?? 4;
+      ok("Plan meta betöltve");
+    }
+
+    async function savePlanMeta(){
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        if(!planId) return err("Plan ID üres.");
+        const weeks = clamp(parseInt($("#p_weeks").value || "4", 10), 1, 24);
+        await fs.setDoc(fs.doc(db, "planTemplates", planId), {
+          id: planId,
+          weeks,
+          name: { hu: planId, de: planId }, // ha külön nevet akarsz, bővítjük
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+        ok("Plan meta mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    async function loadTemplateWeek(){
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
+        if(!planId) return err("Plan ID üres.");
+        const ref = fs.doc(db, "planTemplates", planId, "weeks", String(weekNo));
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          $("#t_workouts").value = pretty([]);
+          $("#t_slots").value = pretty([]);
+          ok("Template week nincs → üres JSON.");
+          return;
+        }
+        const d = snap.data() || {};
+        $("#t_workouts").value = pretty(d.workouts ?? []);
+        $("#t_slots").value = pretty(d.slots ?? []);
+        ok("Template week betöltve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    async function saveTemplateWeek(){
+      try{
+        const planId = ($("#p_planId").value || "").trim();
+        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
+        if(!planId) return err("Plan ID üres.");
+
+        const workouts = parseJson($("#t_workouts").value, []);
+        const slots = parseJson($("#t_slots").value, []);
+        if(!Array.isArray(workouts)) throw new Error("Template workouts: JSON tömb kell.");
+        if(!Array.isArray(slots)) throw new Error("Template slots: JSON tömb kell.");
+
+        await fs.setDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
+          weekNo,
+          workouts,
+          slots,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        ok("Template week mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    $("#btnLoadPlanMeta").addEventListener("click", loadPlanMeta);
+    $("#btnSavePlanMeta").addEventListener("click", savePlanMeta);
+    $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
+    $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
+
+    // ---------- Overrides (user/week) ----------
+    async function loadOverride(){
+      try{
+        if(!SEL_UID) return;
+        const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
+        const ref = fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo));
+        const snap = await fs.getDoc(ref);
+        if(!snap.exists()){
+          $("#ov_workouts").value = pretty({});
+          $("#ov_slots").value = pretty({});
+          return;
+        }
+        const d = snap.data() || {};
+        $("#ov_workouts").value = pretty(d.workouts ?? {});
+        $("#ov_slots").value = pretty(d.slots ?? {});
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    $("#btnLoadOverride").addEventListener("click", async ()=>{ await loadOverride(); ok("Override betöltve"); });
+    $("#ov_week").addEventListener("change", loadOverride);
+
+    $("#btnSaveOverride").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
+
+        const workouts = parseJson($("#ov_workouts").value, {});
+        const slots = parseJson($("#ov_slots").value, {});
+        if(typeof workouts !== "object" || Array.isArray(workouts) || workouts === null) throw new Error("workouts override: JSON objektum kell.");
+        if(typeof slots !== "object" || Array.isArray(slots) || slots === null) throw new Error("slots override: JSON objektum kell.");
+
+        await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
+          weekNo,
+          workouts,
+          slots,
+          updatedAt: fs.serverTimestamp()
+        }, { merge:true });
+
+        ok("Override mentve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    $("#btnDeleteOverride").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
+        await fs.deleteDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)));
+        $("#ov_workouts").value = pretty({});
+        $("#ov_slots").value = pretty({});
+        ok("Override törölve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    // ---------- Auth gate ----------
     onAuth(async (user)=>{
       try{
         if(!user){
@@ -620,13 +896,14 @@
           return;
         }
 
-        ME = user;
         $("#whoami").textContent = `${user.email || "admin"} • uid=${user.uid}`;
         ok("Admin belépés OK");
 
         await loadUsersList();
         await pickUser(user.uid);
-        await loadDietDay();
+
+        // template meta auto
+        await loadPlanMeta();
 
       }catch(e){
         console.error(e);
