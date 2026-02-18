@@ -1,4 +1,4 @@
-// FILE: /hu/shared/firebase.js
+<!-- FILE: /hu/shared/firebase.js -->
 // Firebase v9 modular (CDN) — shared helpers
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
@@ -15,8 +15,7 @@ import {
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
 /**
- * Admin email(ek) — ide tedd be a saját admin email címedet!
- * (így akkor is admin maradsz, ha a role field még nem admin)
+ * Admin email(ek)
  */
 export const ADMIN_EMAILS = [
   "tuskepal@gmail.com",
@@ -132,16 +131,13 @@ export async function ensureUserDoc(uid, email){
       cycleStart: null,
       cycleEnd: null,
 
-      // ✅ ÚJ: prémium étrend struktúra (admin tölti)
       dietPlan: null,
-
-      // ✅ ÚJ: fix motiváció kártya (admin tölti)
       motivationCard: {
         title: "A rendszer szabadság.",
         text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
       },
 
-      // backward compat (ha régi)
+      // backward compat
       dietText: "",
       motivationText: "",
 
@@ -155,7 +151,6 @@ export async function ensureUserDoc(uid, email){
     if(email && data.email !== email){
       await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
     }
-    // ha régi doc, biztosítsuk az új mezőket
     if(!data.motivationCard){
       await setDoc(ref, {
         motivationCard: {
