@@ -1,4 +1,4 @@
-<!-- FILE: /hu/shared/firebase.js -->
+// FILE: /hu/shared/firebase.js
 // Firebase v9 modular (CDN) — shared helpers
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
@@ -86,7 +86,8 @@ export function daysBetween(aIso, bIso){
 // ---------- Navigation ----------
 export function toLogin(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
-  window.location.href = `${BASE_PREFIX}/${l}/login/`;
+  // ✅ JAVÍTVA: A login oldalad a gyökérben van, nem egy /login/ mappában!
+  window.location.href = `${BASE_PREFIX}/${l}/`;
 }
 export function toApp(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
