@@ -57,7 +57,6 @@
     }
     .nav a:hover::after, .nav a.is-active::after{ transform: scaleX(1); }
 
-    /* Buttons */
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.12);
@@ -71,7 +70,6 @@
     .pill.danger{ background: rgba(255,255,255,.15); color: #fff; }
     .menu-btn{ width: 40px; height: 40px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.10); display:none; align-items:center; justify-content:center; cursor:pointer; }
 
-    /* Layout */
     main{ padding-top: 64px; min-height: 100vh; }
     .page{ padding: 18px 0 64px; }
     .glass{
@@ -83,25 +81,21 @@
     .grid{ display:grid; grid-template-columns: 1.2fr .8fr; gap: 14px; align-items:start; }
     @media (max-width: 980px){ .grid{ grid-template-columns: 1fr; } .nav{ display:none; } .menu-btn{ display:inline-flex; } }
 
-    /* Typo & Meta */
     h2, h3{ margin:0 0 6px; font-family: ui-serif, Georgia, serif; letter-spacing: -.2px; }
     .sub{ margin:0 0 12px; color: var(--muted); line-height: 1.5; font-size: 13.5px; }
     .meta-row{ display:flex; flex-wrap:wrap; gap: 10px; margin-top: 10px; font-size: 12.8px; }
     .meta-pill{ display:inline-flex; align-items:center; gap:8px; padding: 8px 12px; border-radius: 999px; background: rgba(255,255,255,.05); border: 1px solid rgba(255,255,255,.08); }
 
-    /* Progress */
     .progress{ background: rgba(0,0,0,.4); border: 1px solid rgba(255,255,255,.08); border-radius: 999px; height: 12px; overflow:hidden; position:relative; }
     .progress > span{ display:block; height:100%; width: 0%; background: linear-gradient(90deg, rgba(255,79,216,.9), rgba(177,76,255,.9)); border-radius: 999px; transition: width .4s ease; }
     .progress.blue > span { background: linear-gradient(90deg, #4facfe, #00f2fe); }
     .progress.green > span { background: linear-gradient(90deg, #43e97b, #38f9d7); }
     .progress-label{ display:flex; justify-content: space-between; font-size: 12.5px; color: rgba(255,255,255,.6); margin: 10px 0 6px; font-weight: 600; }
 
-    /* Tabs */
     .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 14px; }
     .tab{ padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); color: rgba(255,255,255,.85); cursor:pointer; font-size: 13px; font-weight: 800; transition: all .2s; }
     .tab.is-active{ background: linear-gradient(135deg, var(--pink), var(--pink2)); color:#140813; border-color:transparent; box-shadow: 0 4px 12px rgba(255,79,216,.25); }
 
-    /* List & Cards */
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .row{ display:grid; grid-template-columns: 1fr auto; gap: 10px; align-items:center; padding: 12px; border-radius: 16px; background: rgba(0,0,0,.25); border: 1px solid rgba(255,255,255,.06); }
     .row .title{ font-weight: 800; font-size: 14px; }
@@ -110,11 +104,9 @@
     .tiny{ padding: 6px 10px; font-size: 12px; }
     .chip{ display:inline-flex; align-items:center; gap:8px; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.07); color: rgba(255,255,255,.8); font-weight: 800; font-size: 12px; }
     
-    /* Interactive Cards (Diet, Motivation) */
     .interactive{ transition: transform .2s, border-color .2s; }
     .interactive:hover{ transform: translateY(-3px); border-color: rgba(255,255,255,.16); }
 
-    /* Modals */
     .modal-overlay{ position: fixed; inset: 0; z-index: 80; background: rgba(0,0,0,.7); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 18px; }
     .modal-overlay.is-open{ display:flex; }
     .modal{ width: min(980px, 94vw); max-height: min(85vh, 760px); border-radius: 22px; overflow: hidden; position: relative; }
@@ -155,7 +147,7 @@
       <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap;">
         <div>
           <div class="chip" id="chipPackage">Csomag: —</div>
-          <h2 style="margin-top:10px;">Saját programom</h2>
+          <h2 style="margin-top:10px;" id="greetingHeader">Saját programom</h2>
           <p class="sub" id="subStatus">Betöltés…</p>
         </div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
@@ -244,7 +236,7 @@
 
     <section id="technika" class="glass card" style="margin-top:14px;">
       <h3>Technika Vault</h3>
-      <p class="sub">Hamarosan érkeznek a technika videók!</p>
+      <p class="sub">Oktató videók a gyakorlatok helyes kivitelezéséhez.</p>
       <ul class="list" id="techList"></ul>
     </section>
   </main>
@@ -299,6 +291,18 @@
     const infoOverlay = $("#infoOverlay");
     function openOverlay(ov){ ov.classList.add("is-open"); }
     function closeOverlay(ov){ ov.classList.remove("is-open"); }
+    
+    // 🔥 GLOBÁLIS VIDEO LEJÁTSZÓ 🔥
+    window.playVideo = (vid, title = "Lejátszás") => {
+      const src = vimeoEmbedSrc(vid);
+      if(!src) return;
+      openInfo(title, `
+        <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
+          <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
+        </div>
+      `);
+    }
+
     function openInfo(title, html){ $("#infoTitle").textContent = title; $("#infoBody").innerHTML = html; openOverlay(infoOverlay); }
 
     $("#settingsClose").addEventListener("click", ()=>closeOverlay(settingsOverlay));
@@ -341,6 +345,16 @@
       if(m2 && m2[1]) return `https://player.vimeo.com/video/${m2[1]}`;
       if(/^https?:\/\//i.test(v)) return v; 
       return "";
+    }
+
+    // 🔥 AI ÜDVÖZLÉS LOGIKA 🔥
+    function getAiGreeting(name) {
+      const hour = new Date().getHours();
+      const n = name ? `, ${name}` : "";
+      if (hour >= 5 && hour < 10) return `Jó reggelt${n}! Induljon jól a napod!`;
+      if (hour >= 10 && hour < 18) return `Szia${n}! Hogy érzed magad ma?`;
+      if (hour >= 18 && hour < 22) return `Szép estét${n}! Megvolt a mai edzés?`;
+      return `Szia${n}! Ne felejts el eleget pihenni!`;
     }
 
     function pickLang(obj, lang, fallback="—"){
@@ -420,6 +434,9 @@
       $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
+      
+      // 🔥 ÜDVÖZLÉS BEÁLLÍTÁSA 🔥
+      $("#greetingHeader").textContent = getAiGreeting(p.firstName);
 
       if(p.lifetimeAccess || !p.cycleStart || !p.cycleEnd){
         $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
@@ -465,11 +482,11 @@
 
       const dayPlan = profile?.dietPlan?.[weekKey]?.[state.selectedDay] || {};
       const meals = [
-        { label:"Reggeli", icon:"🍳", val: dayPlan.breakfast },
-        { label:"Tízórai", icon:"🍎", val: dayPlan.snack1 },
-        { label:"Ebéd", icon:"🥗", val: dayPlan.lunch },
-        { label:"Uzsonna", icon:"🥑", val: dayPlan.snack2 },
-        { label:"Vacsora", icon:"🍽️", val: dayPlan.dinner }
+        { label:"Reggeli", val: dayPlan.breakfast },
+        { label:"Tízórai", val: dayPlan.snack1 },
+        { label:"Ebéd", val: dayPlan.lunch },
+        { label:"Uzsonna", val: dayPlan.snack2 },
+        { label:"Vacsora", val: dayPlan.dinner }
       ];
 
       $("#dietDetails").innerHTML = meals.map(m => {
@@ -478,9 +495,8 @@
         if(!formattedVal) {
           return `
             <div class="glass interactive" style="padding:14px 16px; margin-bottom:12px; display:flex; gap:14px; align-items:center; opacity:0.4;">
-              <div style="width:46px; height:46px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">${m.icon}</div>
               <div>
-                <div style="font-size:12px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">${m.label}</div>
+                <div style="font-size:11px; font-weight:900; color:var(--muted); text-transform:uppercase; letter-spacing:1px;">${m.label}</div>
                 <div style="font-size:13px; color:var(--muted); margin-top:4px;">Nincs megadva erre a napra.</div>
               </div>
             </div>`;
@@ -488,13 +504,36 @@
 
         return `
           <div class="glass interactive" style="padding:16px; margin-bottom:12px; display:flex; gap:14px; align-items:flex-start;">
-            <div style="width:46px; height:46px; border-radius:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">${m.icon}</div>
             <div style="flex:1;">
-              <div style="font-size:12px; font-weight:900; color:var(--pink); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">${m.label}</div>
+              <div style="font-size:11px; font-weight:900; color:var(--pink); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">${m.label}</div>
               <div style="font-size:13.5px; color:rgba(255,255,255,.95); line-height:1.6;">${formattedVal}</div>
             </div>
           </div>`;
       }).join("");
+    }
+
+    // 🔥 TECHNIKA VAULT BETÖLTÉS 🔥
+    async function loadVault() {
+      const snap = await fs.getDoc(fs.doc(db, "settings", "vault"));
+      const videos = snap.data()?.videos || [];
+      const list = $("#techList");
+      list.innerHTML = "";
+      
+      if(videos.length === 0) {
+        list.innerHTML = `<li class="row"><div class="title">Hamarosan érkeznek a technika videók!</div></li>`;
+        return;
+      }
+
+      videos.forEach(v => {
+        const li = document.createElement("li");
+        li.className = "row interactive";
+        li.onclick = () => playVideo(v.vimeoId, v.title);
+        li.innerHTML = `
+          <div><div class="title">${escapeHtml(v.title)}</div></div>
+          <div class="actions"><button class="pill ghost tiny">Megnyitás</button></div>
+        `;
+        list.appendChild(li);
+      });
     }
 
     function renderMotivation(){
@@ -548,7 +587,6 @@
       ul.innerHTML = "";
       pack.merged.workouts.forEach(w=>{
         const key = `w${weekNo}_${w.id}`;
-        // Biztonságos ellenőrzés a hibás memória ellen!
         const done = !!(state.done && state.done[key]);
         ul.innerHTML += `
           <li class="row">
@@ -557,7 +595,7 @@
               <div class="desc">${escapeHtml(w._desc)}</div>
             </div>
             <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(w._embedSrc || "")}">▶</button>
+              <button class="pill ghost tiny" onclick="playVideo('${escapeHtml(w._rawVideo)}', '${escapeHtml(w._title)}')">▶</button>
               <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}">${done?'Visszavon':'Kész'}</button>
             </div>
           </li>`;
@@ -573,22 +611,9 @@
               <div class="desc">${escapeHtml(s._desc)}<br><span style="color:#aaa;">Jegyzet: ${escapeHtml(s._note)}</span></div>
             </div>
             <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(s._embedSrc || "")}">▶</button>
+              <button class="pill ghost tiny" onclick="playVideo('${escapeHtml(s._rawVideo)}', '${escapeHtml(s._title)}')">▶</button>
             </div>
           </li>`;
-      });
-
-      $$("[data-play]").forEach(b=>{
-        b.addEventListener("click", ()=>{
-          const src = b.getAttribute("data-play");
-          if(!src) return openInfo("Info", "Ehhez még nincs videó beállítva.");
-          
-          openInfo("Lejátszás", `
-            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
-              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
-            </div>
-          `);
-        });
       });
 
       $$("[data-toggle-done]").forEach(b=>{
@@ -638,13 +663,11 @@
       renderTrackers();
     });
 
-    // --- START ---
     onAuth(async (user)=>{
       try {
         if(!user) return toLogin("hu");
         UID = user.uid;
 
-        // 🔥 GOLYÓÁLLÓ MEMÓRIA BETÖLTÉS 🔥
         state.done = lsGet(UID, "done", {}) || {};
         state.checkin = lsGet(UID, "checkin", null);
         state.water = parseInt(lsGet(UID, "water", 0)) || 0;
@@ -657,6 +680,7 @@
         state.weekIdx = calcWeekIndex(profile);
 
         await ensureWeekLoaded(state.weekIdx + 1);
+        await loadVault(); // 🔥 VAULT BETÖLTÉS 🔥
 
         renderHeader();
         renderTrackers();
