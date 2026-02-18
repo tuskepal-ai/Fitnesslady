@@ -86,8 +86,7 @@ export function daysBetween(aIso, bIso){
 // ---------- Navigation ----------
 export function toLogin(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
-  // ✅ JAVÍTVA: A login oldalad a gyökérben van, nem egy /login/ mappában!
-  window.location.href = `${BASE_PREFIX}/${l}/`;
+  window.location.href = `${BASE_PREFIX}/${l}/login/`;
 }
 export function toApp(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
@@ -138,7 +137,6 @@ export async function ensureUserDoc(uid, email){
         text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
       },
 
-      // backward compat
       dietText: "",
       motivationText: "",
 
