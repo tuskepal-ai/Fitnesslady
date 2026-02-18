@@ -334,7 +334,40 @@
       { id:"thu", name:"Cs" }, { id:"fri", name:"Pé" }, { id:"sat", name:"Szo" }, { id:"sun", name:"Va" }
     ];
 
-    // Data Loaders
+    // --- ADATOLVASÓ (OKOS) FUNKCIÓK --- //
+
+    // 1. Videó link normalizáló
+    function vimeoEmbedSrc(raw){
+      const v = String(raw || "").trim();
+      if(!v) return "";
+      if(v.includes("player.vimeo.com/video/")) return v;
+      const m1 = v.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
+      if(m1 && m1[1]) return `https://player.vimeo.com/video/${m1[1]}`;
+      const m2 = v.match(/^(\d{6,})$/);
+      if(m2 && m2[1]) return `https://player.vimeo.com/video/${m2[1]}`;
+      if(/^https?:\/\//i.test(v)) return v; 
+      return "";
+    }
+
+    // 2. Többnyelvű olvasó (Adminból jövő objektumokhoz)
+    function pickLang(obj, lang, fallback="—"){
+      if(!obj) return fallback;
+      if(typeof obj === "string") return obj;
+      if(obj[lang]) return obj[lang];
+      if(obj["hu"]) return obj["hu"];
+      if(obj["de"]) return obj["de"];
+      return fallback;
+    }
+
+    // 3. Sortörés (Enter) támogató szövegformázó étrendhez és motivációhoz
+    function formatMultiline(s) {
+        const t = String(s ?? "").trim();
+        if (!t) return "";
+        return t.split("\n").map(line => escapeHtml(line.trim())).join("<br>");
+    }
+
+    // --- DATA LOADERS --- //
+
     async function loadUserProfile(uid){
       const snap = await fs.getDoc(fs.doc(db, "users", uid));
       return snap.exists() ? snap.data() : null;
@@ -352,19 +385,34 @@
       return snap.exists() ? snap.data() : null;
     }
 
-    function mergeWorkout(templateW, ovW){
+    function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
-      if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
-      w._title = ovW?.title || templateW?.title || "—";
-      w._desc = ovW?.desc || templateW?.desc || "";
+      const rawVideo = ovW?.vimeoId || ovW?.video || templateW?.vimeoId || templateW?.video || "";
+      w._rawVideo = String(rawVideo || "").trim();
+      w._embedSrc = vimeoEmbedSrc(w._rawVideo);
+
+      const tTitle = pickLang(templateW.title, lang, "");
+      const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
+      w._title = oTitle || tTitle || "—";
+
+      const tDesc = pickLang(templateW.desc, lang, "");
+      const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
+      w._desc = oDesc || tDesc || "";
+
       return w;
     }
-    function mergeSlot(templateS, ovS){
+
+    function mergeSlot(templateS, ovS, lang){
       const s = { ...templateS };
-      s.vimeoId = ovS?.vimeoId || templateS?.defaultVimeoId || "";
-      s._title = templateS?.title || "—";
-      s._desc = templateS?.desc || "";
-      s._note = ovS?.note || templateS?.defaultNote || "—";
+      const rawVideo = (ovS?.vimeoId || ovS?.video || templateS?.defaultVimeoId || "");
+      s._rawVideo = String(rawVideo || "").trim();
+      s._embedSrc = vimeoEmbedSrc(s._rawVideo);
+
+      s._title = pickLang(templateS.title, lang, "") || "—";
+      s._desc = pickLang(templateS.desc, lang, "") || "";
+      const tNote = pickLang(templateS.defaultNote, lang, "—");
+      const oNote = ovS?.note ? pickLang(ovS.note, lang, "") : "";
+      s._note = oNote || tNote || "—";
       return s;
     }
 
@@ -377,10 +425,11 @@
       return week - 1;
     }
 
-    // Renders
+    // --- RENDER FUNKCIÓK --- //
+
     function renderHeader(){
       const p = profile;
-      $("#chipPackage").textContent = `Csomag: ${planMeta?.name?.hu || p.planId || "—"}`;
+      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
       $("#pillGoal").textContent = `🎯 Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `⚡ Szint: ${p.level ? `${p.level}/4` : "—"}`;
 
@@ -409,13 +458,12 @@
       $("#barCheckin").style.width = `${done*100}%`;
     }
 
-    // 🔥 ÚJ PRÉMIUM ÉTREND RENDERER
     function renderDiet(){
       const weekKey = `w${state.weekIdx + 1}`;
       const dietDaysContainer = $("#dietDays");
       dietDaysContainer.innerHTML = "";
 
-      // Napi gombok
+      // Fülek rajzolása
       DAYS.forEach(d => {
         const btn = document.createElement("button");
         btn.className = "tab" + (state.selectedDay === d.id ? " is-active" : "");
@@ -427,6 +475,7 @@
         dietDaysContainer.appendChild(btn);
       });
 
+      // Adatok kinyerése
       const dayPlan = profile?.dietPlan?.[weekKey]?.[state.selectedDay] || {};
       const meals = [
         { label:"Reggeli", icon:"🍳", val: dayPlan.breakfast },
@@ -436,9 +485,11 @@
         { label:"Vacsora", icon:"🍽️", val: dayPlan.dinner }
       ];
 
-      // Gyönyörű Kártyák Generálása
+      // Kártyák HTML generálása sortöréssel
       $("#dietDetails").innerHTML = meals.map(m => {
-        if(!m.val) {
+        const formattedVal = formatMultiline(m.val);
+
+        if(!formattedVal) {
           return `
             <div class="glass interactive" style="padding:14px 16px; margin-bottom:12px; display:flex; gap:14px; align-items:center; opacity:0.4;">
               <div style="width:46px; height:46px; border-radius:16px; background:rgba(255,255,255,.05); border:1px solid rgba(255,255,255,.08); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">${m.icon}</div>
@@ -454,7 +505,7 @@
             <div style="width:46px; height:46px; border-radius:16px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.12); display:flex; align-items:center; justify-content:center; font-size:22px; flex-shrink:0;">${m.icon}</div>
             <div style="flex:1;">
               <div style="font-size:12px; font-weight:900; color:var(--pink); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px;">${m.label}</div>
-              <div style="font-size:13.5px; color:rgba(255,255,255,.95); line-height:1.6; white-space:pre-wrap;">${escapeHtml(m.val)}</div>
+              <div style="font-size:13.5px; color:rgba(255,255,255,.95); line-height:1.6;">${formattedVal}</div>
             </div>
           </div>`;
       }).join("");
@@ -462,8 +513,8 @@
 
     function renderMotivation(){
       const mc = profile?.motivationCard;
-      $("#motivationTitle").textContent = mc?.title || "A rendszer szabadság.";
-      $("#motivationBox").textContent = mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.";
+      $("#motivationTitle").innerHTML = escapeHtml(mc?.title || "A rendszer szabadság.");
+      $("#motivationBox").innerHTML = formatMultiline(mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.");
     }
 
     async function ensureWeekLoaded(weekNo){
@@ -478,8 +529,8 @@
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id])),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)]))
+        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
+        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
       };
       weekCache.set(weekNo, { merged });
       return weekCache.get(weekNo);
@@ -519,7 +570,7 @@
               <div class="desc">${escapeHtml(w._desc)}</div>
             </div>
             <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(w.vimeoId || "")}">▶</button>
+              <button class="pill ghost tiny" data-play="${escapeHtml(w._embedSrc || "")}">▶</button>
               <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}">${done?'Visszavon':'Kész'}</button>
             </div>
           </li>`;
@@ -535,17 +586,22 @@
               <div class="desc">${escapeHtml(s._desc)}<br><span style="color:#aaa;">Jegyzet: ${escapeHtml(s._note)}</span></div>
             </div>
             <div class="actions">
-              <button class="pill ghost tiny" data-play="${escapeHtml(s.vimeoId || "")}">▶</button>
+              <button class="pill ghost tiny" data-play="${escapeHtml(s._embedSrc || "")}">▶</button>
             </div>
           </li>`;
       });
 
+      // Lejátszó bekötése
       $$("[data-play]").forEach(b=>{
         b.addEventListener("click", ()=>{
-          const vId = b.getAttribute("data-play");
-          if(!vId) return openInfo("Info", "Ehhez még nincs videó beállítva.");
-          const src = `https://player.vimeo.com/video/${encodeURIComponent(vId)}`;
-          openInfo("Lejátszás", `<iframe src="${src}" width="100%" height="400" frameborder="0" allow="autoplay; fullscreen" allowfullscreen></iframe>`);
+          const src = b.getAttribute("data-play");
+          if(!src) return openInfo("Info", "Ehhez még nincs videó beállítva.");
+          
+          openInfo("Lejátszás", `
+            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
+              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
+            </div>
+          `);
         });
       });
 
@@ -559,10 +615,10 @@
       });
     }
 
-    // Actions
+    // --- ACTIONS --- //
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
-      toLogin("hu");
+      toLogin(state.lang || "hu");
     });
 
     $("#btnResetWeek").addEventListener("click", ()=>{
@@ -595,7 +651,7 @@
       renderTrackers();
     });
 
-    // Start
+    // --- START --- //
     onAuth(async (user)=>{
       if(!user) return toLogin("hu");
       UID = user.uid;
@@ -606,6 +662,8 @@
       state.sleep = lsGet(UID, "sleep", 0);
       
       profile = await loadUserProfile(UID) || {};
+      state.lang = profile.lang || "hu"; // Nyelv beállítása
+      
       planMeta = await loadPlanMeta(profile.planId || "start_v1");
       state.weekIdx = calcWeekIndex(profile);
 
