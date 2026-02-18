@@ -229,7 +229,7 @@
             <hr class="hr" />
 
             <h3>Plan template</h3>
-            <p class="sub">A csomag “alap” heti videói. Minden user megkapja, aki ezt a planId-t használja.</p>
+            <p class="sub">Itt a csomag “alap” heti videói. Ezt minden user megkapja, aki ezt a planId-t használja.</p>
 
             <div class="miniRow">
               <div class="field">
@@ -259,19 +259,19 @@
             </div>
 
             <div class="help">
-              <div><b>Fontos:</b> a videó mező legyen <span class="mono">vimeoId</span> (szám). Ha linket írsz, mentéskor kiszedjük belőle az ID-t.</div>
-              <div class="mono" style="margin-top:6px;">
-                workouts: [{"id":"w1","title":{"hu":"..."},"desc":{"hu":"..."},"vimeoId":"123","duration":"12p"}]
-              </div>
+              workouts: <span class="mono">[{ "id":"w1","title":{"hu":"..."},"desc":{"hu":"..."},"vimeoId":"(Vimeo ID vagy link)","duration":"12p" }]</span><br/>
+              slots: <span class="mono">[{ "slotIndex":1,"title":{"hu":"..."},"desc":{"hu":"..."},"defaultVimeoId":"(Vimeo ID vagy link)" }]</span>
+              <br/><br/>
+              <b>Fontos:</b> régi adat esetén a <span class="mono">video</span> mezőt is elfogadja a vevő app, de innen már <span class="mono">vimeoId</span>-t használj.
             </div>
 
             <div class="field">
               <label for="t_workouts">Template — workouts (JSON tömb)</label>
-              <textarea id="t_workouts" class="mono" placeholder='[{"id":"w1","title":{"hu":"Edzés 1"},"desc":{"hu":""},"vimeoId":"123","duration":"12p"}]'></textarea>
+              <textarea id="t_workouts" class="mono" placeholder='[{"id":"w1","title":{"hu":"Edzés 1"},"desc":{"hu":""},"vimeoId":"","duration":"12p"}]'></textarea>
             </div>
             <div class="field">
               <label for="t_slots">Template — slots (JSON tömb)</label>
-              <textarea id="t_slots" class="mono" placeholder='[{"slotIndex":1,"title":{"hu":"Extra 1"},"desc":{"hu":""},"defaultVimeoId":"123","defaultNote":{"hu":"—"}}]'></textarea>
+              <textarea id="t_slots" class="mono" placeholder='[{"slotIndex":1,"title":{"hu":"Extra 1"},"desc":{"hu":""},"defaultVimeoId":""}]'></textarea>
             </div>
 
             <div class="actions">
@@ -358,7 +358,7 @@
             <hr class="hr" />
 
             <h3>Étrend — 4 hét / napi</h3>
-            <p class="sub">Itt írod a napi étkezéseket. Az appban nap-kártyákkal választható.</p>
+            <p class="sub">Itt írod a napi étkezéseket. A vevő app prémium kártyákban mutatja.</p>
 
             <div class="miniRow">
               <div class="field">
@@ -384,11 +384,11 @@
               </div>
             </div>
 
-            <div class="field"><label for="d_breakfast">Reggeli</label><textarea id="d_breakfast"></textarea></div>
-            <div class="field"><label for="d_snack1">Tízórai</label><textarea id="d_snack1"></textarea></div>
-            <div class="field"><label for="d_lunch">Ebéd</label><textarea id="d_lunch"></textarea></div>
-            <div class="field"><label for="d_snack2">Uzsonna</label><textarea id="d_snack2"></textarea></div>
-            <div class="field"><label for="d_dinner">Vacsora</label><textarea id="d_dinner"></textarea></div>
+            <div class="field"><label for="d_breakfast">Reggeli</label><textarea id="d_breakfast" placeholder="pl. Zabkása gyümölccsel"></textarea></div>
+            <div class="field"><label for="d_snack1">Tízórai</label><textarea id="d_snack1" placeholder="pl. Natúr joghurt + pár szem dió"></textarea></div>
+            <div class="field"><label for="d_lunch">Ebéd</label><textarea id="d_lunch" placeholder="pl. Csirke + rizs + saláta"></textarea></div>
+            <div class="field"><label for="d_snack2">Uzsonna</label><textarea id="d_snack2" placeholder="pl. Gyümölcs / smoothie"></textarea></div>
+            <div class="field"><label for="d_dinner">Vacsora</label><textarea id="d_dinner" placeholder="pl. Tojásos saláta"></textarea></div>
 
             <div class="actions">
               <button class="pill ghost" id="btnLoadDietDay" type="button">↻ Betöltés (nap)</button>
@@ -399,7 +399,7 @@
             <hr class="hr" />
 
             <h3>Személyre szabott videók (Overrides)</h3>
-            <p class="sub">Userenként, hetenként felülírod / hozzáadsz videót + címet + leírást. Az appban azonnal látszik.</p>
+            <p class="sub">Userenként, hetenként felülírod / hozzáadsz videót + címet + leírást. Ez az appban azonnal látszik.</p>
 
             <div class="miniRow">
               <div class="field">
@@ -431,8 +431,8 @@
             <h3>Fix motiváció kártya</h3>
             <p class="sub">Mindig látszik a vevőnél.</p>
 
-            <div class="field"><label for="m_title">Cím</label><input id="m_title" type="text" /></div>
-            <div class="field"><label for="m_text">Szöveg</label><textarea id="m_text"></textarea></div>
+            <div class="field"><label for="m_title">Cím</label><input id="m_title" type="text" placeholder="pl. A rendszer szabadság." /></div>
+            <div class="field"><label for="m_text">Szöveg</label><textarea id="m_text" placeholder="pl. Nem kell tökéletesnek lenned..."></textarea></div>
 
             <div class="actions">
               <button class="pill primary" id="btnSaveMotivation" type="button">💾 Mentés (motiváció)</button>
@@ -483,7 +483,6 @@
 
     let SEL_UID = null;
 
-    // ---------- JSON helpers ----------
     function parseJson(text, fallback){
       const t = String(text || "").trim();
       if(!t) return fallback;
@@ -493,51 +492,16 @@
     }
     function pretty(v){ return JSON.stringify(v, null, 2); }
 
-    // ✅ Vimeo ID normalizálás (admin mentéskor)
-    function extractVimeoId(input){
-      const s = String(input ?? "").trim();
-      if(!s) return "";
-      if(/^\d+$/.test(s)) return s;
-      const m1 = s.match(/vimeo\.com\/(?:video\/)?(\d+)/i);
-      if(m1 && m1[1]) return m1[1];
-      return "";
-    }
-
+    // ✅ kompat: workouts elemekben ha video van, csinálunk vimeoId-t is
     function normalizeWorkoutsArray(arr){
-      return (arr || []).map(w=>{
-        const ww = { ...w };
-
-        // ha valaki "video" / "vimeoid" mezőt használ, átfordítjuk vimeoId-ra
-        const raw = ww.vimeoId ?? ww.vimeoid ?? ww.video ?? ww.url ?? "";
-        const id = extractVimeoId(raw) || String(raw||"").trim();
-
-        ww.vimeoId = id;
-        delete ww.vimeoid;
-        delete ww.video;
-        delete ww.url;
-
-        // kötelező id
-        ww.id = String(ww.id || "").trim() || ("w" + Math.random().toString(16).slice(2,6));
-        return ww;
+      if(!Array.isArray(arr)) return [];
+      return arr.map(w=>{
+        const o = { ...(w||{}) };
+        if(!o.vimeoId && o.video) o.vimeoId = o.video; // régi -> új
+        return o;
       });
     }
 
-    function normalizeSlotsArray(arr){
-      return (arr || []).map(s=>{
-        const ss = { ...s };
-        const raw = ss.defaultVimeoId ?? ss.defaultVimeoid ?? ss.video ?? ss.url ?? "";
-        const id = extractVimeoId(raw) || String(raw||"").trim();
-        ss.defaultVimeoId = id;
-        delete ss.defaultVimeoid;
-        delete ss.video;
-        delete ss.url;
-
-        ss.slotIndex = clamp(parseInt(ss.slotIndex ?? 1, 10), 1, 99);
-        return ss;
-      });
-    }
-
-    // ---------- Profile ----------
     function fillProfileForm(doc){
       $("#u_email").value = doc?.email || "";
       $("#u_role").value = (doc?.role === "admin") ? "admin" : "user";
@@ -558,7 +522,7 @@
     async function loadUsersList(){
       const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
       const col = fs.collection(db, "users");
-      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(120)));
+      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(80)));
 
       const items = snap.docs
         .map(d => ({ id:d.id, ...d.data() }))
@@ -665,7 +629,6 @@
       }
     });
 
-    // ---------- Diet (per day) ----------
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -741,7 +704,6 @@
       }
     });
 
-    // ---------- Motivation card ----------
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -760,7 +722,6 @@
       }
     });
 
-    // ---------- Template plan meta + weeks ----------
     async function loadPlanMeta(){
       const planId = ($("#p_planId").value || "").trim();
       if(!planId) return err("Plan ID üres.");
@@ -823,13 +784,12 @@
         const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
         if(!planId) return err("Plan ID üres.");
 
-        const workoutsRaw = parseJson($("#t_workouts").value, []);
-        const slotsRaw = parseJson($("#t_slots").value, []);
-        if(!Array.isArray(workoutsRaw)) throw new Error("Template workouts: JSON tömb kell.");
-        if(!Array.isArray(slotsRaw)) throw new Error("Template slots: JSON tömb kell.");
+        let workouts = parseJson($("#t_workouts").value, []);
+        let slots = parseJson($("#t_slots").value, []);
+        if(!Array.isArray(workouts)) throw new Error("Template workouts: JSON tömb kell.");
+        if(!Array.isArray(slots)) throw new Error("Template slots: JSON tömb kell.");
 
-        const workouts = normalizeWorkoutsArray(workoutsRaw);
-        const slots = normalizeSlotsArray(slotsRaw);
+        workouts = normalizeWorkoutsArray(workouts);
 
         await fs.setDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
           weekNo,
@@ -838,7 +798,7 @@
           updatedAt: fs.serverTimestamp()
         }, { merge:true });
 
-        ok("Template week mentve (vimeoId standard)");
+        ok("Template week mentve");
       }catch(e){
         console.error(e);
         err(e.message || String(e));
@@ -850,7 +810,6 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    // ---------- Overrides (user/week) ----------
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -884,26 +843,6 @@
         if(typeof workouts !== "object" || Array.isArray(workouts) || workouts === null) throw new Error("workouts override: JSON objektum kell.");
         if(typeof slots !== "object" || Array.isArray(slots) || slots === null) throw new Error("slots override: JSON objektum kell.");
 
-        // ha linket ír be valaki, itt is normalizáljuk
-        for(const k of Object.keys(workouts)){
-          const v = workouts[k] || {};
-          const raw = v.vimeoId ?? v.vimeoid ?? v.video ?? v.url ?? "";
-          const id = extractVimeoId(raw) || String(raw||"").trim();
-          workouts[k] = { ...v, vimeoId: id };
-          delete workouts[k].vimeoid;
-          delete workouts[k].video;
-          delete workouts[k].url;
-        }
-        for(const k of Object.keys(slots)){
-          const v = slots[k] || {};
-          const raw = v.vimeoId ?? v.vimeoid ?? v.video ?? v.url ?? "";
-          const id = extractVimeoId(raw) || String(raw||"").trim();
-          slots[k] = { ...v, vimeoId: id };
-          delete slots[k].vimeoid;
-          delete slots[k].video;
-          delete slots[k].url;
-        }
-
         await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
           weekNo,
           workouts,
@@ -932,7 +871,6 @@
       }
     });
 
-    // ---------- Auth gate ----------
     onAuth(async (user)=>{
       try{
         if(!user){
@@ -963,4 +901,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
