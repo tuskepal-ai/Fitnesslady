@@ -324,7 +324,6 @@
     .note{ color: rgba(255,255,255,.55); font-size: 12.6px; line-height: 1.55; }
     .noteStrong{ color: rgba(255,255,255,.86); font-size: 13.2px; line-height: 1.65; white-space: pre-wrap; }
 
-    /* ✅ prémium diet card */
     .dietGrid{
       display:grid;
       gap:10px;
@@ -354,7 +353,6 @@
       white-space: pre-wrap;
     }
 
-    /* ✅ fix motivation card */
     .motCard{
       margin-top:12px;
       padding: 14px;
@@ -542,7 +540,6 @@
     </div>
   </footer>
 
-  <!-- SETTINGS MODAL -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -574,7 +571,6 @@
     </div>
   </div>
 
-  <!-- INFO MODAL -->
   <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -753,21 +749,39 @@
       return fallback;
     }
 
+    // ✅ BACKWARD COMPAT VIDEO PICKER (vimeoId / vimeoid / video / url)
+    function pickVideoId(w){
+      const v =
+        (w?.vimeoId ?? "") ||
+        (w?.vimeoid ?? "") ||
+        (w?.video ?? "") ||
+        (w?.url ?? "");
+      return String(v || "").trim();
+    }
+
     function mergeWorkout(templateW, ovW, lang){
       const w = { ...templateW };
-      if(ovW?.vimeoId) w.vimeoId = ovW.vimeoId;
+
+      // ✅ normalize template video field into w.vimeoId
+      w.vimeoId = pickVideoId(templateW);
+
+      // override can replace
+      if(ovW?.vimeoId) w.vimeoId = String(ovW.vimeoId || "").trim();
+
       const tTitle = pickLang(templateW.title, lang, "");
       const oTitle = ovW?.title ? pickLang(ovW.title, lang, "") : "";
       w._title = oTitle || tTitle || "—";
+
       const tDesc = pickLang(templateW.desc, lang, "");
       const oDesc = ovW?.desc ? pickLang(ovW.desc, lang, "") : "";
       w._desc = oDesc || tDesc || "";
+
       return w;
     }
 
     function mergeSlot(templateS, ovS, lang){
       const s = { ...templateS };
-      s.vimeoId = (ovS?.vimeoId) ? ovS.vimeoId : (templateS.defaultVimeoId || "");
+      s.vimeoId = (ovS?.vimeoId) ? String(ovS.vimeoId || "").trim() : String(templateS.defaultVimeoId || "").trim();
       const tTitle = pickLang(templateS.title, lang, "");
       s._title = tTitle || "—";
       const tDesc = pickLang(templateS.desc, lang, "");
@@ -778,7 +792,6 @@
       return s;
     }
 
-    // ✅ pro formatter (nem számol, csak “szépít”)
     function proText(s){
       const t = String(s ?? "").trim();
       if(!t) return "";
@@ -790,7 +803,6 @@
     }
 
     function dayKeyFromDate(d=new Date()){
-      // JS: 0=Sun..6=Sat → mi: mon..sun
       const map = ["sun","mon","tue","wed","thu","fri","sat"];
       return map[d.getDay()];
     }
@@ -926,13 +938,17 @@
 
         const li = document.createElement("li");
         li.className = "row";
+
+        // ✅ guarantee final vimeo id
+        const vid = String(w.vimeoId || "").trim();
+
         li.innerHTML = `
           <div>
             <div class="title">${escapeHtml(w._title)} ${done ? ' <span class="chip" style="margin-left:6px;">✅ kész</span>' : ''}</div>
             <div class="desc">${escapeHtml(w._desc || "")}</div>
           </div>
           <div class="actions">
-            <button class="pill ghost tiny" data-play="${escapeHtml(w.vimeoId || "")}">▶ Lejátszás</button>
+            <button class="pill ghost tiny" data-play="${escapeHtml(vid)}">▶ Lejátszás</button>
             <button class="pill ${done ? 'danger' : 'primary'} tiny" data-toggle-done="${escapeHtml(key)}">${done ? 'Visszavon' : 'Kész'}</button>
           </div>
         `;
@@ -958,7 +974,7 @@
 
       $$("[data-play]").forEach(b=>{
         b.addEventListener("click", ()=>{
-          const vimeoId = b.getAttribute("data-play");
+          const vimeoId = String(b.getAttribute("data-play") || "").trim();
           if(!vimeoId){
             openInfo("Lejátszás", `<p class="note">Ehhez még nincs videó beállítva.</p>`);
             return;
@@ -1001,7 +1017,6 @@
       `;
     }
 
-    // ✅ ÚJ: prémium étrend render (admin írja)
     function getDietForToday(){
       const weekNo = state.weekIdx + 1;
       const dayKey = dayKeyFromDate(new Date());
@@ -1010,28 +1025,20 @@
 
       const dayObj = plan?.[wKey]?.[dayKey] || null;
 
-      // backward compat: ha nincs dietPlan, de van régi dietText
       if(!dayObj && String(profile?.dietText||"").trim()){
         return {
           weekNo,
           dayKey,
-          meals: {
-            lunch: proText(profile.dietText)
-          },
+          meals: { lunch: proText(profile.dietText) },
           note: ""
         };
       }
 
-      return {
-        weekNo,
-        dayKey,
-        meals: dayObj || null
-      };
+      return { weekNo, dayKey, meals: dayObj || null };
     }
 
     function renderDiet(){
       const { weekNo, dayKey, meals } = getDietForToday();
-
       $("#dietSub").textContent = `Hét ${weekNo} • ${dayLabelHu(dayKey)}`;
 
       const grid = $("#dietGrid");
@@ -1068,14 +1075,12 @@
         });
       }
 
-      // ✅ fix motivation card (admin írja)
       const mc = profile?.motivationCard || null;
       const title = proText(mc?.title || profile?.motivationText || "A rendszer szabadság.");
       const text  = proText(mc?.text  || profile?.motivationText || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.");
       $("#motTitle").textContent = title || "—";
       $("#motText").textContent = text || "—";
 
-      // steps toggle UI
       const btn = $("#btnSteps");
       btn.classList.toggle("primary", !!state.stepsDone);
       btn.classList.toggle("ghost", !state.stepsDone);
@@ -1172,7 +1177,6 @@
         profile = await loadUserProfile(UID);
         state.lang = (profile.lang === "de") ? "de" : "hu";
 
-        // home link
         const homeLink = document.getElementById("homeLink");
         if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
 
