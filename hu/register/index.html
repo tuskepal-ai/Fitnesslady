@@ -101,6 +101,7 @@
       user-select:none;
       margin-bottom: 10px;
       width: fit-content;
+      flex-wrap: wrap;
     }
 
     label{ display:block; margin: 10px 0 6px; color: rgba(255,255,255,.72); font-weight:800; }
@@ -156,7 +157,10 @@
     <div class="card">
       <div class="chip" id="chipPlan">Csomag: —</div>
       <h1>Regisztráció</h1>
-      <p class="sub">Hozz létre egy fiókot az e-mail címeddel és egy jelszóval. Sikeres regisztráció után automatikusan a Saját programodba visz.</p>
+      <p class="sub">
+        Hozz létre egy fiókot az e-mail címeddel és egy jelszóval.
+        Sikeres regisztráció után a fiókod <b>aktiválásra vár</b> (admin jóváhagyás).
+      </p>
 
       <label for="email">E-mail</label>
       <input id="email" type="email" autocomplete="email" placeholder="email@domain.com" />
@@ -169,7 +173,9 @@
         <a class="pill" id="btnLogin" href="/hu/login/">Már van fiókom</a>
       </div>
 
-      <div class="hint" id="hintBox">Tipp: ha már van fiókod ezzel az e-maillel, válaszd a “Már van fiókom” gombot.</div>
+      <div class="hint" id="hintBox">
+        Tipp: ha már van fiókod ezzel az e-maillel, válaszd a “Már van fiókom” gombot.
+      </div>
 
       <div class="msg" id="msgBox"></div>
     </div>
@@ -181,7 +187,10 @@
   </div>
 
   <script type="module">
-    import { BASE_PREFIX, auth, db, fs, escapeHtml } from "../shared/firebase.js";
+    import {
+      BASE_PREFIX, auth, db, fs, escapeHtml,
+      normalizePlanId, getQueryParam, upsertPurchaseFromStripe
+    } from "../shared/firebase.js";
 
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     document.getElementById("y").textContent = new Date().getFullYear();
@@ -201,20 +210,6 @@
       msg.textContent = text;
     }
 
-    function q(name){
-      const u = new URL(location.href);
-      return (u.searchParams.get(name) || "").trim();
-    }
-
-    function normalizePlan(p){
-      const v = String(p || "").trim();
-      if(!v) return "start_v1";
-      if(v === "start") return "start_v1";
-      if(v === "balance") return "balance_v1";
-      if(v === "pro" || v === "por") return "pro_v1";
-      return v;
-    }
-
     function planLabel(planId){
       const p = String(planId || "").toLowerCase();
       if(p.includes("balance")) return "Balance";
@@ -222,37 +217,22 @@
       return "Start";
     }
 
-    const planId = normalizePlan(q("plan"));
-    const orderId = q("order");
-    const preEmail = q("email");
+    // Stripe redirect params
+    const planId = normalizePlanId(getQueryParam("plan"));
+    const sid = getQueryParam("sid"); // Stripe Checkout Session ID (Payment Link redirectből)
+    const preEmail = getQueryParam("email");
 
-    $("#chipPlan").textContent = `Csomag: ${planLabel(planId)}`;
+    const chip = $("#chipPlan");
+    chip.textContent = `Csomag: ${planLabel(planId)}${sid ? " • Fizetés: OK ✅ (sid megvan)" : " • Fizetés: —"}`;
+
     if(preEmail) $("#email").value = preEmail;
 
-    async function loadOrderIfAny(){
-      if(!orderId) return null;
-      const snap = await fs.getDoc(fs.doc(db, "orders", orderId));
-      if(!snap.exists()) return null;
-      return snap.data() || null;
-    }
-
-    // ha van order, akkor e-mailt felvesszük belőle (ha nincs query)
-    try{
-      const od = await loadOrderIfAny();
-      if(od?.email && !preEmail){
-        $("#email").value = String(od.email || "");
-      }
-    }catch(e){
-      // nem blokkoljuk a regisztrációt
-      console.warn("order load failed:", e);
-    }
-
-    async function createUserProfile(uid, email, planId){
-      // admin a source of truth, de regisztrációkor létre kell hozni a user doc-ot
-      // (admin utána mindent tud állítani)
+    async function createUserProfile(uid, email, planId, sid){
       const payload = {
         email: String(email || "").trim().toLowerCase(),
         role: "user",
+
+        // fontos: a user doc legyen létrehozva
         status: "active",
         planId: String(planId || "start_v1").trim(),
         goal: "Formálás",
@@ -261,21 +241,21 @@
         lifetimeAccess: true,
         cycleStart: null,
         cycleEnd: null,
+
+        // payment flags (admin aktivál)
+        paid: !!sid,                 // van sid → fizetés történt (MVP jelzés)
+        activated: false,            // admin fogja true-ra állítani
+        payment: {
+          provider: sid ? "stripe" : "",
+          sid: sid || "",
+          status: sid ? "pending_activation" : "none"
+        },
+
         updatedAt: fs.serverTimestamp(),
         createdAt: fs.serverTimestamp()
       };
 
       await fs.setDoc(fs.doc(db, "users", uid), payload, { merge: true });
-    }
-
-    async function markOrderRegistered(orderId, uid, email){
-      if(!orderId) return;
-      await fs.setDoc(fs.doc(db, "orders", orderId), {
-        status: "registered",
-        registeredUid: uid,
-        email: String(email || "").trim().toLowerCase(),
-        updatedAt: fs.serverTimestamp()
-      }, { merge:true });
     }
 
     $("#btnCreate").addEventListener("click", async ()=>{
@@ -290,6 +270,11 @@
         showMsg("A jelszó legyen minimum 6 karakter.", "err");
         return;
       }
+      if(!sid){
+        // direkt nem tiltjuk, de jelezzük: így nem “fizetett” flow
+        showMsg("Figyelem: nem látok Stripe fizetés azonosítót (sid). Ha most fizettél, menj vissza és a Stripe sikeroldalról jöjj ide.", "err");
+        return;
+      }
 
       $("#btnCreate").disabled = true;
       showMsg("Regisztráció…");
@@ -298,11 +283,20 @@
         const { createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js");
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
-        await createUserProfile(cred.user.uid, email, planId);
-        await markOrderRegistered(orderId, cred.user.uid, email);
+        // 1) user doc + pending activation
+        await createUserProfile(cred.user.uid, email, planId, sid);
 
-        showMsg("Sikeres regisztráció ✅");
-        location.replace(`${BASE_PREFIX}/hu/app/`);
+        // 2) purchases/{sid} bejegyzés (admin ezt látja)
+        await upsertPurchaseFromStripe({
+          sid,
+          planId,
+          email,
+          uid: cred.user.uid
+        });
+
+        showMsg("Sikeres regisztráció ✅\nA fiókod aktiválásra vár. (Admin oldalon 1 kattintás).");
+        // aktiválás után login/app
+        location.replace(`${BASE_PREFIX}/hu/login/`);
       }catch(err){
         console.error(err);
         const code = String(err?.code || "");
