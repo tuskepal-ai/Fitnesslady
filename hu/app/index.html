@@ -546,8 +546,9 @@
       $("#motivationBox").innerHTML = formatMultiline(mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.");
     }
 
+    /* ✅ FIX #1: Üdvözlő kártya (admin: welcomeCard, régi: introCard) */
     function renderIntroCard(){
-      const ic = profile?.introCard || null;
+      const ic = profile?.welcomeCard || profile?.introCard || null;
       const title = String(ic?.title || "").trim();
       const text  = String(ic?.text || "").trim();
       const raw   = String(ic?.video || "").trim();
@@ -678,10 +679,14 @@
       });
     }
 
+    /* ✅ FIX #2: Technika Vault (admin: techVault.items, régi: techVault[]) */
     function renderTechVault(){
       const list = $("#techList");
       list.innerHTML = "";
-      const items = profile?.techVault || [];
+
+      const raw = profile?.techVault;
+      const items = Array.isArray(raw) ? raw : (raw?.items || []);
+
       if(!items.length){
         list.innerHTML = `
           <li class="row">
@@ -825,3 +830,4 @@
   </script>
 </body>
 </html>
+```0
