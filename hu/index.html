@@ -1,3 +1,4 @@
+<!-- FILE: /hu/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -712,7 +713,7 @@
       <div style="display:flex; align-items:center; gap:10px;">
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
 
-        <!-- ✅ JAVÍTÁS: data-route -> JS-ből kap helyes basePath-os href-et -->
+        <!-- Saját oldalam marad login -->
         <a class="btn interactive" data-route="/hu/login/" href="/hu/login/" style="padding:10px 14px;">Saját oldalam</a>
 
         <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
@@ -740,7 +741,6 @@
             <a class="btn primary interactive" href="#kapcsolat">Ingyenes konzultáció</a>
             <a class="btn interactive" href="#csomagok">Csomagok</a>
 
-            <!-- ✅ JAVÍTÁS -->
             <a class="btn interactive" data-route="/hu/login/" href="/hu/login/">Saját oldalam</a>
 
             <a class="btn ghost interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
@@ -826,7 +826,8 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> 1× kontroll / módosítás</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" data-route="/hu/login/" href="/hu/login/" aria-label="Vásárlás (belépés)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> ORDER (regisztrációs flow) -->
+            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=start_v1" href="/hu/order/?plan=start_v1" aria-label="Jelentkezés (Start)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -843,7 +844,8 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> Heti követés / finomhangolás</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" data-route="/hu/login/" href="/hu/login/" aria-label="Vásárlás (belépés)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> ORDER -->
+            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=balance_v1" href="/hu/order/?plan=balance_v1" aria-label="Jelentkezés (Balance)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -860,7 +862,8 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" data-route="/hu/login/" href="/hu/login/" aria-label="Vásárlás (belépés)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> ORDER -->
+            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=pro_v1" href="/hu/order/?plan=pro_v1" aria-label="Jelentkezés (Pro)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -990,7 +993,6 @@ Edina • Fitnesz Lady
       </div>
 
       <div class="modal-body" id="afszModalBody">
-        <!-- (tartalom változatlan) -->
         <p><b>Hatályos:</b> 2026-02-10</p>
         <p><b>Weboldal / Márka:</b> FitnessLady</p>
         <p><b>Szolgáltató:</b> Tüske Farkas Edina (FitnessLady)</p>
