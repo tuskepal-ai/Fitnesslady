@@ -144,13 +144,6 @@
 
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
-    .help{
-      color: rgba(255,255,255,.62);
-      font-size: 12.8px;
-      line-height: 1.55;
-      margin-top: 8px;
-    }
-
     .toast{
       position: fixed;
       right: 14px;
@@ -214,6 +207,23 @@
 
         <div class="row">
           <div class="box">
+            <!-- ✅ NEW: PAYMENTS / PURCHASES -->
+            <h3>Payments (Stripe)</h3>
+            <p class="sub">Fizetés után a vevő a /hu/register/ oldalon regisztrál → létrejön a <span class="mono">purchases/{sid}</span>. Itt 1 kattintással aktiválod a kiválasztott userre.</p>
+
+            <div class="actions">
+              <button class="pill ghost" id="btnRefreshPurchases" type="button">↻ Payments frissítés</button>
+              <button class="pill primary" id="btnActivateFromPurchase" type="button">✅ Aktiválás (kiválasztott userre)</button>
+            </div>
+
+            <div class="sub" style="margin-top:10px;">Kiválasztott purchase:</div>
+            <div class="pill ghost mono" id="selPurchase">—</div>
+
+            <div class="sub" style="margin-top:10px;">Legutóbbi fizetések:</div>
+            <ul class="list" id="purchasesList"></ul>
+
+            <hr class="hr" />
+
             <div class="field">
               <label for="userSearch">Keresés (email)</label>
               <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
@@ -287,7 +297,6 @@
               <input id="u_email" type="text" placeholder="—" />
             </div>
 
-            <!-- ✅ FIX: NÉV mező -->
             <div class="field">
               <label for="u_name">Név</label>
               <input id="u_name" type="text" placeholder="pl. Anna" />
@@ -330,7 +339,6 @@
               <input id="u_goal" type="text" placeholder="pl. Formálás" />
             </div>
 
-            <!-- ✅ FEJLESZTÉS: planId legördülő + egyedi -->
             <div class="miniRow">
               <div class="field">
                 <label for="u_planIdSelect">Kiosztott Csomag</label>
@@ -372,9 +380,8 @@
 
             <hr class="hr" />
 
-            <!-- ✅ FIX: ÜDVÖZLŐ KÁRTYA + VIDEÓ (külön, nem az overrides-ben) -->
             <h3>Üdvözlő kártya (Személyes üzenet + videó)</h3>
-            <p class="sub">Ez külön kártyán jelenik meg a vevő appban. Nem a „Személyre szabott videók” résznél.</p>
+            <p class="sub">Ez külön kártyán jelenik meg a vevő appban.</p>
 
             <div class="field"><label for="w_title">Cím</label><input id="w_title" type="text" placeholder="pl. Szia! Kezdjük el együtt." /></div>
             <div class="field"><label for="w_text">Szöveg</label><textarea id="w_text" placeholder="pl. Örülök, hogy itt vagy..."></textarea></div>
@@ -496,7 +503,6 @@
 
             <hr class="hr" />
 
-            <!-- ✅ FIX: TECHNIKA VAULT ADMIN -->
             <h3>Technika Vault (Admin anyagok)</h3>
             <p class="sub">Itt mented a technikai anyagokat. A vevő appban „Technika Vault” kártyában jelenik meg.</p>
 
@@ -547,7 +553,8 @@
       auth, db, fs,
       onAuth, logout, toLogin, toApp,
       escapeHtml, safeJsonParse, clamp,
-      ensureUserDoc, getUserRole, isAdminEmail
+      ensureUserDoc, getUserRole, isAdminEmail,
+      listRecentPurchases, activateUserFromPurchase
     } from "../shared/firebase.js";
 
     const $ = (s, r=document) => r.querySelector(s);
@@ -568,8 +575,9 @@
     $("#y").textContent = new Date().getFullYear();
 
     let SEL_UID = null;
+    let SEL_SID = null;
 
-    // 🔥 Dinamikusan rajzoljuk ki az 5 db fix edzés dobozt, hogy szép legyen a kód
+    // 🔥 Dinamikusan rajzoljuk ki az 5 db fix edzés dobozt
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -599,7 +607,6 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
-    // Segédfüggvény a többnyelvű szövegek kiolvasására
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
@@ -608,7 +615,7 @@
 
     const trimStr = (v) => String(v ?? "").trim();
 
-    // ✅ FEJLESZTÉS: planId select + custom logika
+    // ✅ planId select + custom logika
     const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
@@ -678,14 +685,13 @@
 
     function fillProfileForm(doc){
       $("#u_email").value = doc?.email || "";
-      $("#u_name").value = doc?.name || ""; // ✅ név
+      $("#u_name").value = doc?.name || "";
       $("#u_role").value = (doc?.role === "admin") ? "admin" : "user";
       $("#u_status").value = doc?.status || "active";
       $("#u_lang").value = (doc?.lang === "de") ? "de" : "hu";
       $("#u_level").value = clamp(parseInt(doc?.level ?? 2, 10) || 2, 1, 4);
       $("#u_goal").value = doc?.goal || "";
 
-      // ✅ planId UI
       setPlanUI(doc?.planId || "start_v1");
 
       $("#u_lifetime").value = String(!!doc?.lifetimeAccess);
@@ -696,10 +702,81 @@
       $("#m_title").value = mc?.title || "";
       $("#m_text").value = mc?.text || "";
 
-      // ✅ welcome + tech vault
       fillWelcomeForm(doc);
       fillTechVaultForm(doc);
     }
+
+    // ✅ PAYMENTS UI
+    function setSelectedPurchase(p){
+      SEL_SID = p?.sid || p?.id || null;
+      const line = SEL_SID
+        ? `sid=${SEL_SID} • ${p?.planId || "—"} • ${p?.email || "—"} • status=${p?.status || "—"}`
+        : "—";
+      $("#selPurchase").textContent = line;
+    }
+
+    async function loadPurchases(){
+      try{
+        const items = await listRecentPurchases(50);
+        const ul = $("#purchasesList");
+        ul.innerHTML = "";
+
+        const filtered = items.filter(p => (p.status || "") !== "activated");
+        if(filtered.length === 0){
+          ul.innerHTML = `<li class="li"><div><div class="title">Nincs új fizetés</div><div class="desc">A “pending_activation” rekordok itt jelennek meg.</div></div></li>`;
+          setSelectedPurchase(null);
+          return;
+        }
+
+        filtered.forEach(p=>{
+          const li = document.createElement("li");
+          li.className = "li";
+          li.innerHTML = `
+            <div>
+              <div class="title">${escapeHtml(p.planId || "—")} • ${escapeHtml(p.email || "—")}</div>
+              <div class="desc">sid: <span class="mono">${escapeHtml(p.sid || p.id)}</span> • status: <b>${escapeHtml(p.status || "—")}</b> • uid: <span class="mono">${escapeHtml(p.uid || "—")}</span></div>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+              <button class="pill ghost" data-pick-purchase="${escapeHtml(p.sid || p.id)}" type="button">Kiválaszt</button>
+            </div>
+          `;
+          ul.appendChild(li);
+        });
+
+        $$("[data-pick-purchase]").forEach(b=>{
+          b.addEventListener("click", ()=>{
+            const sid = b.getAttribute("data-pick-purchase");
+            const p = filtered.find(x => (x.sid || x.id) === sid) || null;
+            setSelectedPurchase(p);
+            ok("Purchase kiválasztva");
+          });
+        });
+
+        // auto select first if none
+        if(!SEL_SID){
+          setSelectedPurchase(filtered[0]);
+        }
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    $("#btnRefreshPurchases").addEventListener("click", loadPurchases);
+
+    $("#btnActivateFromPurchase").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+        if(!SEL_SID) return err("Nincs purchase kiválasztva.");
+        const r = await activateUserFromPurchase({ uid: SEL_UID, sid: SEL_SID });
+        ok(`Aktiválva: ${r.planId}`);
+        await loadPurchases();
+        await loadUsersList();
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
 
     async function loadUsersList(){
       const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
@@ -722,12 +799,13 @@
         const displayName = (u.name || "").trim();
         const titleLine = displayName ? `${displayName} — ${u.email || u.id}` : (u.email || u.id);
 
+        const pay = (u.activated ? "✅ activated" : (u.paid ? "🟡 paid" : "—"));
         const li = document.createElement("li");
         li.className = "li";
         li.innerHTML = `
           <div>
             <div class="title">${escapeHtml(titleLine)}</div>
-            <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId||"—")}</span></div>
+            <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId||"—")}</span> • pay: <b>${escapeHtml(pay)}</b></div>
           </div>
           <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
             <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
@@ -753,7 +831,7 @@
       if(!snap.exists()){
         await fs.setDoc(ref, {
           email: "",
-          name: "", // ✅
+          name: "",
           role: "user",
           status: "active",
           planId: "start_v1",
@@ -765,8 +843,13 @@
           cycleEnd: null,
           dietPlan: {},
           motivationCard: { title:"A rendszer szabadság.", text:"Nem kell tökéletesnek lenned." },
-          welcomeCard: { title:"Szia! Kezdjük el.", text:"Örülök, hogy itt vagy.", video:"" }, // ✅ default
-          techVault: { items: [] }, // ✅ default
+          welcomeCard: { title:"Szia! Kezdjük el.", text:"Örülök, hogy itt vagy.", video:"" },
+          techVault: { items: [] },
+
+          paid: false,
+          activated: false,
+          payment: { provider:"", sid:"", status:"none" },
+
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         }, { merge:true });
@@ -795,16 +878,13 @@
         if(!SEL_UID) return err("Nincs user kiválasztva.");
         const payload = {
           email: trimStr($("#u_email").value),
-          name: trimStr($("#u_name").value), // ✅
+          name: trimStr($("#u_name").value),
           role: ($("#u_role").value === "admin") ? "admin" : "user",
           status: trimStr($("#u_status").value || "active"),
           lang: ($("#u_lang").value === "de") ? "de" : "hu",
           level: clamp(parseInt($("#u_level").value || "2", 10), 1, 4),
           goal: trimStr($("#u_goal").value),
-
-          // ✅ planId mentése selectből
           planId: getPlanIdFromUI(),
-
           lifetimeAccess: ($("#u_lifetime").value === "true"),
           cycleStart: trimStr($("#u_cycleStart").value) || null,
           cycleEnd: trimStr($("#u_cycleEnd").value) || null,
@@ -816,7 +896,6 @@
       }catch(e){ console.error(e); err(e.message || String(e)); }
     });
 
-    // ✅ ÜDVÖZLŐ mentés
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -942,7 +1021,6 @@
       ok("Hét mezők ürítve");
     });
 
-    // 🔥 TEMPLATE HÉT BETÖLTŐ
     async function loadTemplateWeek(){
       try{
         const planId = trimStr($("#p_planId").value);
@@ -958,12 +1036,9 @@
         }
 
         const d = snap.data() || {};
-
-        // Slotok betöltése
         const sc = Array.isArray(d.slots) ? d.slots.length : 0;
         $("#t_slots_count").value = clamp(sc, 0, 3).toString();
 
-        // Fix edzések betöltése
         const wArr = Array.isArray(d.workouts) ? d.workouts : [];
         wArr.forEach((w, idx) => {
           const i = idx + 1;
@@ -978,14 +1053,12 @@
       }catch(e){ err(e.message || String(e)); }
     }
 
-    // 🔥 TEMPLATE HÉT MENTŐ
     async function saveTemplateWeek(){
       try{
         const planId = trimStr($("#p_planId").value);
         const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
         if(!planId) return err("Csomag neve üres.");
 
-        // Fix edzések összerakása
         const workouts = [];
         for(let i=1; i<=5; i++){
           const title = trimStr($(`#t_w${i}_title`).value);
@@ -993,7 +1066,6 @@
           const vid = trimStr($(`#t_w${i}_vid`).value);
           const dur = trimStr($(`#t_w${i}_dur`).value);
 
-          // csak akkor mentjük, ha van title vagy video
           if(title || vid){
             workouts.push({
               id: `w${i}`,
@@ -1005,7 +1077,6 @@
           }
         }
 
-        // Slotok
         const slotCount = clamp(parseInt($("#t_slots_count").value || "3", 10), 0, 3);
         const slots = [];
         for(let i=1; i<=slotCount; i++){
@@ -1031,7 +1102,7 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    // --- OVERRIDES (SZEMÉLYRE SZABOTT VIDEÓK) ---
+    // --- OVERRIDES ---
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -1111,14 +1182,12 @@
         const a2 = { title: trimStr($("#tv2_title").value), video: trimStr($("#tv2_video").value), text: String($("#tv2_text").value || "") };
         const a3 = { title: trimStr($("#tv3_title").value), video: trimStr($("#tv3_video").value), text: String($("#tv3_text").value || "") };
 
-        // csak akkor vesszük fel, ha van cím vagy szöveg vagy videó
         [a1,a2,a3].forEach(x=>{
           if(x.title || x.video || trimStr(x.text)) items.push(x);
         });
 
         const payload = {
           techVault: { items, updatedAt: new Date().toISOString() },
-          // kompatibilitás, ha az app ezt nézi:
           techniqueVault: { items, updatedAt: new Date().toISOString() },
           updatedAt: fs.serverTimestamp()
         };
@@ -1138,6 +1207,7 @@
         $("#whoami").textContent = `${user.email || "admin"} • uid=${user.uid}`;
         ok("Admin belépés OK");
 
+        await loadPurchases();
         await loadUsersList();
         await pickUser(user.uid);
         await loadPlanMeta();
