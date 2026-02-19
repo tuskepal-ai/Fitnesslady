@@ -12,44 +12,46 @@
       --bg:#07060b;
       --text:rgba(255,255,255,.92);
       --muted:rgba(255,255,255,.70);
+      --muted2:rgba(255,255,255,.55);
       --pink:#ff4fd8;
       --pink2:#b14cff;
+      --gold:#ffd38a;
+
       --stroke: rgba(255,255,255,.10);
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --radius:22px;
       --max: 980px;
-      --hero-url: none;
     }
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
+    /* ✅ App háttér (ugyanaz, mint /hu/app/index.html) */
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
-        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        var(--bg);
       color:var(--text);
       overflow-x:hidden;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,79,216,.10), transparent 60%),
+        radial-gradient(1000px 700px at 85% 25%, rgba(177,76,255,.10), transparent 62%),
+        radial-gradient(900px 520px at 55% 90%, rgba(255,211,138,.07), transparent 55%),
+        var(--bg);
+      background-attachment: fixed;
     }
-    body::before{
-      content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image: var(--hero-url);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity:.92;
-    }
+
     .container{ width:min(var(--max), 92vw); margin:0 auto; padding: 18px 0 44px; }
     .top{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding: 14px 0;
     }
     .brand{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
-    .dot{ width:10px;height:10px;border-radius:999px; background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink)); box-shadow: 0 0 18px rgba(255,79,216,.7); }
+    .dot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.7);
+    }
+
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 10px 14px;
@@ -61,13 +63,17 @@
       cursor:pointer;
       user-select:none;
       white-space: nowrap;
+      gap:8px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); background: rgba(255,255,255,.07); }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
       border-color: rgba(255,255,255,.18);
       font-weight: 900;
     }
+
     .card{
       margin-top: 10px;
       background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
@@ -78,6 +84,7 @@
       -webkit-backdrop-filter: blur(16px);
       padding: 16px;
     }
+
     h1{
       margin: 0 0 8px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
@@ -85,6 +92,7 @@
       font-size: 40px;
     }
     .sub{ margin:0 0 14px; color: var(--muted); line-height:1.6; }
+
     label{ display:block; margin: 10px 0 6px; color: rgba(255,255,255,.72); font-weight:800; }
     input{
       width:100%;
@@ -96,7 +104,19 @@
       outline: none;
       font-size: 15px;
     }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
+    input:focus{
+      border-color: rgba(255,79,216,.35);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+
+    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; align-items:center; }
+    .hint{
+      color: rgba(255,255,255,.58);
+      font-size: 12.8px;
+      line-height: 1.45;
+      margin-top: 10px;
+    }
+
     .msg{
       margin-top: 12px;
       padding: 12px 14px;
@@ -108,11 +128,17 @@
     }
     .msg.ok{ border-color: rgba(130,255,200,.35); }
     .msg.err{ border-color: rgba(255,120,140,.35); }
+
     footer{
       margin-top: 16px;
       padding: 14px 0 0;
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color: rgba(255,255,255,.70);
+      font-size: 13px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .pill{ transition:none; }
     }
   </style>
 </head>
@@ -121,7 +147,7 @@
   <div class="container">
     <div class="top">
       <div class="brand"><span class="dot"></span><span>FitnessLady Login</span></div>
-      <a class="pill" id="btnBack" href="/hu/">← Vissza</a>
+      <a class="pill" id="btnBack" href="#">← Vissza</a>
     </div>
 
     <div class="card">
@@ -138,6 +164,10 @@
         <button class="pill primary" id="btnLogin" type="button">Belépés</button>
       </div>
 
+      <div class="hint">
+        Ha vásárlóként regisztrációs linket kaptál, azon keresztül hozz létre jelszót — utána itt tudsz belépni.
+      </div>
+
       <div class="msg" id="msgBox"></div>
     </div>
 
@@ -148,9 +178,15 @@
   </div>
 
   <script type="module">
-    import { BASE_PREFIX, auth, db, fs, onAuth, toLogin, escapeHtml } from "../shared/firebase.js";
+    import {
+      BASE_PREFIX, auth, db, fs,
+      onAuth, toApp, toAdmin,
+      escapeHtml, loginEmailPassword,
+      ensureUserDoc, getUserRole, isAdminEmail
+    } from "../shared/firebase.js";
 
-    document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
+    // Back link + footer year
+    document.getElementById("btnBack").href = `${BASE_PREFIX}/hu/`;
     document.getElementById("y").textContent = new Date().getFullYear();
 
     const $ = (s) => document.querySelector(s);
@@ -163,49 +199,51 @@
     }
 
     async function routeAfterLogin(user){
-      // role alapján döntünk
       try{
-        const ref = fs.doc(db, "users", user.uid);
-        const snap = await fs.getDoc(ref);
-        const data = snap.exists() ? snap.data() : null;
-        const role = data?.role || "user";
-        if(role === "admin"){
-          location.replace("/hu/admin/");
+        // biztosítsuk a user doc-ot, majd role check
+        const ud = await ensureUserDoc(user.uid, user.email || "");
+        const role = (await getUserRole(user.uid)) || ud?.role || "user";
+
+        if(String(role).toLowerCase() === "admin" || isAdminEmail(user.email || "")){
+          toAdmin("hu");
         }else{
-          location.replace("/hu/app/");
+          toApp("hu");
         }
       }catch(e){
-        // ha role lekérés hiba, akkor user app fallback
-        location.replace("/hu/app/");
+        // fallback: app
+        toApp("hu");
       }
     }
 
-    $("#btnLogin").addEventListener("click", async ()=>{
+    async function doLogin(){
       const email = ($("#email").value || "").trim();
       const pass = ($("#pass").value || "").trim();
+
       if(!email || !pass){
         showMsg("Add meg az e-mailt és a jelszót.", "err");
         return;
       }
 
-      $("#btnLogin").disabled = true;
+      const btn = $("#btnLogin");
+      btn.disabled = true;
       showMsg("Beléptetés…");
 
       try{
-        // Firebase Auth modular: shared/firebase.js-ben az auth és fs már be van állítva.
-        // A fs itt a Firestore namespace, a signIn az auth namespace-ben van.
-        // Biztos megoldás: importáljuk közvetlenül a firebase/auth signIn-t a shared-ből:
-        // -> de nálad a shared fájl már kezeli a login-t a HU oldalon, ezért itt a legegyszerűbb:
-        const { signInWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js");
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-
+        const cred = await loginEmailPassword(email, pass);
         showMsg("Sikeres belépés ✅");
         await routeAfterLogin(cred.user);
       }catch(err){
         console.error(err);
         showMsg(`Hiba: ${escapeHtml(err?.message || String(err))}`, "err");
-        $("#btnLogin").disabled = false;
+        btn.disabled = false;
       }
+    }
+
+    $("#btnLogin").addEventListener("click", doLogin);
+
+    // Enter = belépés
+    $("#pass").addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") doLogin();
     });
 
     // ha már be van lépve, ne a loginon álljon
@@ -217,3 +255,4 @@
   </script>
 </body>
 </html>
+```0
