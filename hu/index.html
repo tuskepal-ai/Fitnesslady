@@ -826,8 +826,12 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> 1× kontroll / módosítás</li>
           </ul>
           <div class="pkg-actions">
-            <!-- ✅ VÁSÁRLÁS -> ORDER (regisztrációs flow) -->
-            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=start_v1" href="/hu/order/?plan=start_v1" aria-label="Jelentkezés (Start)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> STRIPE PAYMENT LINK -->
+            <a class="btn buy-btn interactive"
+               href="https://buy.stripe.com/test_dRm9ATenPf0d21r21m0RG02"
+               target="_blank"
+               rel="noopener"
+               aria-label="Fizetés (Start)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -844,8 +848,12 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> Heti követés / finomhangolás</li>
           </ul>
           <div class="pkg-actions">
-            <!-- ✅ VÁSÁRLÁS -> ORDER -->
-            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=balance_v1" href="/hu/order/?plan=balance_v1" aria-label="Jelentkezés (Balance)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> STRIPE PAYMENT LINK -->
+            <a class="btn buy-btn interactive"
+               href="https://buy.stripe.com/test_5kQ3cv2F7dW9aRX49u0RG01"
+               target="_blank"
+               rel="noopener"
+               aria-label="Fizetés (Balance)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -862,8 +870,12 @@ Edina • Fitnesz Lady
             <li><span class="check"></span> Gyakoribb kontroll + ütemezés</li>
           </ul>
           <div class="pkg-actions">
-            <!-- ✅ VÁSÁRLÁS -> ORDER -->
-            <a class="btn buy-btn interactive" data-route="/hu/order/?plan=pro_v1" href="/hu/order/?plan=pro_v1" aria-label="Jelentkezés (Pro)">Vásárlás</a>
+            <!-- ✅ VÁSÁRLÁS -> STRIPE PAYMENT LINK -->
+            <a class="btn buy-btn interactive"
+               href="https://buy.stripe.com/test_14AdR993v7xL3pv6hC0RG03"
+               target="_blank"
+               rel="noopener"
+               aria-label="Fizetés (Pro)">Vásárlás</a>
             <a class="btn info-btn interactive" href="#kapcsolat">Érdekel</a>
           </div>
         </article>
@@ -1034,7 +1046,7 @@ Edina • Fitnesz Lady
         document.documentElement.style.setProperty("--hero-url", `url("${base}/hero.png")`);
       }
 
-      // data-route linkek basePath-osítása
+      // data-route linkek basePath-osítása (csak belső route-okra)
       document.querySelectorAll("[data-route]").forEach(a=>{
         const route = a.getAttribute("data-route");
         if(!route) return;
