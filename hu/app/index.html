@@ -17,12 +17,11 @@
     .meal-card{ padding:16px; background:rgba(0,0,0,0.2); border-radius:18px; border:1px solid rgba(255,255,255,0.05); margin-bottom:12px; }
     .label{ font-size:11px; font-weight:900; color:var(--pink); text-transform:uppercase; letter-spacing:1px; margin-bottom:6px; }
     .list{ margin:0; padding:0; list-style:none; }
-    .row{ display:grid; grid-template-columns: 1fr auto; gap:10px; align-items:center; padding:12px; border-radius:16px; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,0.06); margin-bottom:10px; }
+    .row{ display:grid; grid-template-columns:1fr auto; gap:10px; align-items:center; padding:12px; border-radius:16px; background:rgba(0,0,0,.25); border:1px solid rgba(255,255,255,0.06); margin-bottom:10px; }
     .row .title{ font-weight:800; font-size:14px; }
-    .row .desc{ color:rgba(255,255,255,.65); font-size:12.5px; margin-top:4px; }
     .pill{ padding:8px 14px; border-radius:999px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.1); color:#fff; cursor:pointer; font-size:12px; font-weight:800; }
     .pill.primary{ background:linear-gradient(135deg, var(--pink), var(--pink2)); color:#140813; border:none; }
-    .pill.danger{ background:rgba(255,255,255,0.15); }
+    .pill.ghost{ background:rgba(255,255,255,0.06); }
     .tabs{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:15px; }
     .progress{ background:rgba(0,0,0,.4); border-radius:999px; height:10px; overflow:hidden; margin:5px 0; }
     .progress span{ display:block; height:100%; background:var(--pink); width:0; transition:width 0.3s; }
@@ -51,45 +50,40 @@
         <div class="tabs" id="dietDays"></div>
         <div id="dietDetails"></div>
         <hr style="opacity:.1; margin:15px 0;">
-        <h3>Célok</h3>
+        <h3>Napi Célok & Check-in</h3>
         <div style="margin-bottom:15px;">Víz <div class="progress"><span id="waterBar"></span></div><button class="pill" id="addWater">+1 Pohár</button></div>
-        <div style="padding:16px; background:rgba(255,79,216,.1); border-radius:18px;"><strong id="motTitle"></strong><p id="motBox" style="font-size:13px; line-height:1.6;"></p></div>
+        <div style="margin-bottom:15px;">Alvás <div class="progress"><span id="sleepBar"></span></div><button class="pill" id="addSleep">+1 Óra</button></div>
+        <div style="padding:16px; background:rgba(255,79,216,.08); border:1px solid rgba(255,79,216,.2); border-radius:18px;"><strong id="motTitle"></strong><p id="motBox" style="font-size:13px; line-height:1.6; white-space:pre-wrap;"></p></div>
       </section>
     </div>
-    <section class="glass"><h3>Technika Vault</h3><ul class="list" id="techList"></ul></section>
+    <section class="glass"><h3>Technika Vault</h3><p class="sub">Helyes kivitelezés és tudástár.</p><ul class="list" id="techList"></ul></section>
   </main>
   <div class="modal-overlay" id="infoOverlay"><div class="modal"><div class="modal-header"><h3 id="infoTitle"></h3><button class="pill" onclick="$('#infoOverlay').classList.remove('is-open')">✕</button></div><div id="infoBody"></div></div></div>
   <script type="module">
-    import { db, fs, onAuth, logout, toLogin, escapeHtml, safeJsonParse } from "../shared/firebase.js";
+    import { db, fs, onAuth, logout, toLogin, escapeHtml } from "../shared/firebase.js";
     const $ = s => document.querySelector(s);
-    let UID = null; let profile = null; let planMeta = null; let weekData = null;
-    const state = { weekIdx: 0, selectedDay: "mon", water: 0, done: {} };
+    let UID = null; let profile = null; let planMeta = null;
+    const state = { weekIdx: 0, selectedDay: "mon", water: 0, sleep: 0, done: {} };
     const DAYS = [{id:"mon",name:"Hé"},{id:"tue",name:"Ke"},{id:"wed",name:"Sze"},{id:"thu",name:"Cs"},{id:"fri",name:"Pé"},{id:"sat",name:"Szo"},{id:"sun",name:"Va"}];
 
-    window.playVideo = (id, title="Edzés") => {
-      $("#infoTitle").textContent = title;
-      $("#infoBody").innerHTML = `<iframe src="https://player.vimeo.com/video/${id}" width="100%" height="450" frameborder="0" allowfullscreen></iframe>`;
-      $("#infoOverlay").classList.add("is-open");
-    };
-
     function getAiGreeting(name){ const h = new Date().getHours(); const n = name ? `, ${name}` : ""; if(h<10) return `Jó reggelt${n}!`; if(h<18) return `Szia${n}!`; return `Szép estét${n}!`; }
+
+    window.openText = (t, d) => { $("#infoTitle").textContent = t; $("#infoBody").innerHTML = `<div style="padding:20px; white-space:pre-wrap; line-height:1.6;">${d}</div>`; $("#infoOverlay").classList.add("is-open"); };
+    window.playVideo = (id, title="Video") => { $("#infoTitle").textContent = title; $("#infoBody").innerHTML = `<iframe src="https://player.vimeo.com/video/${id}" width="100%" height="450" frameborder="0" allowfullscreen></iframe>`; $("#infoOverlay").classList.add("is-open"); };
+
+    async function loadVault() {
+      const vSnap = await fs.getDoc(fs.doc(db, "settings", "vault"));
+      const items = vSnap.data()?.items || [];
+      $("#techList").innerHTML = items.map(v => `<li class="row interactive" onclick="window.openText('${escapeHtml(v.title)}', '${escapeHtml(v.desc)}')"><div class="title">${v.title}</div><button class="pill ghost tiny">Megnyitás</button></li>`).join("") || "Hamarosan...";
+    }
 
     async function renderProgram(){
       const weekNo = state.weekIdx + 1;
       const snap = await fs.getDoc(fs.doc(db, "planTemplates", profile.planId || "start_v1", "weeks", String(weekNo)));
-      weekData = snap.data() || { workouts: [] };
-      
       const ul = $("#workoutList"); ul.innerHTML = "";
-      (weekData.workouts || []).forEach(w => {
+      (snap.data()?.workouts || []).forEach(w => {
         const key = `w${weekNo}_${w.id}`; const done = !!state.done[key];
-        ul.innerHTML += `<li class="row"><div><div class="title">${w.title.hu} ${done?'✅':''}</div></div><div style="display:flex; gap:8px;"><button class="pill ghost" onclick="playVideo('${w.vimeoId}', '${w.title.hu}')">▶</button><button class="pill ${done?'danger':'primary'}" onclick="window.toggleDone('${key}')">${done?'Vissza':'Kész'}</button></div></li>`;
-      });
-
-      const oSnap = await fs.getDoc(fs.doc(db, "users", UID, "overridesWeeks", String(weekNo)));
-      const slots = oSnap.data()?.slots || {};
-      const sl = $("#slotList"); sl.innerHTML = "";
-      Object.keys(slots).forEach(k => {
-        sl.innerHTML += `<li class="row"><div><div class="title">${k}. Személyes feladat</div><div class="desc">${slots[k].note?.hu || ""}</div></div><button class="pill ghost" onclick="playVideo('${slots[k].vimeoId}', 'Személyes feladat')">▶</button></li>`;
+        ul.innerHTML += `<li class="row"><div><div class="title">${w.title.hu} ${done?'✅':''}</div></div><div style="display:flex; gap:8px;"><button class="pill ghost" onclick="playVideo('${w.vimeoId}', '${w.title.hu}')">▶</button><button class="pill ${done?'primary':'ghost'}" onclick="window.toggleDone('${key}')">${done?'Kész':'Kész?'}</button></div></li>`;
       });
     }
 
@@ -106,25 +100,26 @@
       if(!u) return toLogin("hu"); UID = u.uid;
       state.done = JSON.parse(localStorage.getItem(`fl_${UID}_done`) || "{}");
       state.water = parseInt(localStorage.getItem(`fl_${UID}_water`) || "0");
+      state.sleep = parseInt(localStorage.getItem(`fl_${UID}_sleep`) || "0");
+      
       const snap = await fs.getDoc(fs.doc(db, "users", UID)); profile = snap.data() || {};
       const mSnap = await fs.getDoc(fs.doc(db, "planTemplates", profile.planId || "start_v1")); planMeta = mSnap.data() || {};
       
       $("#greetingHeader").textContent = getAiGreeting(profile.firstName);
-      $("#motTitle").textContent = profile.motivationCard?.title || "A rendszer szabadság.";
+      $("#motTitle").textContent = profile.motivationCard?.title || "Szia!";
       $("#motBox").textContent = profile.motivationCard?.text || "";
       $("#waterBar").style.width = (state.water/8*100)+"%";
+      $("#sleepBar").style.width = (state.sleep/8*100)+"%";
       
-      $("#weekTabs").innerHTML = ""; for(let i=0; i<4; i++){ $("#weekTabs").innerHTML += `<button class="pill ${state.weekIdx===i?'primary':''}" onclick="window.setWeek(${i})">${i+1}. hét</button> `; }
+      $("#weekTabs").innerHTML = [1,2,3,4].map(i => `<button class="pill ${state.weekIdx===(i-1)?'primary':''}" onclick="window.setWeek(${i-1})">${i}. hét</button>`).join(" ");
+      if(state.weekIdx===0 && planMeta.introVideo) $("#intro-container").innerHTML = `<div class="box" style="background:rgba(255,211,138,.1); padding:15px; border-radius:18px; margin-bottom:15px;"><h3>Ismerj meg</h3><button class="pill primary" onclick="playVideo('${planMeta.introVideo}', 'Intro')">Videó</button></div>`;
       
-      renderProgram(); renderDiet();
-      if(state.weekIdx===0 && planMeta.introVideo) $("#intro-container").innerHTML = `<div class="box" style="background:rgba(255,211,138,.1); padding:15px; border-radius:18px; margin-bottom:15px;"><h3>Ismerj meg</h3><button class="pill primary" onclick="playVideo('${planMeta.introVideo}', 'Bemutatkozás')">Videó indítása</button></div>`;
-      const vSnap = await fs.getDoc(fs.doc(db, "settings", "vault"));
-      $("#techList").innerHTML = (vSnap.data()?.items || []).map(v => `<li class="row" onclick="window.openText('${escapeHtml(v.title)}','${escapeHtml(v.desc)}')"><div class="title">${v.title}</div><button class="pill ghost tiny">Megnyitás</button></li>`).join("");
+      renderProgram(); renderDiet(); await loadVault();
     });
 
     window.setWeek = (i) => { state.weekIdx = i; renderProgram(); renderDiet(); };
-    window.openText = (t,d) => { $("#infoTitle").textContent=t; $("#infoBody").innerHTML=`<div style="padding:20px; white-space:pre-wrap;">${d}</div>`; $("#infoOverlay").classList.add("is-open"); };
     $("#addWater").onclick = () => { state.water = Math.min(8, state.water+1); localStorage.setItem(`fl_${UID}_water`, state.water); $("#waterBar").style.width = (state.water/8*100)+"%"; };
+    $("#addSleep").onclick = () => { state.sleep = Math.min(8, state.sleep+1); localStorage.setItem(`fl_${UID}_sleep`, state.sleep); $("#sleepBar").style.width = (state.sleep/8*100)+"%"; };
     $("#btnLogout").onclick = async () => { await logout(); toLogin("hu"); };
   </script>
 </body>
