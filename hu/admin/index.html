@@ -41,8 +41,7 @@
       z-index: 50;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
     }
     .topbar-inner{
       height: 64px;
@@ -61,8 +60,7 @@
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(20,12,26,.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       color: var(--text);
       box-shadow: 0 12px 34px rgba(0,0,0,.35);
       cursor:pointer;
@@ -87,8 +85,7 @@
       border: 1px solid rgba(255,255,255,.10);
       border-radius: var(--radius);
       box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
     }
 
     main{ padding: 16px 0 54px; }
@@ -143,13 +140,6 @@
 
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
-    .help{
-      color: rgba(255,255,255,.62);
-      font-size: 12.8px;
-      line-height: 1.55;
-      margin-top: 8px;
-    }
-
     .toast{
       position: fixed;
       right: 14px;
@@ -160,8 +150,7 @@
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.12);
       background: rgba(0,0,0,.45);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
       box-shadow: 0 24px 80px rgba(0,0,0,.55);
       display:none;
     }
@@ -209,7 +198,7 @@
     <div class="container grid">
       <section class="glass card">
         <h2>Customers</h2>
-        <p class="sub">User kiválasztás → profil / étrend / motiváció + edzések (template) + személyre szabás (override) mentés.</p>
+        <p class="sub">User kiválasztás → profil / étrend / motiváció mentés.</p>
 
         <div class="row">
           <div class="box">
@@ -220,56 +209,28 @@
             <div class="actions">
               <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
             </div>
-
             <div class="sub" style="margin-top:10px;">Találatok:</div>
             <ul class="list" id="usersList"></ul>
 
             <hr class="hr" />
 
             <h3>Technika Vault (Tudástár)</h3>
+            <p class="sub">Adj meg technikai leírásokat, amik mindenkinél megjelennek.</p>
             <div class="box">
                 <div class="field">
-                    <label>1. Elem címe</label>
+                    <label>1. Gyakorlat címe</label>
                     <input id="v1_title" type="text" placeholder="pl. Has prés">
-                    <textarea id="v1_desc" placeholder="Leírás / Útmutató..." style="margin-top:5px;"></textarea>
+                    <label style="margin-top:5px;">Leírás</label>
+                    <textarea id="v1_desc" placeholder="Technikai útmutató..."></textarea>
                 </div>
-                <div class="field" style="margin-top:10px;">
-                    <label>2. Elem címe</label>
+                <div class="field" style="margin-top:15px;">
+                    <label>2. Gyakorlat címe</label>
                     <input id="v2_title" type="text" placeholder="pl. Guggolás">
-                    <textarea id="v2_desc" placeholder="Leírás / Útmutató..." style="margin-top:5px;"></textarea>
+                    <label style="margin-top:5px;">Leírás</label>
+                    <textarea id="v2_desc" placeholder="Technikai útmutató..."></textarea>
                 </div>
-                <button class="pill primary" id="btnSaveVault" style="width:100%; margin-top:10px;">💾 Vault mentése</button>
             </div>
-
-            <hr class="hr" />
-
-            <h3>Plan template (Csomag beállítások)</h3>
-            <div class="miniRow">
-              <div class="field">
-                <label for="p_planId">Csomag neve (pl. start_v1)</label>
-                <input id="p_planId" type="text" value="start_v1" />
-              </div>
-              <div class="field">
-                <label for="p_weeks">Hány hetes?</label>
-                <input id="p_weeks" type="number" min="1" max="24" value="4" />
-              </div>
-            </div>
-
-            <div class="field">
-                <label>Hét 1 Bemutatkozó Videó (Vimeo ID)</label>
-                <input id="p_introVideo" type="text" placeholder="pl. 123456789">
-            </div>
-
-            <div class="actions">
-              <button class="pill ghost" id="btnLoadPlanMeta" type="button">↻ Betöltés (meta)</button>
-              <button class="pill primary" id="btnSavePlanMeta" type="button">💾 Mentés (meta)</button>
-            </div>
-
-            <div id="workouts_container"></div>
-
-            <div class="actions" style="margin-top:16px;">
-              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (hét & fix edzések)</button>
-            </div>
+            <button class="pill primary" id="btnSaveVault" style="width:100%;">💾 Tudástár mentése</button>
           </div>
 
           <div class="box">
@@ -278,29 +239,32 @@
 
             <div class="miniRow">
                 <div class="field">
-                    <label for="u_firstname">Keresztnév (AI üdvözléshez)</label>
-                    <input id="u_firstname" type="text" placeholder="Palkó" />
+                    <label for="u_firstname">Keresztnév (Üdvözléshez)</label>
+                    <input id="u_firstname" type="text" placeholder="pl. Palko" />
                 </div>
                 <div class="field">
-                    <label for="u_email">Email</label>
+                    <label for="u_email">Email (Csak olvasható)</label>
                     <input id="u_email" type="text" readonly />
                 </div>
             </div>
 
             <div class="miniRow">
               <div class="field">
-                <label for="u_goal">Cél</label>
-                <input id="u_goal" type="text" />
+                <label for="u_planId">Csomag ID</label>
+                <input id="u_planId" type="text" placeholder="start_v1" />
               </div>
               <div class="field">
-                <label for="u_level">Szint (1–4)</label>
-                <input id="u_level" type="number" min="1" max="4" />
+                <label>Hét 1 Intro Video ID</label>
+                <input id="u_introVideo" type="text" placeholder="pl. 123456789">
               </div>
             </div>
 
-            <div class="actions">
-              <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés (Profil)</button>
+            <div class="miniRow">
+              <div class="field"><label for="u_goal">Cél</label><input id="u_goal" type="text" /></div>
+              <div class="field"><label for="u_level">Szint (1–4)</label><input id="u_level" type="number" /></div>
             </div>
+
+            <button class="pill primary" id="btnSaveUser" style="width:100%;">💾 Profil mentése</button>
 
             <hr class="hr" />
 
@@ -310,17 +274,24 @@
               <select id="d_day"><option value="mon">Hétfő</option><option value="tue">Kedd</option></select>
             </div>
             <div class="field"><label>Ebéd</label><textarea id="d_lunch"></textarea></div>
-            <button class="pill primary" id="btnSaveDietDay" type="button">💾 Mentés (nap)</button>
+            <button class="pill primary" id="btnSaveDietDay" style="width:100%;">💾 Étrend mentése</button>
 
             <hr class="hr" />
 
             <h3>Személyre szabás (Overrides)</h3>
             <div class="field">
-                <label>Videó Link & Jegyzet</label>
+                <label>Extra Videó ID & Jegyzet</label>
                 <input id="ov_slot1_vid" type="text">
-                <textarea id="ov_slot1_note"></textarea>
+                <textarea id="ov_slot1_note" style="margin-top:5px;"></textarea>
             </div>
-            <button class="pill primary" id="btnSaveOverride" type="button">💾 Mentés</button>
+            <button class="pill primary" id="btnSaveOverride" style="width:100%;">💾 Mentés</button>
+
+            <hr class="hr" />
+
+            <h3>Fix motiváció</h3>
+            <div class="field"><label>Cím</label><input id="m_title" type="text" /></div>
+            <div class="field"><label>Szöveg</label><textarea id="m_text"></textarea></div>
+            <button class="pill primary" id="btnSaveMotivation" style="width:100%;">💾 Mentés</button>
           </div>
         </div>
       </section>
@@ -330,72 +301,110 @@
   <div class="toast" id="toast"></div>
 
   <script type="module">
-    import { auth, db, fs, onAuth, logout, toLogin, toApp, escapeHtml, clamp, ensureUserDoc, getUserRole, isAdminEmail } from "../shared/firebase.js";
+    import { auth, db, fs, onAuth, logout, toLogin, escapeHtml, clamp, ensureUserDoc, getUserRole, isAdminEmail } from "../shared/firebase.js";
 
-    const $ = (s, r=document) => r.querySelector(s);
+    const $ = (s) => document.querySelector(s);
     const toast = $("#toast");
-    function showToast(html){ toast.innerHTML = html; toast.classList.add("is-on"); setTimeout(()=>toast.classList.remove("is-on"), 2500); }
-    function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
+    function ok(msg){ toast.innerHTML = `<b>OK</b> — ${msg}`; toast.classList.add("is-on"); setTimeout(()=>toast.classList.remove("is-on"), 2500); }
+    function err(msg){ toast.innerHTML = `<b>HIBA</b> — ${msg}`; toast.classList.add("is-on"); setTimeout(()=>toast.classList.remove("is-on"), 4000); }
 
     $("#btnToApp").onclick = () => { window.location.href = "/hu/app/"; };
-    $("#btnLogout").onclick = async ()=>{ await logout(); toLogin("hu"); };
+    $("#btnLogout").onclick = async () => { await logout(); toLogin("hu"); };
 
     let SEL_UID = null;
+
+    // 🔥 FEJLESZTÉS: TECHNIKA VAULT MENTÉS 🔥
+    $("#btnSaveVault").onclick = async () => {
+      try {
+          const items = [];
+          if($("#v1_title").value) items.push({ title: $("#v1_title").value, desc: $("#v1_desc").value });
+          if($("#v2_title").value) items.push({ title: $("#v2_title").value, desc: $("#v2_desc").value });
+          await fs.setDoc(fs.doc(db, "settings", "vault"), { items });
+          ok("Vault mentve");
+      } catch (e) { err(e.message); }
+    };
 
     async function loadUsersList(){
       const snap = await fs.getDocs(fs.collection(db, "users"));
       const ul = $("#usersList"); ul.innerHTML = "";
-      snap.forEach(d=>{
+      snap.forEach(d => {
         const u = d.data();
         const li = document.createElement("li"); li.className = "li";
-        li.innerHTML = `<div><div class="title">${escapeHtml(u.email || d.id)}</div></div><button class="pill ghost" data-pick="${d.id}">Kiválaszt</button>`;
+        li.innerHTML = `<span>${u.email || d.id}</span><button class="pill ghost tiny" data-id="${d.id}">Kiválaszt</button>`;
         ul.appendChild(li);
       });
-      document.querySelectorAll("[data-pick]").forEach(b=>b.onclick=()=>pickUser(b.dataset.pick));
+      document.querySelectorAll("[data-id]").forEach(b => b.onclick = () => pickUser(b.dataset.id));
     }
 
     async function pickUser(uid){
       SEL_UID = uid; $("#selUser").textContent = uid;
-      const snap = await fs.getDoc(fs.doc(db, "users", uid));
-      const u = snap.data();
-      if(u){
-        $("#u_firstname").value = u.firstName || "";
-        $("#u_email").value = u.email || "";
-        $("#u_goal").value = u.goal || "";
-        $("#u_level").value = u.level || 2;
-        ok("Adatok betöltve");
-      }
+      try {
+        const snap = await fs.getDoc(fs.doc(db, "users", uid));
+        const u = snap.data();
+        if(u){
+            $("#u_firstname").value = u.firstName || "";
+            $("#u_email").value = u.email || "";
+            $("#u_planId").value = u.planId || "";
+            $("#u_introVideo").value = u.introVideo || "";
+            $("#u_goal").value = u.goal || "";
+            $("#u_level").value = u.level || 2;
+            $("#m_title").value = u.motivationCard?.title || "";
+            $("#m_text").value = u.motivationCard?.text || "";
+            ok("User betöltve");
+        }
+      } catch (e) { err(e.message); }
     }
 
-    $("#btnSaveUser").onclick = async ()=>{
+    $("#btnSaveUser").onclick = async () => {
+      if(!SEL_UID) return err("Válassz usert!");
+      try {
+        // 🔥 JAVÍTÁS: UPDATE HELYETT SETDOC MERGE-EL A JOGOSULTSÁG MIATT 🔥
+        await fs.setDoc(fs.doc(db, "users", SEL_UID), {
+          firstName: $("#u_firstname").value,
+          planId: $("#u_planId").value,
+          introVideo: $("#u_introVideo").value,
+          goal: $("#u_goal").value,
+          level: parseInt($("#u_level").value),
+          updatedAt: fs.serverTimestamp()
+        }, { merge: true });
+        ok("Profil mentve");
+      } catch (e) { err(e.message); }
+    };
+
+    $("#btnSaveDietDay").onclick = async () => {
       if(!SEL_UID) return;
-      await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
-        firstName: $("#u_firstname").value,
-        goal: $("#u_goal").value,
-        level: parseInt($("#u_level").value),
-        updatedAt: fs.serverTimestamp()
-      });
-      ok("Profil mentve");
+      const w = $("#d_week").value; const d = $("#d_day").value;
+      try {
+        await fs.setDoc(fs.doc(db, "users", SEL_UID), {
+          dietPlan: { [`w${w}`]: { [d]: { lunch: $("#d_lunch").value } } }
+        }, { merge: true });
+        ok("Étrend mentve");
+      } catch (e) { err(e.message); }
     };
 
-    $("#btnSaveVault").onclick = async () => {
-      const items = [];
-      if($("#v1_title").value) items.push({ title: $("#v1_title").value, desc: $("#v1_desc").value });
-      if($("#v2_title").value) items.push({ title: $("#v2_title").value, desc: $("#v2_desc").value });
-      await fs.setDoc(fs.doc(db, "settings", "vault"), { items });
-      ok("Vault mentve");
+    $("#btnSaveMotivation").onclick = async () => {
+      if(!SEL_UID) return;
+      try {
+        await fs.setDoc(fs.doc(db, "users", SEL_UID), {
+          motivationCard: { title: $("#m_title").value, text: $("#m_text").value }
+        }, { merge: true });
+        ok("Motiváció mentve");
+      } catch (e) { err(e.message); }
     };
 
-    $("#btnSavePlanMeta").onclick = async ()=>{
-      const pId = $("#p_planId").value;
-      await fs.setDoc(fs.doc(db, "planTemplates", pId), {
-        weeks: parseInt($("#p_weeks").value),
-        introVideo: $("#p_introVideo").value
-      }, { merge: true });
-      ok("Meta mentve");
+    $("#btnSaveOverride").onclick = async () => {
+      if(!SEL_UID) return;
+      const weekNo = $("#ov_week")?.value || "1";
+      try {
+        await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
+          slots: { "1": { vimeoId: $("#ov_slot1_vid").value, note: { hu: $("#ov_slot1_note").value } } }
+        }, { merge: true });
+        ok("Override mentve");
+      } catch (e) { err(e.message); }
     };
 
     onAuth(u => { if(u) loadUsersList(); else toLogin("hu"); });
+    $("#btnRefreshUsers").onclick = loadUsersList;
   </script>
 </body>
 </html>
