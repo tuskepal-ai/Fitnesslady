@@ -22,6 +22,7 @@ export const ADMIN_EMAILS = [
 ];
 
 export const BASE_PREFIX = ""; // GitHub Pages root
+
 export const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
@@ -83,6 +84,28 @@ export function daysBetween(aIso, bIso){
   }catch{ return 0; }
 }
 
+export function normalizeEmail(email){
+  return String(email || "").trim().toLowerCase();
+}
+
+export function normalizePlanId(planId){
+  const v = String(planId || "").trim().toLowerCase();
+  if(!v) return "start_v1";
+  if(v === "start") return "start_v1";
+  if(v === "balance") return "balance_v1";
+  if(v === "pro" || v === "por") return "pro_v1";
+  return String(planId || "start_v1").trim();
+}
+
+export function getQueryParam(name, url = window.location.href){
+  try{
+    const u = new URL(url);
+    return (u.searchParams.get(name) || "").trim();
+  }catch{
+    return "";
+  }
+}
+
 // ---------- Navigation ----------
 export function toLogin(lang="hu"){
   const l = (lang === "de") ? "de" : "hu";
@@ -110,8 +133,8 @@ export async function loginEmailPassword(email, password){
 
 // ---------- Profile bootstrap & role check ----------
 export function isAdminEmail(email){
-  const e = String(email || "").trim().toLowerCase();
-  return ADMIN_EMAILS.map(x=>String(x).trim().toLowerCase()).includes(e);
+  const e = normalizeEmail(email);
+  return ADMIN_EMAILS.map(x=>normalizeEmail(x)).includes(e);
 }
 
 export async function ensureUserDoc(uid, email){
@@ -142,10 +165,19 @@ export async function ensureUserDoc(uid, email){
         text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
       },
 
-      // Trackerek napra bontva: trackersByDay["YYYY-MM-DD"] = {water,sleep,checkinDone,checkinAt,updatedAt}
+      // Payment flags (admin a source of truth)
+      paid: false,
+      activated: false,
+      payment: {
+        provider: "",
+        sid: "",
+        status: "none" // none | pending_activation | activated
+      },
+
+      // Trackerek napra bontva
       trackersByDay: {},
 
-      // Technika lista: [{id,title,text,video}]
+      // Technika lista
       techVault: [],
 
       createdAt: serverTimestamp(),
@@ -172,6 +204,9 @@ export async function ensureUserDoc(uid, email){
     if(!data.dietPlan) patch.dietPlan = {};
     if(!data.trackersByDay) patch.trackersByDay = {};
     if(!data.techVault) patch.techVault = [];
+    if(typeof data.paid !== "boolean") patch.paid = false;
+    if(typeof data.activated !== "boolean") patch.activated = false;
+    if(!data.payment) patch.payment = { provider:"", sid:"", status:"none" };
 
     if(Object.keys(patch).length){
       await setDoc(ref, patch, { merge:true });
@@ -186,4 +221,78 @@ export async function getUserRole(uid){
   if(!snap.exists()) return null;
   const role = String((snap.data()?.role || "")).toLowerCase();
   return role || null;
+}
+
+/**
+ * Purchases / Stripe “Payment Link” flow (admin activation)
+ *
+ * Collection: purchases
+ * Doc id: sid (Checkout Session ID)
+ */
+export async function upsertPurchaseFromStripe({ sid, planId, email, uid }){
+  const _sid = String(sid || "").trim();
+  if(!_sid) throw new Error("Missing sid");
+  const _planId = normalizePlanId(planId);
+  const _email = normalizeEmail(email);
+
+  const pref = doc(db, "purchases", _sid);
+  await setDoc(pref, {
+    provider: "stripe",
+    sid: _sid,
+    planId: _planId,
+    email: _email,
+    uid: uid || "",
+    status: "pending_activation", // pending_activation | activated | cancelled
+    createdAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  }, { merge:true });
+
+  return _sid;
+}
+
+export async function activateUserFromPurchase({ uid, sid }){
+  const _uid = String(uid || "").trim();
+  const _sid = String(sid || "").trim();
+  if(!_uid) throw new Error("Missing uid");
+  if(!_sid) throw new Error("Missing sid");
+
+  const pref = doc(db, "purchases", _sid);
+  const ps = await getDoc(pref);
+  if(!ps.exists()) throw new Error("Purchase not found");
+
+  const pd = ps.data() || {};
+  const planId = normalizePlanId(pd.planId || "start_v1");
+  const email = normalizeEmail(pd.email || "");
+
+  // 1) user update
+  await setDoc(doc(db, "users", _uid), {
+    email: email || undefined,
+    planId,
+    status: "active",
+    paid: true,
+    activated: true,
+    payment: {
+      provider: "stripe",
+      sid: _sid,
+      status: "activated"
+    },
+    updatedAt: serverTimestamp()
+  }, { merge:true });
+
+  // 2) purchase update
+  await setDoc(pref, {
+    uid: _uid,
+    status: "activated",
+    activatedAt: serverTimestamp(),
+    updatedAt: serverTimestamp()
+  }, { merge:true });
+
+  return { uid:_uid, sid:_sid, planId };
+}
+
+export async function listRecentPurchases(max=40){
+  const m = clamp(parseInt(max,10) || 40, 1, 120);
+  const col = collection(db, "purchases");
+  const snap = await getDocs(query(col, orderBy("createdAt","desc"), limit(m)));
+  return snap.docs.map(d => ({ id:d.id, ...(d.data()||{}) }));
 }
