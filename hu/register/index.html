@@ -62,7 +62,10 @@
       user-select:none;
       white-space: nowrap;
       text-decoration:none;
+      gap:8px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
+    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); background: rgba(255,255,255,.07); }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
@@ -101,7 +104,6 @@
       user-select:none;
       margin-bottom: 10px;
       width: fit-content;
-      flex-wrap: wrap;
     }
 
     label{ display:block; margin: 10px 0 6px; color: rgba(255,255,255,.72); font-weight:800; }
@@ -114,6 +116,10 @@
       color: var(--text);
       outline: none;
       font-size: 15px;
+    }
+    input:focus{
+      border-color: rgba(255,79,216,.35);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
     }
     .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
 
@@ -130,12 +136,14 @@
     }
     .msg.ok{ border-color: rgba(130,255,200,.35); }
     .msg.err{ border-color: rgba(255,120,140,.35); }
+    .msg.warn{ border-color: rgba(255,211,138,.35); }
 
     footer{
       margin-top: 16px;
       padding: 14px 0 0;
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color: rgba(255,255,255,.70);
+      font-size: 13px;
     }
 
     .hint{
@@ -155,11 +163,12 @@
     </div>
 
     <div class="card">
-      <div class="chip" id="chipPlan">Csomag: —</div>
+      <div class="chip" id="chipTop">Csomag: — • Fizetés: —</div>
+
       <h1>Regisztráció</h1>
       <p class="sub">
         Hozz létre egy fiókot az e-mail címeddel és egy jelszóval.
-        Sikeres regisztráció után a fiókod <b>aktiválásra vár</b> (admin jóváhagyás).
+        Sikeres regisztráció után a fiókod <b>aktiválásra vár</b> (admin jóváhagyás) — ezután beléphetsz a Saját programodba.
       </p>
 
       <label for="email">E-mail</label>
@@ -187,10 +196,7 @@
   </div>
 
   <script type="module">
-    import {
-      BASE_PREFIX, auth, db, fs, escapeHtml,
-      normalizePlanId, getQueryParam, upsertPurchaseFromStripe
-    } from "../shared/firebase.js";
+    import { BASE_PREFIX, auth, db, fs, escapeHtml } from "../shared/firebase.js";
 
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     document.getElementById("y").textContent = new Date().getFullYear();
@@ -205,9 +211,23 @@
     const msg = $("#msgBox");
 
     function showMsg(text, kind="ok"){
-      msg.className = "msg " + (kind === "err" ? "err" : "ok");
+      msg.className = "msg " + (kind === "err" ? "err" : (kind === "warn" ? "warn" : "ok"));
       msg.style.display = "block";
       msg.textContent = text;
+    }
+
+    function q(name){
+      const u = new URL(location.href);
+      return (u.searchParams.get(name) || "").trim();
+    }
+
+    function normalizePlan(p){
+      const v = String(p || "").trim().toLowerCase();
+      if(!v) return "start_v1";
+      if(v === "start") return "start_v1";
+      if(v === "balance") return "balance_v1";
+      if(v === "pro" || v === "por") return "pro_v1";
+      return v;
     }
 
     function planLabel(planId){
@@ -217,45 +237,76 @@
       return "Start";
     }
 
-    // Stripe redirect params
-    const planId = normalizePlanId(getQueryParam("plan"));
-    const sid = getQueryParam("sid"); // Stripe Checkout Session ID (Payment Link redirectből)
-    const preEmail = getQueryParam("email");
+    const planId = normalizePlan(q("plan"));
+    const orderId = q("order");      // opcionális: saját order doc id (Firestore)
+    const preEmail = q("email");     // opcionális
+    const sid = q("sid");            // opcionális: Stripe session id (NEM kötelező)
 
-    const chip = $("#chipPlan");
-    chip.textContent = `Csomag: ${planLabel(planId)}${sid ? " • Fizetés: OK ✅ (sid megvan)" : " • Fizetés: —"}`;
+    // UI chip
+    const payTxt = sid ? `OK (${sid.slice(0,8)}…)` : (orderId ? `order=${orderId}` : "—");
+    $("#chipTop").textContent = `Csomag: ${planLabel(planId)} • Fizetés: ${payTxt}`;
 
     if(preEmail) $("#email").value = preEmail;
 
-    async function createUserProfile(uid, email, planId, sid){
+    async function loadOrderIfAny(){
+      if(!orderId) return null;
+      const snap = await fs.getDoc(fs.doc(db, "orders", orderId));
+      if(!snap.exists()) return null;
+      return snap.data() || null;
+    }
+
+    // Ha van order, onnan betöltjük az emailt (ha nincs query)
+    try{
+      const od = await loadOrderIfAny();
+      if(od?.email && !preEmail){
+        $("#email").value = String(od.email || "");
+      }
+    }catch(e){
+      console.warn("order load failed:", e);
+    }
+
+    // NEM blokkoljuk a regisztrációt sid hiányában, csak jelezzük
+    if(!sid){
+      showMsg("Megjegyzés: Stripe azonosító (sid) nincs a linkben — ez most nem akadály. Regisztrálhatsz, az admin aktiválja a fiókot.", "warn");
+    }
+
+    async function createUserProfile(uid, email, planId){
       const payload = {
         email: String(email || "").trim().toLowerCase(),
         role: "user",
 
-        // fontos: a user doc legyen létrehozva
-        status: "active",
+        // ✅ aktiválás adminból
+        activated: false,
+        status: "pending",
+
         planId: String(planId || "start_v1").trim(),
         goal: "Formálás",
         level: 2,
         lang: "hu",
         lifetimeAccess: true,
+
+        // opcionális fizetési meta
+        lastStripeSid: sid || null,
+        orderId: orderId || null,
+
         cycleStart: null,
         cycleEnd: null,
-
-        // payment flags (admin aktivál)
-        paid: !!sid,                 // van sid → fizetés történt (MVP jelzés)
-        activated: false,            // admin fogja true-ra állítani
-        payment: {
-          provider: sid ? "stripe" : "",
-          sid: sid || "",
-          status: sid ? "pending_activation" : "none"
-        },
-
         updatedAt: fs.serverTimestamp(),
         createdAt: fs.serverTimestamp()
       };
 
       await fs.setDoc(fs.doc(db, "users", uid), payload, { merge: true });
+    }
+
+    async function markOrderRegistered(orderId, uid, email){
+      if(!orderId) return;
+      await fs.setDoc(fs.doc(db, "orders", orderId), {
+        status: "registered",
+        registeredUid: uid,
+        email: String(email || "").trim().toLowerCase(),
+        stripeSid: sid || null,
+        updatedAt: fs.serverTimestamp()
+      }, { merge:true });
     }
 
     $("#btnCreate").addEventListener("click", async ()=>{
@@ -270,11 +321,6 @@
         showMsg("A jelszó legyen minimum 6 karakter.", "err");
         return;
       }
-      if(!sid){
-        // direkt nem tiltjuk, de jelezzük: így nem “fizetett” flow
-        showMsg("Figyelem: nem látok Stripe fizetés azonosítót (sid). Ha most fizettél, menj vissza és a Stripe sikeroldalról jöjj ide.", "err");
-        return;
-      }
 
       $("#btnCreate").disabled = true;
       showMsg("Regisztráció…");
@@ -283,19 +329,12 @@
         const { createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js");
         const cred = await createUserWithEmailAndPassword(auth, email, pass);
 
-        // 1) user doc + pending activation
-        await createUserProfile(cred.user.uid, email, planId, sid);
+        await createUserProfile(cred.user.uid, email, planId);
+        await markOrderRegistered(orderId, cred.user.uid, email);
 
-        // 2) purchases/{sid} bejegyzés (admin ezt látja)
-        await upsertPurchaseFromStripe({
-          sid,
-          planId,
-          email,
-          uid: cred.user.uid
-        });
+        showMsg("Sikeres regisztráció ✅ A fiókod aktiválásra vár (admin).");
 
-        showMsg("Sikeres regisztráció ✅\nA fiókod aktiválásra vár. (Admin oldalon 1 kattintás).");
-        // aktiválás után login/app
+        // login oldalra (ne app-ba), mert pending
         location.replace(`${BASE_PREFIX}/hu/login/`);
       }catch(err){
         console.error(err);
