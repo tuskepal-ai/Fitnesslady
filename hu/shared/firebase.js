@@ -121,6 +121,8 @@ export async function ensureUserDoc(uid, email){
   if(!snap.exists()){
     const initial = {
       email: email || "",
+      name: "",
+
       role: "user",
       status: "active",
       planId: "start_v1",
@@ -131,14 +133,20 @@ export async function ensureUserDoc(uid, email){
       cycleStart: null,
       cycleEnd: null,
 
-      dietPlan: null,
+      dietPlan: {},
+
+      introCard: { title:"", text:"", video:"" },
+
       motivationCard: {
         title: "A rendszer szabadság.",
         text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
       },
 
-      dietText: "",
-      motivationText: "",
+      // Trackerek napra bontva: trackersByDay["YYYY-MM-DD"] = {water,sleep,checkinDone,checkinAt,updatedAt}
+      trackersByDay: {},
+
+      // Technika lista: [{id,title,text,video}]
+      techVault: [],
 
       createdAt: serverTimestamp(),
       updatedAt: serverTimestamp()
@@ -147,16 +155,26 @@ export async function ensureUserDoc(uid, email){
     return initial;
   }else{
     const data = snap.data() || {};
+    const patch = {};
+
     if(email && data.email !== email){
-      await setDoc(ref, { email, updatedAt: serverTimestamp() }, { merge:true });
+      patch.email = email;
+      patch.updatedAt = serverTimestamp();
     }
+    if(!("name" in data)) patch.name = "";
     if(!data.motivationCard){
-      await setDoc(ref, {
-        motivationCard: {
-          title: "A rendszer szabadság.",
-          text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
-        }
-      }, { merge:true });
+      patch.motivationCard = {
+        title: "A rendszer szabadság.",
+        text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
+      };
+    }
+    if(!data.introCard) patch.introCard = { title:"", text:"", video:"" };
+    if(!data.dietPlan) patch.dietPlan = {};
+    if(!data.trackersByDay) patch.trackersByDay = {};
+    if(!data.techVault) patch.techVault = [];
+
+    if(Object.keys(patch).length){
+      await setDoc(ref, patch, { merge:true });
     }
     return (await getDoc(ref)).data();
   }
