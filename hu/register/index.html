@@ -63,9 +63,7 @@
       white-space: nowrap;
       text-decoration:none;
       gap:8px;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); background: rgba(255,255,255,.07); }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
@@ -117,10 +115,7 @@
       outline: none;
       font-size: 15px;
     }
-    input:focus{
-      border-color: rgba(255,79,216,.35);
-      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
-    }
+
     .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
 
     .msg{
@@ -136,14 +131,12 @@
     }
     .msg.ok{ border-color: rgba(130,255,200,.35); }
     .msg.err{ border-color: rgba(255,120,140,.35); }
-    .msg.warn{ border-color: rgba(255,211,138,.35); }
 
     footer{
       margin-top: 16px;
       padding: 14px 0 0;
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color: rgba(255,255,255,.70);
-      font-size: 13px;
     }
 
     .hint{
@@ -151,6 +144,38 @@
       color: rgba(255,255,255,.65);
       font-size: 13px;
       line-height: 1.5;
+    }
+
+    /* ✅ 1 db kötelező pipa */
+    .legal{
+      margin-top: 12px;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.18);
+    }
+    .legal-row{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+    }
+    .legal input[type="checkbox"]{
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      accent-color: var(--pink);
+    }
+    .legal p{
+      margin:0;
+      color: rgba(255,255,255,.78);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    .legal a{
+      text-decoration: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 2px;
+      opacity: .95;
     }
   </style>
 </head>
@@ -163,13 +188,9 @@
     </div>
 
     <div class="card">
-      <div class="chip" id="chipTop">Csomag: — • Fizetés: —</div>
-
+      <div class="chip" id="chipPlan">Csomag: —</div>
       <h1>Regisztráció</h1>
-      <p class="sub">
-        Hozz létre egy fiókot az e-mail címeddel és egy jelszóval.
-        Sikeres regisztráció után a fiókod <b>aktiválásra vár</b> (admin jóváhagyás) — ezután beléphetsz a Saját programodba.
-      </p>
+      <p class="sub">Hozz létre egy fiókot az e-mail címeddel és egy jelszóval. Sikeres regisztráció után automatikusan a Saját programodba visz.</p>
 
       <label for="email">E-mail</label>
       <input id="email" type="email" autocomplete="email" placeholder="email@domain.com" />
@@ -177,14 +198,28 @@
       <label for="pass">Jelszó</label>
       <input id="pass" type="password" autocomplete="new-password" placeholder="Minimum 6 karakter" />
 
+      <!-- ✅ 1 db kötelező pipa -->
+      <div class="legal">
+        <div class="legal-row">
+          <input id="legalAccept" type="checkbox" />
+          <p>
+            Elolvastam és elfogadom az
+            <a id="lnkAfsz" href="/hu/legal/afsz/">ÁFSZ</a>,
+            az
+            <a id="lnkPrivacy" href="/hu/legal/adatkezeles/">Adatkezelési tájékoztató</a>,
+            valamint az
+            <a id="lnkMedical" href="/hu/legal/orvosi/">Orvosi nyilatkozat</a>
+            tartalmát.
+          </p>
+        </div>
+      </div>
+
       <div class="row">
         <button class="pill primary" id="btnCreate" type="button">Fiók létrehozása</button>
         <a class="pill" id="btnLogin" href="/hu/login/">Már van fiókom</a>
       </div>
 
-      <div class="hint" id="hintBox">
-        Tipp: ha már van fiókod ezzel az e-maillel, válaszd a “Már van fiókom” gombot.
-      </div>
+      <div class="hint" id="hintBox">Tipp: ha már van fiókod ezzel az e-maillel, válaszd a “Már van fiókom” gombot.</div>
 
       <div class="msg" id="msgBox"></div>
     </div>
@@ -207,11 +242,16 @@
     back.href = `${BASE_PREFIX}/hu/`;
     login.href = `${BASE_PREFIX}/hu/login/`;
 
+    // legal linkek base-aware
+    document.getElementById("lnkAfsz").href = `${BASE_PREFIX}/hu/legal/afsz/`;
+    document.getElementById("lnkPrivacy").href = `${BASE_PREFIX}/hu/legal/adatkezeles/`;
+    document.getElementById("lnkMedical").href = `${BASE_PREFIX}/hu/legal/orvosi/`;
+
     const $ = (s) => document.querySelector(s);
     const msg = $("#msgBox");
 
     function showMsg(text, kind="ok"){
-      msg.className = "msg " + (kind === "err" ? "err" : (kind === "warn" ? "warn" : "ok"));
+      msg.className = "msg " + (kind === "err" ? "err" : "ok");
       msg.style.display = "block";
       msg.textContent = text;
     }
@@ -222,7 +262,7 @@
     }
 
     function normalizePlan(p){
-      const v = String(p || "").trim().toLowerCase();
+      const v = String(p || "").trim();
       if(!v) return "start_v1";
       if(v === "start") return "start_v1";
       if(v === "balance") return "balance_v1";
@@ -238,14 +278,10 @@
     }
 
     const planId = normalizePlan(q("plan"));
-    const orderId = q("order");      // opcionális: saját order doc id (Firestore)
-    const preEmail = q("email");     // opcionális
-    const sid = q("sid");            // opcionális: Stripe session id (NEM kötelező)
+    const orderId = q("order");
+    const preEmail = q("email");
 
-    // UI chip
-    const payTxt = sid ? `OK (${sid.slice(0,8)}…)` : (orderId ? `order=${orderId}` : "—");
-    $("#chipTop").textContent = `Csomag: ${planLabel(planId)} • Fizetés: ${payTxt}`;
-
+    $("#chipPlan").textContent = `Csomag: ${planLabel(planId)}`;
     if(preEmail) $("#email").value = preEmail;
 
     async function loadOrderIfAny(){
@@ -255,7 +291,7 @@
       return snap.data() || null;
     }
 
-    // Ha van order, onnan betöltjük az emailt (ha nincs query)
+    // ha van order, akkor e-mailt felvesszük belőle (ha nincs query)
     try{
       const od = await loadOrderIfAny();
       if(od?.email && !preEmail){
@@ -265,30 +301,16 @@
       console.warn("order load failed:", e);
     }
 
-    // NEM blokkoljuk a regisztrációt sid hiányában, csak jelezzük
-    if(!sid){
-      showMsg("Megjegyzés: Stripe azonosító (sid) nincs a linkben — ez most nem akadály. Regisztrálhatsz, az admin aktiválja a fiókot.", "warn");
-    }
-
     async function createUserProfile(uid, email, planId){
       const payload = {
         email: String(email || "").trim().toLowerCase(),
         role: "user",
-
-        // ✅ aktiválás adminból
-        activated: false,
-        status: "pending",
-
+        status: "active",
         planId: String(planId || "start_v1").trim(),
         goal: "Formálás",
         level: 2,
         lang: "hu",
         lifetimeAccess: true,
-
-        // opcionális fizetési meta
-        lastStripeSid: sid || null,
-        orderId: orderId || null,
-
         cycleStart: null,
         cycleEnd: null,
         updatedAt: fs.serverTimestamp(),
@@ -304,7 +326,6 @@
         status: "registered",
         registeredUid: uid,
         email: String(email || "").trim().toLowerCase(),
-        stripeSid: sid || null,
         updatedAt: fs.serverTimestamp()
       }, { merge:true });
     }
@@ -322,6 +343,12 @@
         return;
       }
 
+      // ✅ kötelező jogi pipa
+      if(!$("#legalAccept").checked){
+        showMsg("A regisztrációhoz fogadd el az ÁFSZ + Adatkezelés + Orvosi nyilatkozat tartalmát (1 pipa).", "err");
+        return;
+      }
+
       $("#btnCreate").disabled = true;
       showMsg("Regisztráció…");
 
@@ -332,10 +359,8 @@
         await createUserProfile(cred.user.uid, email, planId);
         await markOrderRegistered(orderId, cred.user.uid, email);
 
-        showMsg("Sikeres regisztráció ✅ A fiókod aktiválásra vár (admin).");
-
-        // login oldalra (ne app-ba), mert pending
-        location.replace(`${BASE_PREFIX}/hu/login/`);
+        showMsg("Sikeres regisztráció ✅");
+        location.replace(`${BASE_PREFIX}/hu/app/`);
       }catch(err){
         console.error(err);
         const code = String(err?.code || "");
