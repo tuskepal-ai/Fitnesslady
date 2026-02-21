@@ -1,298 +1,294 @@
-// FILE: /hu/shared/firebase.js
-// Firebase v9 modular (CDN) — shared helpers
+/* FILE: /hu/shared/firebase.js */
+/**
+ * Firebase v9 CDN shared helpers (PRO baseline) + Chat additions (OP2)
+ *
+ * Exports kept compatible with existing /hu/app/index.html:
+ * - BASE_PREFIX, auth, db, fs, onAuth, logout, toLogin
+ * - escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
+ *
+ * + Added for chat-widget/admin:
+ * - storage, ensureUserDoc, getUserDoc, isChatAllowed
+ * - ensureChatThread, listenChatMessages, sendChatText, sendChatImage
+ * - listenChatThreads, markAdminRead, markUserRead, createJitsiRoomName, sendCallInvite
+ */
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+
 import {
   getAuth,
   onAuthStateChanged,
-  signInWithEmailAndPassword,
-  signOut
+  signOut,
+  setPersistence,
+  browserLocalPersistence
 } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
+
+import * as fs from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+
 import {
-  getFirestore,
-  doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, getDocs, query, orderBy, limit, where,
-  serverTimestamp
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+  getStorage,
+  ref,
+  uploadBytes,
+  getDownloadURL
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
-/**
- * Admin email(ek)
- */
-export const ADMIN_EMAILS = [
-  "tuskepal@gmail.com",
-];
+export { fs };
 
-export const BASE_PREFIX = ""; // GitHub Pages root
+/* =========================
+   CONFIG + INIT
+========================= */
+export const BASE_PREFIX = ""; // ha kell alá-mappa github pagesnél, ide tedd: "/repo"
 
-export const firebaseConfig = {
-  apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
-  authDomain: "fitneady-15fd0.firebaseapp.com",
-  projectId: "fitneady-15fd0",
-  storageBucket: "fitneady-15fd0.firebasestorage.app",
-  messagingSenderId: "480597492603",
-  appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
-  measurementId: "G-MH1YK9C2YF"
+const firebaseConfig = window.FIREBASE_CONFIG || {
+  apiKey: "",
+  authDomain: "",
+  projectId: "",
+  storageBucket: "",
+  messagingSenderId: "",
+  appId: ""
 };
 
-export const app = initializeApp(firebaseConfig);
+const app = initializeApp(firebaseConfig);
+
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = fs.getFirestore(app);
+export const storage = getStorage(app);
 
-// Firestore namespace export
-export const fs = {
-  doc, getDoc, setDoc, updateDoc, deleteDoc,
-  collection, getDocs, query, orderBy, limit, where,
-  serverTimestamp
-};
+setPersistence(auth, browserLocalPersistence).catch(()=>{});
 
-// ---------- Helpers ----------
-export function escapeHtml(str){
-  const s = String(str ?? "");
-  return s
-    .replaceAll("&","&amp;")
-    .replaceAll("<","&lt;")
-    .replaceAll(">","&gt;")
-    .replaceAll('"',"&quot;")
-    .replaceAll("'","&#39;");
-}
-export function safeJsonParse(txt, fallback=null){
-  try{ return JSON.parse(txt); }catch{ return fallback; }
-}
-export function clamp(n, a, b){
-  const x = Number(n);
-  return Math.min(b, Math.max(a, x));
-}
-export function todayISO(){
-  const d = new Date();
-  const yyyy = d.getFullYear();
-  const mm = String(d.getMonth()+1).padStart(2,"0");
-  const dd = String(d.getDate()).padStart(2,"0");
-  return `${yyyy}-${mm}-${dd}`;
-}
-export function fmtDate(iso){
-  if(!iso) return "—";
-  try{
-    const d = new Date(iso);
-    return d.toLocaleDateString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit" });
-  }catch{ return String(iso); }
-}
-export function daysBetween(aIso, bIso){
-  try{
-    const a = new Date(aIso);
-    const b = new Date(bIso);
-    const ms = b.getTime() - a.getTime();
-    return Math.floor(ms / (1000*60*60*24));
-  }catch{ return 0; }
-}
+/* =========================
+   NAV
+========================= */
+export function toLogin(lang="hu"){ location.href = `${BASE_PREFIX}/${lang}/login/`; }
+export function toApp(lang="hu"){ location.href = `${BASE_PREFIX}/${lang}/app/`; }
+export function toAdmin(lang="hu"){ location.href = `${BASE_PREFIX}/${lang}/admin/`; }
 
-export function normalizeEmail(email){
-  return String(email || "").trim().toLowerCase();
-}
-
-export function normalizePlanId(planId){
-  const v = String(planId || "").trim().toLowerCase();
-  if(!v) return "start_v1";
-  if(v === "start") return "start_v1";
-  if(v === "balance") return "balance_v1";
-  if(v === "pro" || v === "por") return "pro_v1";
-  return String(planId || "start_v1").trim();
-}
-
-export function getQueryParam(name, url = window.location.href){
-  try{
-    const u = new URL(url);
-    return (u.searchParams.get(name) || "").trim();
-  }catch{
-    return "";
-  }
-}
-
-// ---------- Navigation ----------
-export function toLogin(lang="hu"){
-  const l = (lang === "de") ? "de" : "hu";
-  window.location.href = `${BASE_PREFIX}/${l}/login/`;
-}
-export function toApp(lang="hu"){
-  const l = (lang === "de") ? "de" : "hu";
-  window.location.href = `${BASE_PREFIX}/${l}/app/`;
-}
-export function toAdmin(lang="hu"){
-  const l = (lang === "de") ? "de" : "hu";
-  window.location.href = `${BASE_PREFIX}/${l}/admin/`;
-}
-
-// ---------- Auth ----------
+/* =========================
+   AUTH
+========================= */
 export function onAuth(cb){
   return onAuthStateChanged(auth, cb);
 }
 export async function logout(){
   await signOut(auth);
 }
-export async function loginEmailPassword(email, password){
-  return await signInWithEmailAndPassword(auth, email, password);
+
+/* =========================
+   UTIL
+========================= */
+export function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+export function safeJsonParse(s, fallback=null){
+  try{ return JSON.parse(s); }catch(_){ return fallback; }
+}
+export function todayISO(){
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth()+1).padStart(2,"0");
+  const day = String(d.getDate()).padStart(2,"0");
+  return `${y}-${m}-${day}`;
+}
+export function clamp(n, a, b){
+  const x = Number(n);
+  return Math.max(a, Math.min(b, x));
+}
+export function daysBetween(isoA, isoB){
+  const a = new Date(`${isoA}T00:00:00`).getTime();
+  const b = new Date(`${isoB}T00:00:00`).getTime();
+  return Math.round((b - a) / (24*60*60*1000));
+}
+export function fmtDate(iso){
+  if(!iso) return "—";
+  const d = new Date(`${iso}T00:00:00`);
+  return d.toLocaleDateString("hu-CH", { year:"numeric", month:"2-digit", day:"2-digit" });
 }
 
-// ---------- Profile bootstrap & role check ----------
-export function isAdminEmail(email){
-  const e = normalizeEmail(email);
-  return ADMIN_EMAILS.map(x=>normalizeEmail(x)).includes(e);
-}
-
-export async function ensureUserDoc(uid, email){
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
+/* =========================
+   USER DOC (OP2 fields)
+========================= */
+export async function ensureUserDoc(uid, patch = {}){
+  const r = fs.doc(db, "users", uid);
+  const snap = await fs.getDoc(r);
 
   if(!snap.exists()){
-    const initial = {
-      email: email || "",
-      name: "",
-
-      role: "user",
-      status: "active",
-      planId: "start_v1",
-      goal: "Formálás",
-      level: 2,
-      lang: "hu",
-      lifetimeAccess: true,
-      cycleStart: null,
-      cycleEnd: null,
-
-      dietPlan: {},
-
-      introCard: { title:"", text:"", video:"" },
-
-      motivationCard: {
-        title: "A rendszer szabadság.",
-        text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
-      },
-
-      // Payment flags (admin a source of truth)
+    await fs.setDoc(r, {
+      createdAt: fs.serverTimestamp(),
       paid: false,
-      activated: false,
-      payment: {
-        provider: "",
-        sid: "",
-        status: "none" // none | pending_activation | activated
-      },
+      chatEnabled: false,
+      chatTrialUntil: null,
+      ...patch
+    }, { merge: true });
+    return;
+  }
 
-      // Trackerek napra bontva
-      trackersByDay: {},
+  const d = snap.data() || {};
+  const fix = {};
+  if(typeof d.paid !== "boolean") fix.paid = false;
+  if(typeof d.chatEnabled !== "boolean") fix.chatEnabled = false;
+  if(!("chatTrialUntil" in d)) fix.chatTrialUntil = null;
 
-      // Technika lista
-      techVault: [],
-
-      createdAt: serverTimestamp(),
-      updatedAt: serverTimestamp()
-    };
-    await setDoc(ref, initial, { merge: true });
-    return initial;
-  }else{
-    const data = snap.data() || {};
-    const patch = {};
-
-    if(email && data.email !== email){
-      patch.email = email;
-      patch.updatedAt = serverTimestamp();
-    }
-    if(!("name" in data)) patch.name = "";
-    if(!data.motivationCard){
-      patch.motivationCard = {
-        title: "A rendszer szabadság.",
-        text: "Nem kell tökéletesnek lenned. Elég, ha következetes vagy."
-      };
-    }
-    if(!data.introCard) patch.introCard = { title:"", text:"", video:"" };
-    if(!data.dietPlan) patch.dietPlan = {};
-    if(!data.trackersByDay) patch.trackersByDay = {};
-    if(!data.techVault) patch.techVault = [];
-    if(typeof data.paid !== "boolean") patch.paid = false;
-    if(typeof data.activated !== "boolean") patch.activated = false;
-    if(!data.payment) patch.payment = { provider:"", sid:"", status:"none" };
-
-    if(Object.keys(patch).length){
-      await setDoc(ref, patch, { merge:true });
-    }
-    return (await getDoc(ref)).data();
+  if(Object.keys(fix).length){
+    await fs.updateDoc(r, fix).catch(()=>{});
+  }
+  if(patch && Object.keys(patch).length){
+    await fs.updateDoc(r, patch).catch(()=>{});
   }
 }
 
-export async function getUserRole(uid){
-  const ref = doc(db, "users", uid);
-  const snap = await getDoc(ref);
-  if(!snap.exists()) return null;
-  const role = String((snap.data()?.role || "")).toLowerCase();
-  return role || null;
+export async function getUserDoc(uid){
+  const snap = await fs.getDoc(fs.doc(db, "users", uid));
+  return snap.exists() ? (snap.data() || null) : null;
 }
 
 /**
- * Purchases / Stripe “Payment Link” flow (admin activation)
- *
- * Collection: purchases
- * Doc id: sid (Checkout Session ID)
+ * ✅ OP2: chat allowed when:
+ * - paid === true OR chatEnabled === true OR chatTrialUntil > now
  */
-export async function upsertPurchaseFromStripe({ sid, planId, email, uid }){
-  const _sid = String(sid || "").trim();
-  if(!_sid) throw new Error("Missing sid");
-  const _planId = normalizePlanId(planId);
-  const _email = normalizeEmail(email);
+export function isChatAllowed(userDoc){
+  if(!userDoc) return false;
+  if(userDoc.paid === true) return true;
+  if(userDoc.chatEnabled === true) return true;
 
-  const pref = doc(db, "purchases", _sid);
-  await setDoc(pref, {
-    provider: "stripe",
-    sid: _sid,
-    planId: _planId,
-    email: _email,
-    uid: uid || "",
-    status: "pending_activation", // pending_activation | activated | cancelled
-    createdAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  }, { merge:true });
-
-  return _sid;
+  const t = userDoc.chatTrialUntil;
+  let ms = 0;
+  if(t?.toDate) ms = t.toDate().getTime();
+  else if(typeof t === "number") ms = t;
+  else if(t instanceof Date) ms = t.getTime();
+  return !!ms && ms > Date.now();
 }
 
-export async function activateUserFromPurchase({ uid, sid }){
-  const _uid = String(uid || "").trim();
-  const _sid = String(sid || "").trim();
-  if(!_uid) throw new Error("Missing uid");
-  if(!_sid) throw new Error("Missing sid");
+/* =========================
+   CHAT MODEL
+   chats/{uid} thread meta
+   chats/{uid}/messages/{mid}
+========================= */
+export async function ensureChatThread(uid, meta = {}){
+  const r = fs.doc(db, "chats", uid);
+  const snap = await fs.getDoc(r);
 
-  const pref = doc(db, "purchases", _sid);
-  const ps = await getDoc(pref);
-  if(!ps.exists()) throw new Error("Purchase not found");
+  const base = {
+    uid,
+    createdAt: fs.serverTimestamp(),
+    lastMessageAt: null,
+    lastMessageSender: null,
+    lastMessageText: "",
+    lastAdminReadAt: null,
+    lastUserReadAt: fs.serverTimestamp()
+  };
 
-  const pd = ps.data() || {};
-  const planId = normalizePlanId(pd.planId || "start_v1");
-  const email = normalizeEmail(pd.email || "");
+  if(!snap.exists()){
+    await fs.setDoc(r, { ...base, ...meta }, { merge: true });
+    return;
+  }
 
-  // 1) user update
-  await setDoc(doc(db, "users", _uid), {
-    email: email || undefined,
-    planId,
-    status: "active",
-    paid: true,
-    activated: true,
-    payment: {
-      provider: "stripe",
-      sid: _sid,
-      status: "activated"
-    },
-    updatedAt: serverTimestamp()
-  }, { merge:true });
-
-  // 2) purchase update
-  await setDoc(pref, {
-    uid: _uid,
-    status: "activated",
-    activatedAt: serverTimestamp(),
-    updatedAt: serverTimestamp()
-  }, { merge:true });
-
-  return { uid:_uid, sid:_sid, planId };
+  const d = snap.data() || {};
+  const fix = {};
+  if(!("lastMessageText" in d)) fix.lastMessageText = "";
+  if(!("lastUserReadAt" in d)) fix.lastUserReadAt = fs.serverTimestamp();
+  if(Object.keys(fix).length){
+    await fs.updateDoc(r, fix).catch(()=>{});
+  }
+  if(meta && Object.keys(meta).length){
+    await fs.updateDoc(r, meta).catch(()=>{});
+  }
 }
 
-export async function listRecentPurchases(max=40){
-  const m = clamp(parseInt(max,10) || 40, 1, 120);
-  const col = collection(db, "purchases");
-  const snap = await getDocs(query(col, orderBy("createdAt","desc"), limit(m)));
-  return snap.docs.map(d => ({ id:d.id, ...(d.data()||{}) }));
+async function updateThreadMeta(uid, sender, textPreview){
+  await fs.updateDoc(fs.doc(db, "chats", uid), {
+    lastMessageAt: fs.serverTimestamp(),
+    lastMessageSender: sender,
+    lastMessageText: String(textPreview || "").slice(0, 180)
+  }).catch(()=>{});
 }
+
+export function listenChatMessages(uid, cb){
+  const q = fs.query(
+    fs.collection(db, "chats", uid, "messages"),
+    fs.orderBy("createdAt", "asc"),
+    fs.limit(200)
+  );
+  return fs.onSnapshot(q, (snap)=>{
+    const items = [];
+    snap.forEach(d => items.push({ id: d.id, ...(d.data()||{}) }));
+    cb(items);
+  });
+}
+
+export async function sendChatText(uid, sender, text){
+  const clean = String(text||"").trim();
+  if(!clean) return;
+
+  await fs.addDoc(fs.collection(db, "chats", uid, "messages"), {
+    sender,
+    type: "text",
+    text: clean,
+    createdAt: fs.serverTimestamp()
+  });
+
+  await updateThreadMeta(uid, sender, clean);
+
+  if(sender === "user"){
+    await fs.updateDoc(fs.doc(db, "chats", uid), { lastUserReadAt: fs.serverTimestamp() }).catch(()=>{});
+  }else{
+    await fs.updateDoc(fs.doc(db, "chats", uid), { lastAdminReadAt: fs.serverTimestamp() }).catch(()=>{});
+  }
+}
+
+export async function sendChatImage(uid, sender, file){
+  if(!file) return;
+  const f = file;
+  const ext = (f.name || "img").split(".").pop().slice(0,6);
+  const safeExt = ext.match(/^[a-zA-Z0-9]+$/) ? ext : "jpg";
+  const path = `chat_uploads/${uid}/${Date.now()}_${Math.random().toString(16).slice(2)}.${safeExt}`;
+
+  const r = ref(storage, path);
+  await uploadBytes(r, f, { contentType: f.type || "image/jpeg" });
+  const url = await getDownloadURL(r);
+
+  await fs.addDoc(fs.collection(db, "chats", uid, "messages"), {
+    sender,
+    type: "image",
+    imageUrl: url,
+    text: "",
+    createdAt: fs.serverTimestamp()
+  });
+
+  await updateThreadMeta(uid, sender, "📷 Kép");
+}
+
+export function createJitsiRoomName(uid){
+  return `fitnesslady_${uid}_${Math.random().toString(36).slice(2,10)}`;
+}
+
+export async function sendCallInvite(uid, sender, room){
+  const rr = String(room||"").slice(0, 80);
+  await fs.addDoc(fs.collection(db, "chats", uid, "messages"), {
+    sender,
+    type: "call",
+    callRoom: rr,
+    text: "",
+    createdAt: fs.serverTimestamp()
+  });
+  await updateThreadMeta(uid, sender, "🎥 Videóhívás");
+}
+
+export async function markAdminRead(uid){
+  await fs.updateDoc(fs.doc(db, "chats", uid), { lastAdminReadAt: fs.serverTimestamp() }).catch(()=>{});
+}
+export async function markUserRead(uid){
+  await fs.updateDoc(fs.doc(db, "chats", uid), { lastUserReadAt: fs.serverTimestamp() }).catch(()=>{});
+}
+
+export function listenChatThreads(cb){
+  const q = fs.query(fs.collection(db, "chats"), fs.orderBy("lastMessageAt", "desc"), fs.limit(200));
+  return fs.onSnapshot(q, (snap)=>{
+    const items = [];
+    snap.forEach(d=>items.push({ id:d.id, ...(d.data()||{}) }));
+    cb(items);
+  });
+                  }
