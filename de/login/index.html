@@ -7,9 +7,12 @@
   <title>Fitness Lady — Login</title>
   <meta name="robots" content="noindex" />
   <script>
-    // DE login: HU login UI-t használjuk, csak német nyelvvel
-    localStorage.setItem("lang", "de");
-    location.replace("/hu/login/?lang=de");
+    (function(){
+      const isGitHub = location.hostname.endsWith("github.io");
+      const base = isGitHub ? "/Fitnesslady" : "";
+      localStorage.setItem("lang", "de");
+      location.replace(base + "/hu/login/?lang=de");
+    })();
   </script>
 </head>
 <body></body>
