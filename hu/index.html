@@ -26,6 +26,13 @@
 
       /* ✅ BASE PATH kompatibilitás (JS állítja be szükség esetén) */
       --hero-url: url("/hero.png");
+
+      /* ✅ ugyanaz a logika mint DE-ben: háttér pozíció finomhangolás */
+      --hero-pos-x: 78%;
+      --hero-pos-y: 18%;
+
+      /* topbar magasság */
+      --topbar-h: 64px;
     }
 
     *{ box-sizing:border-box; }
@@ -42,6 +49,9 @@
         var(--bg);
       color:var(--text);
       overflow-x:hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      text-rendering: geometricPrecision;
     }
 
     /* ===== FULL-PAGE BACKGROUND: hero.png végig az egész oldalon ===== */
@@ -52,9 +62,10 @@
       z-index: -1;
       background-image: var(--hero-url);
       background-size: cover;
-      background-position: center;
+      background-position: var(--hero-pos-x) var(--hero-pos-y);
       background-repeat: no-repeat;
       transform: translateZ(0);
+      will-change: transform;
     }
 
     a{ color:inherit; text-decoration:none; }
@@ -84,18 +95,19 @@
       font-size: 15px;
     }
 
-    /* ========= Topbar ========= */
+    /* ========= Topbar (DE-hez igazítva) ========= */
     .topbar{
       position: fixed;
       top:0; left:0; right:0;
       z-index: 50;
+      padding: 12px 14px;
       background: rgba(8,6,12,.55);
       border-bottom: 1px solid rgba(255,255,255,.06);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
     .topbar-inner{
-      height: 64px;
+      height: var(--topbar-h);
       display:flex;
       align-items:center;
       justify-content: space-between;
@@ -108,6 +120,8 @@
       font-weight:800;
       letter-spacing:.2px;
       white-space: nowrap;
+      flex: 0 0 auto;
+      min-width: 0;
     }
     .dot{
       width:10px;height:10px;border-radius:999px;
@@ -161,6 +175,9 @@
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 14px 30px rgba(255,79,216,.22);
       white-space: nowrap;
+      max-width: 220px;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .menu-btn{
@@ -170,6 +187,7 @@
       color: var(--text);
       display:none;
       align-items:center; justify-content:center;
+      flex: 0 0 auto;
     }
 
     /* ========= Hero ========= */
@@ -177,7 +195,7 @@
       position: relative;
       min-height: 100vh;
       min-height: 100dvh;
-      padding-top: 64px;
+      padding-top: calc(var(--topbar-h) + 18px);
       display:flex;
       align-items:center;
       overflow: hidden;
@@ -597,7 +615,7 @@
 
     @media (max-width: 980px){
       .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
-      .badge, .btn, .meta-pill, .glass, .rating{
+      .badge, .btn, .meta-pill, .glass, .rating, .cta-pill{
         backdrop-filter:none !important;
         -webkit-backdrop-filter:none !important;
       }
@@ -612,11 +630,27 @@
     }
 
     @media (max-width: 980px){
+      :root{
+        /* ✅ mobil háttér pozíció (DE-szerű) */
+        --hero-pos-x: 75%;
+        --hero-pos-y: 10%;
+        --topbar-h: 56px;
+      }
+
       .hero-grid{ grid-template-columns: 1fr; }
       .menu-btn{ display:inline-flex; }
       .nav{ display:none; }
       .what-grid{ grid-template-columns: 1fr; }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
+
+      .topbar{ padding: 10px 12px; }
+      .cta-pill{ max-width: 160px; padding: 9px 12px; font-weight: 900; }
+      .btn{ padding: 11px 14px; }
+    }
+
+    @media (max-width: 420px){
+      .cta-pill{ max-width: 132px; }
+      .brand span:last-child{ font-size: 15px; }
     }
   </style>
 </head>
@@ -637,13 +671,13 @@
         <a href="#jogi">Jogi</a>
       </nav>
 
-      <div style="display:flex; align-items:center; gap:10px;">
+      <div style="display:flex; align-items:center; gap:10px; min-width:0;">
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
 
         <!-- Saját oldalam marad login -->
         <a class="btn interactive" data-route="/hu/login/" href="/hu/login/" style="padding:10px 14px;">Saját oldalam</a>
 
-        <a class="cta-pill" href="#kapcsolat">Ingyenes konzultáció</a>
+        <a class="cta-pill" href="#kapcsolat" title="Ingyenes konzultáció">Ingyenes konzultáció</a>
       </div>
     </div>
   </header>
@@ -893,9 +927,7 @@ Edina • Fitnesz Lady
 
       <div class="packages" style="grid-template-columns: 1fr 1fr;">
         <article class="glass interactive pkg reveal" data-delay="1">
-          <div class="pkg-top">
-            <h3>ÁFSZ</h3>
-          </div>
+          <div class="pkg-top"><h3>ÁFSZ</h3></div>
           <p>Általános Szerződési Feltételek.</p>
           <div class="pkg-actions" style="grid-template-columns: 1fr;">
             <a class="btn primary interactive" data-route="/hu/legal/afsz/" href="/hu/legal/afsz/">Megnyitás</a>
@@ -903,9 +935,7 @@ Edina • Fitnesz Lady
         </article>
 
         <article class="glass interactive pkg reveal" data-delay="2">
-          <div class="pkg-top">
-            <h3>Adatkezelési tájékoztató</h3>
-          </div>
+          <div class="pkg-top"><h3>Adatkezelési tájékoztató</h3></div>
           <p>Milyen adatot kezelünk, miért és mennyi ideig.</p>
           <div class="pkg-actions" style="grid-template-columns: 1fr;">
             <a class="btn primary interactive" data-route="/hu/legal/adatkezeles/" href="/hu/legal/adatkezeles/">Megnyitás</a>
@@ -913,9 +943,7 @@ Edina • Fitnesz Lady
         </article>
 
         <article class="glass interactive pkg reveal" data-delay="3">
-          <div class="pkg-top">
-            <h3>Impresszum</h3>
-          </div>
+          <div class="pkg-top"><h3>Impresszum</h3></div>
           <p>Üzemeltető és elérhetőségek.</p>
           <div class="pkg-actions" style="grid-template-columns: 1fr;">
             <a class="btn primary interactive" data-route="/hu/legal/impresszum/" href="/hu/legal/impresszum/">Megnyitás</a>
@@ -923,9 +951,7 @@ Edina • Fitnesz Lady
         </article>
 
         <article class="glass interactive pkg reveal" data-delay="3">
-          <div class="pkg-top">
-            <h3>Orvosi nyilatkozat</h3>
-          </div>
+          <div class="pkg-top"><h3>Orvosi nyilatkozat</h3></div>
           <p>Edzés megkezdése előtti felelősségi tájékoztató.</p>
           <div class="pkg-actions" style="grid-template-columns: 1fr;">
             <a class="btn primary interactive" data-route="/hu/legal/orvosi/" href="/hu/legal/orvosi/">Megnyitás</a>
@@ -1010,7 +1036,7 @@ Edina • Fitnesz Lady
         const nav = document.createElement("div");
         nav.id = "mobileNav";
         nav.style.position = "fixed";
-        nav.style.top = "64px";
+        nav.style.top = "66px";
         nav.style.left = "14px";
         nav.style.right = "14px";
         nav.style.zIndex = "60";
@@ -1357,4 +1383,4 @@ Edina • Fitnesz Lady
     loadReviews();
   </script>
 </body>
-</html>
+  </html>
