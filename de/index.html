@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Fitness Lady — Trainingsprogramme für Frauen</title>
-  <meta name="description" content="Individuelle Trainingsprogramme für Frauen. Nachhaltig, alltagstauglich und auf dich abgestimmt." />
+  <meta name="description" content="Individuelle Trainingsprogramme für Frauen. Struktur, Progression, Ernährung und Begleitung – alltagstauglich und premium." />
   <meta name="theme-color" content="#120018" />
 
   <style>
@@ -165,7 +165,6 @@
       background-size: cover;
       background-repeat: no-repeat;
       background-position: var(--hero-pos-x) var(--hero-pos-y);
-      filter:none;
       transform: translateZ(0);
       will-change: transform;
     }
@@ -295,46 +294,6 @@
       font-weight: 850;
     }
 
-    .about-grid{
-      display:grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 14px;
-      align-items: start;
-    }
-    .about-box{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .about-name{
-      font-family: ui-serif, Georgia, serif;
-      font-size: 20px;
-      margin: 0 0 6px;
-      letter-spacing: -0.2px;
-      font-weight: 800;
-    }
-    .about-text{
-      margin: 0;
-      color: var(--muted);
-      line-height: 1.6;
-      font-size: 13.5px;
-    }
-
-    .hero-cards{
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 14px;
-    }
-    .mini{
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: 18px;
-      padding: 14px;
-    }
-    .mini h3{ margin:0 0 8px; font-size: 14px; letter-spacing: .2px; font-weight: 900; }
-    .mini p{ margin:0; color: var(--muted); font-size: 12.8px; line-height: 1.5; }
-
     section{ position: relative; padding: 52px 0; }
     .container{ max-width: var(--max); padding: 0 14px; margin: 0 auto; }
     .section-title{
@@ -397,6 +356,38 @@
       margin-top: 14px;
       flex-wrap: wrap;
     }
+
+    .about-grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+      align-items: start;
+    }
+    .about-box{
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: 18px;
+      padding: 16px;
+    }
+    .about-name{
+      font-family: ui-serif, Georgia, serif;
+      font-size: 22px;
+      margin: 0 0 8px;
+      letter-spacing: -0.2px;
+      font-weight: 900;
+    }
+    .about-text{
+      margin: 0;
+      color: rgba(255,255,255,.78);
+      line-height: 1.75;
+      font-size: 14px;
+      white-space: pre-wrap;
+    }
+    .about-pills{
+      display:flex; flex-wrap:wrap; gap:10px;
+      margin-top: 14px;
+    }
+    .about-pills .meta-pill{ font-size: 12.8px; }
 
     /* Modal (AGB) */
     .modal-overlay{
@@ -491,17 +482,26 @@
       .hero-grid{ grid-template-columns: 1fr; }
       .nav{ display:none; }
       .menu-btn{ display:inline-flex; }
-      .hero-cards{ grid-template-columns: repeat(2, 1fr); }
       .packages{ grid-template-columns: 1fr; }
       .about-grid{ grid-template-columns: 1fr; }
-    }
-    @media (max-width: 520px){
-      .hero-cards{ grid-template-columns: 1fr; }
     }
   </style>
 </head>
 
 <body>
+  <!--
+    ✅ STRIPE CHECKOUT LINKS (DE):
+    Ide írd be a 3 db ÉLES Stripe Checkout URL-t, és a Kaufen gomb azonnal működik.
+    Pl: https://buy.stripe.com/xxxxxxxxxxxxxxxxxx
+  -->
+  <script>
+    window.FITNESSLADY_PAYMENTS_DE = {
+      start:   "",   // <- Stripe Checkout URL (Start)
+      balance: "",   // <- Stripe Checkout URL (Balance)
+      pro:     ""    // <- Stripe Checkout URL (Pro)
+    };
+  </script>
+
   <header class="topbar">
     <div class="topbar-inner">
       <a class="brand" href="#top" aria-label="Fitness Lady">
@@ -511,7 +511,7 @@
 
       <nav class="nav" aria-label="Menü">
         <a href="#pakete">Pakete</a>
-        <a href="#ablauf">Wie es funktioniert</a>
+        <a href="#uber-mich">Über mich</a>
         <a href="#bewertungen">Bewertungen</a>
         <a href="#agb">AGB</a>
         <a href="#kontakt">Kontakt</a>
@@ -542,13 +542,13 @@
           <h1>Trainingsprogramme für Frauen,<br>die wirklich funktionieren.</h1>
 
           <p class="lead">
-            Klare Struktur, stabile Routine und ein Plan, der zu deinem Alltag passt.
+            Klare Struktur, Progression und ein Plan, der zu deinem Alltag passt.
             Training und Ernährung werden so aufgebaut, dass du dranbleibst – und Ergebnisse siehst.
           </p>
 
           <div class="hero-actions">
-            <a class="btn primary" href="#kontakt">Kostenlose Beratung</a>
-            <a class="btn" href="#pakete">Pakete</a>
+            <a class="btn primary" href="#pakete">Pakete ansehen</a>
+            <a class="btn" href="#uber-mich">Über mich</a>
             <a class="btn ghost" href="/de/login/">Login</a>
             <button class="btn ghost" id="btnAfb" type="button">AGB öffnen</button>
           </div>
@@ -572,66 +572,42 @@
       <div class="card" style="margin-top:22px;">
         <div class="card-inner">
           <div class="card-head">
-            <div class="card-title">Über Fitness Lady</div>
-            <div class="tag">Personal Training</div>
-          </div>
-
-          <div class="about-grid">
-            <div class="about-box">
-              <p class="about-name">Fitness Lady</p>
-              <p class="about-text">
-                Individuelle Begleitung – strukturiert, klar und realistisch. Du bekommst einen Plan,
-                der dich nicht überfordert, sondern dauerhaft funktioniert.
-              </p>
-            </div>
-
-            <div class="about-box">
-              <p class="about-name" style="margin-bottom:10px;">Warum es funktioniert</p>
-              <p class="about-text">
-                Kein Overload. Keine Extreme. Ein System, das in deinen Alltag passt:
-                Progression, Routine, Feedback – und messbare Ergebnisse.
-              </p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="card" style="margin-top:14px;">
-        <div class="card-inner">
-          <div class="card-head">
             <div class="card-title">Was du genau bekommst</div>
             <div class="tag">Premium</div>
           </div>
-
-          <div class="hero-cards">
-            <div class="mini"><h3>Training</h3><p>Wochenplan + Progression. Klar, realistisch, nachhaltig.</p></div>
-            <div class="mini"><h3>Ernährung</h3><p>Einfaches System + individuelle Anpassungen (admin).</p></div>
-            <div class="mini"><h3>Support</h3><p>Feedback, Anpassungen, Begleitung.</p></div>
-            <div class="mini"><h3>Fokus</h3><p>Form • Kraft • Wohlbefinden – zielorientiert.</p></div>
+          <div class="about-grid">
+            <div class="about-box">
+              <div class="about-name">Training</div>
+              <p class="about-text">Wochenstruktur • klare Anleitung • Progression • nachhaltige Belastung</p>
+            </div>
+            <div class="about-box">
+              <div class="about-name">Ernährung</div>
+              <p class="about-text">Einfaches System • Anpassung an deinen Alltag • stabile Energie</p>
+            </div>
           </div>
         </div>
       </div>
+
     </div>
   </main>
 
   <section id="pakete">
     <div class="container">
       <div class="section-title">Pakete</div>
-      <p class="section-sub">Wähle nach Ziel und Zeit. Premium Look, klare Struktur, stabile Routine.</p>
+      <p class="section-sub">Wähle nach Ziel und Zeit. Nach Kauf erhältst du Zugriff auf deinen persönlichen Bereich.</p>
 
       <div class="packages">
         <div class="pkg">
           <div class="pkg-inner">
             <div class="pkg-top"><h4>Start</h4><span class="tag">4 Wochen</span></div>
-            <p>Für einen klaren Plan und Momentum.</p>
+            <p>Für einen klaren Plan, Routine und Momentum.</p>
             <ul class="list">
               <li>✓ Strukturierter Wochenplan</li>
               <li>✓ Ernährungs-Grundsystem</li>
               <li>✓ 1× Anpassung</li>
             </ul>
             <div class="pkg-actions">
-              <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#" data-buy="start" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
@@ -646,8 +622,7 @@
               <li>✓ Gewohnheiten & Mini-Ziele</li>
             </ul>
             <div class="pkg-actions">
-              <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#" data-buy="balance" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
@@ -655,28 +630,72 @@
         <div class="pkg">
           <div class="pkg-inner">
             <div class="pkg-top"><h4>Pro</h4><span class="tag">12 Wochen</span></div>
-            <p>Maximale Begleitung, ohne Überforderung.</p>
+            <p>Maximale Begleitung, klar strukturiert und alltagstauglich.</p>
             <ul class="list">
               <li>✓ Voll personalisiert</li>
               <li>✓ Häufigere Check-ins</li>
               <li>✓ Shape & Performance Fokus</li>
             </ul>
             <div class="pkg-actions">
-              <a class="btn" href="#kontakt" style="padding:10px 14px;">Beratung</a>
-              <a class="btn primary" href="#kontakt" style="padding:10px 14px;">Kaufen</a>
+              <a class="btn primary" href="#" data-buy="pro" style="padding:10px 14px;">Kaufen</a>
             </div>
           </div>
         </div>
       </div>
+
+      <div class="card" style="margin-top:16px;">
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-title">Nach dem Kauf</div>
+            <div class="tag">Zugang</div>
+          </div>
+          <div style="color: rgba(255,255,255,.78); line-height:1.7; font-size: 14px;">
+            Nach der Zahlung erhältst du den Zugang zu deinem persönlichen Bereich (Login).
+            Dort findest du dein Programm, deine Inhalte und deine Anpassungen.
+          </div>
+        </div>
+      </div>
+
     </div>
   </section>
 
-  <section id="ablauf">
+  <section id="uber-mich">
     <div class="container">
-      <div class="section-title">Wie es funktioniert</div>
-      <p class="section-sub">
-        1) Kostenloses Gespräch → 2) Ziel & Level → 3) Plan live im Account → 4) Anpassung durch Feedback.
-      </p>
+      <div class="section-title">Über mich</div>
+      <p class="section-sub">Du bekommst nicht nur einen Plan – du bekommst Struktur, Klarheit und Begleitung.</p>
+
+      <div class="card">
+        <div class="card-inner">
+          <div class="card-head">
+            <div class="card-title">Edina — FitnessLady</div>
+            <div class="tag">Coach</div>
+          </div>
+
+          <div class="about-grid">
+            <div class="about-box">
+              <div class="about-name">Meine Philosophie</div>
+              <p class="about-text">Ich arbeite mit einem klaren System: Struktur → Routine → Progression.
+Kein Chaos, keine Extreme, kein Überfordern. Du sollst dich gut fühlen, stärker werden und Ergebnisse sehen – Schritt für Schritt.</p>
+              <div class="about-pills">
+                <div class="meta-pill">✅ klare Anleitung</div>
+                <div class="meta-pill">✅ alltagstauglich</div>
+                <div class="meta-pill">✅ nachhaltig</div>
+              </div>
+            </div>
+
+            <div class="about-box">
+              <div class="about-name">Wie wir starten</div>
+              <p class="about-text">Du wählst ein Paket, danach bekommst du Zugang zu deinem Bereich.
+Dort findest du dein Programm, deine Inhalte und – je nach Paket – deine Anpassungen und personalisierten Slots.</p>
+              <div class="hero-actions" style="margin-top:14px;">
+                <a class="btn primary" href="#pakete">Paket wählen</a>
+                <a class="btn ghost" href="#kontakt">Kontakt</a>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
     </div>
   </section>
 
@@ -686,16 +705,14 @@
       <p class="section-sub">
         Hier erscheinen Kundenbewertungen. Du kannst auch selbst eine Bewertung schreiben.
       </p>
-      <!-- (A vélemény modulod már működik, itt nem nyúlunk bele) -->
+      <!-- A vélemény modulod itt fut (ha már be van kötve). -->
     </div>
   </section>
 
   <section id="agb">
     <div class="container">
       <div class="section-title">AGB</div>
-      <p class="section-sub">
-        Allgemeine Geschäftsbedingungen & Rechtliches.
-      </p>
+      <p class="section-sub">Allgemeine Geschäftsbedingungen & Rechtliches.</p>
 
       <div class="card">
         <div class="card-inner">
@@ -718,10 +735,8 @@
   <section id="kontakt">
     <div class="container">
       <div class="section-title">Kontakt</div>
-      <p class="section-sub">
-        Für eine kostenlose Beratung: WhatsApp oder Instagram.
-      </p>
-      <!-- ide jöhetnek a valódi linkek / gombok -->
+      <p class="section-sub">Für eine kostenlose Beratung: WhatsApp oder Instagram.</p>
+      <!-- ide mehetnek a valós gombok/linkek -->
     </div>
   </section>
 
@@ -738,7 +753,7 @@
     </div>
   </footer>
 
-  <!-- AGB MODAL (iframe a /de/legal/agb/ oldalra) -->
+  <!-- AGB MODAL -->
   <div class="modal-overlay" id="afszOverlay" role="dialog" aria-modal="true" aria-hidden="true">
     <div class="modal" role="document">
       <div class="modal-header">
@@ -769,7 +784,27 @@
     close?.addEventListener("click", ()=> overlay.classList.remove("is-open"));
     overlay?.addEventListener("click", (e)=>{ if(e.target === overlay) overlay.classList.remove("is-open"); });
 
-    // simple mobile menu toggle
+    // Stripe buy routing
+    function goStripe(plan){
+      const p = (window.FITNESSLADY_PAYMENTS_DE || {});
+      const url = (p[plan] || "").trim();
+      if(!url){
+        // nincs "demo" szöveg a UI-ban; ha üres a link, akkor a Kontakt szekcióra visszük (éles viselkedés)
+        location.hash = "#kontakt";
+        return;
+      }
+      window.location.href = url;
+    }
+
+    document.querySelectorAll("[data-buy]").forEach(a=>{
+      a.addEventListener("click", (e)=>{
+        e.preventDefault();
+        const plan = a.getAttribute("data-buy");
+        goStripe(plan);
+      });
+    });
+
+    // mobile menu
     document.getElementById("menuBtn")?.addEventListener("click", ()=>{
       const open = document.getElementById("mnav");
       if(open){ open.remove(); return; }
@@ -788,7 +823,7 @@
       div.style.padding = "12px";
       div.innerHTML = `
         <a href="#pakete" style="display:block; padding:10px; color:rgba(255,255,255,.88)">Pakete</a>
-        <a href="#ablauf" style="display:block; padding:10px; color:rgba(255,255,255,.88)">Wie es funktioniert</a>
+        <a href="#uber-mich" style="display:block; padding:10px; color:rgba(255,255,255,.88)">Über mich</a>
         <a href="#bewertungen" style="display:block; padding:10px; color:rgba(255,255,255,.88)">Bewertungen</a>
         <a href="#agb" style="display:block; padding:10px; color:rgba(255,255,255,.88)">AGB</a>
         <a href="#kontakt" style="display:block; padding:10px; color:rgba(255,255,255,.88)">Kontakt</a>
