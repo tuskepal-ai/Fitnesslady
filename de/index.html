@@ -34,6 +34,9 @@
       /* ✅ háttér pozíció (DE oldalon a nő jobbra) */
       --hero-pos-x: 78%;
       --hero-pos-y: 18%;
+
+      /* ✅ topbar dinamikus magasság (JS tölti) */
+      --topbar-h: 64px;
     }
 
     *{ box-sizing:border-box; }
@@ -72,7 +75,11 @@
     button{ font:inherit; }
 
     .container{ width: min(var(--max), 92vw); margin: 0 auto; }
-    section{ padding: clamp(44px, 6vw, 76px) 0; background: rgba(7,6,11,.72); border-top: 1px solid rgba(255,255,255,.06); }
+    section{
+      padding: clamp(44px, 6vw, 76px) 0;
+      background: rgba(7,6,11,.72);
+      border-top: 1px solid rgba(255,255,255,.06);
+    }
 
     /* ========= Topbar ========= */
     .topbar{
@@ -85,11 +92,13 @@
       -webkit-backdrop-filter: blur(12px);
     }
     .topbar-inner{
-      height: 64px;
+      min-height: 64px; /* ✅ nem fix height, hogy mobilon is szépen törhessen */
+      padding: 10px 0;
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 12px;
+      flex-wrap: wrap; /* ✅ mobilon törhet, de JS miatt a hero nem csúszik alá */
     }
     .brand{
       display:flex;
@@ -112,11 +121,15 @@
       color: var(--muted);
       font-size: 14px;
       font-weight: 750;
+      flex: 1 1 auto;
+      justify-content: center;
+      min-width: 260px;
     }
     .nav a{
       position: relative;
       padding: 10px 6px;
       opacity:.92;
+      white-space: nowrap;
     }
     .nav a:hover{ opacity:1; color: var(--text); }
     .nav a::after{
@@ -137,7 +150,15 @@
       opacity: 1;
     }
 
-    .rightbar{ display:flex; align-items:center; gap:10px; }
+    .rightbar{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      justify-content:flex-end;
+      flex: 0 0 auto;
+      margin-left: auto;
+      white-space: nowrap;
+    }
 
     .lang-switch{
       display:flex;
@@ -225,7 +246,7 @@
       position: relative;
       min-height: 100vh;
       min-height: 100dvh;
-      padding-top: 64px;
+      padding-top: var(--topbar-h); /* ✅ mindig pont a header alá indul */
       display:flex;
       align-items:center;
       overflow: hidden;
@@ -471,6 +492,123 @@
       font-weight: 900;
     }
 
+    /* ===== Bewertungen (HU modul DE-ben) ===== */
+    .reviews-head{
+      display:flex;
+      align-items:flex-end;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+    .reviews-actions{ display:flex; gap:10px; flex-wrap:wrap; }
+
+    .rating{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      user-select:none;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .rating .star{
+      font-size:16px;
+      line-height:1;
+      color: rgba(255,255,255,.25);
+      transform: translateY(0) scale(1);
+      transition: transform .25s ease, filter .25s ease, color .25s ease;
+      transition-delay: calc(var(--i) * 18ms);
+    }
+    .rating .rating-text{
+      font-size: 13px;
+      opacity: .78;
+      font-weight: 900;
+      letter-spacing: .2px;
+    }
+    .rating.is-anim .star,
+    .rating:hover .star{
+      color: rgba(255, 215, 130, .95);
+      filter: drop-shadow(0 0 10px rgba(255, 200, 120, .35));
+    }
+    .rating.is-anim .star{
+      animation: starPop .55s cubic-bezier(.2,.8,.2,1) both;
+      animation-delay: calc(var(--i) * 40ms);
+    }
+    @keyframes starPop{
+      0%   { transform: translateY(2px) scale(.92); filter: none; }
+      45%  { transform: translateY(-2px) scale(1.10); }
+      100% { transform: translateY(0) scale(1.00); }
+    }
+
+    .review-carousel{ border-radius: var(--radius); }
+    .review-track{
+      display:flex;
+      gap:14px;
+      padding: 10px;
+      scroll-snap-type: x mandatory;
+      overflow-x:auto;
+      scroll-behavior:smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .review-track::-webkit-scrollbar{ display:none; }
+
+    .review-card{
+      min-width: min(440px, 86vw);
+      scroll-snap-align: start;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 14px 40px rgba(0,0,0,.35);
+      padding: 16px;
+      position: relative;
+      overflow:hidden;
+    }
+    .review-card .top{
+      display:flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items:center;
+      color: var(--muted2);
+      font-size: 12px;
+      margin-bottom: 10px;
+      white-space: nowrap;
+    }
+    .review-card .text{
+      margin: 0 0 12px;
+      color: rgba(255,255,255,.92);
+      line-height: 1.55;
+      font-size: 14px;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .review-card .stars{
+      color: rgba(255,255,255,.86);
+      letter-spacing: 1px;
+      font-size: 13px;
+    }
+
+    .review-dots{
+      display:flex;
+      justify-content:center;
+      gap:8px;
+      padding: 8px 0 2px;
+    }
+    .review-dot{
+      width:7px; height:7px;
+      border-radius:999px;
+      background: rgba(255,255,255,.18);
+      transition: transform .2s ease, background .2s ease;
+    }
+    .review-dot.is-active{
+      background: rgba(255, 215, 130, .9);
+      transform: scale(1.35);
+    }
+
     /* Legal quick buttons */
     .legal-links{
       display:flex;
@@ -564,11 +702,12 @@
     /* Performance: scroll közben glow OFF */
     body.is-scrolling .interactive::before{ opacity:0 !important; }
     body.is-scrolling .interactive{ transition:none !important; }
-    body.is-scrolling .glass{ box-shadow: 0 10px 30px rgba(0,0,0,.38) !important; }
+    body.is-scrolling .glass,
+    body.is-scrolling .review-card{ box-shadow: 0 10px 30px rgba(0,0,0,.38) !important; }
 
     @media (max-width: 980px){
       .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
-      .badge, .btn, .meta-pill, .glass{
+      .badge, .btn, .meta-pill, .glass, .rating{
         backdrop-filter:none !important;
         -webkit-backdrop-filter:none !important;
       }
@@ -577,6 +716,8 @@
     @media (prefers-reduced-motion: reduce){
       html{ scroll-behavior:auto; }
       .interactive, .btn{ transition:none; }
+      .review-track{ scroll-behavior:auto; }
+      .rating .star{ transition:none; animation:none !important; }
     }
 
     @media (max-width: 980px){
@@ -589,13 +730,21 @@
       .nav{ display:none; }
       .what-grid{ grid-template-columns: 1fr; }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
+
+      /* ✅ header elemek mobilon: kisebb paddings, ne csússzon szét */
+      .lang-switch{ padding:6px 10px; }
+      .lang-switch .lang{ font-size:12px; }
+      .btn{ padding: 10px 12px; }
+      .cta-pill{ padding: 10px 12px; }
+      .rightbar{ gap:8px; }
+      .topbar-inner{ gap:10px; }
     }
   </style>
 </head>
 
 <body>
   <!-- TOP BAR -->
-  <header class="topbar">
+  <header class="topbar" id="topbar">
     <div class="container topbar-inner">
       <a class="brand" href="#top" aria-label="Fitness Lady">
         <span class="dot"></span>
@@ -613,9 +762,9 @@
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
 
         <div class="lang-switch" aria-label="Sprachauswahl">
-          <a class="lang" data-route="/hu/" href="/hu/">HU</a>
+          <a class="lang" data-route="/hu/" href="/hu/" onclick="localStorage.setItem('lang','hu')">HU</a>
           <span class="sep">·</span>
-          <a class="lang active" data-route="/de/" href="/de/">DE</a>
+          <a class="lang active" data-route="/de/" href="/de/" onclick="localStorage.setItem('lang','de')">DE</a>
         </div>
 
         <a class="btn interactive" data-route="/de/login/" href="/de/login/" style="padding:10px 14px;">Mein Bereich</a>
@@ -630,7 +779,7 @@
 
     <div class="hero-wrap">
       <div class="hero-grid">
-        <div class="reveal">
+        <div>
           <div class="badge">✨ Premium Training • für Frauen</div>
 
           <h1>Trainingsprogramme für Frauen,<br>die wirklich funktionieren.</h1>
@@ -667,7 +816,7 @@
               <div class="about-title">Über mich</div>
               <div class="tag">Edina</div>
             </div>
-            <p class="about-text" id="aboutText">Ich baue nicht nur Form auf – ich baue Vertrauen, Struktur und Zukunft.
+            <p class="about-text">Ich baue nicht nur Form auf – ich baue Vertrauen, Struktur und Zukunft.
 
 Ich bin Edina, die Gründerin von FitnessLady. Ich glaube daran, dass der Körper ein Kraftwerk ist: Mit der richtigen Richtung, Bewusstsein und einem klaren System entstehen sichtbare und nachhaltige Ergebnisse.
 
@@ -820,16 +969,43 @@ Edina • FitnessLady</p>
     </div>
   </section>
 
+  <!-- ✅ BEWERTUNGEN (MOST HIÁNYZOTT) -->
   <section id="bewertungen">
     <div class="container">
-      <div class="section-title">Bewertungen</div>
-      <p class="section-sub">
-        Kundenerfahrungen und Feedback. Du kannst auch selbst eine Bewertung schreiben.
-      </p>
+      <div class="reviews-head">
+        <div>
+          <div class="section-title" style="margin-bottom:6px;">Bewertungen</div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:center;">
+            <div class="rating" id="avgRating" title="Tippen für Animation" aria-label="Durchschnittliche Bewertung">
+              <span class="star" style="--i:1">★</span>
+              <span class="star" style="--i:2">★</span>
+              <span class="star" style="--i:3">★</span>
+              <span class="star" style="--i:4">★</span>
+              <span class="star" style="--i:5">★</span>
+              <span class="rating-text" id="avgText">—</span>
+            </div>
+            <span style="color:var(--muted2); font-size:13px;" id="reviewsMeta">Laden…</span>
+          </div>
+        </div>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <a class="btn primary interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Bewertung schreiben</a>
-        <a class="btn interactive" href="#kontakt">Kontakt</a>
+        <div class="reviews-actions">
+          <a class="btn primary interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Bewertung schreiben</a>
+          <button class="btn interactive" id="refreshBtn" type="button">Aktualisieren</button>
+        </div>
+      </div>
+
+      <div class="glass interactive review-carousel" id="reviewCarousel">
+        <div class="review-track" id="reviewTrack" aria-label="Bewertungen Carousel">
+          <article class="review-card">
+            <div class="top">
+              <span>Laden…</span>
+              <span> </span>
+            </div>
+            <p class="text">Bewertungen werden geladen.</p>
+            <div class="stars">★★★★★</div>
+          </article>
+        </div>
+        <div class="review-dots" id="reviewDots" aria-hidden="true"></div>
       </div>
     </div>
   </section>
@@ -952,9 +1128,20 @@ Edina • FitnessLady</p>
         a.setAttribute("href", base + route);
       });
 
-      // modal iframe src is base-aware
       const frame = document.getElementById("agbFrame");
       if(frame) frame.src = `${base}/de/legal/agb/`;
+    })();
+
+    /* ✅ Topbar height -> hero padding-top fix (mobil wrap esetén is) */
+    (function syncTopbarHeight(){
+      const tb = document.getElementById("topbar");
+      if(!tb) return;
+      const set = () => {
+        const h = tb.offsetHeight || 64;
+        document.documentElement.style.setProperty("--topbar-h", h + "px");
+      };
+      set();
+      window.addEventListener("resize", set);
     })();
 
     /* ===== Scroll performance: glow/hover anim OFF scroll közben ===== */
@@ -967,51 +1154,6 @@ Edina • FitnessLady</p>
       };
       window.addEventListener('scroll', onScroll, { passive: true });
     })();
-
-    /* ========= Mobile menu ========= */
-    const menuBtn = document.getElementById("menuBtn");
-    let open = false;
-
-    menuBtn?.addEventListener("click", () => {
-      open = !open;
-      if(open){
-        const nav = document.createElement("div");
-        nav.id = "mobileNav";
-        nav.style.position = "fixed";
-        nav.style.top = "64px";
-        nav.style.left = "14px";
-        nav.style.right = "14px";
-        nav.style.zIndex = "60";
-        nav.style.background = "rgba(20,12,26,.72)";
-        nav.style.border = "1px solid rgba(255,255,255,.10)";
-        nav.style.borderRadius = "18px";
-        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
-        nav.style.padding = "12px";
-
-        const base = window.__BASE_PATH || "";
-        nav.innerHTML = `
-          <a href="#pakete" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Pakete</a>
-          <a href="#wie" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">So funktioniert’s</a>
-          <a href="#bewertungen" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Bewertungen</a>
-          <a href="#recht" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Rechtliches</a>
-          <a href="#kontakt" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Kontakt</a>
-          <a href="${base}/de/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Mein Bereich</a>
-        `;
-        document.body.appendChild(nav);
-      } else {
-        document.getElementById("mobileNav")?.remove();
-      }
-    });
-
-    document.addEventListener("click", (e) => {
-      const nav = document.getElementById("mobileNav");
-      if(!nav) return;
-      if(e.target === menuBtn) return;
-      if(nav.contains(e.target)) {
-        nav.remove();
-        open = false;
-      }
-    });
 
     /* ========= Touch “active” glow ========= */
     function enableTapGlow(selector=".interactive"){
@@ -1058,6 +1200,314 @@ Edina • FitnessLady</p>
       close?.addEventListener("click", closeModal);
       overlay?.addEventListener("click", (e)=>{ if(e.target === overlay) closeModal(); });
     })();
+
+    /* ========= Mobile menu ========= */
+    const menuBtn = document.getElementById("menuBtn");
+    let open = false;
+
+    menuBtn?.addEventListener("click", () => {
+      open = !open;
+      if(open){
+        const nav = document.createElement("div");
+        nav.id = "mobileNav";
+        nav.style.position = "fixed";
+        nav.style.top = (parseInt(getComputedStyle(document.documentElement).getPropertyValue("--topbar-h")) || 64) + "px";
+        nav.style.left = "14px";
+        nav.style.right = "14px";
+        nav.style.zIndex = "60";
+        nav.style.background = "rgba(20,12,26,.72)";
+        nav.style.border = "1px solid rgba(255,255,255,.10)";
+        nav.style.borderRadius = "18px";
+        nav.style.boxShadow = "0 20px 70px rgba(0,0,0,.55)";
+        nav.style.padding = "12px";
+
+        const base = window.__BASE_PATH || "";
+        nav.innerHTML = `
+          <a href="#pakete" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Pakete</a>
+          <a href="#wie" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">So funktioniert’s</a>
+          <a href="#bewertungen" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Bewertungen</a>
+          <a href="#recht" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Rechtliches</a>
+          <a href="#kontakt" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Kontakt</a>
+          <a href="${base}/de/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Mein Bereich</a>
+        `;
+        document.body.appendChild(nav);
+      } else {
+        document.getElementById("mobileNav")?.remove();
+      }
+    });
+
+    document.addEventListener("click", (e) => {
+      const nav = document.getElementById("mobileNav");
+      if(!nav) return;
+      if(e.target === menuBtn) return;
+      if(nav.contains(e.target)) {
+        nav.remove();
+        open = false;
+      }
+    });
+
+    /* ========= Rating animation (tap/click) ========= */
+    (() => {
+      const r = document.getElementById('avgRating');
+      if(!r) return;
+      const kick = () => {
+        r.classList.remove('is-anim');
+        void r.offsetWidth;
+        r.classList.add('is-anim');
+      };
+      r.addEventListener('click', kick);
+      r.addEventListener('touchstart', kick, {passive:true});
+    })();
+
+    /* ========= Reviews (Sheets CSV) ========= */
+    const SHEET_CSV_URL =
+      "https://docs.google.com/spreadsheets/d/e/2PACX-1vSlH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDu0l1I4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
+
+    const reviewTrack = document.getElementById('reviewTrack');
+    const reviewDots  = document.getElementById('reviewDots');
+    const refreshBtn  = document.getElementById('refreshBtn');
+    const avgText     = document.getElementById('avgText');
+    const reviewsMeta = document.getElementById('reviewsMeta');
+
+    function escapeHtml(s) {
+      return String(s ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+    function normalize(s){ return String(s ?? "").trim().toLowerCase(); }
+
+    function parseCSV(text){
+      const rows = [];
+      let row = [];
+      let cur = "";
+      let inQuotes = false;
+
+      for(let i=0;i<text.length;i++){
+        const c = text[i];
+        const n = text[i+1];
+
+        if(c === '"' && inQuotes && n === '"'){ cur += '"'; i++; continue; }
+        if(c === '"'){ inQuotes = !inQuotes; continue; }
+
+        if(c === ',' && !inQuotes){ row.push(cur); cur=""; continue; }
+        if((c === '\n' || c === '\r') && !inQuotes){
+          if(c === '\r' && n === '\n') i++;
+          row.push(cur);
+          rows.push(row);
+          row = [];
+          cur = "";
+          continue;
+        }
+        cur += c;
+      }
+      if(cur.length || row.length){ row.push(cur); rows.push(row); }
+      return rows;
+    }
+
+    function findHeaderIndex(headers, predicate){
+      for(let i=0;i<headers.length;i++){
+        if(predicate(normalize(headers[i]))) return i;
+      }
+      return -1;
+    }
+
+    function stars(n){
+      const num = Number(n);
+      if(!Number.isFinite(num)) return "★★★★★";
+      const r = Math.max(1, Math.min(5, Math.round(num)));
+      return "★★★★★".slice(0, r) + "☆☆☆☆☆".slice(0, 5-r);
+    }
+
+    let carouselController = null;
+
+    function destroyCarousel(){
+      if(carouselController?.destroy) carouselController.destroy();
+      carouselController = null;
+      reviewDots.innerHTML = "";
+    }
+
+    function initCarousel(){
+      const cards = Array.from(reviewTrack.querySelectorAll('.review-card'));
+      reviewDots.innerHTML = "";
+      if(!cards.length) return;
+
+      const dots = cards.map((_, i) => {
+        const d = document.createElement('div');
+        d.className = 'review-dot';
+        d.addEventListener('click', () => scrollToIndex(i));
+        reviewDots.appendChild(d);
+        return d;
+      });
+
+      let idx = 0;
+      let timer = null;
+      let paused = false;
+      let scrollTick = null;
+
+      function updateDots(){
+        dots.forEach((d,i)=>d.classList.toggle('is-active', i===idx));
+      }
+
+      function scrollToIndex(i){
+        idx = (i + cards.length) % cards.length;
+        reviewTrack.scrollTo({
+          left: cards[idx].offsetLeft - reviewTrack.offsetLeft,
+          behavior: 'smooth'
+        });
+        updateDots();
+      }
+
+      reviewTrack.addEventListener('scroll', () => {
+        clearTimeout(scrollTick);
+        scrollTick = setTimeout(() => {
+          const center = reviewTrack.scrollLeft + reviewTrack.clientWidth * 0.2;
+          let nearest = 0, best = Infinity;
+          cards.forEach((c,i)=>{
+            const dist = Math.abs((c.offsetLeft - reviewTrack.offsetLeft) - center);
+            if(dist < best){ best = dist; nearest = i; }
+          });
+          idx = nearest;
+          updateDots();
+        }, 80);
+      }, {passive:true});
+
+      function start(){
+        if(timer) clearInterval(timer);
+        timer = setInterval(()=>{
+          if(paused) return;
+          scrollToIndex(idx + 1);
+        }, 7000);
+      }
+
+      const carousel = document.getElementById('reviewCarousel');
+      carousel.addEventListener('mouseenter', ()=>paused=true);
+      carousel.addEventListener('mouseleave', ()=>paused=false);
+      carousel.addEventListener('touchstart', ()=>paused=true, {passive:true});
+      carousel.addEventListener('touchend', ()=>paused=false, {passive:true});
+
+      updateDots();
+      start();
+
+      carouselController = {
+        destroy(){
+          if(timer) clearInterval(timer);
+          timer = null;
+        }
+      };
+    }
+
+    function renderReviews(items){
+      destroyCarousel();
+      reviewTrack.innerHTML = "";
+
+      if(!items.length){
+        reviewTrack.innerHTML = `
+          <article class="review-card">
+            <div class="top"><span>Bald verfügbar</span><span></span></div>
+            <p class="text">Noch keine freigegebenen Bewertungen.</p>
+            <div class="stars">★★★★★</div>
+          </article>
+        `;
+        initCarousel();
+        return;
+      }
+
+      for(const it of items){
+        const date = it.date ? escapeHtml(it.date) : "";
+        reviewTrack.insertAdjacentHTML('beforeend', `
+          <article class="review-card interactive">
+            <div class="top">
+              <span>${escapeHtml(it.name)}</span>
+              <span>${date}</span>
+            </div>
+            <p class="text">${escapeHtml(it.text)}</p>
+            <div class="stars">${escapeHtml(it.stars)}</div>
+          </article>
+        `);
+      }
+
+      enableTapGlow('.review-card.interactive');
+      initCarousel();
+    }
+
+    async function loadReviews(){
+      try{
+        reviewsMeta.textContent = "Laden…";
+
+        const url = SHEET_CSV_URL + (SHEET_CSV_URL.includes('?') ? '&' : '?') + 't=' + Date.now();
+        const res = await fetch(url, { cache: 'no-store' });
+        if(!res.ok) throw new Error("CSV fetch failed: " + res.status);
+
+        const csvText = await res.text();
+        const rows = parseCSV(csvText);
+        if(rows.length < 2) throw new Error("Empty CSV");
+
+        const headers = rows.shift();
+
+        // ⚠️ a sheet HU oszlopnevekkel megy (marad)
+        const idxText = findHeaderIndex(headers, h => h === 'véleményed' || h === 'vélemény' || h.includes('vélemény'));
+        const idxApprove = findHeaderIndex(headers, h => h === 'megjelenhet?' || h.includes('megjelenhet'));
+        const idxRating = findHeaderIndex(headers, h => h === 'mennyire' || h === 'mennyire v' || h.startsWith('mennyire'));
+        const idxDate = findHeaderIndex(headers, h => h === 'submitted at' || h.includes('submitted'));
+        const idxName = findHeaderIndex(headers, h => h === 'név' || h === 'name' || h.includes('név'));
+
+        if(idxText === -1 || idxApprove === -1){
+          throw new Error("Missing required columns (Vélemény / Megjelenhet?)");
+        }
+
+        const items = [];
+        let ratingSum = 0;
+        let ratingCount = 0;
+
+        for(const r of rows){
+          const approved = normalize(r[idxApprove]);
+          if(approved !== 'igen') continue;
+
+          const text = String(r[idxText] ?? "").trim();
+          if(!text) continue;
+
+          const ratingRaw = idxRating !== -1 ? String(r[idxRating] ?? "").trim() : "";
+          const ratingNum = Number(ratingRaw);
+          const starsStr = stars(ratingNum);
+
+          if(Number.isFinite(ratingNum)){
+            ratingSum += Math.max(1, Math.min(5, ratingNum));
+            ratingCount += 1;
+          }
+
+          const dateRaw = idxDate !== -1 ? String(r[idxDate] ?? "").trim() : "";
+          const date = dateRaw ? dateRaw.replace("T"," ").replace("Z","") : "";
+
+          const nameRaw = idxName !== -1 ? String(r[idxName] ?? "").trim() : "";
+          const name = nameRaw || "Gast";
+
+          items.push({ text, stars: starsStr, date, name });
+        }
+
+        items.sort((a,b)=> (b.date || "").localeCompare(a.date || ""));
+
+        if(ratingCount > 0){
+          const avg = Math.round((ratingSum / ratingCount) * 10) / 10;
+          avgText.textContent = `${avg} • ${ratingCount} Bewertungen`;
+        } else {
+          avgText.textContent = `${items.length} Bewertungen`;
+        }
+
+        reviewsMeta.textContent = items.length ? `${items.length} freigegebene Bewertungen` : "Noch keine freigegebenen Bewertungen";
+        renderReviews(items.slice(0, 12));
+      }catch(err){
+        console.error(err);
+        avgText.textContent = "—";
+        reviewsMeta.textContent = "Konnte nicht geladen werden";
+        renderReviews([]);
+      }
+    }
+
+    refreshBtn?.addEventListener('click', loadReviews);
+    loadReviews();
   </script>
 </body>
-</html>
+  </html>
