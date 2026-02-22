@@ -1,22 +1,9 @@
 /* FILE: /hu/shared/firebase.js */
 /**
- * Firebase v9 CDN shared helpers (PRO baseline) + Chat additions (OP2)
+ * Firebase v9 CDN shared helpers (PRO baseline) + OP2 Chat
  *
- * ✅ FIX: beégetett firebaseConfig (apiKey/authDomain stb.)
- * ✅ FIX: hiányzó exportok a /hu/login és /hu/admin oldalhoz
- * ✅ FIX: fájl vége nem volt lezárva (syntax error)
- *
- * Exports used by existing pages:
- * - BASE_PREFIX, auth, db, fs, storage
- * - onAuth, logout, toLogin, toApp, toAdmin
- * - escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
- * - loginEmailPassword
- * - ensureUserDoc, getUserDoc, getUserRole, isAdminEmail
- * - listRecentPurchases, activateUserFromPurchase
- *
- * Chat exports:
- * - isChatAllowed, ensureChatThread, listenChatMessages, sendChatText, sendChatImage
- * - listenChatThreads, markAdminRead, markUserRead, createJitsiRoomName, sendCallInvite
+ * ✅ FIX: valódi firebaseConfig beégetve (nincs üres/placeholder)
+ * ✅ FIX: exportok kiegészítve, hogy a /hu/login, /hu/app, /hu/admin is működjön
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -46,21 +33,31 @@ export { fs };
 ========================= */
 export const BASE_PREFIX = ""; // ha kell alá-mappa github pagesnél, ide tedd: "/repo"
 
-// ✅ Default config (a te Firebase web configod)
-// Ha valaha szeretnéd külsőből felülírni: window.FIREBASE_CONFIG = {...}
-const DEFAULT_FIREBASE_CONFIG = {
+/**
+ * ✅ Itt van a config.
+ * FONTOS: storageBucket legyen appspot.com (web SDK-hez ez a tipikus érték)
+ */
+const firebaseConfig = {
   apiKey: "AIzaSyBl2MzyiRzgCzeg-eEWNHkc9Vxx-PgawfU",
   authDomain: "fitneady-15fd0.firebaseapp.com",
   projectId: "fitneady-15fd0",
-  storageBucket: "fitneady-15fd0.firebasestorage.app",
+  storageBucket: "fitneady-15fd0.appspot.com",
   messagingSenderId: "480597492603",
   appId: "1:480597492603:web:2ba6c266c662b4c79e33de",
   measurementId: "G-MH1YK9C2YF"
 };
 
-const firebaseConfig = (window.FIREBASE_CONFIG && typeof window.FIREBASE_CONFIG === "object")
-  ? window.FIREBASE_CONFIG
-  : DEFAULT_FIREBASE_CONFIG;
+// Biztonsági check: ha valami üres maradna, dobjon tiszta hibát
+function assertConfig(cfg){
+  const need = ["apiKey","authDomain","projectId","storageBucket","messagingSenderId","appId"];
+  const missing = need.filter(k => !cfg[k] || String(cfg[k]).includes("FILL_") || String(cfg[k]).trim()==="");
+  if(missing.length){
+    const e = new Error("Firebase config hiányos: " + missing.join(", "));
+    e.code = "firebase/config-missing";
+    throw e;
+  }
+}
+assertConfig(firebaseConfig);
 
 const app = initializeApp(firebaseConfig);
 
@@ -69,18 +66,6 @@ export const db = fs.getFirestore(app);
 export const storage = getStorage(app);
 
 setPersistence(auth, browserLocalPersistence).catch(()=>{});
-
-/* =========================
-   ADMIN EMAILS (hard allow)
-========================= */
-const ADMIN_EMAILS = [
-  "tuskepal@gmail.com"
-];
-
-export function isAdminEmail(email){
-  const e = String(email || "").trim().toLowerCase();
-  return ADMIN_EMAILS.includes(e);
-}
 
 /* =========================
    NAV
@@ -98,8 +83,31 @@ export function onAuth(cb){
 export async function logout(){
   await signOut(auth);
 }
-export async function loginEmailPassword(email, pass){
-  return await signInWithEmailAndPassword(auth, String(email||""), String(pass||""));
+export async function loginEmailPassword(email, password){
+  return await signInWithEmailAndPassword(auth, email, password);
+}
+
+/* =========================
+   ADMIN EMAILS / ROLE
+========================= */
+const ADMIN_EMAILS = [
+  "tuskepal@gmail.com"
+];
+
+export function isAdminEmail(email){
+  const e = String(email || "").trim().toLowerCase();
+  return !!e && ADMIN_EMAILS.includes(e);
+}
+
+export async function getUserRole(uid){
+  try{
+    const snap = await fs.getDoc(fs.doc(db, "users", uid));
+    if(!snap.exists()) return "user";
+    const d = snap.data() || {};
+    return (d.role || "user");
+  }catch(_){
+    return "user";
+  }
 }
 
 /* =========================
@@ -140,63 +148,60 @@ export function fmtDate(iso){
 
 /* =========================
    USER DOC (OP2 fields)
+   ⚠️ kompatibilis: ensureUserDoc(uid, emailString) vagy ensureUserDoc(uid, patchObj)
 ========================= */
-export async function ensureUserDoc(uid, patch = {}){
+export async function ensureUserDoc(uid, emailOrPatch = {}){
+  const patch = (typeof emailOrPatch === "string")
+    ? { email: String(emailOrPatch || "").trim() }
+    : (emailOrPatch || {});
+
   const r = fs.doc(db, "users", uid);
   const snap = await fs.getDoc(r);
 
+  const base = {
+    createdAt: fs.serverTimestamp(),
+    updatedAt: fs.serverTimestamp(),
+    role: "user",
+    status: "active",
+    lang: "hu",
+
+    paid: false,
+    activated: false,
+    payment: { provider:"", sid:"", status:"none" },
+
+    // chat OP2
+    chatEnabled: false,
+    chatTrialUntil: null
+  };
+
   if(!snap.exists()){
-    await fs.setDoc(r, {
-      createdAt: fs.serverTimestamp(),
-      updatedAt: fs.serverTimestamp(),
-
-      email: patch?.email || "",
-      name: patch?.name || "",
-      role: patch?.role || "user",
-      status: patch?.status || "active",
-      lang: patch?.lang || "hu",
-
-      paid: false,
-      activated: false,
-      payment: { provider:"", sid:"", status:"none" },
-
-      chatEnabled: false,
-      chatTrialUntil: null,
-
-      ...patch
-    }, { merge: true });
-    return { ...(patch||{}), paid:false, chatEnabled:false, chatTrialUntil:null };
+    await fs.setDoc(r, { ...base, ...patch }, { merge:true });
+    return { ...base, ...patch };
   }
 
   const d = snap.data() || {};
   const fix = {};
+  if(typeof d.role !== "string") fix.role = "user";
+  if(typeof d.status !== "string") fix.status = "active";
+  if(typeof d.lang !== "string") fix.lang = "hu";
+
   if(typeof d.paid !== "boolean") fix.paid = false;
   if(typeof d.activated !== "boolean") fix.activated = false;
+  if(!("payment" in d)) fix.payment = { provider:"", sid:"", status:"none" };
+
   if(typeof d.chatEnabled !== "boolean") fix.chatEnabled = false;
   if(!("chatTrialUntil" in d)) fix.chatTrialUntil = null;
-  if(!("payment" in d)) fix.payment = { provider:"", sid:"", status:"none" };
-  if(!("role" in d)) fix.role = "user";
-  if(!("status" in d)) fix.status = "active";
-  if(!("lang" in d)) fix.lang = "hu";
 
-  if(Object.keys(fix).length){
-    await fs.updateDoc(r, { ...fix, updatedAt: fs.serverTimestamp() }).catch(()=>{});
+  const up = { ...fix, ...patch, updatedAt: fs.serverTimestamp() };
+  if(Object.keys(up).length){
+    await fs.setDoc(r, up, { merge:true }).catch(()=>{});
   }
-  if(patch && Object.keys(patch).length){
-    await fs.updateDoc(r, { ...patch, updatedAt: fs.serverTimestamp() }).catch(()=>{});
-  }
-
-  return { ...d, ...fix, ...(patch||{}) };
+  return { ...d, ...up };
 }
 
 export async function getUserDoc(uid){
   const snap = await fs.getDoc(fs.doc(db, "users", uid));
   return snap.exists() ? (snap.data() || null) : null;
-}
-
-export async function getUserRole(uid){
-  const d = await getUserDoc(uid);
-  return d?.role || "user";
 }
 
 /**
@@ -213,26 +218,15 @@ export function isChatAllowed(userDoc){
   if(t?.toDate) ms = t.toDate().getTime();
   else if(typeof t === "number") ms = t;
   else if(t instanceof Date) ms = t.getTime();
+  else if(typeof t === "string" && t) ms = new Date(t).getTime();
+
   return !!ms && ms > Date.now();
 }
 
 /* =========================
-   PAYMENTS (Stripe → Firestore)
-   purchases/{sid} (recommended)
+   PAYMENTS (admin használja)
+   purchases/{sid}
 ========================= */
-function normalizePurchaseDoc(d, id){
-  return {
-    id,
-    sid: d?.sid || id,
-    email: d?.email || "",
-    uid: d?.uid || "",
-    planId: d?.planId || d?.plan || "",
-    status: d?.status || "pending_activation",
-    createdAt: d?.createdAt || null,
-    updatedAt: d?.updatedAt || null
-  };
-}
-
 export async function listRecentPurchases(limitN=50){
   const q = fs.query(
     fs.collection(db, "purchases"),
@@ -240,64 +234,43 @@ export async function listRecentPurchases(limitN=50){
     fs.limit(clamp(limitN, 1, 200))
   );
   const snap = await fs.getDocs(q);
-  return snap.docs.map(docu => normalizePurchaseDoc(docu.data() || {}, docu.id));
-}
-
-async function findPurchaseBySid(sid){
-  const id = String(sid || "").trim();
-  if(!id) return null;
-
-  // 1) try direct doc id
-  const direct = await fs.getDoc(fs.doc(db, "purchases", id));
-  if(direct.exists()){
-    return { ref: fs.doc(db, "purchases", id), data: normalizePurchaseDoc(direct.data()||{}, id) };
-  }
-
-  // 2) fallback query by field "sid"
-  const q = fs.query(fs.collection(db, "purchases"), fs.where("sid", "==", id), fs.limit(1));
-  const snap = await fs.getDocs(q);
-  if(snap.empty) return null;
-
-  const d0 = snap.docs[0];
-  return { ref: d0.ref, data: normalizePurchaseDoc(d0.data()||{}, d0.id) };
+  return snap.docs.map(d => ({ id:d.id, ...(d.data()||{}), sid:(d.data()?.sid || d.id) }));
 }
 
 /**
- * Admin action: kiválasztott purchase → kiválasztott user aktiválása
- * - user: paid=true, activated=true, planId beállít
- * - purchase: status="activated", uid beír, activatedAt timestamp
+ * Aktiválás: kiválasztott purchase → rárakjuk a userre a fizetett státuszt és planId-t
+ * majd a purchases/{sid} status = activated
  */
 export async function activateUserFromPurchase({ uid, sid }){
-  const U = String(uid || "").trim();
-  const S = String(sid || "").trim();
-  if(!U) throw new Error("activateUserFromPurchase: uid hiányzik");
-  if(!S) throw new Error("activateUserFromPurchase: sid hiányzik");
+  if(!uid) throw new Error("Missing uid");
+  if(!sid) throw new Error("Missing sid");
 
-  const hit = await findPurchaseBySid(S);
-  if(!hit) throw new Error("Nem találom a purchase rekordot (purchases/{sid}).");
+  const pr = fs.doc(db, "purchases", sid);
+  const ps = await fs.getDoc(pr);
+  if(!ps.exists()) throw new Error("Purchase nem található: " + sid);
 
-  const p = hit.data;
+  const p = ps.data() || {};
   const planId = String(p.planId || "start_v1").trim() || "start_v1";
 
-  // ensure user doc exists + update
-  await ensureUserDoc(U, {});
-  await fs.updateDoc(fs.doc(db, "users", U), {
+  await fs.setDoc(fs.doc(db, "users", uid), {
     paid: true,
     activated: true,
     planId,
-    payment: { provider:"stripe", sid: p.sid || S, status:"activated" },
-    updatedAt: fs.serverTimestamp()
-  });
-
-  // purchase mark activated
-  await fs.setDoc(hit.ref, {
-    status: "activated",
-    uid: U,
-    activatedAt: fs.serverTimestamp(),
+    payment: {
+      provider: String(p.provider || "stripe"),
+      sid,
+      status: String(p.status || "activated")
+    },
     updatedAt: fs.serverTimestamp()
   }, { merge:true });
 
-  return { ok:true, planId, sid: p.sid || S, uid: U };
+  await fs.setDoc(pr, {
+    status: "activated",
+    activatedAt: fs.serverTimestamp(),
+    uid
+  }, { merge:true });
+
+  return { ok:true, planId };
 }
 
 /* =========================
@@ -328,6 +301,7 @@ export async function ensureChatThread(uid, meta = {}){
   const fix = {};
   if(!("lastMessageText" in d)) fix.lastMessageText = "";
   if(!("lastUserReadAt" in d)) fix.lastUserReadAt = fs.serverTimestamp();
+
   if(Object.keys(fix).length){
     await fs.updateDoc(r, fix).catch(()=>{});
   }
@@ -379,6 +353,7 @@ export async function sendChatText(uid, sender, text){
 
 export async function sendChatImage(uid, sender, file){
   if(!file) return;
+
   const f = file;
   const ext = (f.name || "img").split(".").pop().slice(0,6);
   const safeExt = ext.match(/^[a-zA-Z0-9]+$/) ? ext : "jpg";
@@ -433,5 +408,4 @@ export function listenChatThreads(cb){
     snap.forEach(d=>items.push({ id:d.id, ...(d.data()||{}) }));
     cb(items);
   });
-}
-```0
+    }
