@@ -195,10 +195,9 @@
     }
     .chat-overlay.is-open{ display:flex; }
 
-    /* ✅ MOBIL: half-sheet (kisebb) */
     .chat-panel{
       width: min(980px, 100vw);
-      height: min(56vh, 560px); /* <<< kisebb lett */
+      height: min(56vh, 560px);
       border-radius: 26px 26px 0 0;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(10,8,14,.92);
@@ -213,7 +212,6 @@
       opacity: 1;
     }
 
-    /* DESKTOP: jobb oldali drawer */
     @media (min-width: 980px){
       .chat-overlay{ align-items: stretch; justify-content:flex-end; padding-bottom:0; }
       .chat-panel{
@@ -228,7 +226,7 @@
     }
 
     .chat-head{
-      height: 58px; /* <<< kisebb */
+      height: 58px;
       display:flex;
       align-items:center;
       justify-content: space-between;
@@ -246,7 +244,7 @@
       min-width: 0;
     }
     .avatar{
-      width: 34px; height: 34px; /* <<< kisebb */
+      width: 34px; height: 34px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
@@ -284,7 +282,7 @@
     }
 
     .chat-body{
-      height: calc(100% - 58px - 66px); /* <<< igazítva */
+      height: calc(100% - 58px - 66px);
       padding: 12px;
       overflow:auto;
       background:
@@ -295,8 +293,21 @@
 
     .msgRow{ display:flex; margin: 10px 0; gap: 8px; }
     .msgRow.me{ justify-content:flex-end; }
-    .bubble{
+
+    /* ✅ FIX: ne tudjon "összenyomódni" betűnként */
+    .msgCol{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
       max-width: 78%;
+      min-width: 0;
+    }
+    .msgRow.me .msgCol{ align-items:flex-end; }
+
+    .bubble{
+      width: fit-content;       /* ✅ ne legyen min-content grid shrink */
+      min-width: 64px;          /* ✅ ne legyen túl keskeny */
+      max-width: 100%;
       padding: 10px 12px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.10);
@@ -305,7 +316,8 @@
       line-height: 1.45;
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
       white-space: pre-wrap;
-      word-break: break-word;
+      word-break: normal;       /* ✅ ne tördeljen karakterenként */
+      overflow-wrap: break-word;/* ✅ ha nagyon hosszú szó/URL */
     }
     .bubble.me{
       border-color: rgba(255,79,216,.22);
@@ -319,13 +331,12 @@
     .metaTime{
       font-size: 11px;
       color: rgba(255,255,255,.55);
-      margin-top: 6px;
       text-align: right;
     }
     .metaTime.me{ color: rgba(20,8,19,.70); }
 
     .chat-foot{
-      height: 66px; /* <<< kisebb */
+      height: 66px;
       padding: 10px;
       border-top: 1px solid rgba(255,255,255,.08);
       background: rgba(12,10,16,.92);
@@ -1108,11 +1119,17 @@
         return;
       }
       chatEmpty.style.display = "none";
+
       items.forEach(m=>{
         const sender = String(m.sender || "").toLowerCase();
         const isMe = sender === "user";
+
         const row = document.createElement("div");
         row.className = "msgRow " + (isMe ? "me" : "other");
+
+        // ✅ FIX: grid helyett flex oszlop konténer
+        const col = document.createElement("div");
+        col.className = "msgCol";
 
         const bub = document.createElement("div");
         bub.className = "bubble " + (isMe ? "me" : "other");
@@ -1122,15 +1139,13 @@
         t.className = "metaTime " + (isMe ? "me" : "other");
         t.textContent = msgTime(m.createdAt);
 
-        const wrap = document.createElement("div");
-        wrap.style.display = "grid";
-        wrap.style.gap = "6px";
-        wrap.appendChild(bub);
-        wrap.appendChild(t);
+        col.appendChild(bub);
+        col.appendChild(t);
 
-        row.appendChild(wrap);
+        row.appendChild(col);
         chatBody.appendChild(row);
       });
+
       chatBody.scrollTop = chatBody.scrollHeight;
     }
 
@@ -1160,6 +1175,7 @@
       chatUnsub = fs.onSnapshot(q, (snap)=>{
         const items = snap.docs.map(d => ({ id:d.id, ...(d.data()||{}) }));
         renderMessages(items);
+
         if(!chatOpen){
           if(lastSeenCount > 0 && items.length > lastSeenCount){
             chatBadge.textContent = String(items.length - lastSeenCount);
@@ -1244,4 +1260,4 @@
     });
   </script>
 </body>
-</html>
+    </html>
