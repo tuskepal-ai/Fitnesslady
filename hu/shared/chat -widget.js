@@ -1,6 +1,24 @@
 /* ===========================
    FILE: /hu/shared/chat-widget.js
    =========================== */
+
+/**
+ * Customer floating chat widget + Admin embedded chat panel
+ *
+ * Firestore:
+ *  - chats/{uid}            (thread meta)
+ *  - chats/{uid}/messages/* (messages)
+ *
+ * NOTE:
+ *  - Ez a fájl külön van → frissítéskor csak ezt cseréled.
+ *  - Fix: "Sz / ia" jellegű betűnkénti tördelés (min-width + wrap szabályok)
+ *  - Fix: mobilon a chat ne legyen óriási → top-sheet jelleg + max-height
+ *  - Extra: 3D hatású buborék + smooth open animáció
+ */
+
+/* ===========================
+   CUSTOMER CHAT WIDGET
+   =========================== */
 export function initCustomerChatWidget(opts){
   const {
     db, fs, escapeHtml,
@@ -11,7 +29,7 @@ export function initCustomerChatWidget(opts){
     theme = {
       pink: "#ff4fd8",
       pink2: "#b14cff",
-      bg: "rgba(10,8,14,.85)"
+      bg: "rgba(10,8,14,.78)"
     }
   } = opts || {};
 
@@ -22,33 +40,83 @@ export function initCustomerChatWidget(opts){
     const st = document.createElement("style");
     st.id = "fl_chat_widget_styles";
     st.textContent = `
+      :root{
+        --fl-chat-pink: ${theme.pink};
+        --fl-chat-pink2: ${theme.pink2};
+        --fl-chat-bg: ${theme.bg};
+      }
+
+      /* ✅ 3D floating bubble */
       .fl-chat-fab{
-        position: fixed; right: 16px; bottom: 16px; z-index: 999;
-        width: 56px; height: 56px; border-radius: 999px;
-        border: 1px solid rgba(255,255,255,.14);
-        background: linear-gradient(135deg, ${theme.pink}, ${theme.pink2});
+        position: fixed; right: 16px; bottom: 16px; z-index: 9999;
+        width: 60px; height: 60px; border-radius: 999px;
+        border: 1px solid rgba(255,255,255,.18);
+        background:
+          radial-gradient(circle at 35% 28%, rgba(255,255,255,.55), transparent 35%),
+          radial-gradient(circle at 55% 65%, rgba(255,79,216,.35), transparent 55%),
+          linear-gradient(135deg, var(--fl-chat-pink), var(--fl-chat-pink2));
         color:#140813; font-weight: 950; cursor: pointer;
-        box-shadow: 0 18px 55px rgba(0,0,0,.45);
+        box-shadow:
+          0 18px 40px rgba(0,0,0,.55),
+          inset 0 1px 0 rgba(255,255,255,.28);
         display:flex; align-items:center; justify-content:center;
         user-select:none;
+        transform: translateZ(0);
+        transition: transform .18s ease, filter .18s ease;
       }
+      .fl-chat-fab:active{ transform: scale(.97); }
+      .fl-chat-fab:hover{ filter: brightness(1.05); transform: translateY(-1px); }
+
       .fl-chat-fab[disabled]{
         opacity:.55; cursor:not-allowed; filter:saturate(.6);
       }
+
+      /* ✅ Panel: desktop bottom-right; mobile top-sheet */
       .fl-chat-panel{
-        position: fixed; right: 16px; bottom: 84px; z-index: 999;
+        position: fixed; z-index: 10000;
+        right: 16px; bottom: 90px;
         width: min(420px, calc(100vw - 32px));
-        height: min(560px, calc(100vh - 140px));
+        height: min(520px, calc(100vh - 160px));
         border-radius: 22px;
         border: 1px solid rgba(255,255,255,.12);
-        background: ${theme.bg};
-        backdrop-filter: blur(12px);
-        -webkit-backdrop-filter: blur(12px);
+        background: linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
         box-shadow: 0 24px 85px rgba(0,0,0,.55);
+        backdrop-filter: blur(14px);
+        -webkit-backdrop-filter: blur(14px);
         overflow:hidden;
-        display:none;
+
+        display:flex;
+        flex-direction:column;
+
+        /* ✅ animáció */
+        opacity: 0;
+        transform: translateY(10px) scale(.98);
+        pointer-events: none;
+        transition: opacity .18s ease, transform .22s cubic-bezier(.2,.9,.2,1);
       }
-      .fl-chat-panel.is-open{ display:flex; flex-direction:column; }
+      .fl-chat-panel.is-open{
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+      }
+
+      @media (max-width: 520px){
+        .fl-chat-panel{
+          left: 12px;
+          right: 12px;
+          top: 10px;
+          bottom: auto;
+
+          width: auto;
+          height: min(58vh, 520px);
+
+          transform: translateY(-12px) scale(.98);
+        }
+        .fl-chat-panel.is-open{
+          transform: translateY(0) scale(1);
+        }
+      }
+
       .fl-chat-head{
         padding: 12px 14px;
         display:flex; align-items:center; justify-content:space-between; gap:10px;
@@ -57,15 +125,26 @@ export function initCustomerChatWidget(opts){
       }
       .fl-chat-title{
         display:flex; flex-direction:column; gap:2px;
+        min-width: 0;
       }
-      .fl-chat-title b{ font-weight: 950; letter-spacing:.2px; }
-      .fl-chat-title span{ font-size: 12.5px; color: rgba(255,255,255,.72); }
+      .fl-chat-title b{
+        font-weight: 950; letter-spacing:.2px;
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        max-width: 70vw;
+      }
+      .fl-chat-title span{
+        font-size: 12.5px; color: rgba(255,255,255,.72);
+        white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        max-width: 70vw;
+      }
       .fl-chat-close{
-        width: 36px; height: 36px; border-radius: 999px;
+        width: 38px; height: 38px; border-radius: 999px;
         border: 1px solid rgba(255,255,255,.14);
         background: rgba(255,255,255,.06);
         color:#fff; cursor:pointer;
+        flex: 0 0 auto;
       }
+
       .fl-chat-body{
         flex:1;
         padding: 14px;
@@ -73,9 +152,14 @@ export function initCustomerChatWidget(opts){
         display:flex;
         flex-direction:column;
         gap:10px;
+        background: rgba(0,0,0,.10);
       }
+
+      /* ✅ FIX: ne tördeljen betűnként (Sz / ia) */
       .fl-msg{
-        max-width: 86%;
+        display:inline-block;
+        max-width: min(86%, 520px);
+        min-width: 62px;         /* <<< EZ A KULCS, hogy ne legyen túl keskeny */
         border-radius: 16px;
         padding: 10px 12px;
         border: 1px solid rgba(255,255,255,.10);
@@ -83,18 +167,23 @@ export function initCustomerChatWidget(opts){
         color: rgba(255,255,255,.92);
         line-height: 1.45;
         font-size: 13.5px;
+
+        white-space: pre-wrap;
         word-break: break-word;
+        overflow-wrap: anywhere;
       }
       .fl-msg.me{
         margin-left:auto;
-        background: rgba(255,79,216,.12);
-        border-color: rgba(255,79,216,.20);
+        background: linear-gradient(135deg, rgba(255,79,216,.90), rgba(177,76,255,.90));
+        color:#160813;
+        border-color: rgba(255,255,255,.18);
       }
       .fl-msg .meta{
         margin-top:6px;
         font-size: 11.5px;
         color: rgba(255,255,255,.60);
       }
+
       .fl-chat-foot{
         padding: 12px 12px;
         border-top: 1px solid rgba(255,255,255,.10);
@@ -103,7 +192,7 @@ export function initCustomerChatWidget(opts){
       }
       .fl-chat-input{
         flex:1;
-        height: 42px;
+        height: 44px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,.14);
         background: rgba(255,255,255,.06);
@@ -112,7 +201,7 @@ export function initCustomerChatWidget(opts){
         outline:none;
       }
       .fl-chat-btn{
-        height: 42px;
+        height: 44px;
         padding: 0 12px;
         border-radius: 14px;
         border: 1px solid rgba(255,255,255,.14);
@@ -122,10 +211,12 @@ export function initCustomerChatWidget(opts){
         user-select:none;
       }
       .fl-chat-btn.primary{
-        background: linear-gradient(135deg, ${theme.pink}, ${theme.pink2});
+        background: linear-gradient(135deg, var(--fl-chat-pink), var(--fl-chat-pink2));
         color:#140813; border-color: transparent;
+        box-shadow: 0 18px 46px rgba(255,79,216,.18);
       }
       .fl-chat-btn[disabled]{ opacity:.55; cursor:not-allowed; }
+
       .fl-chat-hint{
         padding: 10px 12px;
         border-radius: 16px;
@@ -155,7 +246,9 @@ export function initCustomerChatWidget(opts){
   fab.type = "button";
   fab.textContent = "💬";
   if(!canUseChat) fab.setAttribute("disabled", "disabled");
-  fab.title = canUseChat ? "Chat megnyitása" : "Chat csak fizetett vevőknek (admin engedélyezheti)";
+  fab.title = canUseChat
+    ? "Chat megnyitása"
+    : "Chat csak fizetett vevőknek (admin engedélyezheti)";
 
   const panel = document.createElement("div");
   panel.className = "fl-chat-panel";
@@ -188,12 +281,16 @@ export function initCustomerChatWidget(opts){
   const btnImg = panel.querySelector("#fl_chat_img");
   const btnCall = panel.querySelector("#fl_chat_call");
 
-  function open(){ panel.classList.add("is-open"); scrollDown(); }
+  function open(){
+    panel.classList.add("is-open");
+    scrollDown();
+    setTimeout(()=>{ try{ inp?.focus({ preventScroll:true }); }catch{} }, 160);
+  }
   function close(){ panel.classList.remove("is-open"); }
   function toggle(){ panel.classList.contains("is-open") ? close() : open(); }
   function scrollDown(){ setTimeout(()=>{ body.scrollTop = body.scrollHeight; }, 60); }
 
-  fab.addEventListener("click", ()=>{ if(canUseChat) toggle(); });
+  fab.addEventListener("click", ()=>{ toggle(); });
   btnClose.addEventListener("click", close);
 
   // ----- Firestore refs -----
@@ -228,6 +325,7 @@ export function initCustomerChatWidget(opts){
     const me = (m.senderUid === uid);
     const wrap = document.createElement("div");
     wrap.className = "fl-msg" + (me ? " me" : "");
+
     if(m.type === "image" && m.imageDataUrl){
       wrap.innerHTML = `
         <img class="fl-img" src="${m.imageDataUrl}" alt="Kép" />
@@ -236,6 +334,7 @@ export function initCustomerChatWidget(opts){
       `;
       return wrap;
     }
+
     if(m.type === "call" && m.callUrl){
       wrap.innerHTML = `
         <div><b>Videóhívás</b></div>
@@ -246,6 +345,7 @@ export function initCustomerChatWidget(opts){
       `;
       return wrap;
     }
+
     wrap.innerHTML = `
       <div>${escapeHtml(m.text || "")}</div>
       <div class="meta">${escapeHtml(fmtTime(m.createdAt))}</div>
@@ -253,12 +353,10 @@ export function initCustomerChatWidget(opts){
     return wrap;
   }
 
-  function renderHint(){
+  function renderHint(text){
     const h = document.createElement("div");
     h.className = "fl-chat-hint";
-    h.innerHTML = `
-      <b>Info:</b> itt tudsz Edinának írni. Képet is küldhetsz, és videóhívás linket indíthatsz.
-    `;
+    h.innerHTML = text || `<b>Info:</b> itt tudsz írni. Képet is küldhetsz, és videóhívás linket indíthatsz.`;
     body.appendChild(h);
   }
 
@@ -271,10 +369,13 @@ export function initCustomerChatWidget(opts){
     unsub = fs.onSnapshot(q, (snap)=>{
       body.innerHTML = "";
       if(snap.empty) renderHint();
-      snap.forEach(doc=>{
-        body.appendChild(renderMessage(doc.data() || {}));
+      snap.forEach(docSnap=>{
+        body.appendChild(renderMessage(docSnap.data() || {}));
       });
       scrollDown();
+    }, (err)=>{
+      body.innerHTML = "";
+      renderHint(`<b>Chat hiba:</b> ${escapeHtml(err?.message || String(err))}`);
     });
   }
 
@@ -310,7 +411,6 @@ export function initCustomerChatWidget(opts){
       fr.readAsDataURL(file);
     });
 
-    // draw to canvas
     const img = await new Promise((res, rej)=>{
       const i = new Image();
       i.onload = ()=>res(i);
@@ -329,7 +429,6 @@ export function initCustomerChatWidget(opts){
     ctx.drawImage(img, 0, 0, w, h);
 
     let out = canvas.toDataURL("image/jpeg", quality);
-    // if too large, lower quality
     let q = quality;
     while(out.length > maxBytes * 1.37 && q > 0.45){
       q -= 0.08;
@@ -384,14 +483,11 @@ export function initCustomerChatWidget(opts){
 
   function wire(){
     if(!canUseChat){
-      // show small hint on click
+      // ha nem fizetett, nyíljon meg info panel
       fab.addEventListener("click", ()=>{
         panel.classList.add("is-open");
         body.innerHTML = "";
-        const h = document.createElement("div");
-        h.className = "fl-chat-hint";
-        h.innerHTML = `<b>Chat:</b> csak fizetett vevőknek elérhető. (Admin engedélyezheti.)`;
-        body.appendChild(h);
+        renderHint(`<b>Chat:</b> csak fizetett vevőknek elérhető. (Admin engedélyezheti.)`);
       });
       return;
     }
@@ -478,7 +574,7 @@ export function initAdminChatPanel(opts){
         </div>
 
         <div class="sub" style="margin-top:10px;">
-          Tipp: a videóhívás gomb Jitsi linket küld (gyors, nem kell extra backend).
+          Tipp: a videóhívás gomb Jitsi linket küld.
         </div>
       </div>
     </div>
@@ -519,6 +615,7 @@ export function initAdminChatPanel(opts){
 
     const bubble = document.createElement("div");
     bubble.style.maxWidth = "86%";
+    bubble.style.minWidth = "62px";               // ✅ ugyanaz a wrap-fix adminban is
     bubble.style.padding = "10px 12px";
     bubble.style.borderRadius = "16px";
     bubble.style.border = "1px solid rgba(255,255,255,.10)";
@@ -526,6 +623,9 @@ export function initAdminChatPanel(opts){
     bubble.style.color = "rgba(255,255,255,.92)";
     bubble.style.fontSize = "13.5px";
     bubble.style.lineHeight = "1.45";
+    bubble.style.whiteSpace = "pre-wrap";
+    bubble.style.wordBreak = "break-word";
+    bubble.style.overflowWrap = "anywhere";
 
     if(m.type === "image" && m.imageDataUrl){
       bubble.innerHTML = `
@@ -592,7 +692,11 @@ export function initAdminChatPanel(opts){
 
   async function pickChat(uid, chatData){
     SEL_UID = uid;
-    selEl.textContent = uid ? `uid=${uid} • ${chatData?.userEmail || "—"}` : "—";
+
+    // ✅ ne uid legyen a fő: email az első, uid csak másodlagos
+    const mail = (chatData?.userEmail || "").trim();
+    selEl.textContent = uid ? `${mail || "—"}${uid ? ` • uid=${uid}` : ""}` : "—";
+
     if(typeof onPickUserUid === "function") onPickUserUid(uid);
 
     // reset unread for admin
@@ -625,7 +729,7 @@ export function initAdminChatPanel(opts){
 
     li.innerHTML = `
       <div>
-        <div class="title">${escapeHtml(c.userEmail || uid || "—")}</div>
+        <div class="title">${escapeHtml(c.userEmail || "Ismeretlen email")}</div>
         <div class="desc">
           utolsó: ${escapeHtml(c.lastMessageText || "—")}
           • ${escapeHtml(fmtTime(c.lastMessageAt))}
@@ -647,8 +751,7 @@ export function initAdminChatPanel(opts){
 
   async function sendText(){
     const t = String(inpText.value || "").trim();
-    if(!SEL_UID) return;
-    if(!t) return;
+    if(!SEL_UID || !t) return;
     inpText.value = "";
 
     const msgCol = fs.collection(db, "chats", SEL_UID, "messages");
@@ -748,10 +851,7 @@ export function initAdminChatPanel(opts){
   }
 
   btnRefresh.addEventListener("click", mountRealtimeList);
-  searchEl.addEventListener("input", ()=>{
-    // re-render via realtime snapshot by forcing refresh:
-    mountRealtimeList();
-  });
+  searchEl.addEventListener("input", ()=>mountRealtimeList());
 
   btnSend.addEventListener("click", sendText);
   inpText.addEventListener("keydown", (e)=>{
@@ -777,4 +877,5 @@ export function initAdminChatPanel(opts){
       if(unsubMsgs) unsubMsgs();
     }
   };
-                                        }
+}
+```0
