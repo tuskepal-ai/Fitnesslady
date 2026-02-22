@@ -156,8 +156,6 @@
     }
     .chat-fab:active{ transform: scale(.98); }
     .chat-fab svg{ width: 26px; height: 26px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
-    .chat-fab[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.75); animation:none; }
-
     .chat-badge{
       position:absolute;
       top: -6px;
@@ -200,7 +198,7 @@
     /* ✅ MOBIL: half-sheet (kisebb) */
     .chat-panel{
       width: min(980px, 100vw);
-      height: min(56vh, 560px);
+      height: min(56vh, 560px); /* <<< kisebb lett */
       border-radius: 26px 26px 0 0;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(10,8,14,.92);
@@ -230,7 +228,7 @@
     }
 
     .chat-head{
-      height: 58px;
+      height: 58px; /* <<< kisebb */
       display:flex;
       align-items:center;
       justify-content: space-between;
@@ -248,7 +246,7 @@
       min-width: 0;
     }
     .avatar{
-      width: 34px; height: 34px;
+      width: 34px; height: 34px; /* <<< kisebb */
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.16);
       background: rgba(255,255,255,.06);
@@ -286,7 +284,7 @@
     }
 
     .chat-body{
-      height: calc(100% - 58px - 66px);
+      height: calc(100% - 58px - 66px); /* <<< igazítva */
       padding: 12px;
       overflow:auto;
       background:
@@ -295,17 +293,10 @@
         rgba(6,5,10,.92);
     }
 
-    /* ✅ FIX: ne legyen „Sz / ia” (túl keskeny bubble) */
-    .msgRow{
-      display:flex;
-      width: 100%;
-      margin: 10px 0;
-      gap: 8px;
-    }
+    .msgRow{ display:flex; margin: 10px 0; gap: 8px; }
     .msgRow.me{ justify-content:flex-end; }
     .bubble{
-      max-width: min(78%, 320px);
-      min-width: 72px;
+      max-width: 78%;
       padding: 10px 12px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.10);
@@ -314,8 +305,7 @@
       line-height: 1.45;
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
       white-space: pre-wrap;
-      overflow-wrap: anywhere;
-      word-break: normal;
+      word-break: break-word;
     }
     .bubble.me{
       border-color: rgba(255,79,216,.22);
@@ -335,7 +325,7 @@
     .metaTime.me{ color: rgba(20,8,19,.70); }
 
     .chat-foot{
-      height: 66px;
+      height: 66px; /* <<< kisebb */
       padding: 10px;
       border-top: 1px solid rgba(255,255,255,.08);
       background: rgba(12,10,16,.92);
@@ -364,7 +354,6 @@
       font-weight: 950;
       box-shadow: 0 18px 46px rgba(255,79,216,.14);
     }
-    .chat-send[disabled]{ opacity:.55; cursor:not-allowed; filter:saturate(.75); }
 
     .chat-empty{
       padding: 14px;
@@ -588,8 +577,6 @@
       onAuth, logout, toLogin,
       escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
     } from "../shared/firebase.js";
-
-    import { initCustomerChatHalfSheet } from "../shared/customer-chat-halfsheet.js";
 
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
@@ -1031,8 +1018,6 @@
       catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
 
-    let chatCtl = null;
-
     $("#btnSaveSettings").addEventListener("click", async ()=>{
       try{
         const goal = ($("#setGoal").value || "").trim();
@@ -1040,11 +1025,185 @@
         const photoURL = ($("#setPhoto").value || "").trim();
         await fs.updateDoc(fs.doc(db, "users", UID), { goal, level, photoURL, updatedAt: fs.serverTimestamp() });
         profile.goal = goal; profile.level = level; profile.photoURL = photoURL;
-        renderHeader();
-        if(chatCtl && typeof chatCtl.updateProfile === "function") chatCtl.updateProfile(profile);
+        renderHeader(); renderChatHeader();
         closeOverlay(settingsOverlay);
       }catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
+
+    /* =========================
+       ✅ CHAT (Vevő) — realtime
+    ========================== */
+    const chatFab = $("#chatFab");
+    const chatBadge = $("#chatBadge");
+    const chatOverlay = $("#chatOverlay");
+    const chatClose = $("#chatClose");
+    const chatBody = $("#chatBody");
+    const chatEmpty = $("#chatEmpty");
+    const chatInput = $("#chatInput");
+    const chatSend = $("#chatSend");
+    const chatAvatar = $("#chatAvatar");
+    const chatName = $("#chatName");
+
+    let chatUnsub = null;
+    let chatOpen = false;
+    let lastSeenCount = 0;
+
+    function initials(name){
+      const n = String(name || "").trim();
+      if(!n) return "FL";
+      const parts = n.split(" ").filter(Boolean);
+      const a = (parts[0] || "F").slice(0,1);
+      const b = (parts[1] || "L").slice(0,1);
+      return (a + b).toUpperCase();
+    }
+
+    function renderChatHeader(){
+      const n = (profile?.name || "").trim();
+      const url = String(profile?.photoURL || "").trim();
+      chatAvatar.innerHTML = "";
+      if(url){
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Profilkép";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = ()=>{ chatAvatar.textContent = initials(n); };
+        chatAvatar.appendChild(img);
+      }else{
+        chatAvatar.textContent = initials(n);
+      }
+      chatName.textContent = n ? `Chat • ${n}` : "Chat • FitnessLady";
+    }
+
+    function openChat(){
+      chatOpen = true;
+      chatOverlay.classList.add("is-open");
+      chatOverlay.setAttribute("aria-hidden","false");
+      chatBadge.classList.remove("is-on");
+      chatInput.focus({ preventScroll:true });
+      ensureChatListener();
+    }
+    function closeChat(){
+      chatOpen = false;
+      chatOverlay.classList.remove("is-open");
+      chatOverlay.setAttribute("aria-hidden","true");
+    }
+
+    chatFab.addEventListener("click", openChat);
+    chatClose.addEventListener("click", closeChat);
+    chatOverlay.addEventListener("click", (e)=>{ if(e.target === chatOverlay) closeChat(); });
+
+    function msgTime(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+        if(!d) return "";
+        return d.toLocaleTimeString("hu-CH", { hour:"2-digit", minute:"2-digit" });
+      }catch{ return ""; }
+    }
+
+    function renderMessages(items){
+      chatBody.innerHTML = "";
+      if(!items || items.length === 0){
+        chatEmpty.style.display = "block";
+        chatBody.appendChild(chatEmpty);
+        return;
+      }
+      chatEmpty.style.display = "none";
+      items.forEach(m=>{
+        const sender = String(m.sender || "").toLowerCase();
+        const isMe = sender === "user";
+        const row = document.createElement("div");
+        row.className = "msgRow " + (isMe ? "me" : "other");
+
+        const bub = document.createElement("div");
+        bub.className = "bubble " + (isMe ? "me" : "other");
+        bub.textContent = String(m.text || "");
+
+        const t = document.createElement("div");
+        t.className = "metaTime " + (isMe ? "me" : "other");
+        t.textContent = msgTime(m.createdAt);
+
+        const wrap = document.createElement("div");
+        wrap.style.display = "grid";
+        wrap.style.gap = "6px";
+        wrap.appendChild(bub);
+        wrap.appendChild(t);
+
+        row.appendChild(wrap);
+        chatBody.appendChild(row);
+      });
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function ensureThreadDoc(){
+      const ref = fs.doc(db, "chats", UID);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        await fs.setDoc(ref, {
+          uid: UID,
+          createdAt: fs.serverTimestamp(),
+          lastMessageAt: null,
+          lastMessageSender: null,
+          lastMessageText: "",
+          lastAdminReadAt: null,
+          lastUserReadAt: fs.serverTimestamp()
+        }, { merge:true });
+      }
+    }
+
+    function ensureChatListener(){
+      if(chatUnsub) return;
+      const q = fs.query(
+        fs.collection(db, "chats", UID, "messages"),
+        fs.orderBy("createdAt","asc"),
+        fs.limit(200)
+      );
+      chatUnsub = fs.onSnapshot(q, (snap)=>{
+        const items = snap.docs.map(d => ({ id:d.id, ...(d.data()||{}) }));
+        renderMessages(items);
+        if(!chatOpen){
+          if(lastSeenCount > 0 && items.length > lastSeenCount){
+            chatBadge.textContent = String(items.length - lastSeenCount);
+            chatBadge.classList.add("is-on");
+          }
+          lastSeenCount = items.length;
+        }else{
+          lastSeenCount = items.length;
+          chatBadge.classList.remove("is-on");
+        }
+      }, (err)=>{
+        console.error(err);
+        openInfo("Chat hiba", escapeHtml(err?.message || String(err)));
+      });
+    }
+
+    async function sendChat(){
+      try{
+        const text = String(chatInput.value || "").trim();
+        if(!text) return;
+        chatInput.value = "";
+
+        await ensureThreadDoc();
+        await fs.addDoc(fs.collection(db, "chats", UID, "messages"), {
+          sender: "user",
+          type: "text",
+          text,
+          createdAt: fs.serverTimestamp()
+        });
+
+        await fs.setDoc(fs.doc(db, "chats", UID), {
+          lastMessageAt: fs.serverTimestamp(),
+          lastMessageSender: "user",
+          lastMessageText: text.slice(0, 180),
+          lastUserReadAt: fs.serverTimestamp()
+        }, { merge:true });
+      }catch(e){
+        console.error(e);
+        openInfo("Chat hiba", escapeHtml(e.message || String(e)));
+      }
+    }
+
+    chatSend.addEventListener("click", sendChat);
+    chatInput.addEventListener("keydown", (e)=>{ if(e.key === "Enter") sendChat(); });
 
     onAuth(async (user)=>{
       try {
@@ -1074,13 +1233,8 @@
         $("#setLevel").value = profile.level || 2;
         $("#setPhoto").value = profile.photoURL || "";
 
-        // ✅ Chat init (külön fájlból) — az app többi részéhez nem nyúl
-        chatCtl = initCustomerChatHalfSheet({
-          db, fs, escapeHtml,
-          uid: UID,
-          profile,
-          openInfo
-        });
+        renderChatHeader();
+        ensureChatListener();
 
         document.getElementById("y").textContent = new Date().getFullYear();
       } catch (err) {
