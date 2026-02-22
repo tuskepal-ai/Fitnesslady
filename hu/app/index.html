@@ -120,6 +120,268 @@
     .field input{ height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #fff; padding: 0 12px; outline: none; }
 
     footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-align:center; font-size:13px; color:var(--muted); }
+
+    /* =========================
+       ✅ CHAT (Vevő) — 3D bubble + Apple-like panel
+    ========================== */
+
+    .chat-fab{
+      position: fixed;
+      right: 18px;
+      bottom: 18px;
+      z-index: 120;
+      width: 62px;
+      height: 62px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      cursor: pointer;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+
+      /* 3D candy bubble */
+      background:
+        radial-gradient(18px 18px at 28% 26%, rgba(255,255,255,.85), rgba(255,255,255,0) 60%),
+        radial-gradient(26px 26px at 75% 78%, rgba(255,211,138,.30), rgba(255,211,138,0) 62%),
+        linear-gradient(145deg, rgba(255,79,216,.95), rgba(177,76,255,.95));
+      box-shadow:
+        0 18px 46px rgba(0,0,0,.55),
+        0 10px 28px rgba(255,79,216,.18),
+        inset 0 1px 0 rgba(255,255,255,.25);
+
+      display:flex;
+      align-items:center;
+      justify-content:center;
+
+      transform: translateZ(0);
+      animation: chatFloat 3.2s ease-in-out infinite;
+    }
+    .chat-fab:active{ transform: scale(.98); }
+    .chat-fab svg{ width: 26px; height: 26px; filter: drop-shadow(0 6px 12px rgba(0,0,0,.35)); }
+    .chat-badge{
+      position:absolute;
+      top: -6px;
+      right: -6px;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: rgba(0,0,0,.85);
+      border: 1px solid rgba(255,255,255,.18);
+      color:#fff;
+      font-size: 12px;
+      font-weight: 900;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      box-shadow: 0 14px 30px rgba(0,0,0,.55);
+    }
+    .chat-badge.is-on{ display:flex; }
+
+    @keyframes chatFloat{
+      0%,100%{ transform: translateY(0); }
+      50%{ transform: translateY(-6px); }
+    }
+
+    .chat-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 140;
+      display:none;
+      align-items:flex-end;
+      justify-content:center;
+      background: rgba(0,0,0,.58);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .chat-overlay.is-open{ display:flex; }
+
+    .chat-panel{
+      width: min(980px, 100vw);
+      height: min(78vh, 760px);
+      border-radius: 26px 26px 0 0;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(10,8,14,.92);
+      box-shadow: 0 30px 120px rgba(0,0,0,.70);
+      overflow:hidden;
+      transform: translateY(18px) scale(.985);
+      opacity: 0;
+      transition: transform .22s ease, opacity .22s ease;
+    }
+    .chat-overlay.is-open .chat-panel{
+      transform: translateY(0) scale(1);
+      opacity: 1;
+    }
+
+    /* desktop: right drawer feel */
+    @media (min-width: 980px){
+      .chat-overlay{ align-items: stretch; justify-content:flex-end; }
+      .chat-panel{
+        height: 100vh;
+        width: min(420px, 100vw);
+        border-radius: 26px 0 0 26px;
+        transform: translateX(18px) scale(.985);
+      }
+      .chat-overlay.is-open .chat-panel{
+        transform: translateX(0) scale(1);
+      }
+    }
+
+    .chat-head{
+      height: 64px;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background:
+        radial-gradient(900px 240px at 10% 20%, rgba(255,79,216,.14), transparent 55%),
+        radial-gradient(900px 240px at 90% 10%, rgba(177,76,255,.12), transparent 55%),
+        rgba(18,12,26,.95);
+    }
+    .chat-who{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      min-width: 0;
+    }
+    .avatar{
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.16);
+      background: rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-weight: 950;
+      color: rgba(255,255,255,.92);
+      overflow:hidden;
+      flex: 0 0 auto;
+    }
+    .avatar img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .chat-title{
+      display:grid;
+      gap:2px;
+      min-width: 0;
+    }
+    .chat-title b{
+      font-size: 13.5px;
+      letter-spacing:.2px;
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .chat-title span{
+      font-size: 12px;
+      color: rgba(255,255,255,.68);
+      white-space: nowrap;
+      overflow:hidden;
+      text-overflow: ellipsis;
+    }
+    .chat-x{
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+
+    .chat-body{
+      height: calc(100% - 64px - 72px);
+      padding: 14px;
+      overflow:auto;
+      background:
+        radial-gradient(1000px 600px at 30% 5%, rgba(255,79,216,.08), transparent 52%),
+        radial-gradient(900px 560px at 80% 20%, rgba(177,76,255,.07), transparent 52%),
+        rgba(6,5,10,.92);
+    }
+
+    .msgRow{
+      display:flex;
+      margin: 10px 0;
+      gap: 8px;
+    }
+    .msgRow.me{ justify-content:flex-end; }
+    .bubble{
+      max-width: 78%;
+      padding: 10px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      line-height: 1.45;
+      box-shadow: 0 16px 40px rgba(0,0,0,.35);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .bubble.me{
+      border-color: rgba(255,79,216,.22);
+      background: linear-gradient(135deg, rgba(255,79,216,.92), rgba(177,76,255,.92));
+      color: #140813;
+      font-weight: 800;
+      box-shadow:
+        0 18px 46px rgba(0,0,0,.40),
+        0 12px 28px rgba(255,79,216,.12);
+    }
+    .metaTime{
+      font-size: 11px;
+      color: rgba(255,255,255,.55);
+      margin-top: 6px;
+      text-align: right;
+    }
+    .metaTime.me{ color: rgba(20,8,19,.70); }
+
+    .chat-foot{
+      height: 72px;
+      padding: 12px;
+      border-top: 1px solid rgba(255,255,255,.08);
+      background: rgba(12,10,16,.92);
+      display:flex;
+      align-items:center;
+      gap: 10px;
+    }
+    .chat-input{
+      flex:1;
+      height: 46px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      padding: 0 12px;
+      outline:none;
+    }
+    .chat-send{
+      height: 46px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      cursor:pointer;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      font-weight: 950;
+      box-shadow: 0 18px 46px rgba(255,79,216,.14);
+    }
+
+    .chat-empty{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px dashed rgba(255,255,255,.14);
+      color: rgba(255,255,255,.70);
+      background: rgba(255,255,255,.04);
+      text-align:center;
+      margin-top: 10px;
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .chat-fab{ animation:none; }
+      .chat-panel{ transition:none; }
+    }
   </style>
 </head>
 
@@ -262,6 +524,7 @@
     </div>
   </footer>
 
+  <!-- Settings -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -271,6 +534,10 @@
       <div class="modal-body">
         <div class="field"><label for="setGoal">Cél</label><input id="setGoal" type="text" placeholder="pl. formálás" /></div>
         <div class="field"><label for="setLevel">Szint (1–4)</label><input id="setLevel" type="number" min="1" max="4" /></div>
+
+        <!-- (tervezés) profilkép URL — később lehet feltöltés -->
+        <div class="field"><label for="setPhoto">Profilkép URL (opcionális)</label><input id="setPhoto" type="text" placeholder="https://..." /></div>
+
         <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px;">
           <button class="pill primary" id="btnSaveSettings" type="button">Mentés</button>
         </div>
@@ -278,6 +545,7 @@
     </div>
   </div>
 
+  <!-- Info modal -->
   <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -285,6 +553,43 @@
         <button class="modal-close" id="infoClose" type="button" aria-label="Bezárás">✕</button>
       </div>
       <div class="modal-body" id="infoBody"></div>
+    </div>
+  </div>
+
+  <!-- ✅ CHAT Bubble -->
+  <button class="chat-fab" id="chatFab" type="button" aria-label="Chat megnyitása" title="Chat">
+    <span class="chat-badge" id="chatBadge">1</span>
+    <!-- icon -->
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
+      <path d="M7 8h10M7 12h7M12 20c4.418 0 8-3.134 8-7s-3.582-7-8-7-8 3.134-8 7c0 1.1.33 2.13.93 3.05L4 20l3.18-.79c1.37.51 2.99.79 4.82.79Z"
+            stroke="white" stroke-opacity=".92" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <!-- ✅ CHAT Overlay + Panel -->
+  <div class="chat-overlay" id="chatOverlay" aria-hidden="true">
+    <div class="chat-panel" role="dialog" aria-modal="true" aria-label="Chat">
+      <div class="chat-head">
+        <div class="chat-who">
+          <div class="avatar" id="chatAvatar">FL</div>
+          <div class="chat-title">
+            <b id="chatName">Edina • FitnessLady</b>
+            <span id="chatSub">Írj nyugodtan — 24 órán belül válaszolunk.</span>
+          </div>
+        </div>
+        <button class="chat-x" id="chatClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+
+      <div class="chat-body" id="chatBody">
+        <div class="chat-empty" id="chatEmpty" style="display:none;">
+          Még nincs üzenet. Írj egy üzenetet Edinának! 💬
+        </div>
+      </div>
+
+      <div class="chat-foot">
+        <input class="chat-input" id="chatInput" type="text" placeholder="Írj ide..." autocomplete="off" />
+        <button class="chat-send" id="chatSend" type="button">Küldés</button>
+      </div>
     </div>
   </div>
 
@@ -311,7 +616,7 @@
     $("#infoClose").addEventListener("click", ()=>{ closeOverlay(infoOverlay); $("#infoBody").innerHTML = ""; });
     $("#btnOpenSettings").addEventListener("click", ()=>openOverlay(settingsOverlay));
 
-    // LocalStorage csak "done" (kész/jelölés) miatt marad itt (ez user oldali), minden más Firestore
+    // LocalStorage csak "done" (kész/jelölés) miatt marad itt
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
     const lsSet = (uid, key, value) => localStorage.setItem(k(uid,key), JSON.stringify(value));
@@ -546,7 +851,6 @@
       $("#motivationBox").innerHTML = formatMultiline(mc?.text || "Nem kell tökéletesnek lenned. Elég, ha következetes vagy.");
     }
 
-    /* ✅ FIX #1: Üdvözlő kártya (admin: welcomeCard, régi: introCard) */
     function renderIntroCard(){
       const ic = profile?.welcomeCard || profile?.introCard || null;
       const title = String(ic?.title || "").trim();
@@ -679,7 +983,6 @@
       });
     }
 
-    /* ✅ FIX #2: Technika Vault (admin: techVault.items, régi: techVault[]) */
     function renderTechVault(){
       const list = $("#techList");
       list.innerHTML = "";
@@ -771,19 +1074,25 @@
       }catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
 
-    // Beállítások: profil mentés (admin is tudja írni, de appból is oké)
+    // Beállítások: profil mentés
     $("#btnSaveSettings").addEventListener("click", async ()=>{
       try{
         const goal = ($("#setGoal").value || "").trim();
         const level = clamp(parseInt($("#setLevel").value || "2", 10) || 2, 1, 4);
+        const photoURL = ($("#setPhoto").value || "").trim();
+
         await fs.updateDoc(fs.doc(db, "users", UID), {
           goal,
           level,
+          photoURL,
           updatedAt: fs.serverTimestamp()
         });
         profile.goal = goal;
         profile.level = level;
+        profile.photoURL = photoURL;
+
         renderHeader();
+        renderChatHeader(); // avatar frissítés
         closeOverlay(settingsOverlay);
       }catch(e){
         console.error(e);
@@ -791,7 +1100,199 @@
       }
     });
 
-    // START
+    /* =========================
+       ✅ CHAT (Vevő) — realtime
+    ========================== */
+
+    const chatFab = $("#chatFab");
+    const chatBadge = $("#chatBadge");
+    const chatOverlay = $("#chatOverlay");
+    const chatClose = $("#chatClose");
+    const chatBody = $("#chatBody");
+    const chatEmpty = $("#chatEmpty");
+    const chatInput = $("#chatInput");
+    const chatSend = $("#chatSend");
+    const chatAvatar = $("#chatAvatar");
+    const chatName = $("#chatName");
+
+    let chatUnsub = null;
+    let chatOpen = false;
+    let lastSeenCount = 0;
+
+    function initials(name){
+      const n = String(name || "").trim();
+      if(!n) return "FL";
+      const parts = n.split(" ").filter(Boolean);
+      const a = (parts[0] || "F").slice(0,1);
+      const b = (parts[1] || "L").slice(0,1);
+      return (a + b).toUpperCase();
+    }
+
+    function renderChatHeader(){
+      // a vevő saját profilképét is használhatjuk később, de itt az Edina/brand fej
+      // most: FitnessLady / Edina fixed + vevő saját avatar a bubble-ben NEM kell
+      const n = (profile?.name || "").trim();
+      // chat panel header avatar: vevő képe (saját), így személyesebb
+      const url = String(profile?.photoURL || "").trim();
+      chatAvatar.innerHTML = "";
+      if(url){
+        const img = document.createElement("img");
+        img.src = url;
+        img.alt = "Profilkép";
+        img.referrerPolicy = "no-referrer";
+        img.onerror = ()=>{ chatAvatar.textContent = initials(n); };
+        chatAvatar.appendChild(img);
+      }else{
+        chatAvatar.textContent = initials(n);
+      }
+
+      // név: ne uid!
+      chatName.textContent = n ? `Chat • ${n}` : "Chat • FitnessLady";
+    }
+
+    function openChat(){
+      chatOpen = true;
+      chatOverlay.classList.add("is-open");
+      chatOverlay.setAttribute("aria-hidden","false");
+      chatBadge.classList.remove("is-on");
+      chatInput.focus({ preventScroll:true });
+      ensureChatListener();
+    }
+    function closeChat(){
+      chatOpen = false;
+      chatOverlay.classList.remove("is-open");
+      chatOverlay.setAttribute("aria-hidden","true");
+    }
+
+    chatFab.addEventListener("click", openChat);
+    chatClose.addEventListener("click", closeChat);
+    chatOverlay.addEventListener("click", (e)=>{
+      if(e.target === chatOverlay) closeChat();
+    });
+
+    function msgTime(ts){
+      try{
+        const d = ts?.toDate ? ts.toDate() : (ts ? new Date(ts) : null);
+        if(!d) return "";
+        return d.toLocaleTimeString("hu-CH", { hour:"2-digit", minute:"2-digit" });
+      }catch{ return ""; }
+    }
+
+    function renderMessages(items){
+      chatBody.innerHTML = "";
+      if(!items || items.length === 0){
+        chatEmpty.style.display = "block";
+        chatBody.appendChild(chatEmpty);
+        return;
+      }
+      chatEmpty.style.display = "none";
+
+      items.forEach(m=>{
+        const sender = String(m.sender || "").toLowerCase();
+        const isMe = sender === "user";
+        const row = document.createElement("div");
+        row.className = "msgRow " + (isMe ? "me" : "other");
+
+        const bub = document.createElement("div");
+        bub.className = "bubble " + (isMe ? "me" : "other");
+        bub.textContent = String(m.text || "");
+
+        const t = document.createElement("div");
+        t.className = "metaTime " + (isMe ? "me" : "other");
+        t.textContent = msgTime(m.createdAt);
+
+        const wrap = document.createElement("div");
+        wrap.style.display = "grid";
+        wrap.style.gap = "6px";
+        wrap.appendChild(bub);
+        wrap.appendChild(t);
+
+        row.appendChild(wrap);
+        chatBody.appendChild(row);
+      });
+
+      // autoscroll
+      chatBody.scrollTop = chatBody.scrollHeight;
+    }
+
+    async function ensureThreadDoc(){
+      const ref = fs.doc(db, "chats", UID);
+      const snap = await fs.getDoc(ref);
+      if(!snap.exists()){
+        await fs.setDoc(ref, {
+          uid: UID,
+          createdAt: fs.serverTimestamp(),
+          lastMessageAt: null,
+          lastMessageSender: null,
+          lastMessageText: "",
+          lastAdminReadAt: null,
+          lastUserReadAt: fs.serverTimestamp()
+        }, { merge:true });
+      }
+    }
+
+    function ensureChatListener(){
+      if(chatUnsub) return;
+
+      const q = fs.query(
+        fs.collection(db, "chats", UID, "messages"),
+        fs.orderBy("createdAt","asc"),
+        fs.limit(200)
+      );
+
+      chatUnsub = fs.onSnapshot(q, (snap)=>{
+        const items = snap.docs.map(d => ({ id:d.id, ...(d.data()||{}) }));
+        renderMessages(items);
+
+        // badge: ha nincs nyitva és nőtt a messages count
+        if(!chatOpen){
+          if(lastSeenCount > 0 && items.length > lastSeenCount){
+            chatBadge.textContent = String(items.length - lastSeenCount);
+            chatBadge.classList.add("is-on");
+          }
+          lastSeenCount = items.length;
+        }else{
+          lastSeenCount = items.length;
+          chatBadge.classList.remove("is-on");
+        }
+      });
+    }
+
+    async function sendChat(){
+      try{
+        const text = String(chatInput.value || "").trim();
+        if(!text) return;
+        chatInput.value = "";
+
+        await ensureThreadDoc();
+        await fs.addDoc(fs.collection(db, "chats", UID, "messages"), {
+          sender: "user",
+          type: "text",
+          text,
+          createdAt: fs.serverTimestamp()
+        });
+
+        // thread meta
+        await fs.setDoc(fs.doc(db, "chats", UID), {
+          lastMessageAt: fs.serverTimestamp(),
+          lastMessageSender: "user",
+          lastMessageText: text.slice(0, 180),
+          lastUserReadAt: fs.serverTimestamp()
+        }, { merge:true });
+      }catch(e){
+        console.error(e);
+        openInfo("Chat hiba", escapeHtml(e.message || String(e)));
+      }
+    }
+
+    chatSend.addEventListener("click", sendChat);
+    chatInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") sendChat();
+    });
+
+    /* =========================
+       START
+    ========================== */
     onAuth(async (user)=>{
       try {
         if(!user) return toLogin("hu");
@@ -820,6 +1321,11 @@
         // settings modal default values
         $("#setGoal").value = profile.goal || "";
         $("#setLevel").value = profile.level || 2;
+        $("#setPhoto").value = profile.photoURL || "";
+
+        renderChatHeader();
+        // előkészítjük a listener-t (badge miatt), de nem nyitjuk ki
+        ensureChatListener();
 
         document.getElementById("y").textContent = new Date().getFullYear();
       } catch (err) {
@@ -828,8 +1334,5 @@
       }
     });
   </script>
-
-  <!-- ✅ CHAT WIDGET (ONLY APP) -->
-  <script type="module" src="../shared/chat-widget.js"></script>
 </body>
 </html>
