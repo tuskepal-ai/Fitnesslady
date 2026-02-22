@@ -220,7 +220,7 @@
     }
     .debugBox b{ color:#fff; }
 
-    /* ✅ Chat drawer */
+    /* ✅ CHAT (modal-ish, but keeping your current drawer for now) */
     .chatDrawer{
       position: fixed;
       top: 0;
@@ -700,20 +700,13 @@
     import {
       db, fs,
       onAuth, logout, toLogin, toApp,
-      ensureUserDoc, getUserRole, isAdminEmail
+      ensureUserDoc, getUserRole, isAdminEmail,
+      ensureChatThread, listenChatMessages, sendChatText, markAdminRead,
+      escapeHtml, clamp
     } from "../shared/firebase.js";
 
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
-    const escapeHtml = (s) => String(s ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-
-    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const trimStr = (v) => String(v ?? "").trim();
 
     const toast = $("#toast");
@@ -765,7 +758,7 @@
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
 
-    // ✅ Chat (Firestore)
+    // ✅ CHAT (NOW USING SHARED HELPERS -> CLIENT RECEIVES)
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -773,37 +766,18 @@
     let chatUnsub = null;
     let CHAT_UID = null;
 
-    async function ensureChatThread(uid){
-      const ref = fs.doc(db, "chats", uid);
-      await fs.setDoc(ref, {
-        uid,
-        updatedAt: fs.serverTimestamp(),
-        createdAt: fs.serverTimestamp()
-      }, { merge:true });
-    }
-    function listenChatMessages(uid, cb){
-      const col = fs.collection(db, "chats", uid, "messages");
-      const q = fs.query(col, fs.orderBy("createdAt", "asc"), fs.limit(200));
-      return fs.onSnapshot(q, (snap)=>{
-        const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-        cb(items);
+    function renderChat(items){
+      chatBody.innerHTML = "";
+      items.forEach(m=>{
+        const mine = (m.sender === "admin");
+        const div = document.createElement("div");
+        div.className = "msgBubble " + (mine ? "admin" : "user");
+        div.textContent = m.text || "";
+        chatBody.appendChild(div);
       });
+      chatBody.scrollTop = chatBody.scrollHeight + 9999;
     }
-    async function sendChatText(uid, sender, text){
-      const col = fs.collection(db, "chats", uid, "messages");
-      await fs.addDoc(col, {
-        type: "text",
-        sender: sender === "admin" ? "admin" : "user",
-        text: String(text || ""),
-        createdAt: fs.serverTimestamp()
-      });
-      await fs.setDoc(fs.doc(db, "chats", uid), {
-        updatedAt: fs.serverTimestamp(),
-        lastMessage: String(text || "").slice(0, 140),
-        lastSender: sender === "admin" ? "admin" : "user",
-        adminLastReadAt: fs.serverTimestamp()
-      }, { merge:true });
-    }
+
     function openChatFor(uid){
       if(!uid) return err("Nincs user kiválasztva (chat).");
       CHAT_UID = uid;
@@ -816,28 +790,27 @@
       chatUnsub?.();
       chatBody.innerHTML = "";
 
-      ensureChatThread(uid).then(()=>{
+      ensureChatThread(uid, {}).then(()=>{
         chatUnsub = listenChatMessages(uid, (items)=>{
-          chatBody.innerHTML = "";
-          items.forEach(m=>{
-            const mine = (m.sender === "admin");
-            const div = document.createElement("div");
-            div.className = "msgBubble " + (mine ? "admin" : "user");
-            div.textContent = m.text || "";
-            chatBody.appendChild(div);
-          });
-          chatBody.scrollTop = chatBody.scrollHeight + 9999;
-        });
+          renderChat(items);
+          markAdminRead(uid).catch(()=>{});
+        }, { limit: 300 });
       }).catch(e=>{
         console.error(e);
         err(e.message || String(e));
       });
     }
+
     function closeChat(){
       chatDrawer.classList.remove("on");
       chatDrawer.setAttribute("aria-hidden", "true");
     }
+
     $("#btnChatClose").addEventListener("click", closeChat);
+    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
+    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
+    $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
+
     $("#btnChatSend").addEventListener("click", async ()=>{
       try{
         if(!CHAT_UID) return err("Nincs chat user.");
@@ -854,13 +827,11 @@
         err(e.message || String(e));
       }
     });
+
     chatInput.addEventListener("keydown", (e)=>{
       if(e.key === "Enter") $("#btnChatSend").click();
       if(e.key === "Escape") closeChat();
     });
-    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
-    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
-    $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
     // 🔥 Dinamikus 5 fix edzés box
     const workoutsContainer = $("#workouts_container");
@@ -892,7 +863,7 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
-    // ✅ Helpers for HU/DE objects
+    // ✅ HU/DE helper
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
