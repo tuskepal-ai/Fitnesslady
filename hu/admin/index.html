@@ -220,7 +220,7 @@
     }
     .debugBox b{ color:#fff; }
 
-    /* ✅ CHAT (modal-ish, but keeping your current drawer for now) */
+    /* ✅ Chat drawer */
     .chatDrawer{
       position: fixed;
       top: 0;
@@ -700,13 +700,20 @@
     import {
       db, fs,
       onAuth, logout, toLogin, toApp,
-      ensureUserDoc, getUserRole, isAdminEmail,
-      ensureChatThread, listenChatMessages, sendChatText, markAdminRead,
-      escapeHtml, clamp
+      ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
+
+    const escapeHtml = (s) => String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+
+    const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const trimStr = (v) => String(v ?? "").trim();
 
     const toast = $("#toast");
@@ -758,7 +765,7 @@
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
 
-    // ✅ CHAT (NOW USING SHARED HELPERS -> CLIENT RECEIVES)
+    // ✅ Chat (Firestore)  --- FIXED for delivery: createdAtMs + orderBy createdAtMs
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -766,16 +773,65 @@
     let chatUnsub = null;
     let CHAT_UID = null;
 
-    function renderChat(items){
-      chatBody.innerHTML = "";
-      items.forEach(m=>{
-        const mine = (m.sender === "admin");
-        const div = document.createElement("div");
-        div.className = "msgBubble " + (mine ? "admin" : "user");
-        div.textContent = m.text || "";
-        chatBody.appendChild(div);
+    async function ensureChatThread(uid){
+      const ref = fs.doc(db, "chats", uid);
+      await fs.setDoc(ref, {
+        uid,
+        updatedAt: fs.serverTimestamp(),
+        createdAt: fs.serverTimestamp()
+      }, { merge:true });
+    }
+
+    function listenChatMessages(uid, cb){
+      const col = fs.collection(db, "chats", uid, "messages");
+
+      // ✅ primary: createdAtMs (instant + stable)
+      const q1 = fs.query(col, fs.orderBy("createdAtMs", "asc"), fs.limit(300));
+
+      // ✅ fallback: createdAt (old messages)
+      const q2 = fs.query(col, fs.orderBy("createdAt", "asc"), fs.limit(300));
+
+      let unsub = null;
+      try{
+        unsub = fs.onSnapshot(q1, (snap)=>{
+          const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+          cb(items);
+        }, (e)=>{
+          console.warn("chat q1 failed -> fallback q2", e);
+          unsub?.();
+          unsub = fs.onSnapshot(q2, (snap2)=>{
+            const items2 = snap2.docs.map(d=>({ id:d.id, ...d.data() }));
+            cb(items2);
+          });
+        });
+      }catch(e){
+        console.warn("chat listen error -> q2", e);
+        unsub = fs.onSnapshot(q2, (snap2)=>{
+          const items2 = snap2.docs.map(d=>({ id:d.id, ...d.data() }));
+          cb(items2);
+        });
+      }
+      return () => { try{ unsub?.(); }catch(_){} };
+    }
+
+    async function sendChatText(uid, sender, text){
+      const col = fs.collection(db, "chats", uid, "messages");
+      const nowMs = Date.now();
+
+      await fs.addDoc(col, {
+        type: "text",
+        sender: sender === "admin" ? "admin" : "user",
+        text: String(text || ""),
+        createdAt: fs.serverTimestamp(),
+        createdAtMs: nowMs
       });
-      chatBody.scrollTop = chatBody.scrollHeight + 9999;
+
+      await fs.setDoc(fs.doc(db, "chats", uid), {
+        updatedAt: fs.serverTimestamp(),
+        lastMessage: String(text || "").slice(0, 140),
+        lastSender: sender === "admin" ? "admin" : "user",
+        adminLastReadAt: fs.serverTimestamp()
+      }, { merge:true });
     }
 
     function openChatFor(uid){
@@ -790,11 +846,18 @@
       chatUnsub?.();
       chatBody.innerHTML = "";
 
-      ensureChatThread(uid, {}).then(()=>{
+      ensureChatThread(uid).then(()=>{
         chatUnsub = listenChatMessages(uid, (items)=>{
-          renderChat(items);
-          markAdminRead(uid).catch(()=>{});
-        }, { limit: 300 });
+          chatBody.innerHTML = "";
+          items.forEach(m=>{
+            const mine = (m.sender === "admin");
+            const div = document.createElement("div");
+            div.className = "msgBubble " + (mine ? "admin" : "user");
+            div.textContent = m.text || "";
+            chatBody.appendChild(div);
+          });
+          chatBody.scrollTop = chatBody.scrollHeight + 9999;
+        });
       }).catch(e=>{
         console.error(e);
         err(e.message || String(e));
@@ -805,11 +868,7 @@
       chatDrawer.classList.remove("on");
       chatDrawer.setAttribute("aria-hidden", "true");
     }
-
     $("#btnChatClose").addEventListener("click", closeChat);
-    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
-    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
-    $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
     $("#btnChatSend").addEventListener("click", async ()=>{
       try{
@@ -832,6 +891,10 @@
       if(e.key === "Enter") $("#btnChatSend").click();
       if(e.key === "Escape") closeChat();
     });
+
+    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
+    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
+    $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
     // 🔥 Dinamikus 5 fix edzés box
     const workoutsContainer = $("#workouts_container");
@@ -863,7 +926,7 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
-    // ✅ HU/DE helper
+    // ✅ Helpers for HU/DE objects
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
@@ -1458,4 +1521,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
