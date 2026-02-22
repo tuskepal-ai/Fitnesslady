@@ -56,6 +56,7 @@
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
     }
+
     .pill{
       display:inline-flex; align-items:center; justify-content:center;
       padding: 9px 12px;
@@ -141,7 +142,6 @@
     }
     .li .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
     .li .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
-
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
     .toast{
@@ -182,122 +182,118 @@
     }
     @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
 
-    /* ===== CHAT (ADMIN) ===== */
-    .chatWrap{
-      display:grid;
-      grid-template-columns: 360px 1fr;
-      gap: 12px;
-      align-items: stretch;
-      min-height: 520px;
+    /* ✅ Dropdown menu */
+    .menuWrap{ position:relative; display:flex; align-items:center; gap:10px; }
+    .menu{
+      position:absolute;
+      top: 54px;
+      right: 0;
+      width: 220px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      padding: 8px;
+      display:none;
+      z-index: 80;
     }
-    @media (max-width: 980px){
-      .chatWrap{ grid-template-columns: 1fr; }
+    .menu.on{ display:block; }
+    .menu button{
+      width:100%;
+      justify-content:flex-start;
+      border-radius: 14px;
+      padding: 10px 12px;
     }
-    .chatList{
-      display:grid;
-      grid-template-rows: auto auto 1fr;
-      gap: 10px;
-      min-height: 520px;
+
+    /* ✅ Chat panel (right drawer) */
+    .chatDrawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: min(420px, 100vw);
+      height: 100vh;
+      z-index: 120;
+      transform: translateX(110%);
+      transition: transform .22s ease;
+      background: rgba(0,0,0,.55);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-left: 1px solid rgba(255,255,255,.10);
+      box-shadow: -20px 0 80px rgba(0,0,0,.55);
+      display:flex;
+      flex-direction: column;
     }
-    .chatThread{
-      display:grid;
-      grid-template-rows: auto 1fr auto;
-      gap: 10px;
-      min-height: 520px;
-    }
-    .chatHeader{
+    .chatDrawer.on{ transform: translateX(0); }
+    .chatHead{
+      padding: 12px;
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 10px;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
+      border-bottom: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.25);
     }
-    .chatHeader .hTitle{
-      font-weight: 950;
-      letter-spacing: .2px;
-      font-size: 14px;
-    }
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      min-width: 22px;
-      height: 22px;
-      padding: 0 8px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,79,216,.14);
-      color: rgba(255,255,255,.92);
-      font-weight: 950;
-      font-size: 12px;
-    }
-    .chatItems{
+    .chatTitle{ font-weight: 950; }
+    .chatBody{
+      flex:1;
       overflow:auto;
-      max-height: 420px;
-      padding-right: 2px;
-    }
-    .chatItems::-webkit-scrollbar{ width: 8px; }
-    .chatItems::-webkit-scrollbar-thumb{ background: rgba(255,255,255,.10); border-radius: 99px; }
-
-    .msgPane{
-      overflow:auto;
-      max-height: 420px;
       padding: 12px;
-      border-radius: 18px;
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
+      display:grid;
+      gap: 8px;
     }
-    .msg{
-      display:flex;
-      margin: 10px 0;
-    }
-    .msg .bubble{
-      max-width: min(640px, 92%);
+    .msgBubble{
+      max-width: 86%;
       padding: 10px 12px;
       border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
-      color: rgba(255,255,255,.92);
       line-height: 1.45;
-      font-size: 13.5px;
+      font-size: 14px;
       white-space: pre-wrap;
       word-break: break-word;
     }
-    .msg .meta{
-      margin-top: 6px;
-      font-size: 11.5px;
-      color: rgba(255,255,255,.55);
+    .msgBubble.admin{ margin-left:auto; border-color: rgba(255,79,216,.22); }
+    .msgBubble.user{ border-color: rgba(255,211,138,.20); }
+    .chatFoot{
+      padding: 10px;
+      border-top: 1px solid rgba(255,255,255,.10);
       display:flex;
-      gap: 10px;
-      align-items:center;
+      gap: 8px;
+      background: rgba(0,0,0,.25);
     }
-    .msg.is-admin{ justify-content: flex-end; }
-    .msg.is-admin .bubble{
-      background: linear-gradient(135deg, rgba(255,79,216,.25), rgba(177,76,255,.18));
-      border-color: rgba(255,79,216,.18);
+    .chatFoot input{
+      flex:1;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.92);
+      padding: 10px 12px;
+      outline:none;
+      font-size: 14px;
     }
-    .msg.is-user{ justify-content: flex-start; }
-    .msgComposer{
-      display:flex;
-      gap: 10px;
-      align-items: flex-end;
-      padding: 12px;
-      border-radius: 18px;
+    .chatFoot button{
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      color:#140813;
+      padding: 10px 12px;
+      cursor:pointer;
+      font-weight: 950;
+      white-space: nowrap;
+    }
+    .chatHint{
+      padding: 10px 12px;
+      color: rgba(255,255,255,.70);
+      font-size: 12.8px;
+      border-top: 1px solid rgba(255,255,255,.10);
       background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
     }
-    .msgComposer textarea{
-      min-height: 44px;
-      max-height: 120px;
-      resize: vertical;
-    }
-    .hint{
-      font-size: 12.5px;
-      color: rgba(255,255,255,.65);
-      line-height: 1.45;
+
+    @media (prefers-reduced-motion: reduce){
+      .chatDrawer{ transition:none; }
+      .pill{ transition:none; }
     }
   </style>
 </head>
@@ -309,10 +305,16 @@
         <span class="dot"></span>
         <span>FitnessLady Admin</span>
       </div>
-      <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap;">
+
+      <div class="menuWrap">
         <span class="pill ghost mono" id="whoami">…</span>
-        <button class="pill ghost" id="btnToApp" type="button">↩ App</button>
-        <button class="pill danger" id="btnLogout" type="button">⎋ Kilépés</button>
+        <button class="pill ghost" id="btnMenu" type="button">☰ Menü</button>
+
+        <div class="menu" id="menuBox">
+          <button class="pill ghost" id="m_toApp" type="button">↩ App</button>
+          <button class="pill ghost" id="m_chat" type="button">💬 Chat (kiválasztott)</button>
+          <button class="pill danger" id="m_logout" type="button">⎋ Kilépés</button>
+        </div>
       </div>
     </div>
   </header>
@@ -325,7 +327,6 @@
 
         <div class="row">
           <div class="box">
-            <!-- ✅ NEW: PAYMENTS / PURCHASES -->
             <h3>Payments (Stripe)</h3>
             <p class="sub">Fizetés után a vevő a /hu/register/ oldalon regisztrál → létrejön a <span class="mono">purchases/{sid}</span>. Itt 1 kattintással aktiválod a kiválasztott userre.</p>
 
@@ -553,7 +554,7 @@
             <hr class="hr" />
 
             <h3>Személyre szabott videók beállítása (Overrides)</h3>
-            <p class="sub">Itt adhatod meg a heti extra videókat a vevőnek (Slots).</p>
+            <p class="sub">Itt adhatod meg a heti extra videókat a vevőnek (Slots). Nincs több kódolás!</p>
 
             <div class="miniRow">
               <div class="field">
@@ -654,72 +655,6 @@
           </div>
         </div>
       </section>
-
-      <!-- ✅ ADMIN CHAT (HIÁNYZÓ RÉSZ) -->
-      <section class="glass card">
-        <h2>Chat (Admin)</h2>
-        <p class="sub">Vevő chat → admin itt látja és válaszol. A chat dokumentum a <span class="mono">chats</span> kollekcióban van, az üzenetek pedig: <span class="mono">chats/{chatId}/messages</span>.</p>
-
-        <div class="chatWrap">
-          <!-- LEFT: CHAT LIST -->
-          <div class="chatList">
-            <div class="box" style="padding:12px;">
-              <div class="field" style="margin:0;">
-                <label for="chatSearch">Keresés (email / név)</label>
-                <input id="chatSearch" type="text" placeholder="pl. anna@gmail.com" />
-              </div>
-              <div class="actions" style="margin-top:10px;">
-                <button class="pill ghost" id="btnRefreshChats" type="button">↻ Chat lista</button>
-                <button class="pill ghost" id="btnOpenChatForSelectedUser" type="button">👤 Chat (kiválasztott user)</button>
-              </div>
-              <div class="hint" style="margin-top:10px;">
-                Tipp: előbb válassz usert a Customers listában, aztán “Chat (kiválasztott user)”.
-              </div>
-            </div>
-
-            <div class="chatHeader">
-              <div class="hTitle">Beszélgetések</div>
-              <div style="display:flex; gap:8px; align-items:center;">
-                <span class="badge" id="adminUnreadBadge" title="Összes új üzenet">0</span>
-              </div>
-            </div>
-
-            <div class="box chatItems" id="chatListBox">
-              <ul class="list" id="chatListUl" style="margin:0;"></ul>
-            </div>
-          </div>
-
-          <!-- RIGHT: THREAD -->
-          <div class="chatThread">
-            <div class="chatHeader">
-              <div>
-                <div class="hTitle" id="chatThreadTitle">Nincs kiválasztva</div>
-                <div class="hint" id="chatThreadSub">Válassz egy beszélgetést bal oldalon.</div>
-              </div>
-              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-                <button class="pill ghost" id="btnMarkChatRead" type="button">✓ Olvasottnak</button>
-                <button class="pill ghost" id="btnCloseChat" type="button">✕ Bezár</button>
-              </div>
-            </div>
-
-            <div class="msgPane" id="msgPane">
-              <div class="hint">—</div>
-            </div>
-
-            <div class="msgComposer">
-              <div style="flex:1; display:grid; gap:6px;">
-                <label for="chatMsg">Üzenet</label>
-                <textarea id="chatMsg" placeholder="Írj vissza a vevőnek…"></textarea>
-                <div class="hint">Kép / videóhívás később: Storage + WebRTC. Most stabil text chat.</div>
-              </div>
-              <div style="display:grid; gap:10px;">
-                <button class="pill primary" id="btnSendChatMsg" type="button">Küldés</button>
-              </div>
-            </div>
-          </div>
-        </div>
-
-      </section>
     </div>
   </main>
 
@@ -732,13 +667,28 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- ✅ Chat drawer -->
+  <aside class="chatDrawer" id="chatDrawer" aria-hidden="true">
+    <div class="chatHead">
+      <div class="chatTitle">💬 Chat — <span class="mono" id="chatUserLine">—</span></div>
+      <button class="pill ghost" id="btnChatClose" type="button">✕</button>
+    </div>
+    <div class="chatBody" id="chatBody"></div>
+    <div class="chatFoot">
+      <input id="chatInput" type="text" placeholder="Írj a kiválasztott usernek…" />
+      <button id="btnChatSend" type="button">Küldés</button>
+    </div>
+    <div class="chatHint">A chat mindig a kiválasztott userhez tartozik. (chats/{uid})</div>
+  </aside>
+
   <script type="module">
     import {
       auth, db, fs,
       onAuth, logout, toLogin, toApp,
       escapeHtml, safeJsonParse, clamp,
       ensureUserDoc, getUserRole, isAdminEmail,
-      listRecentPurchases, activateUserFromPurchase
+      listRecentPurchases, activateUserFromPurchase,
+      ensureChatThread, listenChatMessages, sendChatText, markAdminRead
     } from "../shared/firebase.js";
 
     const $ = (s, r=document) => r.querySelector(s);
@@ -754,16 +704,108 @@
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
     function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 3800); }
 
-    $("#btnLogout").addEventListener("click", async ()=>{ await logout(); toLogin("hu"); });
-    $("#btnToApp").addEventListener("click", ()=>toApp("hu"));
     $("#y").textContent = new Date().getFullYear();
+
+    // ✅ Menu
+    const menuBtn = $("#btnMenu");
+    const menuBox = $("#menuBox");
+    function toggleMenu(force=null){
+      const on = (force === null) ? !menuBox.classList.contains("on") : !!force;
+      menuBox.classList.toggle("on", on);
+    }
+    menuBtn.addEventListener("click", ()=>toggleMenu());
+    document.addEventListener("click", (e)=>{
+      if(menuBox.classList.contains("on")){
+        if(!menuBox.contains(e.target) && e.target !== menuBtn) toggleMenu(false);
+      }
+    });
+
+    $("#m_logout").addEventListener("click", async ()=>{ await logout(); toLogin("hu"); });
+    $("#m_toApp").addEventListener("click", ()=>toApp("hu"));
 
     let SEL_UID = null;
     let SEL_SID = null;
 
-    /* ===========================
-       TEMPLATE UI (fix edzések)
-    ============================ */
+    // ✅ CHAT state
+    const chatDrawer = $("#chatDrawer");
+    const chatBody = $("#chatBody");
+    const chatInput = $("#chatInput");
+    const chatUserLine = $("#chatUserLine");
+    let chatUnsub = null;
+    let CHAT_UID = null;
+
+    function openChatFor(uid){
+      if(!uid) return err("Nincs user kiválasztva (chat).");
+      CHAT_UID = uid;
+      chatUserLine.textContent = `uid=${uid}`;
+      chatDrawer.classList.add("on");
+      chatDrawer.setAttribute("aria-hidden", "false");
+      chatInput.value = "";
+      chatInput.focus({ preventScroll:true });
+
+      // restart listener
+      chatUnsub?.();
+      chatBody.innerHTML = "";
+      ensureChatThread(uid, {}).then(()=>{
+        chatUnsub = listenChatMessages(uid, (items)=>{
+          chatBody.innerHTML = "";
+          items.forEach(m=>{
+            const mine = (m.sender === "admin");
+            const div = document.createElement("div");
+            div.className = "msgBubble " + (mine ? "admin" : "user");
+            if(m.type === "text"){
+              div.textContent = m.text || "";
+            }else if(m.type === "image" && m.imageUrl){
+              div.innerHTML = `<a href="${escapeHtml(m.imageUrl)}" target="_blank" rel="noopener">📷 Kép megnyitása</a>`;
+            }else{
+              div.textContent = m.text || "";
+            }
+            chatBody.appendChild(div);
+          });
+          chatBody.scrollTop = chatBody.scrollHeight + 9999;
+          markAdminRead(uid).catch(()=>{});
+        });
+      }).catch(e=>{
+        console.error(e);
+        err(e.message || String(e));
+      });
+    }
+
+    function closeChat(){
+      chatDrawer.classList.remove("on");
+      chatDrawer.setAttribute("aria-hidden", "true");
+    }
+
+    $("#btnChatClose").addEventListener("click", closeChat);
+
+    $("#m_chat").addEventListener("click", ()=>{
+      toggleMenu(false);
+      openChatFor(SEL_UID);
+    });
+
+    $("#btnChatSend").addEventListener("click", async ()=>{
+      try{
+        if(!CHAT_UID) return err("Nincs chat user.");
+        const t = String(chatInput.value || "").trim();
+        if(!t) return;
+        $("#btnChatSend").disabled = true;
+        await sendChatText(CHAT_UID, "admin", t);
+        chatInput.value = "";
+        $("#btnChatSend").disabled = false;
+        chatInput.focus({ preventScroll:true });
+      }catch(e){
+        $("#btnChatSend").disabled = false;
+        console.error(e);
+        err(e.message || String(e));
+      }
+    });
+
+    chatInput.addEventListener("keydown", (e)=>{
+      if(e.key === "Enter") $("#btnChatSend").click();
+      if(e.key === "Escape") closeChat();
+    });
+
+    // 🔥 Dinamikusan rajzoljuk ki az 5 db fix edzés dobozt
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -798,9 +840,10 @@
       if(typeof val === "string") return val;
       return val.hu || val.de || "";
     };
+
     const trimStr = (v) => String(v ?? "").trim();
 
-    // planId select + custom logika
+    // ✅ planId select + custom logika
     const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
@@ -891,9 +934,7 @@
       fillTechVaultForm(doc);
     }
 
-    /* ===========================
-       PAYMENTS UI
-    ============================ */
+    // ✅ PAYMENTS UI
     function setSelectedPurchase(p){
       SEL_SID = p?.sid || p?.id || null;
       const line = SEL_SID
@@ -964,13 +1005,10 @@
       }
     });
 
-    /* ===========================
-       USERS LIST
-    ============================ */
     async function loadUsersList(){
       const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
       const col = fs.collection(db, "users");
-      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(120)));
+      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(80)));
 
       const items = snap.docs
         .map(d => ({ id:d.id, ...d.data() }))
@@ -1055,7 +1093,10 @@
       await loadDietDay();
       await loadOverride();
 
-      // ✅ chat: ha van kiválasztott user, engedélyezd a gyors megnyitást
+      // ha chat nyitva volt, váltsunk az új userre
+      if(chatDrawer.classList.contains("on")){
+        openChatFor(uid);
+      }
     }
 
     $("#btnRefreshUsers").addEventListener("click", loadUsersList);
@@ -1103,9 +1144,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ===========================
-       DIET
-    ============================ */
+    // --- ÉTREND ---
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -1161,9 +1200,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ===========================
-       MOTIVATION
-    ============================ */
+    // --- MOTIVÁCIÓ ---
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1175,9 +1212,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ===========================
-       PLAN TEMPLATE
-    ============================ */
+    // --- TEMPLATE (ALAP CSOMAG) ---
     async function loadPlanMeta(){
       const planId = trimStr($("#p_planId").value);
       if(!planId) return err("Csomag neve (Plan ID) üres.");
@@ -1299,9 +1334,7 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    /* ===========================
-       OVERRIDES
-    ============================ */
+    // --- OVERRIDES ---
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -1357,9 +1390,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ===========================
-       TECH VAULT
-    ============================ */
+    // ✅ TECH VAULT
     async function loadTechVault(){
       try{
         if(!SEL_UID) return;
@@ -1398,309 +1429,9 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ===========================
-       ADMIN CHAT (THIS IS THE MISSING PART)
-       Data model:
-         chats/{chatId}:
-           userId, userEmail, userName
-           lastText, lastAt
-           unreadForAdmin (number)
-           unreadForUser (number)
-           createdAt, updatedAt
-         chats/{chatId}/messages/{msgId}:
-           from: "user" | "admin"
-           text: string
-           createdAt: Timestamp
-    ============================ */
-    let ADMIN_UID = null;
-    let ACTIVE_CHAT_ID = null;
-    let ACTIVE_CHAT = null;
-    let unsubscribeMessages = null;
-    let unsubscribeChats = null;
-
-    function chatIdForUid(uid){ return `u_${uid}`; }
-    function fmtTs(ts){
-      try{
-        if(!ts) return "";
-        const d = ts?.toDate ? ts.toDate() : (ts instanceof Date ? ts : new Date(ts));
-        const hh = String(d.getHours()).padStart(2,"0");
-        const mm = String(d.getMinutes()).padStart(2,"0");
-        const dd = String(d.getDate()).padStart(2,"0");
-        const mo = String(d.getMonth()+1).padStart(2,"0");
-        return `${mo}.${dd} ${hh}:${mm}`;
-      }catch{ return ""; }
-    }
-
-    function setThreadHeader(chat){
-      if(!chat){
-        $("#chatThreadTitle").textContent = "Nincs kiválasztva";
-        $("#chatThreadSub").textContent = "Válassz egy beszélgetést bal oldalon.";
-        return;
-      }
-      const name = (chat.userName || "").trim();
-      const email = (chat.userEmail || "").trim();
-      $("#chatThreadTitle").textContent = name ? `${name} — ${email || chat.userId}` : (email || chat.userId || "Chat");
-      $("#chatThreadSub").textContent = `chatId: ${chat.id} • uid: ${chat.userId || "—"}`;
-    }
-
-    function renderChatList(items){
-      const q = ($("#chatSearch").value || "").trim().toLowerCase();
-      const ul = $("#chatListUl");
-      ul.innerHTML = "";
-
-      const filtered = items.filter(c=>{
-        const s = `${c.userName||""} ${c.userEmail||""} ${c.userId||""}`.toLowerCase();
-        return !q || s.includes(q);
-      });
-
-      const totalUnread = filtered.reduce((acc,c)=>acc + (parseInt(c.unreadForAdmin||0,10)||0), 0);
-      $("#adminUnreadBadge").textContent = String(totalUnread);
-
-      if(filtered.length === 0){
-        ul.innerHTML = `<li class="li"><div><div class="title">Nincs chat</div><div class="desc">Ha a vevő ír az appban, itt megjelenik.</div></div></li>`;
-        return;
-      }
-
-      filtered.forEach(c=>{
-        const unread = parseInt(c.unreadForAdmin||0,10)||0;
-        const isActive = (ACTIVE_CHAT_ID && c.id === ACTIVE_CHAT_ID);
-
-        const li = document.createElement("li");
-        li.className = "li";
-        li.style.borderColor = isActive ? "rgba(255,79,216,.35)" : "rgba(255,255,255,.10)";
-        li.style.background = isActive ? "rgba(255,79,216,.07)" : "rgba(0,0,0,.18)";
-
-        const title = (c.userName || c.userEmail || c.userId || "Chat").trim();
-        const last = (c.lastText || "").trim();
-        const time = fmtTs(c.lastAt);
-
-        li.innerHTML = `
-          <div>
-            <div class="title" style="display:flex; gap:10px; align-items:center; justify-content:space-between;">
-              <span>${escapeHtml(title)}</span>
-              ${unread ? `<span class="badge" title="Új üzenet">${unread}</span>` : ``}
-            </div>
-            <div class="desc">${escapeHtml(last || "—")} ${time ? `• <span class="mono">${escapeHtml(time)}</span>` : ""}</div>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-            <button class="pill ghost" data-open-chat="${escapeHtml(c.id)}" type="button">Megnyit</button>
-          </div>
-        `;
-        ul.appendChild(li);
-      });
-
-      $$("[data-open-chat]").forEach(b=>{
-        b.addEventListener("click", async ()=>{
-          const id = b.getAttribute("data-open-chat");
-          const item = filtered.find(x => x.id === id);
-          await openChatById(id, item || null);
-        });
-      });
-    }
-
-    async function ensureChatForUser(uid){
-      const chatId = chatIdForUid(uid);
-      const userSnap = await fs.getDoc(fs.doc(db, "users", uid));
-      const u = userSnap.exists() ? (userSnap.data() || {}) : {};
-      const payload = {
-        id: chatId,
-        userId: uid,
-        userEmail: u.email || "",
-        userName: u.name || "",
-        unreadForAdmin: 0,
-        unreadForUser: 0,
-        lastText: "",
-        lastAt: null,
-        createdAt: fs.serverTimestamp(),
-        updatedAt: fs.serverTimestamp()
-      };
-      await fs.setDoc(fs.doc(db, "chats", chatId), payload, { merge:true });
-      return chatId;
-    }
-
-    async function openChatById(chatId, chatObj=null){
-      try{
-        if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; }
-
-        const snap = await fs.getDoc(fs.doc(db, "chats", chatId));
-        if(!snap.exists()){
-          ACTIVE_CHAT_ID = null;
-          ACTIVE_CHAT = null;
-          setThreadHeader(null);
-          $("#msgPane").innerHTML = `<div class="hint">A chat nem található.</div>`;
-          return;
-        }
-
-        ACTIVE_CHAT_ID = chatId;
-        ACTIVE_CHAT = { id: snap.id, ...snap.data() };
-        setThreadHeader(ACTIVE_CHAT);
-
-        // mark read (admin)
-        await fs.setDoc(fs.doc(db, "chats", chatId), { unreadForAdmin: 0, updatedAt: fs.serverTimestamp() }, { merge:true });
-
-        // live messages
-        const msgQ = fs.query(
-          fs.collection(db, "chats", chatId, "messages"),
-          fs.orderBy("createdAt", "asc"),
-          fs.limit(300)
-        );
-
-        unsubscribeMessages = fs.onSnapshot(msgQ, (qs)=>{
-          const pane = $("#msgPane");
-          pane.innerHTML = "";
-
-          if(qs.empty){
-            pane.innerHTML = `<div class="hint">Nincs üzenet. Írj rá a vevőre.</div>`;
-            return;
-          }
-
-          qs.docs.forEach(d=>{
-            const m = d.data() || {};
-            const from = m.from || "user";
-            const text = String(m.text || "");
-            const ts = fmtTs(m.createdAt);
-
-            const row = document.createElement("div");
-            row.className = "msg " + (from === "admin" ? "is-admin" : "is-user");
-            row.innerHTML = `
-              <div>
-                <div class="bubble">${escapeHtml(text)}</div>
-                <div class="meta">
-                  <span>${from === "admin" ? "Admin" : "Vevő"}</span>
-                  ${ts ? `<span class="mono">${escapeHtml(ts)}</span>` : ``}
-                </div>
-              </div>
-            `;
-            pane.appendChild(row);
-          });
-
-          // scroll bottom
-          pane.scrollTop = pane.scrollHeight + 9999;
-        });
-
-      }catch(e){
-        console.error(e);
-        err(e.message || String(e));
-      }
-    }
-
-    async function sendAdminMessage(){
-      try{
-        if(!ACTIVE_CHAT_ID) return err("Nincs megnyitott chat.");
-        const txt = trimStr($("#chatMsg").value);
-        if(!txt) return;
-
-        const chatRef = fs.doc(db, "chats", ACTIVE_CHAT_ID);
-        const msgRef = fs.doc(fs.collection(db, "chats", ACTIVE_CHAT_ID, "messages"));
-
-        await fs.setDoc(msgRef, {
-          from: "admin",
-          text: txt,
-          createdAt: fs.serverTimestamp()
-        });
-
-        // update chat meta: lastText, lastAt, +unread for user
-        await fs.setDoc(chatRef, {
-          lastText: txt,
-          lastAt: fs.serverTimestamp(),
-          unreadForUser: fs.increment(1),
-          updatedAt: fs.serverTimestamp()
-        }, { merge:true });
-
-        $("#chatMsg").value = "";
-      }catch(e){
-        console.error(e);
-        err(e.message || String(e));
-      }
-    }
-
-    $("#btnSendChatMsg").addEventListener("click", sendAdminMessage);
-    $("#chatMsg").addEventListener("keydown", (e)=>{
-      if(e.key === "Enter" && !e.shiftKey){
-        e.preventDefault();
-        sendAdminMessage();
-      }
-    });
-
-    $("#btnCloseChat").addEventListener("click", ()=>{
-      if(unsubscribeMessages){ unsubscribeMessages(); unsubscribeMessages = null; }
-      ACTIVE_CHAT_ID = null;
-      ACTIVE_CHAT = null;
-      setThreadHeader(null);
-      $("#msgPane").innerHTML = `<div class="hint">Válassz egy beszélgetést bal oldalon.</div>`;
-      $("#chatMsg").value = "";
-    });
-
-    $("#btnMarkChatRead").addEventListener("click", async ()=>{
-      try{
-        if(!ACTIVE_CHAT_ID) return;
-        await fs.setDoc(fs.doc(db, "chats", ACTIVE_CHAT_ID), { unreadForAdmin: 0, updatedAt: fs.serverTimestamp() }, { merge:true });
-        ok("Olvasottnak jelölve");
-      }catch(e){
-        err(e.message || String(e));
-      }
-    });
-
-    async function initChatsLive(){
-      if(unsubscribeChats){ unsubscribeChats(); unsubscribeChats = null; }
-
-      const q = fs.query(
-        fs.collection(db, "chats"),
-        fs.orderBy("lastAt", "desc"),
-        fs.limit(80)
-      );
-
-      unsubscribeChats = fs.onSnapshot(q, (qs)=>{
-        const items = qs.docs.map(d=>({ id:d.id, ...d.data() }));
-        renderChatList(items);
-
-        // ha van aktív chat, frissítsük a header meta-t is
-        if(ACTIVE_CHAT_ID){
-          const found = items.find(x=>x.id === ACTIVE_CHAT_ID);
-          if(found){
-            ACTIVE_CHAT = found;
-            setThreadHeader(ACTIVE_CHAT);
-          }
-        }
-      });
-    }
-
-    $("#btnRefreshChats").addEventListener("click", async ()=>{
-      await initChatsLive();
-      ok("Chat lista frissítve");
-    });
-
-    $("#chatSearch").addEventListener("input", ()=>{
-      // a live snapshot majd újrarenderel, de itt is triggereljük kényelmi okból:
-      window.clearTimeout(window.__cs);
-      window.__cs = window.setTimeout(async ()=>{
-        // force re-render by reloading once (quick)
-        const qs = await fs.getDocs(fs.query(fs.collection(db, "chats"), fs.orderBy("lastAt","desc"), fs.limit(80)));
-        const items = qs.docs.map(d=>({ id:d.id, ...d.data() }));
-        renderChatList(items);
-      }, 220);
-    });
-
-    $("#btnOpenChatForSelectedUser").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Előbb válassz usert a Customers listában.");
-        const chatId = await ensureChatForUser(SEL_UID);
-        await openChatById(chatId);
-        ok("Chat megnyitva a kiválasztott userhez");
-      }catch(e){
-        console.error(e);
-        err(e.message || String(e));
-      }
-    });
-
-    /* ===========================
-       BOOT
-    ============================ */
     onAuth(async (user)=>{
       try{
         if(!user){ toLogin("hu"); return; }
-        ADMIN_UID = user.uid;
-
         const ud = await ensureUserDoc(user.uid, user.email || "");
         const role = (await getUserRole(user.uid)) || ud?.role || "user";
         if((String(role).toLowerCase() !== "admin") && !isAdminEmail(user.email || "")){ toApp("hu"); return; }
@@ -1712,12 +1443,8 @@
         await loadUsersList();
         await pickUser(user.uid);
         await loadPlanMeta();
-
-        // ✅ Start chats live
-        await initChatsLive();
-
       }catch(e){ err(e.message || String(e)); }
     });
   </script>
 </body>
-</html>
+  </html>
