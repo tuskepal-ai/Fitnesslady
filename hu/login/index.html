@@ -72,11 +72,7 @@
       border-color: rgba(255,255,255,.18);
       font-weight: 900;
     }
-    .pill:disabled{
-      opacity:.65;
-      cursor:not-allowed;
-      transform:none !important;
-    }
+    .pill:disabled{ opacity:.6; cursor:not-allowed; transform:none !important; }
 
     .card{
       margin-top: 10px;
@@ -186,92 +182,123 @@
     </footer>
   </div>
 
-  <script type="module">
-    import {
-      BASE_PREFIX,
-      onAuth, toApp, toAdmin,
-      loginEmailPassword,
-      ensureUserDoc, getUserRole, isAdminEmail
-    } from "../shared/firebase.js";
+  <!-- ✅ 1) Non-module hibafogó: akkor is kiír, ha a module import elhasal -->
+  <script>
+    (function(){
+      const msg = document.getElementById("msgBox");
+      function show(text, kind){
+        if(!msg) return;
+        msg.className = "msg " + (kind === "err" ? "err" : "ok");
+        msg.style.display = "block";
+        msg.textContent = String(text || "");
+      }
+      window.__flShow = show;
 
-    document.getElementById("btnBack").href = `${BASE_PREFIX}/hu/`;
-    document.getElementById("y").textContent = new Date().getFullYear();
+      window.addEventListener("error", function(ev){
+        const detail = {
+          type: "window.error",
+          message: ev && ev.message,
+          filename: ev && ev.filename,
+          lineno: ev && ev.lineno,
+          colno: ev && ev.colno,
+          error: ev && ev.error ? { name: ev.error.name, message: ev.error.message, stack: ev.error.stack } : null
+        };
+        show("JS ERROR (non-module):\n" + JSON.stringify(detail, null, 2), "err");
+      });
+
+      window.addEventListener("unhandledrejection", function(ev){
+        const r = ev && ev.reason;
+        const detail = {
+          type: "unhandledrejection",
+          reason: (r && (r.message || r.code)) ? { code: r.code || null, message: r.message || String(r), stack: r.stack || null } : String(r)
+        };
+        show("PROMISE ERROR (non-module):\n" + JSON.stringify(detail, null, 2), "err");
+      });
+
+      // ping: DOM OK
+      show("DOM OK — JS hibafogó aktív.\nMost töltöm a firebase modult…", "ok");
+    })();
+  </script>
+
+  <!-- ✅ 2) Module: dinamikus import + try/catch, hogy biztosan kiírjuk ha import hiba van -->
+  <script type="module">
+    const show = (text, kind="ok") => (window.__flShow ? window.__flShow(text, kind) : console.log(text));
 
     const $ = (s) => document.querySelector(s);
-    const msg = $("#msgBox");
 
-    function showMsg(text, kind="ok"){
-      msg.className = "msg " + (kind === "err" ? "err" : "ok");
-      msg.style.display = "block";
-      msg.textContent = text;
+    function fmtErr(e){
+      return JSON.stringify({
+        name: e?.name || null,
+        code: e?.code || null,
+        message: e?.message || String(e),
+        stack: e?.stack || null
+      }, null, 2);
     }
 
-    function formatAnyError(e){
-      try{
-        const out = {
-          name: e?.name || null,
-          code: e?.code || null,
-          message: e?.message || String(e),
-          stack: e?.stack || null
-        };
-        return JSON.stringify(out, null, 2);
-      }catch(_){
-        return String(e);
-      }
-    }
+    // UI alap
+    $("#y").textContent = new Date().getFullYear();
 
-    async function routeAfterLogin(user){
-      try{
-        const ud = await ensureUserDoc(user.uid, user.email || "");
-        const role = (await getUserRole(user.uid)) || ud?.role || "user";
-        if(String(role).toLowerCase() === "admin" || isAdminEmail(user.email || "")){
-          toAdmin("hu");
-        }else{
-          toApp("hu");
-        }
-      }catch(e){
-        // ha route hiba van, azt is lássuk
-        showMsg("ROUTE ERROR:\n" + formatAnyError(e), "err");
-        toApp("hu");
-      }
-    }
+    try{
+      // 🔥 FONTOS: itt derül ki a 404 / rossz útvonal
+      const fb = await import("../shared/firebase.js");
 
-    async function doLogin(){
-      const email = ($("#email").value || "").trim();
-      const pass  = ($("#pass").value || ""); // jelszót nem trimeljük
+      // back link
+      $("#btnBack").href = `${fb.BASE_PREFIX}/hu/`;
 
-      if(!email || !pass){
-        showMsg("VALIDATION ERROR:\n" + JSON.stringify({ emailEmpty: !email, passEmpty: !pass }, null, 2), "err");
-        return;
-      }
+      show("MODULE OK — firebase.js betöltve ✅\nHa most sem megy a belépés, kattints és látni fogod a konkrét login hibát.", "ok");
 
-      const btn = $("#btnLogin");
-      btn.disabled = true;
-      showMsg("Beléptetés…", "ok");
-
-      try{
-        const cred = await loginEmailPassword(email, pass);
-        showMsg("LOGIN OK:\n" + JSON.stringify({ uid: cred?.user?.uid || null, email: cred?.user?.email || null }, null, 2), "ok");
-        await routeAfterLogin(cred.user);
-      }catch(e){
-        console.error(e);
-        showMsg("LOGIN ERROR:\n" + formatAnyError(e), "err");
-        btn.disabled = false;
-      }
-    }
-
-    $("#btnLogin").addEventListener("click", doLogin);
-    $("#pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
-
-    onAuth(async (user)=>{
-      if(user){
+      async function routeAfterLogin(user){
         try{
-          await routeAfterLogin(user);
+          const ud = await fb.ensureUserDoc(user.uid, user.email || "");
+          const role = (await fb.getUserRole(user.uid)) || ud?.role || "user";
+          if(String(role).toLowerCase() === "admin" || fb.isAdminEmail(user.email || "")){
+            fb.toAdmin("hu");
+          }else{
+            fb.toApp("hu");
+          }
         }catch(e){
-          showMsg("AUTH STATE ERROR:\n" + formatAnyError(e), "err");
+          show("ROUTE ERROR:\n" + fmtErr(e), "err");
+          fb.toApp("hu");
         }
       }
-    });
+
+      async function doLogin(){
+        const email = ($("#email").value || "").trim();
+        const pass  = ($("#pass").value || ""); // jelszó: ne trim
+
+        if(!email || !pass){
+          show("VALIDATION ERROR:\n" + JSON.stringify({ emailEmpty: !email, passEmpty: !pass }, null, 2), "err");
+          return;
+        }
+
+        const btn = $("#btnLogin");
+        btn.disabled = true;
+        show("Beléptetés…", "ok");
+
+        try{
+          const cred = await fb.loginEmailPassword(email, pass);
+          show("LOGIN OK ✅\n" + JSON.stringify({ uid: cred?.user?.uid || null, email: cred?.user?.email || null }, null, 2), "ok");
+          await routeAfterLogin(cred.user);
+        }catch(e){
+          show("LOGIN ERROR:\n" + fmtErr(e), "err");
+          btn.disabled = false;
+        }
+      }
+
+      $("#btnLogin").addEventListener("click", doLogin);
+      $("#pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+
+      fb.onAuth(async (user)=>{
+        if(user){
+          show("AUTH STATE: már be vagy jelentkezve → routing…", "ok");
+          await routeAfterLogin(user);
+        }
+      });
+
+    }catch(e){
+      // ⛔ itt fog kijönni pl. 404 / SyntaxError / CORS / import error
+      show("MODULE IMPORT ERROR:\n" + fmtErr(e) + "\n\nTipp: nagyon valószínű a ../shared/firebase.js útvonal 404-es vagy hibás.", "err");
+    }
   </script>
 </body>
 </html>
