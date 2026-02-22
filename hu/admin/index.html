@@ -344,9 +344,18 @@
             <hr class="hr" />
 
             <div class="field">
-              <label for="userSearch">Keresés (email)</label>
+              <label for="userSearch">Keresés (email / név / uid)</label>
               <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
             </div>
+
+            <!-- ✅ ÚJ: Gyors kiválasztás (nem bontja szét a UI-t, csak segít) -->
+            <div class="field" style="margin-top:8px;">
+              <label for="userPick">Gyors kiválasztás</label>
+              <select id="userPick">
+                <option value="">— válassz —</option>
+              </select>
+            </div>
+
             <div class="actions">
               <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
             </div>
@@ -685,7 +694,7 @@
     import {
       auth, db, fs,
       onAuth, logout, toLogin, toApp,
-      escapeHtml, safeJsonParse, clamp,
+      escapeHtml, clamp,
       ensureUserDoc, getUserRole, isAdminEmail,
       listRecentPurchases, activateUserFromPurchase,
       ensureChatThread, listenChatMessages, sendChatText, markAdminRead
@@ -726,6 +735,11 @@
     let SEL_UID = null;
     let SEL_SID = null;
 
+    // ✅ remember selected user
+    const SEL_KEY = "fl_admin_sel_uid_v1";
+    function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
+    function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
+
     // ✅ CHAT state
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
@@ -743,7 +757,6 @@
       chatInput.value = "";
       chatInput.focus({ preventScroll:true });
 
-      // restart listener
       chatUnsub?.();
       chatBody.innerHTML = "";
       ensureChatThread(uid, {}).then(()=>{
@@ -998,60 +1011,121 @@
         const r = await activateUserFromPurchase({ uid: SEL_UID, sid: SEL_SID });
         ok(`Aktiválva: ${r.planId}`);
         await loadPurchases();
-        await loadUsersList();
+        await loadUsersList(true);
       }catch(e){
         console.error(e);
         err(e.message || String(e));
       }
     });
 
-    async function loadUsersList(){
-      const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
-      const col = fs.collection(db, "users");
-      const snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(80)));
+    // ✅ USERS UI (minimál)
+    const userPick = $("#userPick");
+    let USERS_CACHE = [];
 
-      const items = snap.docs
-        .map(d => ({ id:d.id, ...d.data() }))
-        .filter(u => !qtxt || String(u.email||"").toLowerCase().includes(qtxt));
-
-      const ul = $("#usersList");
-      ul.innerHTML = "";
-
-      if(items.length === 0){
-        ul.innerHTML = `<li class="li"><div><div class="title">Nincs találat</div><div class="desc">Próbálj másik keresést.</div></div></li>`;
-        return;
-      }
-
+    function fillUserPickDropdown(items){
+      const keep = userPick.value || "";
+      userPick.innerHTML = `<option value="">— válassz —</option>`;
       items.forEach(u=>{
-        const displayName = (u.name || "").trim();
-        const titleLine = displayName ? `${displayName} — ${u.email || u.id}` : (u.email || u.id);
-
-        const pay = (u.activated ? "✅ activated" : (u.paid ? "🟡 paid" : "—"));
-        const li = document.createElement("li");
-        li.className = "li";
-        li.innerHTML = `
-          <div>
-            <div class="title">${escapeHtml(titleLine)}</div>
-            <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId||"—")}</span> • pay: <b>${escapeHtml(pay)}</b></div>
-          </div>
-          <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
-            <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
-          </div>
-        `;
-        ul.appendChild(li);
+        const opt = document.createElement("option");
+        opt.value = u.id;
+        const nm = (u.name || "").trim();
+        const em = (u.email || "").trim();
+        opt.textContent = nm ? `${nm} — ${em || u.id}` : (em || u.id);
+        userPick.appendChild(opt);
       });
+      if(keep && items.some(x=>x.id===keep)) userPick.value = keep;
+      else if(SEL_UID && items.some(x=>x.id===SEL_UID)) userPick.value = SEL_UID;
+    }
 
-      $$("[data-pick]").forEach(b=>{
-        b.addEventListener("click", async ()=>{
-          const uid = b.getAttribute("data-pick");
-          await pickUser(uid);
+    userPick.addEventListener("change", async ()=>{
+      const uid = (userPick.value || "").trim();
+      if(!uid) return;
+      await pickUser(uid);
+    });
+
+    async function loadUsersList(keepSelection=false){
+      try{
+        const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
+        const col = fs.collection(db, "users");
+
+        // ✅ FIX: fallback query-k, hogy biztosan listázzon
+        let snap = null;
+        try{
+          snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(200)));
+        }catch(e1){
+          try{
+            snap = await fs.getDocs(fs.query(col, fs.orderBy("createdAt"), fs.limit(200)));
+          }catch(e2){
+            snap = await fs.getDocs(fs.query(col, fs.limit(200)));
+          }
+        }
+
+        const raw = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        USERS_CACHE = raw;
+
+        const items = raw.filter(u=>{
+          if(!qtxt) return true;
+          const em = String(u.email||"").toLowerCase();
+          const nm = String(u.name||"").toLowerCase();
+          const id = String(u.id||"").toLowerCase();
+          return em.includes(qtxt) || nm.includes(qtxt) || id.includes(qtxt);
         });
-      });
+
+        fillUserPickDropdown(raw);
+
+        const ul = $("#usersList");
+        ul.innerHTML = "";
+
+        if(items.length === 0){
+          ul.innerHTML = `<li class="li"><div><div class="title">Nincs találat</div><div class="desc">Próbálj másik keresést.</div></div></li>`;
+        } else {
+          items.forEach(u=>{
+            const displayName = (u.name || "").trim();
+            const titleLine = displayName ? `${displayName} — ${u.email || u.id}` : (u.email || u.id);
+
+            const pay = (u.activated ? "✅ activated" : (u.paid ? "🟡 paid" : "—"));
+            const li = document.createElement("li");
+            li.className = "li";
+            li.innerHTML = `
+              <div>
+                <div class="title">${escapeHtml(titleLine)}</div>
+                <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId||"—")}</span> • pay: <b>${escapeHtml(pay)}</b></div>
+              </div>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
+                <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
+              </div>
+            `;
+            ul.appendChild(li);
+          });
+
+          $$("[data-pick]").forEach(b=>{
+            b.addEventListener("click", async ()=>{
+              const uid = b.getAttribute("data-pick");
+              await pickUser(uid);
+            });
+          });
+        }
+
+        // ✅ auto pick: last selected OR first item (nem a saját admin uid)
+        if(!keepSelection){
+          const saved = loadSel();
+          if(saved && raw.some(x=>x.id===saved)){
+            await pickUser(saved);
+          } else if(items.length > 0) {
+            await pickUser(items[0].id);
+          }
+        }
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
     }
 
     async function pickUser(uid){
       SEL_UID = uid;
+      saveSel(uid);
       $("#selUser").textContent = uid ? `uid=${uid}` : "—";
+      if(userPick.value !== uid) userPick.value = uid;
 
       const ref = fs.doc(db, "users", uid);
       const snap = await fs.getDoc(ref);
@@ -1093,18 +1167,18 @@
       await loadDietDay();
       await loadOverride();
 
-      // ha chat nyitva volt, váltsunk az új userre
       if(chatDrawer.classList.contains("on")){
         openChatFor(uid);
       }
     }
 
-    $("#btnRefreshUsers").addEventListener("click", loadUsersList);
+    $("#btnRefreshUsers").addEventListener("click", ()=>loadUsersList(true));
     $("#userSearch").addEventListener("input", ()=>{
       window.clearTimeout(window.__su);
-      window.__su = window.setTimeout(loadUsersList, 220);
+      window.__su = window.setTimeout(()=>loadUsersList(true), 220);
     });
 
+    // --- a többi részed változatlan logika (save user, diet, motivation, template, overrides, tech vault) ---
     $("#btnSaveUser").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1124,7 +1198,7 @@
         };
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Profil mentve");
-        await loadUsersList();
+        await loadUsersList(true);
       }catch(e){ console.error(e); err(e.message || String(e)); }
     });
 
@@ -1440,11 +1514,10 @@
         ok("Admin belépés OK");
 
         await loadPurchases();
-        await loadUsersList();
-        await pickUser(user.uid);
+        await loadUsersList(false); // ✅ itt választunk normálisan (last/first)
         await loadPlanMeta();
       }catch(e){ err(e.message || String(e)); }
     });
   </script>
 </body>
-  </html>
+</html>
