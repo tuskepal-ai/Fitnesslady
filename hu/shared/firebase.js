@@ -1,15 +1,6 @@
 /* FILE: /hu/shared/firebase.js */
 /**
  * Firebase v9 CDN shared helpers (PRO baseline) + Chat additions (OP2)
- *
- * Exports kept compatible with existing /hu/app/index.html:
- * - BASE_PREFIX, auth, db, fs, onAuth, logout, toLogin
- * - escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
- *
- * + Added for chat-widget/admin:
- * - storage, ensureUserDoc, getUserDoc, isChatAllowed
- * - ensureChatThread, listenChatMessages, sendChatText, sendChatImage
- * - listenChatThreads, markAdminRead, markUserRead, createJitsiRoomName, sendCallInvite
  */
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
@@ -38,22 +29,68 @@ export { fs };
 ========================= */
 export const BASE_PREFIX = ""; // ha kell alá-mappa github pagesnél, ide tedd: "/repo"
 
+function showFatal(msg, details = null) {
+  try {
+    console.error("[FIREBASE FATAL]", msg, details || "");
+    const el = document.createElement("div");
+    el.style.cssText = `
+      position:fixed; left:12px; right:12px; bottom:12px; z-index:99999;
+      background:rgba(0,0,0,.72); color:#fff; border:1px solid rgba(255,255,255,.18);
+      border-radius:16px; padding:12px 14px; font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+      box-shadow: 0 24px 80px rgba(0,0,0,.55);
+      white-space: pre-wrap; line-height:1.35; font-size:12.5px;
+    `;
+    el.textContent =
+      `FIREBASE CONFIG HIBA:\n${msg}\n` +
+      (details ? `\n${typeof details === "string" ? details : JSON.stringify(details, null, 2)}` : "") +
+      `\n\nTipp: töltsd ki a /hu/shared/firebase.js-ben a firebaseConfig mezőket (apiKey, authDomain, projectId, stb.).`;
+    document.body.appendChild(el);
+  } catch (_) {}
+}
+
 const firebaseConfig = window.FIREBASE_CONFIG || {
-  apiKey: "",
-  authDomain: "",
-  projectId: "",
-  storageBucket: "",
-  messagingSenderId: "",
-  appId: ""
+  // ❗ IDE kell a Firebase Web App config
+  // Firebase Console → Project settings → Your apps (Web) → "Config"
+  apiKey: "FILL_API_KEY",
+  authDomain: "FILL_AUTH_DOMAIN",
+  projectId: "FILL_PROJECT_ID",
+  storageBucket: "FILL_STORAGE_BUCKET",
+  messagingSenderId: "FILL_MESSAGING_SENDER_ID",
+  appId: "FILL_APP_ID"
 };
 
-const app = initializeApp(firebaseConfig);
+function validateFirebaseConfig(cfg) {
+  const required = ["apiKey", "authDomain", "projectId", "storageBucket", "messagingSenderId", "appId"];
+  const missing = required.filter(k => !cfg || !String(cfg[k] || "").trim() || String(cfg[k]).startsWith("FILL_"));
+  return { ok: missing.length === 0, missing };
+}
+
+const v = validateFirebaseConfig(firebaseConfig);
+if (!v.ok) {
+  showFatal(
+    `Hiányzó / placeholder Firebase config mezők: ${v.missing.join(", ")}`,
+    firebaseConfig
+  );
+  // Ne menjen tovább "néma" hibával
+  throw new Error("Firebase config missing: " + v.missing.join(", "));
+}
+
+let app;
+try {
+  app = initializeApp(firebaseConfig);
+} catch (e) {
+  showFatal("initializeApp() hiba", e?.message || String(e));
+  throw e;
+}
 
 export const auth = getAuth(app);
 export const db = fs.getFirestore(app);
 export const storage = getStorage(app);
 
-setPersistence(auth, browserLocalPersistence).catch(()=>{});
+setPersistence(auth, browserLocalPersistence).catch((e)=>{
+  console.warn("Auth persistence warning:", e?.message || e);
+});
 
 /* =========================
    NAV
@@ -291,4 +328,4 @@ export function listenChatThreads(cb){
     snap.forEach(d=>items.push({ id:d.id, ...(d.data()||{}) }));
     cb(items);
   });
-                  }
+}
