@@ -11,13 +11,24 @@
       --bg:#05050a;
       --text: rgba(255,255,255,.92);
       --muted: rgba(255,255,255,.70);
+      --muted2: rgba(255,255,255,.55);
+
       --pink:#ff4fd8;
       --pink2:#b14cff;
       --gold:#ffd38a;
+
       --radius: 22px;
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --max: 1180px;
+      --radius2: 18px;
+      --shadow: 0 22px 70px rgba(0,0,0,.55);
+
+      --max: 1220px;
+      --sidebarW: 260px;
+      --line: rgba(255,255,255,.10);
+      --glass0: rgba(255,255,255,.06);
+      --glass1: rgba(255,255,255,.03);
+      --panel: rgba(0,0,0,.20);
     }
+
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
     body{
@@ -25,40 +36,82 @@
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       color: var(--text);
       background:
-        radial-gradient(1200px 700px at 15% 10%, rgba(255,79,216,.10), transparent 60%),
-        radial-gradient(1000px 700px at 85% 20%, rgba(177,76,255,.08), transparent 60%),
+        radial-gradient(1200px 700px at 15% 10%, rgba(255,79,216,.12), transparent 60%),
+        radial-gradient(1000px 700px at 85% 20%, rgba(177,76,255,.10), transparent 60%),
         linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
         linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px),
         var(--bg);
       background-size: auto,auto, 60px 60px, 60px 60px, auto;
       overflow-x:hidden;
     }
+
     a{ color:inherit; text-decoration:none; }
     button,input,textarea,select{ font:inherit; }
 
-    .container{ width:min(var(--max), 92vw); margin:0 auto; }
+    /* ===== Shell ===== */
+    .appShell{
+      width:min(var(--max), 94vw);
+      margin: 16px auto 54px;
+      display:grid;
+      grid-template-columns: var(--sidebarW) 1fr;
+      gap: 16px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .appShell{ grid-template-columns: 1fr; width: min(var(--max), 94vw); }
+    }
+
+    /* ===== Glass ===== */
+    .glass{
+      background: linear-gradient(180deg, var(--glass0), var(--glass1));
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+    .panel{
+      background: rgba(0,0,0,.18);
+      border: 1px solid rgba(255,255,255,.10);
+      border-radius: var(--radius2);
+    }
+
+    /* ===== Topbar ===== */
     .topbar{
-      position: sticky; top:0;
+      position: sticky;
+      top:0;
       z-index: 50;
-      background: rgba(8,6,12,.55);
-      border-bottom: 1px solid rgba(255,255,255,.06);
+      background: rgba(8,6,12,.60);
+      border-bottom: 1px solid rgba(255,255,255,.07);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
     .topbar-inner{
+      width:min(var(--max), 94vw);
+      margin:0 auto;
       height: 64px;
-      display:flex; align-items:center; justify-content: space-between;
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
       gap: 12px;
     }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight: 900; letter-spacing:.2px; }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
     .dot{
       width:10px;height:10px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
     }
+    .top-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
 
     .pill{
-      display:inline-flex; align-items:center; justify-content:center;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
       padding: 9px 12px;
       border-radius: 999px;
       border: 1px solid rgba(255,255,255,.12);
@@ -70,10 +123,13 @@
       cursor:pointer;
       user-select:none;
       white-space: nowrap;
-      gap:8px;
       transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
     }
-    .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); box-shadow: 0 16px 44px rgba(0,0,0,.45); }
+    .pill:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 16px 44px rgba(0,0,0,.45);
+    }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
@@ -83,30 +139,126 @@
     }
     .pill.ghost{ background: rgba(255,255,255,.06); }
     .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
-    .glass{
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
+    /* ===== Sidebar ===== */
+    .sidebar{
+      position: sticky;
+      top: 78px;
+      padding: 14px;
+    }
+    @media (max-width: 980px){
+      .sidebar{ position: relative; top:auto; }
+    }
+    .sideHead{
+      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      padding: 12px 12px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
+      background: rgba(0,0,0,.16);
+      margin-bottom: 12px;
+    }
+    .sideHead .t{
+      font-weight: 950;
+      letter-spacing:.2px;
+      display:flex;
+      align-items:center;
+      gap:10px;
+    }
+    .sideNav{
+      display:grid;
+      gap: 8px;
+      margin-top: 10px;
+    }
+    .navBtn{
+      width: 100%;
+      justify-content: flex-start;
+      padding: 11px 12px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.14);
+      color: rgba(255,255,255,.90);
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      position: relative;
+    }
+    .navBtn:hover{
+      transform: translateY(-1px);
+      border-color: rgba(255,255,255,.18);
+      background: rgba(0,0,0,.18);
+    }
+    .navBtn.active{
+      border-color: rgba(255,79,216,.30);
+      background: rgba(255,79,216,.08);
+    }
+    .navBtn.active::before{
+      content:"";
+      position:absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 4px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 18px rgba(255,79,216,.35);
+    }
+    .navI{
+      width: 22px;
+      display:inline-flex;
+      justify-content:center;
+      opacity:.95;
     }
 
-    main{ padding: 16px 0 54px; }
-    .grid{ display:grid; grid-template-columns: 1fr; gap: 14px; }
-    .card{ padding: 16px; }
-    .card h2, .card h3{
+    /* ===== Main content ===== */
+    .content{
+      padding: 16px;
+    }
+    .pageTitle{
+      margin: 6px 0 12px;
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      letter-spacing: -.3px;
+      font-size: 34px;
+      line-height: 1.05;
+    }
+    .pageSub{
+      margin: 0 0 16px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 14px;
+    }
+
+    .section{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: var(--radius2);
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.16);
+    }
+    .sectionTitle{
       margin: 0 0 8px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
       letter-spacing: -.2px;
+      font-size: 20px;
     }
-    .card h2{ font-size: 22px; }
-    .card h3{ font-size: 18px; }
-    .sub{ margin: 0 0 12px; color: rgba(255,255,255,.70); line-height: 1.55; font-size: 13.5px; }
+    .sub{
+      margin: 0 0 12px;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13.5px;
+    }
 
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    @media (max-width: 980px){ .row{ grid-template-columns: 1fr; } }
+    .grid2{
+      display:grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 12px;
+      align-items:start;
+    }
+    @media (max-width: 980px){
+      .grid2{ grid-template-columns: 1fr; }
+    }
 
     .box{
       background: rgba(0,0,0,.18);
@@ -114,8 +266,9 @@
       border-radius: 18px;
       padding: 12px;
     }
+
     .field{ display:grid; gap:6px; margin: 10px 0; }
-    label{ color: rgba(255,255,255,.70); font-size: 12.8px; font-weight: 800; letter-spacing:.2px; }
+    label{ color: rgba(255,255,255,.72); font-size: 12.8px; font-weight: 850; letter-spacing:.2px; }
     input, select, textarea{
       width: 100%;
       padding: 11px 12px;
@@ -129,6 +282,16 @@
 
     .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
 
+    .hr{ border:none; height:1px; background:rgba(255,255,255,.08); margin:14px 0; }
+
+    .miniRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
+
+    /* ===== Users list (optional) ===== */
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .li{
       display:grid;
@@ -142,13 +305,25 @@
     }
     .li .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
     .li .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
+    .debugBox{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.78);
+      font-size: 12.8px;
+      line-height: 1.45;
+    }
+    .debugBox b{ color:#fff; }
+
+    /* ===== Toast ===== */
     .toast{
       position: fixed;
       right: 14px;
       bottom: 14px;
-      z-index: 99;
+      z-index: 250;
       width: min(520px, calc(100vw - 28px));
       padding: 12px 14px;
       border-radius: 16px;
@@ -162,6 +337,7 @@
     .toast.is-on{ display:block; }
     .toast b{ font-weight: 950; }
 
+    /* ===== Footer ===== */
     footer{
       padding: 18px 0 46px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -169,97 +345,86 @@
       backdrop-filter: blur(10px);
     }
     .footer-inner{
+      width:min(var(--max), 94vw);
+      margin:0 auto;
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    .hr{ border:none; height:1px; background:rgba(255,255,255,.08); margin:14px 0; }
-
-    .miniRow{
-      display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 10px;
-    }
-    @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
-
-    /* ✅ Dropdown menu */
-    .menuWrap{ position:relative; display:flex; align-items:center; gap:10px; }
-    .menu{
-      position:absolute;
-      top: 54px;
-      right: 0;
-      width: 220px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.55);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      box-shadow: 0 24px 80px rgba(0,0,0,.55);
-      padding: 8px;
-      display:none;
-      z-index: 80;
-    }
-    .menu.on{ display:block; }
-    .menu button{
-      width:100%;
-      justify-content:flex-start;
-      border-radius: 14px;
-      padding: 10px 12px;
-    }
-
-    /* ✅ Debug */
-    .debugBox{
-      margin-top: 10px;
-      padding: 10px 12px;
-      border-radius: 14px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.22);
-      color: rgba(255,255,255,.78);
-      font-size: 12.8px;
-      line-height: 1.45;
-    }
-    .debugBox b{ color:#fff; }
-
-    /* ✅ Chat drawer */
-    .chatDrawer{
+    /* ===== Chat window (like client: floating modal) ===== */
+    .chatWin{
       position: fixed;
-      top: 0;
-      right: 0;
-      width: min(420px, 100vw);
-      height: 100vh;
-      z-index: 120;
-      transform: translateX(110%);
-      transition: transform .22s ease;
-      background: rgba(0,0,0,.55);
+      right: 18px;
+      bottom: 18px;
+      z-index: 220;
+      width: min(460px, calc(100vw - 36px));
+      height: min(560px, calc(100vh - 110px));
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.58);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      border-left: 1px solid rgba(255,255,255,.10);
-      box-shadow: -20px 0 80px rgba(0,0,0,.55);
-      display:flex;
-      flex-direction: column;
+      box-shadow: 0 26px 90px rgba(0,0,0,.62);
+      overflow:hidden;
+      display:none;
     }
-    .chatDrawer.on{ transform: translateX(0); }
+    .chatWin.on{ display:flex; flex-direction:column; }
     .chatHead{
-      padding: 12px;
+      padding: 12px 12px;
       display:flex;
       align-items:center;
       justify-content: space-between;
       gap: 10px;
       border-bottom: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.22);
     }
-    .chatTitle{ font-weight: 950; }
+    .chatTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+    .chatDot{
+      width:10px;height:10px;border-radius:999px;
+      background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow: 0 0 18px rgba(255,79,216,.65);
+    }
+    .chatMeta{
+      margin-top: 2px;
+      font-size: 12px;
+      color: rgba(255,255,255,.65);
+      font-weight: 700;
+    }
     .chatBody{
       flex:1;
       overflow:auto;
       padding: 12px;
-      display:grid;
-      gap: 8px;
+      display:flex;
+      flex-direction:column;
+      gap: 10px;
     }
-    .msgBubble{
-      max-width: 86%;
+    .msgRow{
+      display:flex;
+      gap: 10px;
+      align-items:flex-end;
+    }
+    .msgRow.mine{ justify-content:flex-end; }
+    .avatar{
+      width: 30px;
+      height: 30px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background:
+        radial-gradient(14px 14px at 30% 30%, rgba(255,255,255,.16), transparent 60%),
+        linear-gradient(135deg, rgba(255,79,216,.22), rgba(177,76,255,.16));
+      box-shadow: 0 12px 30px rgba(0,0,0,.30);
+      flex: 0 0 auto;
+    }
+    .bubble{
+      max-width: 78%;
       padding: 10px 12px;
-      border-radius: 16px;
+      border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
       background: rgba(255,255,255,.06);
       line-height: 1.45;
@@ -267,14 +432,19 @@
       white-space: pre-wrap;
       word-break: break-word;
     }
-    .msgBubble.admin{ margin-left:auto; border-color: rgba(255,79,216,.22); }
-    .msgBubble.user{ border-color: rgba(255,211,138,.20); }
+    .mine .bubble{
+      background: linear-gradient(135deg, rgba(255,79,216,.22), rgba(177,76,255,.18));
+      border-color: rgba(255,79,216,.24);
+    }
+    .theirs .bubble{
+      border-color: rgba(255,211,138,.18);
+    }
     .chatFoot{
       padding: 10px;
       border-top: 1px solid rgba(255,255,255,.10);
       display:flex;
       gap: 8px;
-      background: rgba(0,0,0,.25);
+      background: rgba(0,0,0,.22);
     }
     .chatFoot input{
       flex:1;
@@ -291,390 +461,388 @@
       border: 1px solid rgba(255,255,255,.14);
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#140813;
-      padding: 10px 12px;
+      padding: 10px 14px;
       cursor:pointer;
       font-weight: 950;
       white-space: nowrap;
     }
-    .chatHint{
-      padding: 10px 12px;
-      color: rgba(255,255,255,.70);
-      font-size: 12.8px;
-      border-top: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
-    }
 
     @media (prefers-reduced-motion: reduce){
-      .chatDrawer{ transition:none; }
-      .pill{ transition:none; }
+      .pill, .navBtn{ transition:none; }
     }
   </style>
 </head>
 
 <body>
   <header class="topbar">
-    <div class="container topbar-inner">
+    <div class="topbar-inner">
       <div class="brand">
         <span class="dot"></span>
-        <span>FitnessLady Admin</span>
+        <span>FitnessLady <span style="opacity:.78; font-weight:900;">Admin</span></span>
       </div>
 
-      <div class="menuWrap">
+      <div class="top-actions">
         <span class="pill ghost mono" id="whoami">…</span>
-
-        <button class="pill danger" id="btnTopLogout" type="button">⎋ Kilépés</button>
         <button class="pill primary" id="btnTopChat" type="button">💬 Chat</button>
-
-        <button class="pill ghost" id="btnMenu" type="button">☰ Menü</button>
-
-        <div class="menu" id="menuBox">
-          <button class="pill ghost" id="m_toApp" type="button">↩ App</button>
-          <button class="pill ghost" id="m_chat" type="button">💬 Chat (kiválasztott)</button>
-          <button class="pill danger" id="m_logout" type="button">⎋ Kilépés</button>
-        </div>
+        <button class="pill danger" id="btnTopLogout" type="button">⎋ Kilépés</button>
       </div>
     </div>
   </header>
 
-  <main>
-    <div class="container grid">
-      <section class="glass card">
-        <h2>Customers</h2>
-        <p class="sub">User kiválasztás → profil / étrend / motiváció + edzések (template) + személyre szabás (override) mentés.</p>
+  <main class="appShell">
+    <!-- SIDEBAR -->
+    <aside class="glass sidebar">
+      <div class="sideHead">
+        <div class="t"><span class="dot"></span><span style="font-weight:950;">Menü</span></div>
+        <span class="mono" style="font-size:12px; color:rgba(255,255,255,.65);">Éles</span>
+      </div>
 
-        <div class="row">
-          <!-- LEFT -->
-          <div class="box">
+      <div class="sideNav" id="sideNav">
+        <button class="navBtn active" type="button" data-scroll="#sec-users"><span class="navI">👤</span>Felhasználók</button>
+        <button class="navBtn" type="button" data-scroll="#sec-plan"><span class="navI">📦</span>Plan template</button>
+        <button class="navBtn" type="button" data-scroll="#sec-diet"><span class="navI">🍽️</span>Étrend</button>
+        <button class="navBtn" type="button" data-scroll="#sec-mot"><span class="navI">💜</span>Motiváció</button>
+        <button class="navBtn" type="button" data-scroll="#sec-ov"><span class="navI">✨</span>Személyre szabás</button>
+        <button class="navBtn" type="button" data-scroll="#sec-tech"><span class="navI">⭐</span>Technika Vault</button>
+      </div>
+
+      <div class="debugBox" style="margin-top:12px;">
+        <b>Tip</b>: először válassz usert a „Gyors kiválasztás”-nál, utána Chat / mentések.
+      </div>
+    </aside>
+
+    <!-- CONTENT -->
+    <section class="glass content">
+      <h1 class="pageTitle">Felhasználók</h1>
+      <p class="pageSub">A /hu/register/ után regisztrált vevőket itt kezeled: profil, chat, étrend, motiváció, technika, template + override.</p>
+
+      <div class="grid2" id="sec-users">
+        <!-- LEFT: User selection -->
+        <div class="section">
+          <h2 class="sectionTitle">Kiválasztás</h2>
+          <p class="sub">Válassz felhasználót a legördülőből. (A találat lista lent csak extra, ha kell.)</p>
+
+          <div class="field">
+            <label for="userSearch">Keresés (email / név / uid)</label>
+            <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
+          </div>
+
+          <div class="field" style="margin-top:8px;">
+            <label for="userPick">Gyors kiválasztás</label>
+            <select id="userPick">
+              <option value="">— válassz —</option>
+            </select>
+          </div>
+
+          <div class="actions">
+            <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
+          </div>
+
+          <div class="debugBox" id="debugBox"><b>DEBUG</b>: users count: — • last error: —</div>
+
+          <!-- Optional list (you can hide later if you want) -->
+          <div class="sub" style="margin-top:12px;">Találatok (opcionális):</div>
+          <ul class="list" id="usersList"></ul>
+        </div>
+
+        <!-- RIGHT: Selected user card -->
+        <div class="section">
+          <h2 class="sectionTitle">User profil</h2>
+          <p class="sub">A kiválasztott user adatai + chat megnyitás.</p>
+
+          <div class="sub">Kiválasztott user:</div>
+          <div class="pill ghost mono" id="selUser">—</div>
+
+          <div class="miniRow" style="margin-top:10px;">
             <div class="field">
-              <label for="userSearch">Keresés (email / név / uid)</label>
-              <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
+              <label for="u_email">Email</label>
+              <input id="u_email" type="text" placeholder="—" />
             </div>
-
-            <div class="field" style="margin-top:8px;">
-              <label for="userPick">Gyors kiválasztás</label>
-              <select id="userPick">
-                <option value="">— válassz —</option>
-              </select>
-            </div>
-
-            <div class="actions">
-              <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
-            </div>
-
-            <div class="debugBox" id="debugBox"><b>DEBUG</b>: users count: — • last error: —</div>
-
-            <div class="sub" style="margin-top:10px;">Találatok:</div>
-            <ul class="list" id="usersList"></ul>
-
-            <hr class="hr" />
-
-            <h3>Plan template (Csomag beállítások)</h3>
-            <p class="sub">Itt állítod be, hogy egy adott csomag hány hetes, és mik a fix videói (amiket mindenki megkap).</p>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="p_planId">Csomag neve (pl. start_v1, balance_v1)</label>
-                <input id="p_planId" type="text" value="start_v1" />
-              </div>
-              <div class="field">
-                <label for="p_weeks">Hány hetes a program?</label>
-                <input id="p_weeks" type="number" min="1" max="24" value="4" />
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="pill ghost" id="btnLoadPlanMeta" type="button">↻ Betöltés (meta)</button>
-              <button class="pill primary" id="btnSavePlanMeta" type="button">💾 Mentés (meta)</button>
-            </div>
-
-            <div class="miniRow" style="margin-top:14px;">
-              <div class="field">
-                <label for="p_weekNo">Szerkesztett hét (melyik hetet töltöd ki?)</label>
-                <input id="p_weekNo" type="number" min="1" max="24" value="1" />
-              </div>
-              <div class="field">
-                <label>&nbsp;</label>
-                <button class="pill ghost" id="btnLoadTemplateWeek" type="button">↻ Betöltés (hét videói)</button>
-              </div>
-            </div>
-
-            <div class="field" style="margin-top: 14px; padding: 12px; background: rgba(255,79,216,.08); border: 1px solid rgba(255,79,216,.2); border-radius: 14px;">
-              <label for="t_slots_count" style="color:#fff;">Hány darab "Személyre szabott" videó keret legyen a héten?</label>
-              <select id="t_slots_count" style="margin-top: 8px; font-weight: 800; color: var(--pink);">
-                <option value="0">0 (Nincs extra videó)</option>
-                <option value="1">1 darab videó / feladat</option>
-                <option value="2">2 darab videó / feladat</option>
-                <option value="3" selected>3 darab videó / feladat</option>
-              </select>
-            </div>
-
-            <h4 style="margin-top:20px; color:var(--gold); font-family: ui-serif;">Heti fix edzések (Maximum 5/hét)</h4>
-            <p class="sub" style="font-size:12px;">Töltsd ki azokat, amik a csomaghoz tartoznak. Amit üresen hagysz, az nem jelenik meg.</p>
-
-            <div id="workouts_container"></div>
-
-            <div class="actions" style="margin-top:16px;">
-              <button class="pill ghost" id="btnClearTemplateWeek" type="button">🧹 Ürítés (hét mezők)</button>
-              <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (hét & fix edzések)</button>
+            <div class="field">
+              <label for="u_name">Név</label>
+              <input id="u_name" type="text" placeholder="pl. Anna" />
             </div>
           </div>
 
-          <!-- RIGHT -->
-          <div class="box">
-            <div class="sub">Kiválasztott user:</div>
-            <div class="pill ghost mono" id="selUser">—</div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="u_email">Email</label>
-                <input id="u_email" type="text" placeholder="—" />
-              </div>
-              <div class="field">
-                <label for="u_name">Név</label>
-                <input id="u_name" type="text" placeholder="pl. Anna" />
-              </div>
-            </div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="u_role">Role</label>
-                <select id="u_role">
-                  <option value="user">user</option>
-                  <option value="admin">admin</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="u_status">Status</label>
-                <select id="u_status">
-                  <option value="active">active</option>
-                  <option value="paused">paused</option>
-                  <option value="disabled">disabled</option>
-                </select>
-              </div>
-            </div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="u_lang">Nyelv</label>
-                <select id="u_lang">
-                  <option value="hu">hu</option>
-                  <option value="de">de</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="u_level">Szint (1–4)</label>
-                <input id="u_level" type="number" min="1" max="4" value="2" />
-              </div>
-            </div>
-
+          <div class="miniRow">
             <div class="field">
-              <label for="u_goal">Cél</label>
-              <input id="u_goal" type="text" placeholder="pl. Formálás" />
+              <label for="u_role">Role</label>
+              <select id="u_role">
+                <option value="user">user</option>
+                <option value="admin">admin</option>
+              </select>
             </div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="u_planIdSelect">Kiosztott Csomag</label>
-                <select id="u_planIdSelect">
-                  <option value="start_v1">Start</option>
-                  <option value="balance_v1">Balance</option>
-                  <option value="pro_v1">Pro</option>
-                  <option value="custom">Egyedi…</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="u_lifetime">Lifetime access</label>
-                <select id="u_lifetime">
-                  <option value="true">true</option>
-                  <option value="false">false</option>
-                </select>
-              </div>
+            <div class="field">
+              <label for="u_status">Status</label>
+              <select id="u_status">
+                <option value="active">active</option>
+                <option value="paused">paused</option>
+                <option value="disabled">disabled</option>
+              </select>
             </div>
+          </div>
 
-            <div class="field" id="u_planIdCustomWrap" style="display:none;">
-              <label for="u_planIdCustom">Egyedi planId (pl. start_v2)</label>
-              <input id="u_planIdCustom" type="text" placeholder="pl. start_v2" />
+          <div class="miniRow">
+            <div class="field">
+              <label for="u_lang">Nyelv</label>
+              <select id="u_lang">
+                <option value="hu">hu</option>
+                <option value="de">de</option>
+              </select>
             </div>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="u_cycleStart">Kezdés (YYYY-MM-DD / üres)</label>
-                <input id="u_cycleStart" type="text" placeholder="2026-02-01" />
-              </div>
-              <div class="field">
-                <label for="u_cycleEnd">Vége (YYYY-MM-DD / üres)</label>
-                <input id="u_cycleEnd" type="text" placeholder="2026-03-01" />
-              </div>
+            <div class="field">
+              <label for="u_level">Szint (1–4)</label>
+              <input id="u_level" type="number" min="1" max="4" value="2" />
             </div>
+          </div>
 
-            <div class="actions">
-              <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés (Profil)</button>
-              <button class="pill primary" id="btnOpenChatInline" type="button">💬 Chat megnyitása</button>
+          <div class="field">
+            <label for="u_goal">Cél</label>
+            <input id="u_goal" type="text" placeholder="pl. Formálás" />
+          </div>
+
+          <div class="miniRow">
+            <div class="field">
+              <label for="u_planIdSelect">Kiosztott Csomag</label>
+              <select id="u_planIdSelect">
+                <option value="start_v1">Start</option>
+                <option value="balance_v1">Balance</option>
+                <option value="pro_v1">Pro</option>
+                <option value="custom">Egyedi…</option>
+              </select>
             </div>
-
-            <hr class="hr" />
-
-            <h3>Üdvözlő kártya (Személyes üzenet + videó)</h3>
-            <p class="sub">Ez külön kártyán jelenik meg a vevő appban.</p>
-
-            <div class="field"><label for="w_title">Cím</label><input id="w_title" type="text" placeholder="pl. Szia! Kezdjük el együtt." /></div>
-            <div class="field"><label for="w_text">Szöveg</label><textarea id="w_text" placeholder="pl. Örülök, hogy itt vagy..."></textarea></div>
-            <div class="field"><label for="w_video">Videó link (opcionális)</label><input id="w_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
-
-            <div class="actions">
-              <button class="pill primary" id="btnSaveWelcome" type="button">💾 Mentés (Üdvözlő)</button>
+            <div class="field">
+              <label for="u_lifetime">Lifetime access</label>
+              <select id="u_lifetime">
+                <option value="true">true</option>
+                <option value="false">false</option>
+              </select>
             </div>
+          </div>
 
-            <hr class="hr" />
+          <div class="field" id="u_planIdCustomWrap" style="display:none;">
+            <label for="u_planIdCustom">Egyedi planId (pl. start_v2)</label>
+            <input id="u_planIdCustom" type="text" placeholder="pl. start_v2" />
+          </div>
 
-            <h3>Étrend — 4 hét / napi</h3>
-            <p class="sub">Itt írod a napi étkezéseket. A vevő app prémium kártyákban mutatja.</p>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="d_week">Hét</label>
-                <select id="d_week">
-                  <option value="1">Hét 1</option>
-                  <option value="2">Hét 2</option>
-                  <option value="3">Hét 3</option>
-                  <option value="4">Hét 4</option>
-                </select>
-              </div>
-              <div class="field">
-                <label for="d_day">Nap</label>
-                <select id="d_day">
-                  <option value="mon">Hétfő</option>
-                  <option value="tue">Kedd</option>
-                  <option value="wed">Szerda</option>
-                  <option value="thu">Csütörtök</option>
-                  <option value="fri">Péntek</option>
-                  <option value="sat">Szombat</option>
-                  <option value="sun">Vasárnap</option>
-                </select>
-              </div>
+          <div class="miniRow">
+            <div class="field">
+              <label for="u_cycleStart">Kezdés (YYYY-MM-DD / üres)</label>
+              <input id="u_cycleStart" type="text" placeholder="2026-02-01" />
             </div>
-
-            <div class="field"><label for="d_breakfast">Reggeli</label><textarea id="d_breakfast" placeholder="pl. Zabkása gyümölccsel"></textarea></div>
-            <div class="field"><label for="d_snack1">Tízórai</label><textarea id="d_snack1" placeholder="pl. Natúr joghurt + pár szem dió"></textarea></div>
-            <div class="field"><label for="d_lunch">Ebéd</label><textarea id="d_lunch" placeholder="pl. Csirke + rizs + saláta"></textarea></div>
-            <div class="field"><label for="d_snack2">Uzsonna</label><textarea id="d_snack2" placeholder="pl. Gyümölcs / smoothie"></textarea></div>
-            <div class="field"><label for="d_dinner">Vacsora</label><textarea id="d_dinner" placeholder="pl. Tojásos saláta"></textarea></div>
-
-            <div class="actions">
-              <button class="pill ghost" id="btnLoadDietDay" type="button">↻ Betöltés (nap)</button>
-              <button class="pill primary" id="btnSaveDietDay" type="button">💾 Mentés (nap)</button>
-              <button class="pill danger" id="btnClearDietDay" type="button">🗑 Törlés (nap)</button>
+            <div class="field">
+              <label for="u_cycleEnd">Vége (YYYY-MM-DD / üres)</label>
+              <input id="u_cycleEnd" type="text" placeholder="2026-03-01" />
             </div>
+          </div>
 
-            <hr class="hr" />
-
-            <h3>Személyre szabott videók beállítása (Overrides)</h3>
-            <p class="sub">Itt adhatod meg a heti extra videókat a vevőnek (Slots).</p>
-
-            <div class="miniRow">
-              <div class="field">
-                <label for="ov_week">Hét kiválasztása</label>
-                <input id="ov_week" type="number" min="1" max="24" value="1" />
-              </div>
-              <div class="field">
-                <label>&nbsp;</label>
-                <button class="pill ghost" id="btnLoadOverride" type="button">↻ Betöltés</button>
-              </div>
-            </div>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
-              <div style="font-weight:900; color:var(--pink); margin-bottom:8px;">▶ 1. Személyre szabott videó</div>
-              <div class="field">
-                <label>Videó linkje (vagy ID-ja)</label>
-                <input id="ov_slot1_vid" type="text" placeholder="pl. https://vimeo.com/123456" />
-              </div>
-              <div class="field">
-                <label>Jegyzet / Üzenet a vevőnek</label>
-                <textarea id="ov_slot1_note" placeholder="pl. Szuperül haladsz, figyelj a tartásodra!"></textarea>
-              </div>
-            </div>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
-              <div style="font-weight:900; color:var(--pink); margin-bottom:8px;">▶ 2. Személyre szabott videó</div>
-              <div class="field">
-                <label>Videó linkje (vagy ID-ja)</label>
-                <input id="ov_slot2_vid" type="text" placeholder="pl. https://vimeo.com/123456" />
-              </div>
-              <div class="field">
-                <label>Jegyzet / Üzenet a vevőnek</label>
-                <textarea id="ov_slot2_note" placeholder="pl. Csak így tovább!"></textarea>
-              </div>
-            </div>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
-              <div style="font-weight:900; color:var(--pink); margin-bottom:8px;">▶ 3. Személyre szabott videó</div>
-              <div class="field">
-                <label>Videó linkje (vagy ID-ja)</label>
-                <input id="ov_slot3_vid" type="text" placeholder="pl. https://vimeo.com/123456" />
-              </div>
-              <div class="field">
-                <label>Jegyzet / Üzenet a vevőnek</label>
-                <textarea id="ov_slot3_note" placeholder="pl. Ha nehéz, tarts szünetet."></textarea>
-              </div>
-            </div>
-
-            <div class="actions">
-              <button class="pill primary" id="btnSaveOverride" type="button">💾 Mentés (Személyre szabás)</button>
-              <button class="pill danger" id="btnDeleteOverride" type="button">🗑 Törlés</button>
-            </div>
-
-            <hr class="hr" />
-
-            <h3>Fix motiváció kártya</h3>
-            <p class="sub">Mindig látszik a vevőnél.</p>
-
-            <div class="field"><label for="m_title">Cím</label><input id="m_title" type="text" placeholder="pl. A rendszer szabadság." /></div>
-            <div class="field"><label for="m_text">Szöveg</label><textarea id="m_text" placeholder="pl. Nem kell tökéletesnek lenned..."></textarea></div>
-
-            <div class="actions">
-              <button class="pill primary" id="btnSaveMotivation" type="button">💾 Mentés (motiváció)</button>
-            </div>
-
-            <hr class="hr" />
-
-            <h3>Technika Vault (Admin anyagok)</h3>
-            <p class="sub">Itt mented a technikai anyagokat. A vevő appban „Technika Vault” kártyában jelenik meg.</p>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
-              <div style="font-weight:900; color:var(--gold); margin-bottom:8px;">★ Technika 1</div>
-              <div class="field"><label for="tv1_title">Cím</label><input id="tv1_title" type="text" placeholder="pl. Guggolás technika" /></div>
-              <div class="field"><label for="tv1_video">Videó link (opcionális)</label><input id="tv1_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
-              <div class="field"><label for="tv1_text">Szöveg</label><textarea id="tv1_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
-            </div>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
-              <div style="font-weight:900; color:var(--gold); margin-bottom:8px;">★ Technika 2</div>
-              <div class="field"><label for="tv2_title">Cím</label><input id="tv2_title" type="text" placeholder="pl. Csípő tolás" /></div>
-              <div class="field"><label for="tv2_video">Videó link (opcionális)</label><input id="tv2_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
-              <div class="field"><label for="tv2_text">Szöveg</label><textarea id="tv2_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
-            </div>
-
-            <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
-              <div style="font-weight:900; color:var(--gold); margin-bottom:8px;">★ Technika 3</div>
-              <div class="field"><label for="tv3_title">Cím</label><input id="tv3_title" type="text" placeholder="pl. Fekvőtámasz tartás" /></div>
-              <div class="field"><label for="tv3_video">Videó link (opcionális)</label><input id="tv3_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
-              <div class="field"><label for="tv3_text">Szöveg</label><textarea id="tv3_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
-            </div>
-
-            <div class="actions">
-              <button class="pill ghost" id="btnLoadTechVault" type="button">↻ Betöltés (Technika)</button>
-              <button class="pill primary" id="btnSaveTechVault" type="button">💾 Mentés (Technika)</button>
-              <button class="pill danger" id="btnClearTechVault" type="button">🗑 Ürítés (Technika mezők)</button>
-            </div>
-
+          <div class="actions">
+            <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés</button>
+            <button class="pill primary" id="btnOpenChatInline" type="button">💬 Küldés / Chat</button>
           </div>
         </div>
-      </section>
-    </div>
+      </div>
+
+      <!-- PLAN TEMPLATE -->
+      <div class="section" id="sec-plan">
+        <h2 class="sectionTitle">Plan template</h2>
+        <p class="sub">Csomag meta + heti fix edzések (dinamikusan ment: csak a kitöltött edzések kerülnek a Firestore-ba).</p>
+
+        <div class="miniRow">
+          <div class="field">
+            <label for="p_planId">Csomag neve (pl. start_v1, balance_v1)</label>
+            <input id="p_planId" type="text" value="start_v1" />
+          </div>
+          <div class="field">
+            <label for="p_weeks">Hány hetes a program?</label>
+            <input id="p_weeks" type="number" min="1" max="24" value="4" />
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="pill ghost" id="btnLoadPlanMeta" type="button">↻ Betöltés (meta)</button>
+          <button class="pill primary" id="btnSavePlanMeta" type="button">💾 Mentés (meta)</button>
+        </div>
+
+        <div class="miniRow" style="margin-top:14px;">
+          <div class="field">
+            <label for="p_weekNo">Szerkesztett hét</label>
+            <input id="p_weekNo" type="number" min="1" max="24" value="1" />
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <button class="pill ghost" id="btnLoadTemplateWeek" type="button">↻ Betöltés (hét)</button>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top: 14px; padding: 12px; background: rgba(255,79,216,.08); border: 1px solid rgba(255,79,216,.2); border-radius: 14px;">
+          <label for="t_slots_count" style="color:#fff;">Hány darab "Személyre szabott" keret legyen a héten?</label>
+          <select id="t_slots_count" style="margin-top: 8px; font-weight: 850; color: var(--pink);">
+            <option value="0">0 (Nincs extra)</option>
+            <option value="1">1 darab</option>
+            <option value="2">2 darab</option>
+            <option value="3" selected>3 darab</option>
+          </select>
+        </div>
+
+        <h3 style="margin:16px 0 6px; color:var(--gold); font-family: ui-serif;">Heti fix edzések (max 5)</h3>
+        <p class="sub" style="font-size:12.8px;">Amit üresen hagysz, nem lesz mentve, és nem jelenik meg a vevőnél.</p>
+
+        <div id="workouts_container"></div>
+
+        <div class="actions" style="margin-top:12px;">
+          <button class="pill ghost" id="btnClearTemplateWeek" type="button">🧹 Ürítés</button>
+          <button class="pill primary" id="btnSaveTemplateWeek" type="button">💾 Mentés (hét)</button>
+        </div>
+      </div>
+
+      <!-- WELCOME -->
+      <div class="section">
+        <h2 class="sectionTitle">Üdvözlő kártya</h2>
+        <p class="sub">Személyes üzenet + videó (külön kártya a vevőnél).</p>
+
+        <div class="field"><label for="w_title">Cím</label><input id="w_title" type="text" placeholder="pl. Szia! Kezdjük el együtt." /></div>
+        <div class="field"><label for="w_text">Szöveg</label><textarea id="w_text" placeholder="pl. Örülök, hogy itt vagy..."></textarea></div>
+        <div class="field"><label for="w_video">Videó link (opcionális)</label><input id="w_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
+
+        <div class="actions">
+          <button class="pill primary" id="btnSaveWelcome" type="button">💾 Mentés</button>
+        </div>
+      </div>
+
+      <!-- DIET -->
+      <div class="section" id="sec-diet">
+        <h2 class="sectionTitle">Étrend — 4 hét / napi</h2>
+        <p class="sub">Napi étkezések (a vevőnél prémium kártyákban jelenik meg).</p>
+
+        <div class="miniRow">
+          <div class="field">
+            <label for="d_week">Hét</label>
+            <select id="d_week">
+              <option value="1">Hét 1</option>
+              <option value="2">Hét 2</option>
+              <option value="3">Hét 3</option>
+              <option value="4">Hét 4</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="d_day">Nap</label>
+            <select id="d_day">
+              <option value="mon">Hétfő</option>
+              <option value="tue">Kedd</option>
+              <option value="wed">Szerda</option>
+              <option value="thu">Csütörtök</option>
+              <option value="fri">Péntek</option>
+              <option value="sat">Szombat</option>
+              <option value="sun">Vasárnap</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="field"><label for="d_breakfast">Reggeli</label><textarea id="d_breakfast" placeholder="pl. Zabkása gyümölccsel"></textarea></div>
+        <div class="field"><label for="d_snack1">Tízórai</label><textarea id="d_snack1" placeholder="pl. Natúr joghurt + dió"></textarea></div>
+        <div class="field"><label for="d_lunch">Ebéd</label><textarea id="d_lunch" placeholder="pl. Csirke + rizs + saláta"></textarea></div>
+        <div class="field"><label for="d_snack2">Uzsonna</label><textarea id="d_snack2" placeholder="pl. Gyümölcs / smoothie"></textarea></div>
+        <div class="field"><label for="d_dinner">Vacsora</label><textarea id="d_dinner" placeholder="pl. Tojásos saláta"></textarea></div>
+
+        <div class="actions">
+          <button class="pill ghost" id="btnLoadDietDay" type="button">↻ Betöltés</button>
+          <button class="pill primary" id="btnSaveDietDay" type="button">💾 Mentés</button>
+          <button class="pill danger" id="btnClearDietDay" type="button">🗑 Törlés</button>
+        </div>
+      </div>
+
+      <!-- MOTIVATION -->
+      <div class="section" id="sec-mot">
+        <h2 class="sectionTitle">Fix motiváció kártya</h2>
+        <p class="sub">Mindig látszik a vevőnél.</p>
+
+        <div class="field"><label for="m_title">Cím</label><input id="m_title" type="text" placeholder="pl. A rendszer szabadság." /></div>
+        <div class="field"><label for="m_text">Szöveg</label><textarea id="m_text" placeholder="pl. Nem kell tökéletesnek lenned..."></textarea></div>
+
+        <div class="actions">
+          <button class="pill primary" id="btnSaveMotivation" type="button">💾 Mentés</button>
+        </div>
+      </div>
+
+      <!-- OVERRIDES -->
+      <div class="section" id="sec-ov">
+        <h2 class="sectionTitle">Személyre szabás (Overrides)</h2>
+        <p class="sub">Heti extra videók / üzenetek a kiválasztott userhez.</p>
+
+        <div class="miniRow">
+          <div class="field">
+            <label for="ov_week">Hét</label>
+            <input id="ov_week" type="number" min="1" max="24" value="1" />
+          </div>
+          <div class="field">
+            <label>&nbsp;</label>
+            <button class="pill ghost" id="btnLoadOverride" type="button">↻ Betöltés</button>
+          </div>
+        </div>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
+          <div style="font-weight:950; color:var(--pink); margin-bottom:8px;">▶ 1. Személyre szabott</div>
+          <div class="field"><label>Videó link / ID</label><input id="ov_slot1_vid" type="text" placeholder="pl. https://vimeo.com/123456" /></div>
+          <div class="field"><label>Jegyzet / Üzenet</label><textarea id="ov_slot1_note" placeholder="pl. Szuperül haladsz!"></textarea></div>
+        </div>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
+          <div style="font-weight:950; color:var(--pink); margin-bottom:8px;">▶ 2. Személyre szabott</div>
+          <div class="field"><label>Videó link / ID</label><input id="ov_slot2_vid" type="text" placeholder="pl. https://vimeo.com/123456" /></div>
+          <div class="field"><label>Jegyzet / Üzenet</label><textarea id="ov_slot2_note" placeholder="pl. Csak így tovább!"></textarea></div>
+        </div>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,79,216,.2);">
+          <div style="font-weight:950; color:var(--pink); margin-bottom:8px;">▶ 3. Személyre szabott</div>
+          <div class="field"><label>Videó link / ID</label><input id="ov_slot3_vid" type="text" placeholder="pl. https://vimeo.com/123456" /></div>
+          <div class="field"><label>Jegyzet / Üzenet</label><textarea id="ov_slot3_note" placeholder="pl. Ha nehéz, tarts szünetet."></textarea></div>
+        </div>
+
+        <div class="actions">
+          <button class="pill primary" id="btnSaveOverride" type="button">💾 Mentés</button>
+          <button class="pill danger" id="btnDeleteOverride" type="button">🗑 Törlés</button>
+        </div>
+      </div>
+
+      <!-- TECH VAULT -->
+      <div class="section" id="sec-tech">
+        <h2 class="sectionTitle">Technika Vault</h2>
+        <p class="sub">Technikai anyagok a vevő „Technika Vault” kártyájához.</p>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
+          <div style="font-weight:950; color:var(--gold); margin-bottom:8px;">★ Technika 1</div>
+          <div class="field"><label for="tv1_title">Cím</label><input id="tv1_title" type="text" placeholder="pl. Guggolás technika" /></div>
+          <div class="field"><label for="tv1_video">Videó link (opcionális)</label><input id="tv1_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
+          <div class="field"><label for="tv1_text">Szöveg</label><textarea id="tv1_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
+        </div>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
+          <div style="font-weight:950; color:var(--gold); margin-bottom:8px;">★ Technika 2</div>
+          <div class="field"><label for="tv2_title">Cím</label><input id="tv2_title" type="text" placeholder="pl. Csípő tolás" /></div>
+          <div class="field"><label for="tv2_video">Videó link (opcionális)</label><input id="tv2_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
+          <div class="field"><label for="tv2_text">Szöveg</label><textarea id="tv2_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
+        </div>
+
+        <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
+          <div style="font-weight:950; color:var(--gold); margin-bottom:8px;">★ Technika 3</div>
+          <div class="field"><label for="tv3_title">Cím</label><input id="tv3_title" type="text" placeholder="pl. Fekvőtámasz tartás" /></div>
+          <div class="field"><label for="tv3_video">Videó link (opcionális)</label><input id="tv3_video" type="text" placeholder="pl. https://vimeo.com/..." /></div>
+          <div class="field"><label for="tv3_text">Szöveg</label><textarea id="tv3_text" placeholder="Kulcspontok, hibák, tippek..."></textarea></div>
+        </div>
+
+        <div class="actions">
+          <button class="pill ghost" id="btnLoadTechVault" type="button">↻ Betöltés</button>
+          <button class="pill primary" id="btnSaveTechVault" type="button">💾 Mentés</button>
+          <button class="pill danger" id="btnClearTechVault" type="button">🗑 Ürítés</button>
+        </div>
+      </div>
+
+    </section>
   </main>
 
   <footer>
-    <div class="container footer-inner">
+    <div class="footer-inner">
       <div>© <span id="y"></span> FitnessLady</div>
       <div>Tüske web design</div>
     </div>
@@ -682,18 +850,22 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- ✅ Chat drawer -->
-  <aside class="chatDrawer" id="chatDrawer" aria-hidden="true">
+  <!-- ✅ Chat window (floating, like client) -->
+  <aside class="chatWin" id="chatDrawer" aria-hidden="true">
     <div class="chatHead">
-      <div class="chatTitle">💬 Chat — <span class="mono" id="chatUserLine">—</span></div>
+      <div>
+        <div class="chatTitle"><span class="chatDot"></span>Chat — <span class="mono" id="chatUserLine">—</span></div>
+        <div class="chatMeta mono" id="chatMetaLine">—</div>
+      </div>
       <button class="pill ghost" id="btnChatClose" type="button">✕</button>
     </div>
+
     <div class="chatBody" id="chatBody"></div>
+
     <div class="chatFoot">
-      <input id="chatInput" type="text" placeholder="Írj a kiválasztott usernek…" />
+      <input id="chatInput" type="text" placeholder="Írj ide…" />
       <button id="btnChatSend" type="button">Küldés</button>
     </div>
-    <div class="chatHint">A chat mindig a kiválasztott userhez tartozik.</div>
   </aside>
 
   <script type="module">
@@ -735,17 +907,21 @@
 
     $("#y").textContent = new Date().getFullYear();
 
-    // ✅ Menu
-    const menuBtn = $("#btnMenu");
-    const menuBox = $("#menuBox");
-    function toggleMenu(force=null){
-      const on = (force === null) ? !menuBox.classList.contains("on") : !!force;
-      menuBox.classList.toggle("on", on);
+    // ✅ Sidebar scroll + active
+    const nav = $("#sideNav");
+    function setActiveNav(btn){
+      $$("#sideNav .navBtn").forEach(x=>x.classList.remove("active"));
+      btn.classList.add("active");
     }
-    menuBtn.addEventListener("click", ()=>toggleMenu());
-    document.addEventListener("click", (e)=>{
-      if(menuBox.classList.contains("on")){
-        if(!menuBox.contains(e.target) && e.target !== menuBtn) toggleMenu(false);
+    nav.addEventListener("click", (e)=>{
+      const b = e.target.closest("[data-scroll]");
+      if(!b) return;
+      const sel = b.getAttribute("data-scroll");
+      const el = document.querySelector(sel);
+      if(el){
+        setActiveNav(b);
+        const y = el.getBoundingClientRect().top + window.scrollY - 82;
+        window.scrollTo({ top: y, behavior: "smooth" });
       }
     });
 
@@ -753,9 +929,8 @@
       await logout();
       toLogin("hu");
     }
-    $("#m_logout").addEventListener("click", doLogout);
     $("#btnTopLogout").addEventListener("click", doLogout);
-    $("#m_toApp").addEventListener("click", ()=>toApp("hu"));
+    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
 
     // ✅ state
     let SEL_UID = null;
@@ -765,11 +940,12 @@
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
 
-    // ✅ Chat (Firestore)  --- FIXED for delivery: createdAtMs + orderBy createdAtMs
+    // ✅ Chat (Firestore)
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
     const chatUserLine = $("#chatUserLine");
+    const chatMetaLine = $("#chatMetaLine");
     let chatUnsub = null;
     let CHAT_UID = null;
 
@@ -781,51 +957,22 @@
         createdAt: fs.serverTimestamp()
       }, { merge:true });
     }
-
     function listenChatMessages(uid, cb){
       const col = fs.collection(db, "chats", uid, "messages");
-
-      // ✅ primary: createdAtMs (instant + stable)
-      const q1 = fs.query(col, fs.orderBy("createdAtMs", "asc"), fs.limit(300));
-
-      // ✅ fallback: createdAt (old messages)
-      const q2 = fs.query(col, fs.orderBy("createdAt", "asc"), fs.limit(300));
-
-      let unsub = null;
-      try{
-        unsub = fs.onSnapshot(q1, (snap)=>{
-          const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
-          cb(items);
-        }, (e)=>{
-          console.warn("chat q1 failed -> fallback q2", e);
-          unsub?.();
-          unsub = fs.onSnapshot(q2, (snap2)=>{
-            const items2 = snap2.docs.map(d=>({ id:d.id, ...d.data() }));
-            cb(items2);
-          });
-        });
-      }catch(e){
-        console.warn("chat listen error -> q2", e);
-        unsub = fs.onSnapshot(q2, (snap2)=>{
-          const items2 = snap2.docs.map(d=>({ id:d.id, ...d.data() }));
-          cb(items2);
-        });
-      }
-      return () => { try{ unsub?.(); }catch(_){} };
+      const q = fs.query(col, fs.orderBy("createdAt", "asc"), fs.limit(200));
+      return fs.onSnapshot(q, (snap)=>{
+        const items = snap.docs.map(d=>({ id:d.id, ...d.data() }));
+        cb(items);
+      });
     }
-
     async function sendChatText(uid, sender, text){
       const col = fs.collection(db, "chats", uid, "messages");
-      const nowMs = Date.now();
-
       await fs.addDoc(col, {
         type: "text",
         sender: sender === "admin" ? "admin" : "user",
         text: String(text || ""),
-        createdAt: fs.serverTimestamp(),
-        createdAtMs: nowMs
+        createdAt: fs.serverTimestamp()
       });
-
       await fs.setDoc(fs.doc(db, "chats", uid), {
         updatedAt: fs.serverTimestamp(),
         lastMessage: String(text || "").slice(0, 140),
@@ -837,7 +984,10 @@
     function openChatFor(uid){
       if(!uid) return err("Nincs user kiválasztva (chat).");
       CHAT_UID = uid;
-      chatUserLine.textContent = `uid=${uid}`;
+
+      chatUserLine.textContent = uid;
+      chatMetaLine.textContent = `UID: ${uid}`;
+
       chatDrawer.classList.add("on");
       chatDrawer.setAttribute("aria-hidden", "false");
       chatInput.value = "";
@@ -851,10 +1001,25 @@
           chatBody.innerHTML = "";
           items.forEach(m=>{
             const mine = (m.sender === "admin");
-            const div = document.createElement("div");
-            div.className = "msgBubble " + (mine ? "admin" : "user");
-            div.textContent = m.text || "";
-            chatBody.appendChild(div);
+            const row = document.createElement("div");
+            row.className = "msgRow " + (mine ? "mine" : "theirs");
+
+            if(!mine){
+              const av = document.createElement("div");
+              av.className = "avatar";
+              row.appendChild(av);
+            }
+
+            const bub = document.createElement("div");
+            bub.className = "bubble";
+            bub.textContent = m.text || "";
+            row.appendChild(bub);
+
+            if(mine){
+              // no avatar on mine
+            }
+
+            chatBody.appendChild(row);
           });
           chatBody.scrollTop = chatBody.scrollHeight + 9999;
         });
@@ -869,7 +1034,6 @@
       chatDrawer.setAttribute("aria-hidden", "true");
     }
     $("#btnChatClose").addEventListener("click", closeChat);
-
     $("#btnChatSend").addEventListener("click", async ()=>{
       try{
         if(!CHAT_UID) return err("Nincs chat user.");
@@ -886,23 +1050,19 @@
         err(e.message || String(e));
       }
     });
-
     chatInput.addEventListener("keydown", (e)=>{
       if(e.key === "Enter") $("#btnChatSend").click();
       if(e.key === "Escape") closeChat();
     });
-
-    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
-    $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
     $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
-    // 🔥 Dinamikus 5 fix edzés box
+    // 🔥 Dinamikus 5 fix edzés box (UI 5, mentés dinamikus: csak kitöltött megy)
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
       workoutsHTML += `
         <div class="box" style="margin-bottom:12px; border-color: rgba(255,211,138,.2);">
-          <div style="font-weight:900; color:var(--gold); margin-bottom:8px;">★ Fix Edzés ${i}</div>
+          <div style="font-weight:950; color:var(--gold); margin-bottom:8px;">★ Fix Edzés ${i}</div>
           <div class="miniRow">
             <div class="field">
               <label>Edzés Címe</label>
@@ -1354,10 +1514,11 @@
           $(`#t_w${i}_dur`).value = w.duration || "";
         });
 
-        ok(`Csomag hét (${weekNo}) beállításai betöltve.`);
+        ok(`Csomag hét (${weekNo}) betöltve.`);
       }catch(e){ err(e.message || String(e)); }
     }
 
+    // ✅ Dinamikus mentés: csak a kitöltött edzések kerülnek a workouts[] tömbbe
     async function saveTemplateWeek(){
       try{
         const planId = trimStr($("#p_planId").value);
@@ -1367,15 +1528,16 @@
         const workouts = [];
         for(let i=1; i<=5; i++){
           const title = trimStr($(`#t_w${i}_title`).value);
-          const desc = trimStr($(`#t_w${i}_desc`).value);
-          const vid = trimStr($(`#t_w${i}_vid`).value);
-          const dur = trimStr($(`#t_w${i}_dur`).value);
+          const desc  = trimStr($(`#t_w${i}_desc`).value);
+          const vid   = trimStr($(`#t_w${i}_vid`).value);
+          const dur   = trimStr($(`#t_w${i}_dur`).value);
 
-          if(title || vid){
+          // dinamikus: ha bármi ki van töltve, mentjük
+          if(title || desc || vid || dur){
             workouts.push({
               id: `w${i}`,
               title: { hu: title, de: title },
-              desc: { hu: desc, de: desc },
+              desc:  { hu: desc,  de: desc  },
               vimeoId: vid,
               duration: dur
             });
@@ -1521,4 +1683,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
