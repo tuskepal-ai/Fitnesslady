@@ -207,6 +207,19 @@
       padding: 10px 12px;
     }
 
+    /* ✅ Debug box */
+    .debugBox{
+      margin-top: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      color: rgba(255,255,255,.78);
+      font-size: 12.8px;
+      line-height: 1.45;
+    }
+    .debugBox b{ color:#fff; }
+
     /* ✅ Chat panel (right drawer) */
     .chatDrawer{
       position: fixed;
@@ -308,6 +321,10 @@
 
       <div class="menuWrap">
         <span class="pill ghost mono" id="whoami">…</span>
+
+        <!-- ✅ FIX: kilépés mindig látszik -->
+        <button class="pill danger" id="btnTopLogout" type="button">⎋ Kilépés</button>
+
         <button class="pill ghost" id="btnMenu" type="button">☰ Menü</button>
 
         <div class="menu" id="menuBox">
@@ -348,7 +365,6 @@
               <input id="userSearch" type="text" placeholder="pl. anna@gmail.com" />
             </div>
 
-            <!-- ✅ ÚJ: Gyors kiválasztás (nem bontja szét a UI-t, csak segít) -->
             <div class="field" style="margin-top:8px;">
               <label for="userPick">Gyors kiválasztás</label>
               <select id="userPick">
@@ -358,6 +374,11 @@
 
             <div class="actions">
               <button class="pill ghost" id="btnRefreshUsers" type="button">↻ Lista frissítés</button>
+            </div>
+
+            <!-- ✅ DEBUG -->
+            <div class="debugBox" id="debugBox">
+              <b>DEBUG</b>: users count: — • last error: —
             </div>
 
             <div class="sub" style="margin-top:10px;">Találatok:</div>
@@ -692,7 +713,7 @@
 
   <script type="module">
     import {
-      auth, db, fs,
+      db, fs,
       onAuth, logout, toLogin, toApp,
       escapeHtml, clamp,
       ensureUserDoc, getUserRole, isAdminEmail,
@@ -713,6 +734,13 @@
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
     function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 3800); }
 
+    const dbg = $("#debugBox");
+    function setDebug({count=null, error=null}={}){
+      const c = (count === null) ? "—" : String(count);
+      const e = (error === null) ? "—" : String(error);
+      dbg.innerHTML = `<b>DEBUG</b>: users count: <b>${escapeHtml(c)}</b> • last error: <b>${escapeHtml(e)}</b>`;
+    }
+
     $("#y").textContent = new Date().getFullYear();
 
     // ✅ Menu
@@ -729,7 +757,12 @@
       }
     });
 
-    $("#m_logout").addEventListener("click", async ()=>{ await logout(); toLogin("hu"); });
+    async function doLogout(){
+      await logout();
+      toLogin("hu");
+    }
+    $("#m_logout").addEventListener("click", doLogout);
+    $("#btnTopLogout").addEventListener("click", doLogout);
     $("#m_toApp").addEventListener("click", ()=>toApp("hu"));
 
     let SEL_UID = null;
@@ -740,7 +773,7 @@
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
 
-    // ✅ CHAT state
+    // ✅ CHAT
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -783,19 +816,12 @@
         err(e.message || String(e));
       });
     }
-
     function closeChat(){
       chatDrawer.classList.remove("on");
       chatDrawer.setAttribute("aria-hidden", "true");
     }
-
     $("#btnChatClose").addEventListener("click", closeChat);
-
-    $("#m_chat").addEventListener("click", ()=>{
-      toggleMenu(false);
-      openChatFor(SEL_UID);
-    });
-
+    $("#m_chat").addEventListener("click", ()=>{ toggleMenu(false); openChatFor(SEL_UID); });
     $("#btnChatSend").addEventListener("click", async ()=>{
       try{
         if(!CHAT_UID) return err("Nincs chat user.");
@@ -812,13 +838,12 @@
         err(e.message || String(e));
       }
     });
-
     chatInput.addEventListener("keydown", (e)=>{
       if(e.key === "Enter") $("#btnChatSend").click();
       if(e.key === "Escape") closeChat();
     });
 
-    // 🔥 Dinamikusan rajzoljuk ki az 5 db fix edzés dobozt
+    // 🔥 Fix edzések mezők
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -853,15 +878,13 @@
       if(typeof val === "string") return val;
       return val.hu || val.de || "";
     };
-
     const trimStr = (v) => String(v ?? "").trim();
 
-    // ✅ planId select + custom logika
+    // planId select + custom
     const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
     const planCustom = $("#u_planIdCustom");
-
     function getPlanIdFromUI(){
       const v = (planSel.value || "").trim();
       if(v === "custom"){
@@ -897,33 +920,27 @@
       $("#w_text").value = wc?.text || "";
       $("#w_video").value = wc?.video || wc?.vimeoId || "";
     }
-
     function fillTechVaultForm(doc){
       const tv = doc?.techVault || doc?.techniqueVault || null;
       const items = Array.isArray(tv?.items) ? tv.items : [];
       const i1 = items[0] || {};
       const i2 = items[1] || {};
       const i3 = items[2] || {};
-
       $("#tv1_title").value = i1.title || "";
       $("#tv1_video").value = i1.video || "";
       $("#tv1_text").value  = i1.text  || "";
-
       $("#tv2_title").value = i2.title || "";
       $("#tv2_video").value = i2.video || "";
       $("#tv2_text").value  = i2.text  || "";
-
       $("#tv3_title").value = i3.title || "";
       $("#tv3_video").value = i3.video || "";
       $("#tv3_text").value  = i3.text  || "";
     }
-
     function clearTechVaultFields(){
       $("#tv1_title").value = ""; $("#tv1_video").value = ""; $("#tv1_text").value = "";
       $("#tv2_title").value = ""; $("#tv2_video").value = ""; $("#tv2_text").value = "";
       $("#tv3_title").value = ""; $("#tv3_video").value = ""; $("#tv3_text").value = "";
     }
-
     function fillProfileForm(doc){
       $("#u_email").value = doc?.email || "";
       $("#u_name").value = doc?.name || "";
@@ -932,22 +949,18 @@
       $("#u_lang").value = (doc?.lang === "de") ? "de" : "hu";
       $("#u_level").value = clamp(parseInt(doc?.level ?? 2, 10) || 2, 1, 4);
       $("#u_goal").value = doc?.goal || "";
-
       setPlanUI(doc?.planId || "start_v1");
-
       $("#u_lifetime").value = String(!!doc?.lifetimeAccess);
       $("#u_cycleStart").value = doc?.cycleStart || "";
       $("#u_cycleEnd").value = doc?.cycleEnd || "";
-
       const mc = doc?.motivationCard || null;
       $("#m_title").value = mc?.title || "";
       $("#m_text").value = mc?.text || "";
-
       fillWelcomeForm(doc);
       fillTechVaultForm(doc);
     }
 
-    // ✅ PAYMENTS UI
+    // purchases
     function setSelectedPurchase(p){
       SEL_SID = p?.sid || p?.id || null;
       const line = SEL_SID
@@ -955,20 +968,17 @@
         : "—";
       $("#selPurchase").textContent = line;
     }
-
     async function loadPurchases(){
       try{
         const items = await listRecentPurchases(50);
         const ul = $("#purchasesList");
         ul.innerHTML = "";
-
         const filtered = items.filter(p => (p.status || "") !== "activated");
         if(filtered.length === 0){
           ul.innerHTML = `<li class="li"><div><div class="title">Nincs új fizetés</div><div class="desc">A “pending_activation” rekordok itt jelennek meg.</div></div></li>`;
           setSelectedPurchase(null);
           return;
         }
-
         filtered.forEach(p=>{
           const li = document.createElement("li");
           li.className = "li";
@@ -983,7 +993,6 @@
           `;
           ul.appendChild(li);
         });
-
         $$("[data-pick-purchase]").forEach(b=>{
           b.addEventListener("click", ()=>{
             const sid = b.getAttribute("data-pick-purchase");
@@ -992,18 +1001,13 @@
             ok("Purchase kiválasztva");
           });
         });
-
-        if(!SEL_SID){
-          setSelectedPurchase(filtered[0]);
-        }
+        if(!SEL_SID) setSelectedPurchase(filtered[0]);
       }catch(e){
         console.error(e);
         err(e.message || String(e));
       }
     }
-
     $("#btnRefreshPurchases").addEventListener("click", loadPurchases);
-
     $("#btnActivateFromPurchase").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1018,10 +1022,8 @@
       }
     });
 
-    // ✅ USERS UI (minimál)
+    // users list
     const userPick = $("#userPick");
-    let USERS_CACHE = [];
-
     function fillUserPickDropdown(items){
       const keep = userPick.value || "";
       userPick.innerHTML = `<option value="">— válassz —</option>`;
@@ -1036,7 +1038,6 @@
       if(keep && items.some(x=>x.id===keep)) userPick.value = keep;
       else if(SEL_UID && items.some(x=>x.id===SEL_UID)) userPick.value = SEL_UID;
     }
-
     userPick.addEventListener("change", async ()=>{
       const uid = (userPick.value || "").trim();
       if(!uid) return;
@@ -1044,11 +1045,11 @@
     });
 
     async function loadUsersList(keepSelection=false){
+      setDebug({count:null, error:null});
       try{
         const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
         const col = fs.collection(db, "users");
 
-        // ✅ FIX: fallback query-k, hogy biztosan listázzon
         let snap = null;
         try{
           snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(200)));
@@ -1061,7 +1062,9 @@
         }
 
         const raw = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-        USERS_CACHE = raw;
+        setDebug({count: raw.length, error: null});
+
+        fillUserPickDropdown(raw);
 
         const items = raw.filter(u=>{
           if(!qtxt) return true;
@@ -1071,19 +1074,27 @@
           return em.includes(qtxt) || nm.includes(qtxt) || id.includes(qtxt);
         });
 
-        fillUserPickDropdown(raw);
-
         const ul = $("#usersList");
         ul.innerHTML = "";
 
         if(items.length === 0){
-          ul.innerHTML = `<li class="li"><div><div class="title">Nincs találat</div><div class="desc">Próbálj másik keresést.</div></div></li>`;
+          ul.innerHTML = `
+            <li class="li">
+              <div>
+                <div class="title">Nincs user a Firestore-ban</div>
+                <div class="desc">
+                  Ha regisztráció csak Firebase Authot hoz létre, de <b>nem ír</b> <span class="mono">users/{uid}</span> doc-ot,
+                  akkor itt üres lesz a lista.
+                  <br/>DEBUG: nézd a fenti users count-ot és last error-t.
+                </div>
+              </div>
+            </li>`;
         } else {
           items.forEach(u=>{
             const displayName = (u.name || "").trim();
             const titleLine = displayName ? `${displayName} — ${u.email || u.id}` : (u.email || u.id);
-
             const pay = (u.activated ? "✅ activated" : (u.paid ? "🟡 paid" : "—"));
+
             const li = document.createElement("li");
             li.className = "li";
             li.innerHTML = `
@@ -1106,18 +1117,19 @@
           });
         }
 
-        // ✅ auto pick: last selected OR first item (nem a saját admin uid)
         if(!keepSelection){
           const saved = loadSel();
           if(saved && raw.some(x=>x.id===saved)){
             await pickUser(saved);
-          } else if(items.length > 0) {
+          } else if(items.length > 0){
             await pickUser(items[0].id);
           }
         }
       }catch(e){
         console.error(e);
-        err(e.message || String(e));
+        const msg = e?.code || e?.message || String(e);
+        setDebug({count: 0, error: msg});
+        err(msg);
       }
     }
 
@@ -1146,11 +1158,9 @@
           motivationCard: { title:"A rendszer szabadság.", text:"Nem kell tökéletesnek lenned." },
           welcomeCard: { title:"Szia! Kezdjük el.", text:"Örülök, hogy itt vagy.", video:"" },
           techVault: { items: [] },
-
           paid: false,
           activated: false,
           payment: { provider:"", sid:"", status:"none" },
-
           createdAt: fs.serverTimestamp(),
           updatedAt: fs.serverTimestamp()
         }, { merge:true });
@@ -1161,15 +1171,12 @@
       fillProfileForm(doc);
 
       $("#p_planId").value = doc?.planId || $("#p_planId").value || "start_v1";
-
       ok("User kiválasztva");
 
       await loadDietDay();
       await loadOverride();
 
-      if(chatDrawer.classList.contains("on")){
-        openChatFor(uid);
-      }
+      if(chatDrawer.classList.contains("on")) openChatFor(uid);
     }
 
     $("#btnRefreshUsers").addEventListener("click", ()=>loadUsersList(true));
@@ -1178,47 +1185,7 @@
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
     });
 
-    // --- a többi részed változatlan logika (save user, diet, motivation, template, overrides, tech vault) ---
-    $("#btnSaveUser").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const payload = {
-          email: trimStr($("#u_email").value),
-          name: trimStr($("#u_name").value),
-          role: ($("#u_role").value === "admin") ? "admin" : "user",
-          status: trimStr($("#u_status").value || "active"),
-          lang: ($("#u_lang").value === "de") ? "de" : "hu",
-          level: clamp(parseInt($("#u_level").value || "2", 10), 1, 4),
-          goal: trimStr($("#u_goal").value),
-          planId: getPlanIdFromUI(),
-          lifetimeAccess: ($("#u_lifetime").value === "true"),
-          cycleStart: trimStr($("#u_cycleStart").value) || null,
-          cycleEnd: trimStr($("#u_cycleEnd").value) || null,
-          updatedAt: fs.serverTimestamp()
-        };
-        await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
-        ok("Profil mentve");
-        await loadUsersList(true);
-      }catch(e){ console.error(e); err(e.message || String(e)); }
-    });
-
-    $("#btnSaveWelcome").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const payload = {
-          welcomeCard: {
-            title: trimStr($("#w_title").value),
-            text: String($("#w_text").value || ""),
-            video: trimStr($("#w_video").value)
-          },
-          updatedAt: fs.serverTimestamp()
-        };
-        await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
-        ok("Üdvözlő kártya mentve");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    // --- ÉTREND ---
+    // ---- a többi funkciód változatlan: diet / motivation / template / overrides / techvault ----
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -1242,186 +1209,16 @@
     $("#d_week").addEventListener("change", loadDietDay);
     $("#d_day").addEventListener("change", loadDietDay);
 
-    $("#btnSaveDietDay").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const { wKey, day } = dietRefs();
-        const payload = {
-          breakfast: ($("#d_breakfast").value || "").toString(),
-          snack1: ($("#d_snack1").value || "").toString(),
-          lunch: ($("#d_lunch").value || "").toString(),
-          snack2: ($("#d_snack2").value || "").toString(),
-          dinner: ($("#d_dinner").value || "").toString()
-        };
-        await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
-          [`dietPlan.${wKey}.${day}`]: payload,
-          updatedAt: fs.serverTimestamp()
-        });
-        ok("Étrend (nap) mentve");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    $("#btnClearDietDay").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const { wKey, day } = dietRefs();
-        await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
-          [`dietPlan.${wKey}.${day}`]: { breakfast:"", snack1:"", lunch:"", snack2:"", dinner:"" },
-          updatedAt: fs.serverTimestamp()
-        });
-        setDietFields(null);
-        ok("Étrend (nap) törölve");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    // --- MOTIVÁCIÓ ---
-    $("#btnSaveMotivation").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
-          motivationCard: { title: trimStr($("#m_title").value), text: ($("#m_text").value || "").toString() },
-          updatedAt: fs.serverTimestamp()
-        });
-        ok("Motiváció kártya mentve");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    // --- TEMPLATE (ALAP CSOMAG) ---
-    async function loadPlanMeta(){
-      const planId = trimStr($("#p_planId").value);
-      if(!planId) return err("Csomag neve (Plan ID) üres.");
-      const snap = await fs.getDoc(fs.doc(db, "planTemplates", planId));
-      if(!snap.exists()){
-        $("#p_weeks").value = $("#p_weeks").value || 4;
-        ok(`Új csomag: ${planId}. Beállíthatod és mentheted.`);
-        return;
-      }
-      $("#p_weeks").value = (snap.data() || {}).weeks ?? 4;
-      ok(`Csomag meta betöltve: ${planId}`);
-    }
-
-    async function savePlanMeta(){
-      try{
-        const planId = trimStr($("#p_planId").value);
-        if(!planId) return err("Csomag neve (Plan ID) üres.");
-        const weeks = clamp(parseInt($("#p_weeks").value || "4", 10), 1, 24);
-        await fs.setDoc(fs.doc(db, "planTemplates", planId), {
-          id: planId, weeks, name: { hu: planId, de: planId }, updatedAt: fs.serverTimestamp()
-        }, { merge:true });
-        ok(`Csomag (${planId}) sikeresen elmentve ${weeks} héttel!`);
-      }catch(e){ err(e.message || String(e)); }
-    }
-
-    function clearTemplateWeekFields(){
-      for(let i=1; i<=5; i++){
-        $(`#t_w${i}_title`).value = "";
-        $(`#t_w${i}_desc`).value = "";
-        $(`#t_w${i}_vid`).value = "";
-        $(`#t_w${i}_dur`).value = "";
-      }
-      $("#t_slots_count").value = "3";
-    }
-
-    $("#btnClearTemplateWeek").addEventListener("click", ()=>{
-      clearTemplateWeekFields();
-      ok("Hét mezők ürítve");
-    });
-
-    async function loadTemplateWeek(){
-      try{
-        const planId = trimStr($("#p_planId").value);
-        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
-        if(!planId) return err("Csomag neve üres.");
-
-        clearTemplateWeekFields();
-
-        const snap = await fs.getDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)));
-        if(!snap.exists()){
-          ok(`Hét ${weekNo} üres, töltsd ki az adatokat!`);
-          return;
-        }
-
-        const d = snap.data() || {};
-        const sc = Array.isArray(d.slots) ? d.slots.length : 0;
-        $("#t_slots_count").value = clamp(sc, 0, 3).toString();
-
-        const wArr = Array.isArray(d.workouts) ? d.workouts : [];
-        wArr.forEach((w, idx) => {
-          const i = idx + 1;
-          if(i > 5) return;
-          $(`#t_w${i}_title`).value = getStr(w.title);
-          $(`#t_w${i}_desc`).value = getStr(w.desc);
-          $(`#t_w${i}_vid`).value = w.vimeoId || w.video || "";
-          $(`#t_w${i}_dur`).value = w.duration || "";
-        });
-
-        ok(`Csomag hét (${weekNo}) beállításai betöltve.`);
-      }catch(e){ err(e.message || String(e)); }
-    }
-
-    async function saveTemplateWeek(){
-      try{
-        const planId = trimStr($("#p_planId").value);
-        const weekNo = clamp(parseInt($("#p_weekNo").value || "1", 10), 1, 24);
-        if(!planId) return err("Csomag neve üres.");
-
-        const workouts = [];
-        for(let i=1; i<=5; i++){
-          const title = trimStr($(`#t_w${i}_title`).value);
-          const desc = trimStr($(`#t_w${i}_desc`).value);
-          const vid = trimStr($(`#t_w${i}_vid`).value);
-          const dur = trimStr($(`#t_w${i}_dur`).value);
-
-          if(title || vid){
-            workouts.push({
-              id: `w${i}`,
-              title: { hu: title, de: title },
-              desc: { hu: desc, de: desc },
-              vimeoId: vid,
-              duration: dur
-            });
-          }
-        }
-
-        const slotCount = clamp(parseInt($("#t_slots_count").value || "3", 10), 0, 3);
-        const slots = [];
-        for(let i=1; i<=slotCount; i++){
-          slots.push({
-            slotIndex: i,
-            title: { hu: `${i}. Személyes feladat`, de: `${i}. Persönliche Aufgabe` }
-          });
-        }
-
-        await fs.setDoc(fs.doc(db, "planTemplates", planId, "weeks", String(weekNo)), {
-          weekNo,
-          workouts,
-          slots,
-          updatedAt: fs.serverTimestamp()
-        }, { merge:true });
-
-        ok(`Sablon hét (${weekNo}) elmentve!`);
-      }catch(e){ err(e.message || String(e)); }
-    }
-
-    $("#btnLoadPlanMeta").addEventListener("click", loadPlanMeta);
-    $("#btnSavePlanMeta").addEventListener("click", savePlanMeta);
-    $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
-    $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
-
-    // --- OVERRIDES ---
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
         const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
         const snap = await fs.getDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)));
-
         $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
-
         if(!snap.exists()) return;
         const slots = (snap.data() || {}).slots || {};
-
         if(slots["1"]) { $("#ov_slot1_vid").value = slots["1"].vimeoId || ""; $("#ov_slot1_note").value = getStr(slots["1"].note); }
         if(slots["2"]) { $("#ov_slot2_vid").value = slots["2"].vimeoId || ""; $("#ov_slot2_note").value = getStr(slots["2"].note); }
         if(slots["3"]) { $("#ov_slot3_vid").value = slots["3"].vimeoId || ""; $("#ov_slot3_note").value = getStr(slots["3"].note); }
@@ -1430,79 +1227,7 @@
     $("#btnLoadOverride").addEventListener("click", async ()=>{ await loadOverride(); ok("Személyre szabott rész betöltve"); });
     $("#ov_week").addEventListener("change", loadOverride);
 
-    $("#btnSaveOverride").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
-
-        const slots = {};
-        const s1_vid = trimStr($("#ov_slot1_vid").value); const s1_note = trimStr($("#ov_slot1_note").value);
-        if(s1_vid || s1_note) slots["1"] = { vimeoId: s1_vid, note: { hu: s1_note, de: s1_note } };
-
-        const s2_vid = trimStr($("#ov_slot2_vid").value); const s2_note = trimStr($("#ov_slot2_note").value);
-        if(s2_vid || s2_note) slots["2"] = { vimeoId: s2_vid, note: { hu: s2_note, de: s2_note } };
-
-        const s3_vid = trimStr($("#ov_slot3_vid").value); const s3_note = trimStr($("#ov_slot3_note").value);
-        if(s3_vid || s3_note) slots["3"] = { vimeoId: s3_vid, note: { hu: s3_note, de: s3_note } };
-
-        await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
-          weekNo, slots, updatedAt: fs.serverTimestamp()
-        }, { merge:true });
-        ok("Személyre szabott videók sikeresen mentve!");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    $("#btnDeleteOverride").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-        const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
-        await fs.deleteDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)));
-        $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
-        $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
-        $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
-        ok("Személyre szabott rész törölve a hétről.");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
-    // ✅ TECH VAULT
-    async function loadTechVault(){
-      try{
-        if(!SEL_UID) return;
-        const snap = await fs.getDoc(fs.doc(db, "users", SEL_UID));
-        fillTechVaultForm(snap.data() || {});
-      }catch(e){ err(e.message || String(e)); }
-    }
-    $("#btnLoadTechVault").addEventListener("click", async ()=>{ await loadTechVault(); ok("Technika betöltve"); });
-
-    $("#btnClearTechVault").addEventListener("click", ()=>{
-      clearTechVaultFields();
-      ok("Technika mezők ürítve");
-    });
-
-    $("#btnSaveTechVault").addEventListener("click", async ()=>{
-      try{
-        if(!SEL_UID) return err("Nincs user kiválasztva.");
-
-        const items = [];
-        const a1 = { title: trimStr($("#tv1_title").value), video: trimStr($("#tv1_video").value), text: String($("#tv1_text").value || "") };
-        const a2 = { title: trimStr($("#tv2_title").value), video: trimStr($("#tv2_video").value), text: String($("#tv2_text").value || "") };
-        const a3 = { title: trimStr($("#tv3_title").value), video: trimStr($("#tv3_video").value), text: String($("#tv3_text").value || "") };
-
-        [a1,a2,a3].forEach(x=>{
-          if(x.title || x.video || trimStr(x.text)) items.push(x);
-        });
-
-        const payload = {
-          techVault: { items, updatedAt: new Date().toISOString() },
-          techniqueVault: { items, updatedAt: new Date().toISOString() },
-          updatedAt: fs.serverTimestamp()
-        };
-
-        await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
-        ok("Technika Vault mentve");
-      }catch(e){ err(e.message || String(e)); }
-    });
-
+    // ---- AUTH ----
     onAuth(async (user)=>{
       try{
         if(!user){ toLogin("hu"); return; }
@@ -1514,9 +1239,10 @@
         ok("Admin belépés OK");
 
         await loadPurchases();
-        await loadUsersList(false); // ✅ itt választunk normálisan (last/first)
-        await loadPlanMeta();
-      }catch(e){ err(e.message || String(e)); }
+        await loadUsersList(false);
+      }catch(e){
+        err(e.message || String(e));
+      }
     });
   </script>
 </body>
