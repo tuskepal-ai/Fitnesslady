@@ -26,7 +26,6 @@
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
 
-    /* ✅ App háttér (ugyanaz, mint /hu/app/index.html) */
     body{
       margin:0;
       font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
@@ -72,6 +71,11 @@
       color:#140813;
       border-color: rgba(255,255,255,.18);
       font-weight: 900;
+    }
+    .pill:disabled{
+      opacity:.65;
+      cursor:not-allowed;
+      transform:none !important;
     }
 
     .card{
@@ -125,6 +129,8 @@
       background: rgba(0,0,0,.25);
       color: rgba(255,255,255,.86);
       display:none;
+      white-space: pre-wrap;
+      word-break: break-word;
     }
     .msg.ok{ border-color: rgba(130,255,200,.35); }
     .msg.err{ border-color: rgba(255,120,140,.35); }
@@ -179,9 +185,9 @@
 
   <script type="module">
     import {
-      BASE_PREFIX, auth, db, fs,
+      BASE_PREFIX,
       onAuth, toApp, toAdmin,
-      escapeHtml, loginEmailPassword,
+      loginEmailPassword,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
@@ -198,9 +204,19 @@
       msg.textContent = text;
     }
 
+    function humanAuthError(e){
+      const code = String(e?.code || "");
+      if(code.includes("auth/invalid-email")) return "Hibás e-mail formátum.";
+      if(code.includes("auth/user-not-found")) return "Nincs ilyen felhasználó ezzel az e-maillel.";
+      if(code.includes("auth/wrong-password")) return "Hibás jelszó.";
+      if(code.includes("auth/invalid-credential")) return "Hibás e-mail vagy jelszó.";
+      if(code.includes("auth/too-many-requests")) return "Túl sok próbálkozás. Próbáld újra kicsit később.";
+      if(code.includes("auth/network-request-failed")) return "Hálózati hiba. Ellenőrizd az internetet.";
+      return e?.message ? String(e.message) : String(e);
+    }
+
     async function routeAfterLogin(user){
       try{
-        // biztosítsuk a user doc-ot, majd role check
         const ud = await ensureUserDoc(user.uid, user.email || "");
         const role = (await getUserRole(user.uid)) || ud?.role || "user";
 
@@ -209,15 +225,14 @@
         }else{
           toApp("hu");
         }
-      }catch(e){
-        // fallback: app
+      }catch(_e){
         toApp("hu");
       }
     }
 
     async function doLogin(){
       const email = ($("#email").value || "").trim();
-      const pass = ($("#pass").value || "").trim();
+      const pass  = ($("#pass").value || ""); // ✅ NEM TRIM! (jelszó szóköz is lehet)
 
       if(!email || !pass){
         showMsg("Add meg az e-mailt és a jelszót.", "err");
@@ -232,21 +247,19 @@
         const cred = await loginEmailPassword(email, pass);
         showMsg("Sikeres belépés ✅");
         await routeAfterLogin(cred.user);
-      }catch(err){
-        console.error(err);
-        showMsg(`Hiba: ${escapeHtml(err?.message || String(err))}`, "err");
+      }catch(e){
+        console.error(e);
+        showMsg(`Hiba: ${humanAuthError(e)}`, "err");
         btn.disabled = false;
       }
     }
 
     $("#btnLogin").addEventListener("click", doLogin);
 
-    // Enter = belépés
     $("#pass").addEventListener("keydown", (e)=>{
       if(e.key === "Enter") doLogin();
     });
 
-    // ha már be van lépve, ne a loginon álljon
     onAuth(async (user)=>{
       if(user){
         await routeAfterLogin(user);
@@ -255,4 +268,3 @@
   </script>
 </body>
 </html>
-```0
