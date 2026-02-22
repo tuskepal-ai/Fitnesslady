@@ -131,6 +131,9 @@
       display:none;
       white-space: pre-wrap;
       word-break: break-word;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      font-size: 12.5px;
+      line-height: 1.45;
     }
     .msg.ok{ border-color: rgba(130,255,200,.35); }
     .msg.err{ border-color: rgba(255,120,140,.35); }
@@ -191,7 +194,6 @@
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
-    // Back link + footer year
     document.getElementById("btnBack").href = `${BASE_PREFIX}/hu/`;
     document.getElementById("y").textContent = new Date().getFullYear();
 
@@ -204,65 +206,70 @@
       msg.textContent = text;
     }
 
-    function humanAuthError(e){
-      const code = String(e?.code || "");
-      if(code.includes("auth/invalid-email")) return "Hibás e-mail formátum.";
-      if(code.includes("auth/user-not-found")) return "Nincs ilyen felhasználó ezzel az e-maillel.";
-      if(code.includes("auth/wrong-password")) return "Hibás jelszó.";
-      if(code.includes("auth/invalid-credential")) return "Hibás e-mail vagy jelszó.";
-      if(code.includes("auth/too-many-requests")) return "Túl sok próbálkozás. Próbáld újra kicsit később.";
-      if(code.includes("auth/network-request-failed")) return "Hálózati hiba. Ellenőrizd az internetet.";
-      return e?.message ? String(e.message) : String(e);
+    function formatAnyError(e){
+      try{
+        const out = {
+          name: e?.name || null,
+          code: e?.code || null,
+          message: e?.message || String(e),
+          stack: e?.stack || null
+        };
+        return JSON.stringify(out, null, 2);
+      }catch(_){
+        return String(e);
+      }
     }
 
     async function routeAfterLogin(user){
       try{
         const ud = await ensureUserDoc(user.uid, user.email || "");
         const role = (await getUserRole(user.uid)) || ud?.role || "user";
-
         if(String(role).toLowerCase() === "admin" || isAdminEmail(user.email || "")){
           toAdmin("hu");
         }else{
           toApp("hu");
         }
-      }catch(_e){
+      }catch(e){
+        // ha route hiba van, azt is lássuk
+        showMsg("ROUTE ERROR:\n" + formatAnyError(e), "err");
         toApp("hu");
       }
     }
 
     async function doLogin(){
       const email = ($("#email").value || "").trim();
-      const pass  = ($("#pass").value || ""); // ✅ NEM TRIM! (jelszó szóköz is lehet)
+      const pass  = ($("#pass").value || ""); // jelszót nem trimeljük
 
       if(!email || !pass){
-        showMsg("Add meg az e-mailt és a jelszót.", "err");
+        showMsg("VALIDATION ERROR:\n" + JSON.stringify({ emailEmpty: !email, passEmpty: !pass }, null, 2), "err");
         return;
       }
 
       const btn = $("#btnLogin");
       btn.disabled = true;
-      showMsg("Beléptetés…");
+      showMsg("Beléptetés…", "ok");
 
       try{
         const cred = await loginEmailPassword(email, pass);
-        showMsg("Sikeres belépés ✅");
+        showMsg("LOGIN OK:\n" + JSON.stringify({ uid: cred?.user?.uid || null, email: cred?.user?.email || null }, null, 2), "ok");
         await routeAfterLogin(cred.user);
       }catch(e){
         console.error(e);
-        showMsg(`Hiba: ${humanAuthError(e)}`, "err");
+        showMsg("LOGIN ERROR:\n" + formatAnyError(e), "err");
         btn.disabled = false;
       }
     }
 
     $("#btnLogin").addEventListener("click", doLogin);
-
-    $("#pass").addEventListener("keydown", (e)=>{
-      if(e.key === "Enter") doLogin();
-    });
+    $("#pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
 
     onAuth(async (user)=>{
       if(user){
-        await routeAfterLogin(user);
+        try{
+          await routeAfterLogin(user);
+        }catch(e){
+          showMsg("AUTH STATE ERROR:\n" + formatAnyError(e), "err");
+        }
       }
     });
   </script>
