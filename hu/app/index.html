@@ -3,8 +3,17 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Fitness Lady — Saját programom</title>
+
+  <!-- ✅ PWA -->
+  <link rel="manifest" href="/hu/app/manifest.webmanifest">
+  <meta name="theme-color" content="#ff4fd8">
+  <meta name="application-name" content="FitnessLady">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="FitnessLady">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="apple-touch-icon" href="/hu/app/icons/icon-192.png">
 
   <style>
     :root{
@@ -1127,7 +1136,6 @@
         const row = document.createElement("div");
         row.className = "msgRow " + (isMe ? "me" : "other");
 
-        // ✅ FIX: grid helyett flex oszlop konténer
         const col = document.createElement("div");
         col.className = "msgCol";
 
@@ -1259,5 +1267,8 @@
       }
     });
   </script>
+
+  <!-- ✅ PWA bootstrap -->
+  <script src="/hu/app/pwa.js"></script>
 </body>
-    </html>
+</html>
