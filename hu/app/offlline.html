@@ -1,0 +1,67 @@
+<!-- FILE: /hu/app/offline.html -->
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="theme-color" content="#ff4fd8" />
+  <title>FitnessLady — Offline</title>
+  <style>
+    :root{
+      --bg0:#07060b; --bg1:#0b0912;
+      --text:rgba(255,255,255,.92);
+      --muted:rgba(255,255,255,.70);
+      --pink:#ff4fd8; --violet:#b14cff; --gold:#ffd38a;
+      --r:22px;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 20%, rgba(255,79,216,.18), transparent 55%),
+        radial-gradient(900px 600px at 85% 30%, rgba(177,76,255,.18), transparent 60%),
+        radial-gradient(900px 600px at 55% 90%, rgba(255,211,138,.12), transparent 60%),
+        linear-gradient(180deg,var(--bg0),var(--bg1));
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      display:flex; align-items:center; justify-content:center;
+      padding:24px;
+    }
+    .card{
+      width:min(520px,100%);
+      border-radius:var(--r);
+      background: rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.12);
+      box-shadow: 0 20px 70px rgba(0,0,0,.55);
+      padding:22px;
+    }
+    .logo{
+      display:flex; gap:12px; align-items:center; margin-bottom:12px;
+    }
+    .dot{
+      width:14px;height:14px;border-radius:999px;
+      background: linear-gradient(135deg,var(--pink),var(--violet),var(--gold));
+      box-shadow: 0 0 0 6px rgba(255,79,216,.10);
+    }
+    h1{font-size:20px; margin:0 0 6px}
+    p{margin:0 0 16px; color:var(--muted); line-height:1.45}
+    .btn{
+      display:inline-flex; align-items:center; justify-content:center;
+      padding:12px 14px; border-radius:14px;
+      color:rgba(0,0,0,.9);
+      background: linear-gradient(135deg,var(--pink),var(--violet));
+      border:0; font-weight:800; cursor:pointer;
+      text-decoration:none;
+    }
+    .hint{margin-top:10px; font-size:13px; color:rgba(255,255,255,.55)}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo"><span class="dot"></span><strong>FitnessLady</strong></div>
+    <h1>Nincs internetkapcsolat</h1>
+    <p>Az app felülete elindul, de az edzésterv és a videók betöltéséhez internet kell. Kapcsold vissza a netet, és próbáld újra.</p>
+    <a class="btn" href="/hu/app/">Újrapróbálom</a>
+    <div class="hint">Tipp: cache miatt gyenge netnél is gyorsabban indul.</div>
+  </div>
+</body>
+</html>
