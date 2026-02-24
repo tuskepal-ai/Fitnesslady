@@ -3,17 +3,22 @@
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+
   <title>Fitness Lady — Saját programom</title>
 
   <!-- ✅ PWA -->
-  <link rel="manifest" href="/hu/app/manifest.webmanifest">
-  <meta name="theme-color" content="#ff4fd8">
-  <meta name="application-name" content="FitnessLady">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="FitnessLady">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <link rel="apple-touch-icon" href="/hu/app/icons/icon-192.png">
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#07060b" />
+
+  <!-- ✅ iOS PWA (Add to Home Screen) -->
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="FitnessLady" />
+  <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
+  <!-- extra fallback -->
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
+  <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
 
   <style>
     :root{
@@ -129,6 +134,21 @@
     .field input{ height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #fff; padding: 0 12px; outline: none; }
 
     footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-align:center; font-size:13px; color:var(--muted); }
+
+    /* ✅ iOS install help card */
+    .ios-install{
+      display:none;
+      margin-top: 12px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,211,138,.18);
+      background: rgba(255,211,138,.06);
+      color: rgba(255,255,255,.86);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .ios-install b{ color:#fff; }
+    .ios-install .pill{ margin-top: 10px; }
 
     /* =========================
        ✅ CHAT (Vevő) — 3D bubble + Apple-like half-sheet
@@ -303,7 +323,6 @@
     .msgRow{ display:flex; margin: 10px 0; gap: 8px; }
     .msgRow.me{ justify-content:flex-end; }
 
-    /* ✅ FIX: ne tudjon "összenyomódni" betűnként */
     .msgCol{
       display:flex;
       flex-direction:column;
@@ -314,8 +333,8 @@
     .msgRow.me .msgCol{ align-items:flex-end; }
 
     .bubble{
-      width: fit-content;       /* ✅ ne legyen min-content grid shrink */
-      min-width: 64px;          /* ✅ ne legyen túl keskeny */
+      width: fit-content;
+      min-width: 64px;
       max-width: 100%;
       padding: 10px 12px;
       border-radius: 16px;
@@ -325,8 +344,8 @@
       line-height: 1.45;
       box-shadow: 0 16px 40px rgba(0,0,0,.35);
       white-space: pre-wrap;
-      word-break: normal;       /* ✅ ne tördeljen karakterenként */
-      overflow-wrap: break-word;/* ✅ ha nagyon hosszú szó/URL */
+      word-break: normal;
+      overflow-wrap: break-word;
     }
     .bubble.me{
       border-color: rgba(255,79,216,.22);
@@ -423,6 +442,12 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
           <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
         </div>
+      </div>
+
+      <!-- ✅ iOS install help (csak iPhone Safari esetén, ha nincs telepítve) -->
+      <div class="ios-install" id="iosInstallHelp">
+        <b>iPhone telepítés:</b> Safari → <b>Megosztás</b> (⤴︎) → <b>Add to Home Screen</b>.
+        <div style="opacity:.85; margin-top:6px;">Utána ikonként lesz a kezdőképernyőn, „appként” nyílik meg.</div>
       </div>
 
       <div class="progress-label">
@@ -600,6 +625,20 @@
 
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
+
+    // ✅ iOS install help (csak iOS Safari + nem standalone)
+    (function iosInstallHint(){
+      const el = document.getElementById("iosInstallHelp");
+      if(!el) return;
+      const ua = navigator.userAgent || "";
+      const isIOS = /iPhone|iPad|iPod/i.test(ua);
+      const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
+      // iOS Safari standalone régi jelző:
+      const iosStandalone = (navigator.standalone === true);
+      if(isIOS && !(isStandalone || iosStandalone)){
+        el.style.display = "block";
+      }
+    })();
 
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -1267,8 +1306,5 @@
       }
     });
   </script>
-
-  <!-- ✅ PWA bootstrap -->
-  <script src="/hu/app/pwa.js"></script>
 </body>
 </html>
