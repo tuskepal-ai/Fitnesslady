@@ -1,16 +1,28 @@
 {
-  "name": "FitnessLady",
+  "name": "Fitness Lady",
   "short_name": "FitnessLady",
-  "description": "FitnessLady — Saját programom, edzések, étrend és trackerek.",
-  "start_url": "/hu/app/?source=pwa",
+  "start_url": "/hu/app/",
   "scope": "/hu/app/",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#07060b",
   "theme_color": "#ff4fd8",
+  "description": "Fitness Lady — Saját programom",
   "icons": [
-    { "src": "/hu/app/icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "/hu/app/icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
-    { "src": "/hu/app/icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "/hu/app/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/hu/app/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/hu/app/icons/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable any"
+    }
   ]
 }
