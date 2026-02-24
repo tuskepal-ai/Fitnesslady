@@ -4,19 +4,15 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-
   <title>Fitness Lady — Saját programom</title>
 
-  <!-- ✅ PWA -->
-  <link rel="manifest" href="./manifest.webmanifest" />
+  <!-- ✅ PWA / iOS installer támogatás -->
   <meta name="theme-color" content="#07060b" />
-
-  <!-- ✅ iOS PWA (Add to Home Screen) -->
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FitnessLady" />
+  <link rel="manifest" href="./manifest.webmanifest" />
   <link rel="apple-touch-icon" href="./icons/apple-touch-icon.png" />
-  <!-- extra fallback -->
   <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="./icons/icon-512.png" />
 
@@ -134,21 +130,6 @@
     .field input{ height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #fff; padding: 0 12px; outline: none; }
 
     footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-align:center; font-size:13px; color:var(--muted); }
-
-    /* ✅ iOS install help card */
-    .ios-install{
-      display:none;
-      margin-top: 12px;
-      padding: 14px 14px;
-      border-radius: 18px;
-      border: 1px solid rgba(255,211,138,.18);
-      background: rgba(255,211,138,.06);
-      color: rgba(255,255,255,.86);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-    .ios-install b{ color:#fff; }
-    .ios-install .pill{ margin-top: 10px; }
 
     /* =========================
        ✅ CHAT (Vevő) — 3D bubble + Apple-like half-sheet
@@ -323,6 +304,7 @@
     .msgRow{ display:flex; margin: 10px 0; gap: 8px; }
     .msgRow.me{ justify-content:flex-end; }
 
+    /* ✅ FIX: ne tudjon "összenyomódni" betűnként */
     .msgCol{
       display:flex;
       flex-direction:column;
@@ -408,6 +390,95 @@
       .chat-fab{ animation:none; }
       .chat-panel{ transition:none; }
     }
+
+    /* =========================
+       ✅ iOS "Installer" bar (nem valódi auto-install; instrukciós banner)
+    ========================== */
+    .ios-install-bar{
+      position: fixed;
+      left: 12px;
+      right: 12px;
+      bottom: calc(12px + env(safe-area-inset-bottom));
+      z-index: 200;
+      display: none;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(12,10,16,.88);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      box-shadow: 0 22px 80px rgba(0,0,0,.55);
+      padding: 12px;
+      transform: translateZ(0);
+    }
+    .ios-install-bar.is-on{ display:block; }
+
+    .ios-install-row{
+      display:flex;
+      align-items:flex-start;
+      gap: 10px;
+    }
+    .ios-install-icon{
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      border: 1px solid rgba(255,255,255,.16);
+      overflow:hidden;
+      flex: 0 0 auto;
+      background: rgba(255,255,255,.06);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.18);
+      display:flex; align-items:center; justify-content:center;
+      font-weight: 950;
+    }
+    .ios-install-icon img{ width:100%; height:100%; object-fit:cover; display:block; }
+    .ios-install-text{ min-width:0; flex:1; }
+    .ios-install-text b{
+      display:block;
+      font-size: 13.5px;
+      letter-spacing:.2px;
+      margin-bottom: 2px;
+    }
+    .ios-install-text span{
+      display:block;
+      color: rgba(255,255,255,.72);
+      font-size: 12.6px;
+      line-height: 1.45;
+    }
+    .ios-steps{
+      margin-top: 8px;
+      display:flex;
+      flex-wrap:wrap;
+      gap: 8px;
+    }
+    .ios-step{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.86);
+      font-size: 12.5px;
+      font-weight: 850;
+      user-select:none;
+      white-space: nowrap;
+    }
+    .ios-actions{
+      display:flex;
+      align-items:center;
+      gap: 8px;
+      margin-left: 10px;
+      flex: 0 0 auto;
+    }
+    .ios-x{
+      width: 38px; height: 38px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color:#fff;
+      cursor:pointer;
+      display:flex; align-items:center; justify-content:center;
+    }
   </style>
 </head>
 
@@ -442,12 +513,6 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
           <button class="pill ghost" id="btnOpenSettings" type="button">Beállítások</button>
         </div>
-      </div>
-
-      <!-- ✅ iOS install help (csak iPhone Safari esetén, ha nincs telepítve) -->
-      <div class="ios-install" id="iosInstallHelp">
-        <b>iPhone telepítés:</b> Safari → <b>Megosztás</b> (⤴︎) → <b>Add to Home Screen</b>.
-        <div style="opacity:.85; margin-top:6px;">Utána ikonként lesz a kezdőképernyőn, „appként” nyílik meg.</div>
       </div>
 
       <div class="progress-label">
@@ -551,6 +616,27 @@
     </div>
   </footer>
 
+  <!-- ✅ iOS Installer Bar -->
+  <div class="ios-install-bar" id="iosInstallBar" aria-hidden="true">
+    <div class="ios-install-row">
+      <div class="ios-install-icon" id="iosInstallIcon" aria-hidden="true">FL</div>
+
+      <div class="ios-install-text">
+        <b>Telepítsd a FitnessLady appot</b>
+        <span>iPhone-on nem ugrik fel automatikusan. Így tudod feltenni ikonként a kezdőképernyőre:</span>
+
+        <div class="ios-steps" aria-label="iOS telepítés lépések">
+          <div class="ios-step">1) Megosztás <span style="opacity:.9">□↑</span></div>
+          <div class="ios-step">2) „Kezdőképernyőhöz adás”</div>
+        </div>
+      </div>
+
+      <div class="ios-actions">
+        <button class="ios-x" id="iosInstallClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Settings -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
@@ -625,20 +711,6 @@
 
     const homeLink = document.getElementById("homeLink");
     if (homeLink) homeLink.href = `${BASE_PREFIX}/hu/`;
-
-    // ✅ iOS install help (csak iOS Safari + nem standalone)
-    (function iosInstallHint(){
-      const el = document.getElementById("iosInstallHelp");
-      if(!el) return;
-      const ua = navigator.userAgent || "";
-      const isIOS = /iPhone|iPad|iPod/i.test(ua);
-      const isStandalone = window.matchMedia && window.matchMedia("(display-mode: standalone)").matches;
-      // iOS Safari standalone régi jelző:
-      const iosStandalone = (navigator.standalone === true);
-      if(isIOS && !(isStandalone || iosStandalone)){
-        el.style.display = "block";
-      }
-    })();
 
     const $ = (sel, root=document) => root.querySelector(sel);
     const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
@@ -1088,6 +1160,45 @@
         closeOverlay(settingsOverlay);
       }catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
+
+    /* =========================
+       ✅ iOS Installer banner logic
+    ========================== */
+    (function initIOSInstaller(){
+      const bar = document.getElementById("iosInstallBar");
+      const btnX = document.getElementById("iosInstallClose");
+      const iconBox = document.getElementById("iosInstallIcon");
+      if(!bar || !btnX) return;
+
+      const ua = navigator.userAgent || "";
+      const isIOS = /iphone|ipad|ipod/i.test(ua);
+      const isSafari = /safari/i.test(ua) && !/crios|fxios|opios|edgios/i.test(ua);
+      const isStandalone =
+        (window.matchMedia && window.matchMedia("(display-mode: standalone)").matches) ||
+        (typeof navigator.standalone === "boolean" && navigator.standalone);
+
+      const dismissed = localStorage.getItem("fl_ios_install_dismissed_v1") === "1";
+      const shouldShow = isIOS && isSafari && !isStandalone && !dismissed;
+
+      // ikon preview (ha van)
+      try{
+        const img = new Image();
+        img.src = "./icons/apple-touch-icon.png";
+        img.alt = "App ikon";
+        img.onload = ()=>{ iconBox.innerHTML = ""; iconBox.appendChild(img); };
+      }catch{}
+
+      if(shouldShow){
+        bar.classList.add("is-on");
+        bar.setAttribute("aria-hidden","false");
+      }
+
+      btnX.addEventListener("click", ()=>{
+        localStorage.setItem("fl_ios_install_dismissed_v1", "1");
+        bar.classList.remove("is-on");
+        bar.setAttribute("aria-hidden","true");
+      });
+    })();
 
     /* =========================
        ✅ CHAT (Vevő) — realtime
