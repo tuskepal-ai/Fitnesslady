@@ -705,6 +705,11 @@
             <a class="btn interactive" data-route="/hu/login/" href="/hu/login/">Saját oldalam</a>
 
             <a class="btn ghost interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
+
+            <!-- ✅ PWA install gomb (csak támogatott böngészőn látszik) -->
+            <button class="btn ghost interactive" id="installAppBtn" type="button" style="display:none;">
+              App telepítése
+            </button>
           </div>
 
           <div class="meta-row">
@@ -1381,6 +1386,42 @@ Edina • Fitnesz Lady
 
     refreshBtn?.addEventListener('click', loadReviews);
     loadReviews();
+
+    /* =========================================================
+      ✅ PWA install gomb (landingről)
+      - csak olyan böngészőn jelenik meg, ami támogatja (Android Chrome)
+      - ha nincs prompt (pl. iOS), fallback: átvisz az appra
+    ========================================================== */
+    (function setupInstallButton(){
+      const btn = document.getElementById("installAppBtn");
+      if(!btn) return;
+
+      let deferredPrompt = null;
+
+      window.addEventListener("beforeinstallprompt", (e) => {
+        e.preventDefault();
+        deferredPrompt = e;
+        btn.style.display = "inline-flex";
+      });
+
+      btn.addEventListener("click", async () => {
+        try{
+          if(deferredPrompt){
+            deferredPrompt.prompt();
+            await deferredPrompt.userChoice;
+            deferredPrompt = null;
+            btn.style.display = "none";
+            return;
+          }
+          const base = window.__BASE_PATH || "";
+          window.location.href = base + "/hu/app/";
+        }catch(err){
+          console.error(err);
+          const base = window.__BASE_PATH || "";
+          window.location.href = base + "/hu/app/";
+        }
+      });
+    })();
   </script>
 </body>
-  </html>
+</html>
