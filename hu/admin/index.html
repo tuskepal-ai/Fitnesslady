@@ -99,7 +99,6 @@
 
     main{ padding: 16px 0 54px; }
 
-    /* ✅ Admin layout (mint a mockup): bal oldali menü + tartalom */
     .adminLayout{
       display:grid;
       grid-template-columns: 260px 1fr;
@@ -249,7 +248,6 @@
     }
     @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
 
-    /* ✅ Dropdown menu */
     .menuWrap{ position:relative; display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
     @media (max-width: 560px){
       .menuWrap{ gap:8px; }
@@ -278,7 +276,6 @@
       padding: 10px 12px;
     }
 
-    /* ✅ Debug */
     .debugBox{
       margin-top: 10px;
       padding: 10px 12px;
@@ -291,11 +288,9 @@
     }
     .debugBox b{ color:#fff; }
 
-    /* ✅ Page panels */
     .page{ display:none; }
     .page.on{ display:block; }
 
-    /* ✅ Chat overlay (viewporthoz FIX, mint a vevő oldalon) */
     .chatOverlay{
       position: fixed;
       inset: 0;
@@ -419,6 +414,92 @@
       white-space: nowrap;
     }
 
+    /* ✅ Check-in cards */
+    .checkinCards{
+      display:grid;
+      gap: 12px;
+    }
+    .checkinCard{
+      padding: 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 240px at 10% 0%, rgba(255,79,216,.10), transparent 55%),
+        radial-gradient(900px 220px at 90% 20%, rgba(177,76,255,.08), transparent 60%),
+        rgba(0,0,0,.18);
+    }
+    .checkinHead{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom: 10px;
+    }
+    .checkinTag{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .checkinGrid{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 10px;
+    }
+    @media (max-width: 980px){
+      .checkinGrid{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    @media (max-width: 620px){
+      .checkinGrid{ grid-template-columns: 1fr; }
+    }
+    .checkinMini{
+      padding: 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.08);
+      background: rgba(255,255,255,.04);
+    }
+    .checkinMini b{
+      display:block;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: rgba(255,255,255,.92);
+    }
+    .checkinMini span{
+      display:block;
+      font-size: 13px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .checkinPreview{
+      margin-top: 12px;
+      display:grid;
+      gap: 10px;
+    }
+    .checkinPreview img{
+      width: 100%;
+      max-width: 280px;
+      border-radius: 16px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+      display:block;
+    }
+    .emptyState{
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px dashed rgba(255,255,255,.12);
+      background: rgba(255,255,255,.03);
+      color: rgba(255,255,255,.70);
+      line-height: 1.55;
+    }
+
     @media (prefers-reduced-motion: reduce){
       .pill{ transition:none; }
     }
@@ -452,7 +533,6 @@
 
   <main>
     <div class="container adminLayout">
-      <!-- ✅ Sidebar -->
       <aside class="glass sidebar">
         <div class="navTitle">Admin</div>
 
@@ -462,6 +542,7 @@
           <button class="pill navBtn" data-pagebtn="diet" type="button">🥗 Étrend</button>
           <button class="pill navBtn" data-pagebtn="motivation" type="button">💜 Motiváció</button>
           <button class="pill navBtn" data-pagebtn="overrides" type="button">✨ Személyre szabás</button>
+          <button class="pill navBtn" data-pagebtn="checkin" type="button">📋 Check-in</button>
           <button class="pill navBtn" data-pagebtn="tech" type="button">⭐ Technika Vault</button>
         </div>
 
@@ -471,15 +552,12 @@
         </div>
       </aside>
 
-      <!-- ✅ Content -->
       <section class="content glass contentCard">
-        <!-- PAGE: USERS -->
         <div class="page on" id="page_users">
           <h2>Felhasználók</h2>
           <p class="sub">User kiválasztás → profil mentés + chat + üdvözlő.</p>
 
           <div class="row">
-            <!-- LEFT: picker -->
             <div class="box">
               <div class="field">
                 <label for="userSearch">Keresés (email / név / uid)</label>
@@ -507,7 +585,6 @@
               </details>
             </div>
 
-            <!-- RIGHT: profile -->
             <div class="box">
               <h3>User profil</h3>
               <p class="sub">Állítsd be a profilt, majd küldj üzenetet (Chat).</p>
@@ -616,7 +693,6 @@
           </div>
         </div>
 
-        <!-- PAGE: PLAN -->
         <div class="page" id="page_plan">
           <h2>Plan template</h2>
           <p class="sub">Csomag meta + heti fix edzések (dinamikus mezők). Csak a kitöltött edzések kerülnek Firestore-ba.</p>
@@ -671,7 +747,6 @@
           </div>
         </div>
 
-        <!-- PAGE: DIET -->
         <div class="page" id="page_diet">
           <h2>Étrend</h2>
           <p class="sub">4 hét / napi bontás. A vevő app prémium kártyákban mutatja.</p>
@@ -715,7 +790,6 @@
           </div>
         </div>
 
-        <!-- PAGE: MOTIVATION -->
         <div class="page" id="page_motivation">
           <h2>Motiváció</h2>
           <p class="sub">Fix motiváció kártya (mindig látszik a vevőnél).</p>
@@ -729,7 +803,6 @@
           </div>
         </div>
 
-        <!-- PAGE: OVERRIDES -->
         <div class="page" id="page_overrides">
           <h2>Személyre szabás</h2>
           <p class="sub">Heti extra videók (slots) a kiválasztott userhez: users/{uid}/overridesWeeks/{weekNo}.</p>
@@ -789,7 +862,39 @@
           </div>
         </div>
 
-        <!-- PAGE: TECH -->
+        <!-- ✅ PAGE: CHECK-IN -->
+        <div class="page" id="page_checkin">
+          <h2>Check-in</h2>
+          <p class="sub">A kiválasztott user heti check-injei: testsúly, közérzet, energia, alvás, mérések, megjegyzés és kép.</p>
+
+          <div class="box">
+            <div class="miniRow">
+              <div class="field">
+                <label for="ci_limit">Hány db check-int töltsünk be?</label>
+                <select id="ci_limit">
+                  <option value="10">10</option>
+                  <option value="20" selected>20</option>
+                  <option value="50">50</option>
+                </select>
+              </div>
+              <div class="field">
+                <label>&nbsp;</label>
+                <button class="pill ghost" id="btnLoadCheckins" type="button">↻ Betöltés</button>
+              </div>
+            </div>
+
+            <div id="checkinStats" class="debugBox" style="margin-top:12px;"><b>CHECK-IN</b>: nincs betöltve</div>
+
+            <div class="actions" style="margin-top:12px;">
+              <button class="pill ghost" id="btnOpenLatestCheckinImage" type="button">🖼 Legutóbbi kép</button>
+            </div>
+
+            <div id="checkinsWrap" class="checkinCards" style="margin-top:14px;">
+              <div class="emptyState">Válassz ki egy usert, majd nyomj a <b>Betöltés</b> gombra.</div>
+            </div>
+          </div>
+        </div>
+
         <div class="page" id="page_tech">
           <h2>Technika Vault</h2>
           <p class="sub">Admin anyagok a kiválasztott userhez (techVault.items).</p>
@@ -837,7 +942,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- ✅ Chat overlay -->
   <div class="chatOverlay" id="chatOverlay" aria-hidden="true">
     <div class="chatWin" id="chatWin" role="dialog" aria-modal="true">
       <div class="chatHead">
@@ -896,7 +1000,6 @@
 
     $("#y").textContent = new Date().getFullYear();
 
-    // ✅ Menu
     const menuBtn = $("#btnMenu");
     const menuBox = $("#menuBox");
     function toggleMenu(force=null){
@@ -918,7 +1021,6 @@
     $("#btnTopLogout").addEventListener("click", doLogout);
     $("#m_toApp").addEventListener("click", ()=>toApp("hu"));
 
-    // ✅ Sidebar navigation
     const PAGE_KEY = "fl_admin_page_v1";
     const pages = {
       users: $("#page_users"),
@@ -926,6 +1028,7 @@
       diet: $("#page_diet"),
       motivation: $("#page_motivation"),
       overrides: $("#page_overrides"),
+      checkin: $("#page_checkin"),
       tech: $("#page_tech")
     };
 
@@ -939,6 +1042,13 @@
       });
       localStorage.setItem(PAGE_KEY, key);
       window.scrollTo({ top: 0, behavior: "smooth" });
+
+      if(key === "checkin" && SEL_UID){
+        loadCheckins().catch(e=>{
+          console.error(e);
+          err(e.message || String(e));
+        });
+      }
     }
 
     $$("[data-pagebtn]").forEach(btn=>{
@@ -948,15 +1058,12 @@
       });
     });
 
-    // ✅ state
     let SEL_UID = null;
 
-    // ✅ remember selected user
     const SEL_KEY = "fl_admin_sel_uid_v1";
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
 
-    // ✅ Cache (uid -> {name,email})
     const USERS_CACHE = new Map();
     function setUserCache(uid, name, email){
       if(!uid) return;
@@ -966,7 +1073,6 @@
       return USERS_CACHE.get(uid) || { name:"", email:"" };
     }
 
-    // ✅ Chat overlay
     const chatOverlay = $("#chatOverlay");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -1105,7 +1211,6 @@
     $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
     $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
-    // 🔥 Dinamikus 5 fix edzés box
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -1135,18 +1240,16 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
-    // ✅ Helpers for HU/DE objects
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
       return val.hu || val.de || "";
     };
 
-    // ✅ planId select + custom
-    const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
     const planCustom = $("#u_planIdCustom");
+    const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
 
     function getPlanIdFromUI(){
       const v = (planSel.value || "").trim();
@@ -1224,7 +1327,6 @@
       fillTechVaultForm(doc);
     }
 
-    // ✅ USERS LIST
     const userPick = $("#userPick");
 
     function fillUserPickDropdown(items){
@@ -1375,6 +1477,9 @@
 
       await loadDietDay();
       await loadOverride();
+      if($("#page_checkin").classList.contains("on")){
+        await loadCheckins();
+      }
 
       ok("User kiválasztva");
 
@@ -1418,7 +1523,6 @@
       }catch(e){ console.error(e); err(e.message || String(e)); }
     });
 
-    // ✅ Welcome
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1435,7 +1539,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Diet
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -1491,7 +1594,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Motivation
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1503,7 +1605,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Plan meta
     async function loadPlanMeta(){
       const planId = trimStr($("#p_planId").value);
       if(!planId) return err("Csomag neve (Plan ID) üres.");
@@ -1623,7 +1724,6 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    // ✅ Overrides
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -1679,7 +1779,145 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Tech Vault
+    /* ✅ Check-ins */
+    let LAST_CHECKINS = [];
+
+    function fmtDateAny(v){
+      try{
+        if(!v) return "—";
+        const d = (typeof v?.toDate === "function") ? v.toDate() : new Date(v);
+        if(Number.isNaN(d.getTime())) return "—";
+        return d.toLocaleString("hu-HU", {
+          year:"numeric", month:"2-digit", day:"2-digit",
+          hour:"2-digit", minute:"2-digit"
+        });
+      }catch{
+        return "—";
+      }
+    }
+
+    function asDisplay(v, suffix=""){
+      if(v === null || v === undefined || v === "") return "—";
+      return `${v}${suffix}`;
+    }
+
+    function renderCheckins(items){
+      LAST_CHECKINS = items.slice();
+      const wrap = $("#checkinsWrap");
+      const stats = $("#checkinStats");
+
+      if(!SEL_UID){
+        stats.innerHTML = `<b>CHECK-IN</b>: nincs kiválasztott user`;
+        wrap.innerHTML = `<div class="emptyState">Először válassz ki egy felhasználót.</div>`;
+        return;
+      }
+
+      const latest = items[0] || null;
+      stats.innerHTML = `<b>CHECK-IN</b>: összesen <b>${items.length}</b> db • legutóbbi: <b>${escapeHtml(latest ? fmtDateAny(latest.submittedAtISO || latest.submittedAt) : "—")}</b>`;
+
+      if(!items.length){
+        wrap.innerHTML = `<div class="emptyState">Ennél a usernél még nincs beküldött heti check-in.</div>`;
+        return;
+      }
+
+      wrap.innerHTML = items.map(it => {
+        const submitted = fmtDateAny(it.submittedAtISO || it.submittedAt);
+        const dueAt = it.dueAt || "—";
+        const imgBlock = it.imageUrl ? `
+          <div class="checkinPreview">
+            <a class="pill ghost" href="${escapeHtml(it.imageUrl)}" target="_blank" rel="noopener">🖼 Kép megnyitása</a>
+            <img src="${escapeHtml(it.imageUrl)}" alt="Check-in kép" loading="lazy" />
+          </div>
+        ` : "";
+
+        return `
+          <div class="checkinCard">
+            <div class="checkinHead">
+              <div>
+                <div class="title" style="font-weight:950; font-size:15px;">Check-in #${escapeHtml(it.checkinIndex ?? "—")}</div>
+                <div class="desc" style="color:rgba(255,255,255,.70); font-size:12.8px; margin-top:4px;">Beküldve: ${escapeHtml(submitted)} • Esedékes: ${escapeHtml(dueAt)}</div>
+              </div>
+              <div class="checkinTag">📋 Hét: ${escapeHtml(it.weekNumber ?? "—")}</div>
+            </div>
+
+            <div class="checkinGrid">
+              <div class="checkinMini"><b>Testsúly</b><span>${escapeHtml(asDisplay(it.weight, " kg"))}</span></div>
+              <div class="checkinMini"><b>Közérzet</b><span>${escapeHtml(asDisplay(it.mood, "/10"))}</span></div>
+              <div class="checkinMini"><b>Energia</b><span>${escapeHtml(asDisplay(it.energy, "/10"))}</span></div>
+              <div class="checkinMini"><b>Alvás</b><span>${escapeHtml(asDisplay(it.sleep, " óra"))}</span></div>
+              <div class="checkinMini"><b>Derék</b><span>${escapeHtml(asDisplay(it.waist, " cm"))}</span></div>
+              <div class="checkinMini"><b>Csípő</b><span>${escapeHtml(asDisplay(it.hips, " cm"))}</span></div>
+              <div class="checkinMini"><b>Comb</b><span>${escapeHtml(asDisplay(it.thigh, " cm"))}</span></div>
+              <div class="checkinMini"><b>Ciklus indulás</b><span>${escapeHtml(it.cycleStart || "—")}</span></div>
+              <div class="checkinMini"><b>UID</b><span class="mono">${escapeHtml(it.uid || SEL_UID || "—")}</span></div>
+            </div>
+
+            <div class="checkinMini" style="margin-top:10px;">
+              <b>Megjegyzés</b>
+              <span>${escapeHtml(it.note || "—")}</span>
+            </div>
+
+            ${imgBlock}
+          </div>
+        `;
+      }).join("");
+    }
+
+    async function loadCheckins(){
+      try{
+        if(!SEL_UID){
+          renderCheckins([]);
+          return;
+        }
+
+        const lim = clamp(parseInt($("#ci_limit").value || "20", 10), 1, 100);
+        const col = fs.collection(db, "users", SEL_UID, "checkins");
+
+        let snap;
+        try{
+          snap = await fs.getDocs(fs.query(col, fs.orderBy("checkinIndex", "desc"), fs.limit(lim)));
+        }catch{
+          try{
+            snap = await fs.getDocs(fs.query(col, fs.orderBy("submittedAt", "desc"), fs.limit(lim)));
+          }catch{
+            snap = await fs.getDocs(fs.query(col, fs.limit(lim)));
+          }
+        }
+
+        const items = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        items.sort((a,b)=>{
+          const ai = Number(a.checkinIndex ?? -1);
+          const bi = Number(b.checkinIndex ?? -1);
+          if(ai !== bi) return bi - ai;
+
+          const at = new Date(a.submittedAtISO || a.submittedAt?.toDate?.() || 0).getTime() || 0;
+          const bt = new Date(b.submittedAtISO || b.submittedAt?.toDate?.() || 0).getTime() || 0;
+          return bt - at;
+        });
+
+        renderCheckins(items);
+        ok("Check-in lista betöltve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
+    }
+
+    $("#btnLoadCheckins").addEventListener("click", loadCheckins);
+    $("#ci_limit").addEventListener("change", ()=>{
+      if($("#page_checkin").classList.contains("on") && SEL_UID){
+        loadCheckins().catch(e=>{
+          console.error(e);
+          err(e.message || String(e));
+        });
+      }
+    });
+    $("#btnOpenLatestCheckinImage").addEventListener("click", ()=>{
+      const latest = LAST_CHECKINS.find(x => x.imageUrl);
+      if(!latest?.imageUrl) return err("Nincs feltöltött kép a legutóbbi check-inek között.");
+      window.open(latest.imageUrl, "_blank", "noopener");
+    });
+
     async function loadTechVault(){
       try{
         if(!SEL_UID) return;
@@ -1714,7 +1952,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ AUTH BOOT
     onAuth(async (user)=>{
       try{
         if(!user){ toLogin("hu"); return; }
@@ -1728,7 +1965,6 @@
         $("#whoami").textContent = `${user.email || "admin"} • uid=${user.uid}`;
         ok("Admin belépés OK");
 
-        // ✅ restore last page
         const last = (localStorage.getItem(PAGE_KEY) || "users").trim();
         setPage(last);
 
@@ -1741,4 +1977,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
