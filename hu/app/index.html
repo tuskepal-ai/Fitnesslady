@@ -521,7 +521,6 @@
     .msgRow{ display:flex; margin: 10px 0; gap: 8px; }
     .msgRow.me{ justify-content:flex-end; }
 
-    /* ✅ FIX: ne tudjon "összenyomódni" betűnként */
     .msgCol{
       display:flex;
       flex-direction:column;
@@ -608,9 +607,6 @@
       .chat-panel{ transition:none; }
     }
 
-    /* =========================
-       ✅ iOS "Installer" bar (nem valódi auto-install; instrukciós banner)
-    ========================== */
     .ios-install-bar{
       position: fixed;
       left: 12px;
@@ -929,7 +925,6 @@
     </div>
   </footer>
 
-  <!-- Settings -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -947,7 +942,6 @@
     </div>
   </div>
 
-  <!-- Info modal -->
   <div class="modal-overlay" id="infoOverlay" role="dialog" aria-modal="true" aria-labelledby="infoTitle" aria-hidden="true">
     <div class="glass modal" role="document">
       <div class="modal-header">
@@ -958,7 +952,6 @@
     </div>
   </div>
 
-  <!-- ✅ iOS Installer Bar -->
   <div class="ios-install-bar" id="iosInstallBar" aria-hidden="true">
     <div class="ios-install-row">
       <div class="ios-install-icon" id="iosInstallIcon" aria-hidden="true">FL</div>
@@ -979,7 +972,6 @@
     </div>
   </div>
 
-  <!-- ✅ CHAT Bubble -->
   <button class="chat-fab" id="chatFab" type="button" aria-label="Chat megnyitása" title="Chat">
     <span class="chat-badge" id="chatBadge">1</span>
     <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -988,7 +980,6 @@
     </svg>
   </button>
 
-  <!-- ✅ CHAT Overlay + Panel -->
   <div class="chat-overlay" id="chatOverlay" aria-hidden="true">
     <div class="chat-panel" role="dialog" aria-modal="true" aria-label="Chat">
       <div class="chat-head">
@@ -1021,10 +1012,10 @@
       ref as storageRef,
       uploadBytes,
       getDownloadURL
-    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-storage.js";
 
     import {
-      BASE_PREFIX, auth, db, fs,
+      BASE_PREFIX, app, auth, db, fs,
       onAuth, logout, toLogin,
       escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
     } from "../shared/firebase.js";
@@ -1053,7 +1044,7 @@
     let profile = null;
     let planMeta = null;
     const weekCache = new Map();
-    const storage = getStorage();
+    const storage = getStorage(app);
 
     const state = {
       weekIdx: 0,
@@ -1851,9 +1842,6 @@
       }catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
 
-    /* =========================
-       ✅ iOS Installer banner logic
-    ========================== */
     (function initIOSInstaller(){
       const bar = document.getElementById("iosInstallBar");
       const btnX = document.getElementById("iosInstallClose");
@@ -1889,9 +1877,6 @@
       });
     })();
 
-    /* =========================
-       ✅ CHAT (Vevő) — realtime
-    ========================== */
     const chatFab = $("#chatFab");
     const chatBadge = $("#chatBadge");
     const chatOverlay = $("#chatOverlay");
@@ -2109,4 +2094,4 @@
     });
   </script>
 </body>
-                                                                      </html>
+</html>
