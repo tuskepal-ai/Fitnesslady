@@ -167,15 +167,16 @@
       display:inline-flex;
       align-items:center;
       justify-content:center;
-      padding: 10px 14px;
+      padding: 10px 16px;
       border-radius: 999px;
       background: linear-gradient(135deg, var(--pink), var(--pink2));
       color:#120613;
       font-weight: 900;
+      font-size: 15px;
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 14px 30px rgba(255,79,216,.22);
       white-space: nowrap;
-      max-width: 220px;
+      max-width: 140px;
       overflow: hidden;
       text-overflow: ellipsis;
     }
@@ -644,12 +645,12 @@
       .hero-wrap{ margin-left: auto; margin-right: auto; }
 
       .topbar{ padding: 10px 12px; }
-      .cta-pill{ max-width: 160px; padding: 9px 12px; font-weight: 900; }
+      .cta-pill{ max-width: 108px; padding: 9px 14px; font-weight: 900; font-size: 14px; }
       .btn{ padding: 11px 14px; }
     }
 
     @media (max-width: 420px){
-      .cta-pill{ max-width: 132px; }
+      .cta-pill{ max-width: 96px; }
       .brand span:last-child{ font-size: 15px; }
     }
   </style>
@@ -677,7 +678,7 @@
         <!-- Saját oldalam marad login -->
         <a class="btn interactive" data-route="/hu/login/" href="/hu/login/" style="padding:10px 14px;">Saját oldalam</a>
 
-        <a class="cta-pill" href="#kapcsolat" title="Ingyenes konzultáció">Ingyenes konzultáció</a>
+        <a class="cta-pill" href="mailto:Fitnesslady92@gmail.com?subject=Fitness%20Lady%20-%20Ingyenes%20konzult%C3%A1ci%C3%B3" title="Email">Email</a>
       </div>
     </div>
   </header>
@@ -699,7 +700,7 @@
           </p>
 
           <div class="hero-actions">
-            <a class="btn primary interactive" href="#kapcsolat">Ingyenes konzultáció</a>
+            <a class="btn primary interactive" href="mailto:Fitnesslady92@gmail.com?subject=Fitness%20Lady%20-%20Ingyenes%20konzult%C3%A1ci%C3%B3">Email</a>
             <a class="btn interactive" href="#csomagok">Csomagok</a>
 
             <a class="btn interactive" data-route="/hu/login/" href="/hu/login/">Saját oldalam</a>
@@ -715,7 +716,7 @@
           <div class="meta-row">
             <div class="meta-pill">📍 Visp</div>
             <div class="meta-pill">⏱️ Online • személyre szabva</div>
-            <div class="meta-pill">💬 Instagram: @fitnesslady</div>
+            <div class="meta-pill">✉️ Fitnesslady92@gmail.com</div>
           </div>
         </div>
 
@@ -969,15 +970,15 @@ Edina • Fitnesz Lady
   <section id="kapcsolat" class="section">
     <div class="container">
       <div class="section-title reveal">Kapcsolat</div>
-      <p class="section-sub reveal" data-delay="1">Ingyenes konzultációhoz írj WhatsAppon vagy Instagramon.</p>
+      <p class="section-sub reveal" data-delay="1">Ingyenes konzultációhoz írj e-mailt, vagy nézd meg az inspirációs csoportot.</p>
 
       <div class="glass interactive pkg reveal" data-delay="2" style="display:flex; gap:12px; flex-wrap:wrap; align-items:center; justify-content:space-between;">
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <a class="btn interactive" href="#" onclick="alert('Itt majd WhatsApp link lesz'); return false;">WhatsApp</a>
-          <a class="btn interactive" href="#" onclick="alert('Itt majd Instagram link lesz'); return false;">Instagram</a>
+          <a class="btn interactive" href="mailto:Fitnesslady92@gmail.com?subject=Fitness%20Lady%20-%20Ingyenes%20konzult%C3%A1ci%C3%B3">Email</a>
+          <a class="btn interactive" href="https://www.facebook.com/share/g/18C35Z8QKx/" target="_blank" rel="noopener">Inspiráció</a>
         </div>
         <div style="color:var(--muted); font-size:13px;">
-          📍 Visp • Online • @fitnesslady
+          📍 Visp • Online • Fitnesslady92@gmail.com
         </div>
       </div>
     </div>
@@ -1059,6 +1060,7 @@ Edina • Fitnesz Lady
           <a href="#jogi" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Jogi</a>
           <a href="#kapcsolat" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Kapcsolat</a>
           <a href="${base}/hu/login/" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Saját oldalam</a>
+          <a href="mailto:Fitnesslady92@gmail.com?subject=Fitness%20Lady%20-%20Ingyenes%20konzult%C3%A1ci%C3%B3" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Email</a>
         `;
         document.body.appendChild(nav);
       } else {
