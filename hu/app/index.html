@@ -25,6 +25,9 @@
       --pink:#ff4fd8;
       --pink2:#b14cff;
       --gold:#ffd38a;
+      --ok:#79f7ba;
+      --warn:#ffd38a;
+      --danger:#ff8097;
       --radius:22px;
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
@@ -130,6 +133,220 @@
     .field input{ height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #fff; padding: 0 12px; outline: none; }
 
     footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-align:center; font-size:13px; color:var(--muted); }
+
+    /* =========================
+       ✅ WEEKLY CHECK-IN
+    ========================== */
+    .checkin-status-card{
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(800px 220px at 12% 0%, rgba(255,79,216,.15), transparent 55%),
+        radial-gradient(800px 220px at 90% 20%, rgba(177,76,255,.11), transparent 60%),
+        rgba(255,255,255,.04);
+      box-shadow: 0 18px 46px rgba(0,0,0,.30);
+    }
+    .checkin-status-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:8px;
+    }
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 900;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.88);
+    }
+    .status-pill.ok{
+      background: rgba(121,247,186,.12);
+      border-color: rgba(121,247,186,.26);
+      color: #dffff1;
+    }
+    .status-pill.warn{
+      background: rgba(255,211,138,.12);
+      border-color: rgba(255,211,138,.26);
+      color: #fff2d2;
+    }
+    .status-pill.danger{
+      background: rgba(255,128,151,.12);
+      border-color: rgba(255,128,151,.26);
+      color: #ffe0e6;
+    }
+    .checkin-meta{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 680px){
+      .checkin-meta{ grid-template-columns: 1fr; }
+    }
+    .checkin-mini{
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .checkin-mini b{
+      display:block;
+      margin-bottom:4px;
+      font-size: 12px;
+      color: rgba(255,255,255,.90);
+      letter-spacing: .2px;
+    }
+    .checkin-mini span{
+      display:block;
+      color: rgba(255,255,255,.68);
+      font-size: 12.8px;
+      line-height: 1.45;
+    }
+    .checkin-form{
+      margin-top: 14px;
+      display:none;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .checkin-form.is-open{ display:block; }
+    .checkin-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 10px;
+    }
+    @media (max-width: 860px){
+      .checkin-grid{ grid-template-columns: 1fr; }
+    }
+    .checkin-field{
+      display:grid;
+      gap: 6px;
+    }
+    .checkin-field label{
+      color: rgba(255,255,255,.76);
+      font-size: 12.5px;
+      font-weight: 800;
+    }
+    .checkin-field input,
+    .checkin-field select,
+    .checkin-field textarea{
+      width:100%;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.12);
+      background: rgba(255,255,255,.05);
+      color: #fff;
+      padding: 12px 14px;
+      outline: none;
+      font-size: 14px;
+      min-height: 46px;
+    }
+    .checkin-field textarea{
+      min-height: 124px;
+      resize: vertical;
+    }
+    .checkin-field input:focus,
+    .checkin-field select:focus,
+    .checkin-field textarea:focus{
+      border-color: rgba(255,79,216,.35);
+      box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+    .file-wrap{
+      display:grid;
+      gap: 8px;
+    }
+    .file-note{
+      font-size: 12px;
+      color: rgba(255,255,255,.58);
+      line-height: 1.45;
+    }
+    .checkin-preview{
+      display:none;
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 16px;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .checkin-preview.is-on{ display:block; }
+    .checkin-preview img{
+      display:block;
+      width: 100%;
+      max-height: 320px;
+      object-fit: cover;
+      border-radius: 14px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.22);
+    }
+    .checkin-actions{
+      display:flex;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 16px;
+    }
+    .checkin-summary{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 18px;
+      background: rgba(121,247,186,.06);
+      border: 1px solid rgba(121,247,186,.16);
+    }
+    .checkin-summary-grid{
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 10px;
+      margin-top: 10px;
+    }
+    @media (max-width: 760px){
+      .checkin-summary-grid{ grid-template-columns: 1fr; }
+    }
+    .checkin-summary-item{
+      padding: 12px;
+      border-radius: 14px;
+      background: rgba(0,0,0,.22);
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .checkin-summary-item b{
+      display:block;
+      margin-bottom: 4px;
+      font-size: 12px;
+      color: rgba(255,255,255,.88);
+    }
+    .checkin-summary-item span{
+      display:block;
+      color: rgba(255,255,255,.72);
+      font-size: 13px;
+      line-height: 1.45;
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+    .checkin-image-link{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      margin-top: 10px;
+      font-size: 13px;
+      font-weight: 900;
+      color: #fff;
+      background: rgba(255,255,255,.08);
+      border: 1px solid rgba(255,255,255,.12);
+      border-radius: 999px;
+      padding: 8px 12px;
+    }
+    .inline-note{
+      font-size: 12px;
+      color: rgba(255,255,255,.62);
+      line-height: 1.45;
+    }
 
     /* =========================
        ✅ CHAT (Vevő) — 3D bubble + Apple-like half-sheet
@@ -491,7 +708,7 @@
       <nav class="nav" aria-label="Vevő menü">
         <a href="#program" data-nav>Programom</a>
         <a href="#etrend" data-nav>Étrend</a>
-        <a href="#checkin" data-nav>Célok</a>
+        <a href="#checkin" data-nav>Check-in</a>
         <a href="#technika" data-nav>Technika</a>
       </nav>
       <div style="display:flex; align-items:center; gap:10px;">
@@ -568,8 +785,110 @@
         </section>
 
         <section id="checkin" class="glass card">
+          <h3>Heti Check-in</h3>
+          <p class="sub">Töltsd ki a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.</p>
+
+          <div class="checkin-status-card" id="weeklyCheckinCard">
+            <div class="checkin-status-top">
+              <div>
+                <div class="status-pill" id="weeklyCheckinStatusPill">Betöltés…</div>
+                <div style="margin-top:10px; font-family: ui-serif, Georgia, serif; font-size:18px; font-weight:800;" id="weeklyCheckinTitle">Heti check-in</div>
+                <div class="sub" style="margin-top:6px; margin-bottom:0;" id="weeklyCheckinText">Állapot ellenőrzése…</div>
+              </div>
+
+              <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="pill primary" id="btnOpenWeeklyCheckin" type="button" style="display:none;">Check-in kitöltése</button>
+                <button class="pill ghost" id="btnEditWeeklyCheckin" type="button" style="display:none;">Check-in módosítása</button>
+              </div>
+            </div>
+
+            <div class="checkin-meta">
+              <div class="checkin-mini">
+                <b>Esedékesség</b>
+                <span id="weeklyCheckinDueLabel">—</span>
+              </div>
+              <div class="checkin-mini">
+                <b>Következő check-in</b>
+                <span id="weeklyCheckinNextLabel">—</span>
+              </div>
+            </div>
+
+            <div class="checkin-form" id="weeklyCheckinFormWrap">
+              <div class="inline-note">
+                A mezők Firestore-ba mentődnek, a kép pedig Firebase Storage-ba. A derék / csípő / comb mezők cm-ben értendők.
+              </div>
+
+              <div class="checkin-grid">
+                <div class="checkin-field">
+                  <label for="ciWeight">Testsúly (kg)</label>
+                  <input id="ciWeight" type="number" step="0.1" min="0" placeholder="pl. 64.8" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciMood">Közérzet (1–10)</label>
+                  <input id="ciMood" type="number" step="1" min="1" max="10" placeholder="pl. 8" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciEnergy">Energia (1–10)</label>
+                  <input id="ciEnergy" type="number" step="1" min="1" max="10" placeholder="pl. 7" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciSleepHours">Alvás (óra)</label>
+                  <input id="ciSleepHours" type="number" step="0.5" min="0" placeholder="pl. 7.5" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciWaist">Derék (cm)</label>
+                  <input id="ciWaist" type="number" step="0.1" min="0" placeholder="pl. 74" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciHips">Csípő (cm)</label>
+                  <input id="ciHips" type="number" step="0.1" min="0" placeholder="pl. 98" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciThigh">Comb (cm)</label>
+                  <input id="ciThigh" type="number" step="0.1" min="0" placeholder="pl. 56" />
+                </div>
+
+                <div class="checkin-field">
+                  <label for="ciPhoto">Kép feltöltés</label>
+                  <div class="file-wrap">
+                    <input id="ciPhoto" type="file" accept="image/*" />
+                    <div class="file-note">Ajánlott: álló kép, jó fényviszonyokkal. JPG vagy PNG.</div>
+                  </div>
+                </div>
+
+                <div class="checkin-field" style="grid-column: 1 / -1;">
+                  <label for="ciNote">Megjegyzés</label>
+                  <textarea id="ciNote" placeholder="Írd le röviden, hogy hogy érezted magad ezen a héten, mi ment jól, min szeretnél változtatni."></textarea>
+                </div>
+              </div>
+
+              <div class="checkin-preview" id="ciPreviewWrap">
+                <img id="ciPreviewImg" alt="Check-in előnézet" />
+              </div>
+
+              <div class="checkin-actions">
+                <button class="pill primary" id="btnSaveWeeklyCheckin" type="button">Check-in mentése</button>
+                <button class="pill ghost" id="btnCancelWeeklyCheckin" type="button">Mégsem</button>
+              </div>
+            </div>
+
+            <div class="checkin-summary" id="weeklyCheckinSummary" style="display:none;">
+              <strong style="display:block; margin-bottom:8px;">Legutóbbi elküldött check-in</strong>
+              <div class="checkin-summary-grid" id="weeklyCheckinSummaryGrid"></div>
+              <a class="checkin-image-link" id="weeklyCheckinImageLink" href="#" target="_blank" rel="noopener" style="display:none;">Kép megnyitása</a>
+            </div>
+          </div>
+
+          <div style="height:14px;"></div>
+
           <h3>Napi célok</h3>
-          <p class="sub">A nap állapota Firestore-ban van mentve, adminból is kezelhető.</p>
+          <p class="sub">A napi állapot Firestore-ban van mentve, adminból is kezelhető.</p>
 
           <div style="display:grid; gap:14px;">
             <div>
@@ -581,14 +900,8 @@
             <div>
               <div class="progress-label" style="margin-top:0;"><span>Alvás</span><span id="lblSleep">0/8</span></div>
               <div class="progress green"><span id="barSleep"></span></div>
-              <div style="margin-top:8px;"><button class="pill ghost tiny" id="btnAddSleep" type="button">+1</button></div>
-            </div>
-
-            <div>
-              <div class="progress-label" style="margin-top:0;"><span>Check-in</span><span id="checkinLabel">0/1</span></div>
-              <div class="progress"><span id="barCheckin"></span></div>
               <div style="margin-top:8px;">
-                <button class="pill primary tiny" id="btnDoCheckin" type="button">Kész</button>
+                <button class="pill ghost tiny" id="btnAddSleep" type="button">+1</button>
                 <button class="pill ghost tiny" id="btnResetTrackers" type="button">Nullázás</button>
               </div>
             </div>
@@ -616,27 +929,6 @@
     </div>
   </footer>
 
-  <!-- ✅ iOS Installer Bar -->
-  <div class="ios-install-bar" id="iosInstallBar" aria-hidden="true">
-    <div class="ios-install-row">
-      <div class="ios-install-icon" id="iosInstallIcon" aria-hidden="true">FL</div>
-
-      <div class="ios-install-text">
-        <b>Telepítsd a FitnessLady appot</b>
-        <span>iPhone-on nem ugrik fel automatikusan. Így tudod feltenni ikonként a kezdőképernyőre:</span>
-
-        <div class="ios-steps" aria-label="iOS telepítés lépések">
-          <div class="ios-step">1) Megosztás <span style="opacity:.9">□↑</span></div>
-          <div class="ios-step">2) „Kezdőképernyőhöz adás”</div>
-        </div>
-      </div>
-
-      <div class="ios-actions">
-        <button class="ios-x" id="iosInstallClose" type="button" aria-label="Bezárás">✕</button>
-      </div>
-    </div>
-  </div>
-
   <!-- Settings -->
   <div class="modal-overlay" id="settingsOverlay" role="dialog" aria-modal="true" aria-labelledby="settingsTitle" aria-hidden="true">
     <div class="glass modal" role="document">
@@ -663,6 +955,27 @@
         <button class="modal-close" id="infoClose" type="button" aria-label="Bezárás">✕</button>
       </div>
       <div class="modal-body" id="infoBody"></div>
+    </div>
+  </div>
+
+  <!-- ✅ iOS Installer Bar -->
+  <div class="ios-install-bar" id="iosInstallBar" aria-hidden="true">
+    <div class="ios-install-row">
+      <div class="ios-install-icon" id="iosInstallIcon" aria-hidden="true">FL</div>
+
+      <div class="ios-install-text">
+        <b>Telepítsd a FitnessLady appot</b>
+        <span>iPhone-on nem ugrik fel automatikusan. Így tudod feltenni ikonként a kezdőképernyőre:</span>
+
+        <div class="ios-steps" aria-label="iOS telepítés lépések">
+          <div class="ios-step">1) Megosztás <span style="opacity:.9">□↑</span></div>
+          <div class="ios-step">2) „Kezdőképernyőhöz adás”</div>
+        </div>
+      </div>
+
+      <div class="ios-actions">
+        <button class="ios-x" id="iosInstallClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
     </div>
   </div>
 
@@ -704,6 +1017,13 @@
 
   <script type="module">
     import {
+      getStorage,
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
+
+    import {
       BASE_PREFIX, auth, db, fs,
       onAuth, logout, toLogin,
       escapeHtml, safeJsonParse, todayISO, clamp, daysBetween, fmtDate
@@ -733,13 +1053,20 @@
     let profile = null;
     let planMeta = null;
     const weekCache = new Map();
+    const storage = getStorage();
 
     const state = {
       weekIdx: 0,
       selectedDay: "mon",
       done: {},
-      trackers: { day: todayISO(), water:0, sleep:0, checkinDone:false, checkinAt:null },
-      lang: "hu"
+      trackers: { day: todayISO(), water:0, sleep:0 },
+      lang: "hu",
+      checkinsByIndex: {},
+      currentCheckinIndex: 0,
+      currentCheckinDueAt: "",
+      currentCheckinBase: "",
+      currentCheckinDoc: null,
+      checkinPreviewUrl: ""
     };
 
     const DAYS = [
@@ -782,6 +1109,58 @@
       return "Jó estét";
     }
 
+    function dateFromAny(v){
+      try{
+        if(!v) return null;
+        if(typeof v?.toDate === "function") return v.toDate();
+        const d = new Date(v);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }catch{
+        return null;
+      }
+    }
+
+    function isoDateFromAny(v){
+      const d = dateFromAny(v);
+      return d ? d.toISOString().slice(0,10) : "";
+    }
+
+    function addDaysIso(baseIso, add){
+      const d = new Date(`${baseIso}T12:00:00`);
+      d.setDate(d.getDate() + add);
+      return d.toISOString().slice(0,10);
+    }
+
+    function humanDueText(days){
+      if(days <= 0) return "Ma esedékes";
+      if(days === 1) return "1 nap múlva";
+      return `${days} nap múlva`;
+    }
+
+    function humanDateLabel(iso){
+      if(!iso) return "—";
+      try{
+        return new Date(`${iso}T12:00:00`).toLocaleDateString("hu-HU", { year:"numeric", month:"long", day:"numeric" });
+      }catch{
+        return iso;
+      }
+    }
+
+    function numberOrNull(v){
+      const raw = String(v ?? "").trim().replace(",", ".");
+      if(!raw) return null;
+      const n = Number(raw);
+      return Number.isFinite(n) ? n : null;
+    }
+
+    function sanitizeFilename(name){
+      return String(name || "photo")
+        .toLowerCase()
+        .replace(/[^a-z0-9._-]+/g, "-")
+        .replace(/-+/g, "-")
+        .replace(/^-|-$/g, "");
+    }
+
     async function loadUserProfile(uid){
       const snap = await fs.getDoc(fs.doc(db, "users", uid));
       return snap.exists() ? snap.data() : null;
@@ -804,7 +1183,7 @@
       const snap = await fs.getDoc(fs.doc(db, "users", UID));
       const data = snap.data() || {};
       const byDay = data.trackersByDay || {};
-      const t = byDay[day] || { water:0, sleep:0, checkinDone:false, checkinAt:null };
+      const t = byDay[day] || { water:0, sleep:0 };
       state.trackers = { day, ...t };
     }
 
@@ -813,8 +1192,6 @@
       const next = {
         water: clamp(parseInt(partial.water ?? state.trackers.water ?? 0, 10) || 0, 0, 8),
         sleep: clamp(parseInt(partial.sleep ?? state.trackers.sleep ?? 0, 10) || 0, 0, 8),
-        checkinDone: typeof partial.checkinDone === "boolean" ? partial.checkinDone : !!state.trackers.checkinDone,
-        checkinAt: (partial.checkinAt !== undefined) ? partial.checkinAt : (state.trackers.checkinAt || null),
         updatedAt: new Date().toISOString()
       };
       await fs.updateDoc(fs.doc(db, "users", UID), {
@@ -864,6 +1241,228 @@
       return week - 1;
     }
 
+    function getCheckinBaseIso(){
+      return (
+        String(profile?.cycleStart || "").trim() ||
+        String(profile?.startDate || "").trim() ||
+        isoDateFromAny(profile?.createdAt) ||
+        todayISO()
+      );
+    }
+
+    async function loadWeeklyCheckins(){
+      state.checkinsByIndex = {};
+      try{
+        const q = fs.query(
+          fs.collection(db, "users", UID, "checkins"),
+          fs.orderBy("checkinIndex", "desc"),
+          fs.limit(50)
+        );
+        const snap = await fs.getDocs(q);
+        snap.forEach(docSnap=>{
+          const d = docSnap.data() || {};
+          if(Number.isFinite(d.checkinIndex)){
+            state.checkinsByIndex[d.checkinIndex] = { id: docSnap.id, ...d };
+          }
+        });
+      }catch(e){
+        console.error(e);
+      }
+    }
+
+    function getCurrentCheckinMeta(){
+      const baseIso = getCheckinBaseIso();
+      const passedDays = Math.max(0, daysBetween(baseIso, todayISO()));
+      state.currentCheckinBase = baseIso;
+
+      if(passedDays < 7){
+        return {
+          baseIso,
+          passedDays,
+          currentIndex: 0,
+          dueAt: addDaysIso(baseIso, 7),
+          status: "upcoming",
+          daysUntilDue: 7 - passedDays
+        };
+      }
+
+      const currentIndex = Math.floor(passedDays / 7);
+      const dueAt = addDaysIso(baseIso, currentIndex * 7);
+      const mod = passedDays % 7;
+      const doc = state.checkinsByIndex[currentIndex] || null;
+
+      if(doc){
+        return {
+          baseIso,
+          passedDays,
+          currentIndex,
+          dueAt,
+          status: "submitted",
+          daysUntilDue: mod === 0 ? 7 : 7 - mod,
+          doc
+        };
+      }
+
+      return {
+        baseIso,
+        passedDays,
+        currentIndex,
+        dueAt,
+        status: mod === 0 ? "due" : "pending",
+        daysUntilDue: mod === 0 ? 0 : 7 - mod,
+        doc: null
+      };
+    }
+
+    function setCheckinFormValues(doc = null){
+      $("#ciWeight").value = doc?.weight ?? "";
+      $("#ciMood").value = doc?.mood ?? "";
+      $("#ciEnergy").value = doc?.energy ?? "";
+      $("#ciSleepHours").value = doc?.sleep ?? "";
+      $("#ciWaist").value = doc?.waist ?? "";
+      $("#ciHips").value = doc?.hips ?? "";
+      $("#ciThigh").value = doc?.thigh ?? "";
+      $("#ciNote").value = doc?.note ?? "";
+      $("#ciPhoto").value = "";
+
+      const previewWrap = $("#ciPreviewWrap");
+      const previewImg = $("#ciPreviewImg");
+      if(state.checkinPreviewUrl){
+        URL.revokeObjectURL(state.checkinPreviewUrl);
+        state.checkinPreviewUrl = "";
+      }
+
+      if(doc?.imageUrl){
+        previewImg.src = doc.imageUrl;
+        previewWrap.classList.add("is-on");
+      }else{
+        previewImg.removeAttribute("src");
+        previewWrap.classList.remove("is-on");
+      }
+    }
+
+    function openCheckinForm(editMode = false){
+      const wrap = $("#weeklyCheckinFormWrap");
+      wrap.classList.add("is-open");
+      const meta = getCurrentCheckinMeta();
+      setCheckinFormValues(editMode ? meta.doc : null);
+    }
+
+    function closeCheckinForm(){
+      $("#weeklyCheckinFormWrap").classList.remove("is-open");
+      if(state.checkinPreviewUrl){
+        URL.revokeObjectURL(state.checkinPreviewUrl);
+        state.checkinPreviewUrl = "";
+      }
+      $("#ciPreviewImg").removeAttribute("src");
+      $("#ciPreviewWrap").classList.remove("is-on");
+      $("#ciPhoto").value = "";
+    }
+
+    function renderWeeklyCheckinSummary(doc){
+      const box = $("#weeklyCheckinSummary");
+      const grid = $("#weeklyCheckinSummaryGrid");
+      const imageLink = $("#weeklyCheckinImageLink");
+
+      if(!doc){
+        box.style.display = "none";
+        grid.innerHTML = "";
+        imageLink.style.display = "none";
+        imageLink.removeAttribute("href");
+        return;
+      }
+
+      const rows = [
+        ["Beküldve", humanDateLabel(isoDateFromAny(doc.submittedAtISO || doc.submittedAt))],
+        ["Testsúly", doc.weight != null ? `${doc.weight} kg` : "—"],
+        ["Közérzet", doc.mood != null ? `${doc.mood}/10` : "—"],
+        ["Energia", doc.energy != null ? `${doc.energy}/10` : "—"],
+        ["Alvás", doc.sleep != null ? `${doc.sleep} óra` : "—"],
+        ["Derék", doc.waist != null ? `${doc.waist} cm` : "—"],
+        ["Csípő", doc.hips != null ? `${doc.hips} cm` : "—"],
+        ["Comb", doc.thigh != null ? `${doc.thigh} cm` : "—"],
+        ["Megjegyzés", doc.note ? doc.note : "—"]
+      ];
+
+      grid.innerHTML = rows.map(([label, value]) => `
+        <div class="checkin-summary-item">
+          <b>${escapeHtml(label)}</b>
+          <span>${escapeHtml(String(value || "—"))}</span>
+        </div>
+      `).join("");
+
+      if(doc.imageUrl){
+        imageLink.href = doc.imageUrl;
+        imageLink.style.display = "inline-flex";
+      }else{
+        imageLink.style.display = "none";
+        imageLink.removeAttribute("href");
+      }
+
+      box.style.display = "block";
+    }
+
+    function renderWeeklyCheckin(){
+      const meta = getCurrentCheckinMeta();
+      state.currentCheckinIndex = meta.currentIndex;
+      state.currentCheckinDueAt = meta.dueAt;
+      state.currentCheckinDoc = meta.doc || null;
+
+      const pill = $("#weeklyCheckinStatusPill");
+      const title = $("#weeklyCheckinTitle");
+      const text = $("#weeklyCheckinText");
+      const due = $("#weeklyCheckinDueLabel");
+      const next = $("#weeklyCheckinNextLabel");
+      const btnOpen = $("#btnOpenWeeklyCheckin");
+      const btnEdit = $("#btnEditWeeklyCheckin");
+
+      btnOpen.style.display = "none";
+      btnEdit.style.display = "none";
+
+      if(meta.status === "upcoming"){
+        pill.className = "status-pill warn";
+        pill.textContent = "Még nem esedékes";
+        title.textContent = "Következő heti check-in";
+        text.textContent = `A check-in a program indulásától számítva 7 naponta jelenik meg. A következő ${humanDueText(meta.daysUntilDue).toLowerCase()}.`;
+        due.textContent = humanDateLabel(meta.dueAt);
+        next.textContent = humanDueText(meta.daysUntilDue);
+        renderWeeklyCheckinSummary(null);
+      }
+
+      if(meta.status === "due"){
+        pill.className = "status-pill ok";
+        pill.textContent = "Új check-in elérhető";
+        title.textContent = `Check-in #${meta.currentIndex}`;
+        text.textContent = "Töltsd ki most a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.";
+        due.textContent = `${humanDateLabel(meta.dueAt)} • Ma`;
+        next.textContent = "Beküldés után 7 nap múlva";
+        btnOpen.style.display = "inline-flex";
+        renderWeeklyCheckinSummary(null);
+      }
+
+      if(meta.status === "pending"){
+        pill.className = "status-pill danger";
+        pill.textContent = "Check-in függőben";
+        title.textContent = `Check-in #${meta.currentIndex}`;
+        text.textContent = "A heti check-in már esedékes. Kérlek töltsd ki, hogy lássam az aktuális állapotodat.";
+        due.textContent = `${humanDateLabel(meta.dueAt)} • Függőben`;
+        next.textContent = humanDueText(meta.daysUntilDue);
+        btnOpen.style.display = "inline-flex";
+        renderWeeklyCheckinSummary(null);
+      }
+
+      if(meta.status === "submitted"){
+        pill.className = "status-pill ok";
+        pill.textContent = "Check-in elküldve";
+        title.textContent = `Check-in #${meta.currentIndex} rendben`;
+        text.textContent = "Az aktuális heti check-in megérkezett. A következő automatikusan 7 nap múlva lesz elérhető.";
+        due.textContent = `${humanDateLabel(meta.dueAt)} • Beküldve`;
+        next.textContent = humanDueText(meta.daysUntilDue);
+        btnEdit.style.display = "inline-flex";
+        renderWeeklyCheckinSummary(meta.doc);
+      }
+    }
+
     function renderWelcome(){
       const name = (profile?.name || "").trim();
       const g = timeGreetingHu();
@@ -888,10 +1487,6 @@
       $("#barWater").style.width = `${clamp(((t.water||0)/8)*100, 0, 100)}%`;
       $("#lblSleep").textContent = `${clamp(t.sleep||0,0,8)}/8`;
       $("#barSleep").style.width = `${clamp(((t.sleep||0)/8)*100, 0, 100)}%`;
-
-      const done = t.checkinDone ? 1 : 0;
-      $("#checkinLabel").textContent = `${done}/1`;
-      $("#barCheckin").style.width = `${done*100}%`;
     }
 
     function renderDiet(){
@@ -1119,6 +1714,105 @@
       });
     }
 
+    async function uploadCheckinImage(file, checkinIndex){
+      const safeName = sanitizeFilename(file.name || "photo.jpg") || "photo.jpg";
+      const path = `checkins/${UID}/checkin-${checkinIndex}-${Date.now()}-${safeName}`;
+      const ref = storageRef(storage, path);
+      await uploadBytes(ref, file, { contentType: file.type || "image/jpeg" });
+      const url = await getDownloadURL(ref);
+      return { imageUrl: url, imagePath: path };
+    }
+
+    async function saveWeeklyCheckin(){
+      const btn = $("#btnSaveWeeklyCheckin");
+      btn.disabled = true;
+
+      try{
+        const weight = numberOrNull($("#ciWeight").value);
+        const mood = numberOrNull($("#ciMood").value);
+        const energy = numberOrNull($("#ciEnergy").value);
+        const sleep = numberOrNull($("#ciSleepHours").value);
+        const waist = numberOrNull($("#ciWaist").value);
+        const hips = numberOrNull($("#ciHips").value);
+        const thigh = numberOrNull($("#ciThigh").value);
+        const note = String($("#ciNote").value || "").trim();
+
+        if(mood != null && (mood < 1 || mood > 10)) throw new Error("A közérzet mező 1 és 10 között lehet.");
+        if(energy != null && (energy < 1 || energy > 10)) throw new Error("Az energia mező 1 és 10 között lehet.");
+
+        let payload = {
+          uid: UID,
+          checkinIndex: state.currentCheckinIndex,
+          dueAt: state.currentCheckinDueAt,
+          cycleStart: state.currentCheckinBase,
+          weekNumber: state.weekIdx + 1,
+          weight,
+          mood,
+          energy,
+          sleep,
+          waist,
+          hips,
+          thigh,
+          note,
+          submittedAt: fs.serverTimestamp(),
+          submittedAtISO: new Date().toISOString(),
+          updatedAt: fs.serverTimestamp()
+        };
+
+        const file = $("#ciPhoto").files?.[0] || null;
+        if(file){
+          const img = await uploadCheckinImage(file, state.currentCheckinIndex);
+          payload = { ...payload, ...img };
+        } else if(state.currentCheckinDoc?.imageUrl){
+          payload.imageUrl = state.currentCheckinDoc.imageUrl;
+          payload.imagePath = state.currentCheckinDoc.imagePath || "";
+        }
+
+        await fs.setDoc(
+          fs.doc(db, "users", UID, "checkins", `checkin-${state.currentCheckinIndex}`),
+          payload,
+          { merge: true }
+        );
+
+        await loadWeeklyCheckins();
+        renderWeeklyCheckin();
+        closeCheckinForm();
+        openInfo("Siker", "A heti check-in sikeresen el lett mentve.");
+      }catch(e){
+        console.error(e);
+        openInfo("Hiba", escapeHtml(e.message || String(e)));
+      }finally{
+        btn.disabled = false;
+      }
+    }
+
+    $("#btnOpenWeeklyCheckin").addEventListener("click", ()=>openCheckinForm(false));
+    $("#btnEditWeeklyCheckin").addEventListener("click", ()=>openCheckinForm(true));
+    $("#btnCancelWeeklyCheckin").addEventListener("click", closeCheckinForm);
+    $("#btnSaveWeeklyCheckin").addEventListener("click", saveWeeklyCheckin);
+
+    $("#ciPhoto").addEventListener("change", (e)=>{
+      const file = e.target.files?.[0] || null;
+      const previewWrap = $("#ciPreviewWrap");
+      const previewImg = $("#ciPreviewImg");
+
+      if(state.checkinPreviewUrl){
+        URL.revokeObjectURL(state.checkinPreviewUrl);
+        state.checkinPreviewUrl = "";
+      }
+
+      if(!file){
+        previewImg.removeAttribute("src");
+        previewWrap.classList.remove("is-on");
+        return;
+      }
+
+      const url = URL.createObjectURL(file);
+      state.checkinPreviewUrl = url;
+      previewImg.src = url;
+      previewWrap.classList.add("is-on");
+    });
+
     $("#btnLogout").addEventListener("click", async ()=>{
       await logout();
       toLogin(state.lang || "hu");
@@ -1140,12 +1834,8 @@
       try{ await saveTrackers({ sleep: Math.min(8, (state.trackers.sleep || 0) + 1) }); renderTrackers(); }
       catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
-    $("#btnDoCheckin").addEventListener("click", async ()=>{
-      try{ await saveTrackers({ checkinDone:true, checkinAt: new Date().toISOString() }); renderTrackers(); }
-      catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
-    });
     $("#btnResetTrackers").addEventListener("click", async ()=>{
-      try{ await saveTrackers({ water:0, sleep:0, checkinDone:false, checkinAt:null }); renderTrackers(); }
+      try{ await saveTrackers({ water:0, sleep:0 }); renderTrackers(); }
       catch(e){ console.error(e); openInfo("Hiba", escapeHtml(e.message || String(e))); }
     });
 
@@ -1180,7 +1870,6 @@
       const dismissed = localStorage.getItem("fl_ios_install_dismissed_v1") === "1";
       const shouldShow = isIOS && isSafari && !isStandalone && !dismissed;
 
-      // ikon preview (ha van)
       try{
         const img = new Image();
         img.src = "./icons/apple-touch-icon.png";
@@ -1393,6 +2082,7 @@
 
         await loadTrackersForToday();
         await ensureWeekLoaded(state.weekIdx + 1);
+        await loadWeeklyCheckins();
 
         renderWelcome();
         renderHeader();
@@ -1402,6 +2092,7 @@
         renderDiet();
         renderMotivation();
         renderTechVault();
+        renderWeeklyCheckin();
 
         $("#setGoal").value = profile.goal || "";
         $("#setLevel").value = profile.level || 2;
@@ -1418,4 +2109,4 @@
     });
   </script>
 </body>
-</html>
+                                                                      </html>
