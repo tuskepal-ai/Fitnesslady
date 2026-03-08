@@ -125,30 +125,26 @@
       box-shadow: 0 0 0 4px rgba(255,79,216,.12);
     }
 
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; align-items:center; }
-    .hint{
-      color: rgba(255,255,255,.58);
-      font-size: 12.8px;
-      line-height: 1.45;
-      margin-top: 10px;
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top: 14px;
+      align-items:center;
     }
 
-    .msg{
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.86);
-      display:none;
-      white-space: pre-wrap;
-      word-break: break-word;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-      font-size: 12.5px;
-      line-height: 1.45;
+    .link-btn{
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: rgba(255,255,255,.82);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      text-decoration: underline;
+      text-underline-offset: 3px;
     }
-    .msg.ok{ border-color: rgba(130,255,200,.35); }
-    .msg.err{ border-color: rgba(255,120,140,.35); }
+    .link-btn:hover{ color:#fff; }
 
     footer{
       margin-top: 16px;
@@ -183,13 +179,8 @@
 
       <div class="row">
         <button class="pill primary" id="btnLogin" type="button">Belépés</button>
+        <button class="link-btn" id="btnForgot" type="button">Elfelejtett jelszó</button>
       </div>
-
-      <div class="hint">
-        Ha vásárlóként regisztrációs linket kaptál, azon keresztül hozz létre jelszót — utána itt tudsz belépni.
-      </div>
-
-      <div class="msg" id="msgBox"></div>
     </div>
 
     <footer>
@@ -198,70 +189,35 @@
     </footer>
   </div>
 
-  <!-- ✅ 1) Non-module hibafogó: akkor is kiír, ha a module import elhasal -->
-  <script>
-    (function(){
-      const msg = document.getElementById("msgBox");
-      function show(text, kind){
-        if(!msg) return;
-        msg.className = "msg " + (kind === "err" ? "err" : "ok");
-        msg.style.display = "block";
-        msg.textContent = String(text || "");
-      }
-      window.__flShow = show;
-
-      window.addEventListener("error", function(ev){
-        const detail = {
-          type: "window.error",
-          message: ev && ev.message,
-          filename: ev && ev.filename,
-          lineno: ev && ev.lineno,
-          colno: ev && ev.colno,
-          error: ev && ev.error ? { name: ev.error.name, message: ev.error.message, stack: ev.error.stack } : null
-        };
-        show("JS ERROR (non-module):\n" + JSON.stringify(detail, null, 2), "err");
-      });
-
-      window.addEventListener("unhandledrejection", function(ev){
-        const r = ev && ev.reason;
-        const detail = {
-          type: "unhandledrejection",
-          reason: (r && (r.message || r.code)) ? { code: r.code || null, message: r.message || String(r), stack: r.stack || null } : String(r)
-        };
-        show("PROMISE ERROR (non-module):\n" + JSON.stringify(detail, null, 2), "err");
-      });
-
-      // ping: DOM OK
-      show("DOM OK — JS hibafogó aktív.\nMost töltöm a firebase modult…", "ok");
-    })();
-  </script>
-
-  <!-- ✅ 2) Module: dinamikus import + try/catch, hogy biztosan kiírjuk ha import hiba van -->
   <script type="module">
-    const show = (text, kind="ok") => (window.__flShow ? window.__flShow(text, kind) : console.log(text));
-
     const $ = (s) => document.querySelector(s);
 
-    function fmtErr(e){
-      return JSON.stringify({
-        name: e?.name || null,
-        code: e?.code || null,
-        message: e?.message || String(e),
-        stack: e?.stack || null
-      }, null, 2);
-    }
-
-    // UI alap
     $("#y").textContent = new Date().getFullYear();
 
+    function getReadableError(e){
+      return e?.message || "Ismeretlen hiba";
+    }
+
+    async function sendResetViaFallback(email){
+      const authModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+      const fb = await import("../shared/firebase.js");
+      const auth =
+        fb.auth ||
+        fb.firebaseAuth ||
+        fb.getAuthInstance?.() ||
+        fb.getAuth?.();
+
+      if (!auth) {
+        throw new Error("Nem található Firebase Auth példány a shared/firebase.js-ben.");
+      }
+
+      await authModule.sendPasswordResetEmail(auth, email);
+    }
+
     try{
-      // 🔥 FONTOS: itt derül ki a 404 / rossz útvonal
       const fb = await import("../shared/firebase.js");
 
-      // back link
       $("#btnBack").href = `${fb.BASE_PREFIX}/hu/`;
-
-      show("MODULE OK — firebase.js betöltve ✅\nHa most sem megy a belépés, kattints és látni fogod a konkrét login hibát.", "ok");
 
       async function routeAfterLogin(user){
         try{
@@ -272,48 +228,74 @@
           }else{
             fb.toApp("hu");
           }
-        }catch(e){
-          show("ROUTE ERROR:\n" + fmtErr(e), "err");
+        }catch{
           fb.toApp("hu");
         }
       }
 
       async function doLogin(){
         const email = ($("#email").value || "").trim();
-        const pass  = ($("#pass").value || ""); // jelszó: ne trim
+        const pass  = ($("#pass").value || "");
 
-        if(!email || !pass){
-          show("VALIDATION ERROR:\n" + JSON.stringify({ emailEmpty: !email, passEmpty: !pass }, null, 2), "err");
-          return;
-        }
+        if(!email || !pass) return;
 
         const btn = $("#btnLogin");
         btn.disabled = true;
-        show("Beléptetés…", "ok");
 
         try{
           const cred = await fb.loginEmailPassword(email, pass);
-          show("LOGIN OK ✅\n" + JSON.stringify({ uid: cred?.user?.uid || null, email: cred?.user?.email || null }, null, 2), "ok");
           await routeAfterLogin(cred.user);
-        }catch(e){
-          show("LOGIN ERROR:\n" + fmtErr(e), "err");
+        }catch{
+          btn.disabled = false;
+        }
+      }
+
+      async function doForgotPassword(){
+        const email = ($("#email").value || "").trim();
+
+        if(!email){
+          alert("Írd be az e-mail címedet a jelszó visszaállításához.");
+          $("#email").focus();
+          return;
+        }
+
+        const btn = $("#btnForgot");
+        btn.disabled = true;
+
+        try{
+          if (typeof fb.sendPasswordResetEmail === "function") {
+            await fb.sendPasswordResetEmail(email);
+          } else if (typeof fb.resetPassword === "function") {
+            await fb.resetPassword(email);
+          } else if (typeof fb.resetPasswordEmail === "function") {
+            await fb.resetPasswordEmail(email);
+          } else if (typeof fb.sendResetEmail === "function") {
+            await fb.sendResetEmail(email);
+          } else {
+            await sendResetViaFallback(email);
+          }
+
+          alert("Elküldtük a jelszó-visszaállító e-mailt.");
+        } catch (e) {
+          alert("A jelszó-visszaállítás most nem sikerült. Kérlek próbáld újra később.");
+          console.error("Forgot password error:", getReadableError(e), e);
+        } finally {
           btn.disabled = false;
         }
       }
 
       $("#btnLogin").addEventListener("click", doLogin);
+      $("#btnForgot").addEventListener("click", doForgotPassword);
       $("#pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
 
       fb.onAuth(async (user)=>{
         if(user){
-          show("AUTH STATE: már be vagy jelentkezve → routing…", "ok");
           await routeAfterLogin(user);
         }
       });
 
     }catch(e){
-      // ⛔ itt fog kijönni pl. 404 / SyntaxError / CORS / import error
-      show("MODULE IMPORT ERROR:\n" + fmtErr(e) + "\n\nTipp: nagyon valószínű a ../shared/firebase.js útvonal 404-es vagy hibás.", "err");
+      console.error("Login module error:", e);
     }
   </script>
 </body>
