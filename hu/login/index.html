@@ -1,4 +1,3 @@
-<!-- FILE: /hu/login/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -7,19 +6,12 @@
   <title>FitnessLady Login</title>
   <meta name="robots" content="noindex" />
 
-  <!-- ✅ PWA / iOS -->
   <meta name="theme-color" content="#07060b" />
-
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="apple-mobile-web-app-title" content="FitnessLady" />
-  <!-- loginból az app ikon -->
   <link rel="apple-touch-icon" href="../app/icons/apple-touch-icon.png" />
-
-  <!-- opcionális: manifest (iOS-n nem kötelező, de jó) -->
   <link rel="manifest" href="../app/manifest.webmanifest" />
-
-  <!-- extra fallback ikonok -->
   <link rel="icon" type="image/png" sizes="192x192" href="../app/icons/icon-192.png" />
   <link rel="icon" type="image/png" sizes="512x512" href="../app/icons/icon-512.png" />
 
@@ -32,6 +24,8 @@
       --pink:#ff4fd8;
       --pink2:#b14cff;
       --gold:#ffd38a;
+      --green:#7dffb3;
+      --red:#ff8f8f;
 
       --stroke: rgba(255,255,255,.10);
       --shadow: 0 18px 55px rgba(0,0,0,.55);
@@ -56,11 +50,16 @@
     }
 
     .container{ width:min(var(--max), 92vw); margin:0 auto; padding: 18px 0 44px; }
+
     .top{
       display:flex; align-items:center; justify-content:space-between; gap:12px;
       padding: 14px 0;
     }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
+
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px;
+    }
+
     .dot{
       width:10px;height:10px;border-radius:999px;
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
@@ -79,7 +78,8 @@
       user-select:none;
       white-space: nowrap;
       gap:8px;
-      transition: transform .18s ease, border-color .18s ease, background .18s ease;
+      transition: transform .18s ease, border-color .18s ease, background .18s ease, opacity .18s ease;
+      text-decoration:none;
     }
     .pill:hover{ transform: translateY(-1px); border-color: rgba(255,255,255,.20); background: rgba(255,255,255,.07); }
     .pill.primary{
@@ -87,6 +87,11 @@
       color:#140813;
       border-color: rgba(255,255,255,.18);
       font-weight: 900;
+    }
+    .pill.secondary{
+      background: rgba(255,255,255,.06);
+      color: #fff;
+      font-weight: 800;
     }
     .pill:disabled{ opacity:.6; cursor:not-allowed; transform:none !important; }
 
@@ -106,10 +111,69 @@
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
       letter-spacing: -.3px;
       font-size: 40px;
+      line-height: 1.05;
     }
-    .sub{ margin:0 0 14px; color: var(--muted); line-height:1.6; }
 
-    label{ display:block; margin: 10px 0 6px; color: rgba(255,255,255,.72); font-weight:800; }
+    .sub{
+      margin:0 0 14px;
+      color: var(--muted);
+      line-height:1.6;
+    }
+
+    .notice{
+      display:none;
+      margin: 0 0 14px;
+      padding: 14px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(255,211,138,.24);
+      background: linear-gradient(180deg, rgba(255,211,138,.14), rgba(255,211,138,.07));
+      color: #fff3d5;
+      box-shadow: 0 14px 36px rgba(0,0,0,.25);
+    }
+    .notice.show{ display:block; }
+    .notice strong{ display:block; margin-bottom:6px; color:#fff; }
+
+    .status{
+      display:none;
+      margin: 0 0 14px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      font-weight: 700;
+      line-height: 1.5;
+    }
+    .status.show{ display:block; }
+    .status.ok{
+      border: 1px solid rgba(125,255,179,.22);
+      background: rgba(125,255,179,.10);
+      color: #dfffea;
+    }
+    .status.err{
+      border: 1px solid rgba(255,143,143,.22);
+      background: rgba(255,143,143,.10);
+      color: #ffe2e2;
+    }
+    .status.info{
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(255,255,255,.06);
+      color: #f2f2f2;
+    }
+
+    .section-title{
+      margin: 18px 0 8px;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,.60);
+    }
+
+    label{
+      display:block;
+      margin: 10px 0 6px;
+      color: rgba(255,255,255,.72);
+      font-weight:800;
+    }
+
     input{
       width:100%;
       padding: 14px 14px;
@@ -120,9 +184,17 @@
       outline: none;
       font-size: 15px;
     }
+
     input:focus{
       border-color: rgba(255,79,216,.35);
       box-shadow: 0 0 0 4px rgba(255,79,216,.12);
+    }
+
+    .hint{
+      margin-top: 7px;
+      color: var(--muted2);
+      font-size: 13px;
+      line-height: 1.5;
     }
 
     .row{
@@ -146,12 +218,31 @@
     }
     .link-btn:hover{ color:#fff; }
 
+    .sep{
+      height: 1px;
+      margin: 18px 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,.14), transparent);
+    }
+
+    .mini{
+      margin-top: 10px;
+      color: rgba(255,255,255,.70);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
     footer{
       margin-top: 16px;
       padding: 14px 0 0;
       display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
       color: rgba(255,255,255,.70);
       font-size: 13px;
+    }
+
+    @media (max-width: 640px){
+      h1{ font-size: 34px; }
+      .row > *{ width: 100%; }
+      .pill, .link-btn{ justify-content:center; text-align:center; }
     }
 
     @media (prefers-reduced-motion: reduce){
@@ -168,6 +259,13 @@
     </div>
 
     <div class="card">
+      <div class="notice" id="purchaseNotice">
+        <strong>Sikeres vásárlás után itt tudsz belépni.</strong>
+        Ha még nincs jelszavad, először nyomd meg az <b>„Jelszó beállítása / visszaállítása”</b> gombot. A rendszer e-mailt küld a megadott címedre, és utána már be tudsz jelentkezni.
+      </div>
+
+      <div class="status info" id="statusBox"></div>
+
       <h1>Bejelentkezés</h1>
       <p class="sub">E-mail + jelszó. Belépés után automatikusan a Saját programodba visz.</p>
 
@@ -176,10 +274,26 @@
 
       <label for="pass">Jelszó</label>
       <input id="pass" type="password" autocomplete="current-password" placeholder="••••••••" />
+      <div class="hint">Ha most vásároltál, és még nincs jelszavad, ne itt próbálkozz először. Előbb állíts be jelszót lent.</div>
 
       <div class="row">
         <button class="pill primary" id="btnLogin" type="button">Belépés</button>
         <button class="link-btn" id="btnForgot" type="button">Elfelejtett jelszó</button>
+      </div>
+
+      <div class="sep"></div>
+
+      <div class="section-title">Új vásárló vagy?</div>
+      <p class="sub" style="margin-bottom:10px;">
+        Ha a Stripe fizetés után érkeztél ide, ezzel a gombbal tudsz jelszót beállítani az e-mail címedhez.
+      </p>
+
+      <div class="row" style="margin-top:0;">
+        <button class="pill secondary" id="btnSetPassword" type="button">Jelszó beállítása / visszaállítása</button>
+      </div>
+
+      <div class="mini">
+        Ugyanarra az e-mail címre kérd a linket, amivel a vásárlást indítottad.
       </div>
     </div>
 
@@ -191,11 +305,48 @@
 
   <script type="module">
     const $ = (s) => document.querySelector(s);
+    const qs = new URLSearchParams(window.location.search);
 
     $("#y").textContent = new Date().getFullYear();
 
     function getReadableError(e){
       return e?.message || "Ismeretlen hiba";
+    }
+
+    function showStatus(message, type = "info"){
+      const box = $("#statusBox");
+      box.textContent = message;
+      box.className = `status show ${type}`;
+    }
+
+    function clearStatus(){
+      const box = $("#statusBox");
+      box.textContent = "";
+      box.className = "status info";
+    }
+
+    function readQueryEmail(){
+      const raw =
+        qs.get("email") ||
+        qs.get("prefill_email") ||
+        qs.get("customer_email") ||
+        "";
+      return String(raw).trim();
+    }
+
+    function shouldShowPurchaseNotice(){
+      const success = qs.get("success");
+      const checkout = qs.get("checkout");
+      const source = qs.get("source");
+      const fromStripe = qs.get("from") === "stripe";
+
+      return (
+        success === "1" ||
+        success === "true" ||
+        checkout === "success" ||
+        source === "stripe" ||
+        fromStripe
+      );
     }
 
     async function sendResetViaFallback(email){
@@ -219,6 +370,16 @@
 
       $("#btnBack").href = `${fb.BASE_PREFIX}/hu/`;
 
+      const queryEmail = readQueryEmail();
+      if (queryEmail) {
+        $("#email").value = queryEmail;
+      }
+
+      if (shouldShowPurchaseNotice()) {
+        $("#purchaseNotice").classList.add("show");
+        showStatus("A fizetés rendben van. Most állíts be jelszót ugyanarra az e-mail címre, majd jelentkezz be.", "ok");
+      }
+
       async function routeAfterLogin(user){
         try{
           const ud = await fb.ensureUserDoc(user.uid, user.email || "");
@@ -234,10 +395,17 @@
       }
 
       async function doLogin(){
+        clearStatus();
+
         const email = ($("#email").value || "").trim();
         const pass  = ($("#pass").value || "");
 
-        if(!email || !pass) return;
+        if(!email || !pass){
+          showStatus("Add meg az e-mail címedet és a jelszavadat.", "err");
+          if (!email) $("#email").focus();
+          else $("#pass").focus();
+          return;
+        }
 
         const btn = $("#btnLogin");
         btn.disabled = true;
@@ -245,22 +413,39 @@
         try{
           const cred = await fb.loginEmailPassword(email, pass);
           await routeAfterLogin(cred.user);
-        }catch{
+        }catch(e){
+          const msg = String(getReadableError(e) || "").toLowerCase();
+
+          if (
+            msg.includes("auth/user-not-found") ||
+            msg.includes("auth/invalid-credential") ||
+            msg.includes("auth/wrong-password") ||
+            msg.includes("auth/invalid-login-credentials")
+          ) {
+            showStatus("Ezzel az e-mail címmel még nincs beállított jelszó, vagy hibás a belépési adat. Ha most vásároltál, előbb nyomd meg a „Jelszó beállítása / visszaállítása” gombot.", "err");
+          } else {
+            showStatus("A belépés most nem sikerült. Ellenőrizd az adatokat, majd próbáld újra.", "err");
+          }
+          console.error("Login error:", getReadableError(e), e);
           btn.disabled = false;
         }
       }
 
       async function doForgotPassword(){
+        clearStatus();
+
         const email = ($("#email").value || "").trim();
 
         if(!email){
-          alert("Írd be az e-mail címedet a jelszó visszaállításához.");
+          showStatus("Írd be az e-mail címedet a jelszó-visszaállításhoz.", "err");
           $("#email").focus();
           return;
         }
 
-        const btn = $("#btnForgot");
-        btn.disabled = true;
+        const btnForgot = $("#btnForgot");
+        const btnSetPassword = $("#btnSetPassword");
+        btnForgot.disabled = true;
+        btnSetPassword.disabled = true;
 
         try{
           if (typeof fb.sendPasswordResetEmail === "function") {
@@ -275,18 +460,30 @@
             await sendResetViaFallback(email);
           }
 
-          alert("Elküldtük a jelszó-visszaállító e-mailt.");
+          showStatus("Elküldtük a jelszó linket. Nézd meg az e-mail fiókodat, állítsd be a jelszót, majd gyere vissza és jelentkezz be.", "ok");
         } catch (e) {
-          alert("A jelszó-visszaállítás most nem sikerült. Kérlek próbáld újra később.");
+          showStatus("A jelszó-visszaállítás most nem sikerült. Kérlek próbáld újra később.", "err");
           console.error("Forgot password error:", getReadableError(e), e);
         } finally {
-          btn.disabled = false;
+          btnForgot.disabled = false;
+          btnSetPassword.disabled = false;
         }
       }
 
       $("#btnLogin").addEventListener("click", doLogin);
       $("#btnForgot").addEventListener("click", doForgotPassword);
-      $("#pass").addEventListener("keydown", (e)=>{ if(e.key === "Enter") doLogin(); });
+      $("#btnSetPassword").addEventListener("click", doForgotPassword);
+
+      $("#pass").addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") doLogin();
+      });
+
+      $("#email").addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") {
+          e.preventDefault();
+          $("#pass").focus();
+        }
+      });
 
       fb.onAuth(async (user)=>{
         if(user){
@@ -296,6 +493,7 @@
 
     }catch(e){
       console.error("Login module error:", e);
+      showStatus("A bejelentkező modul most nem töltött be rendesen. Kérlek frissítsd az oldalt.", "err");
     }
   </script>
 </body>
