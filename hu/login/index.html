@@ -261,7 +261,7 @@
     <div class="card">
       <div class="notice" id="purchaseNotice">
         <strong>Sikeres vásárlás után itt tudsz belépni.</strong>
-        Ha még nincs jelszavad, először nyomd meg az <b>„Jelszó beállítása / visszaállítása”</b> gombot. A rendszer e-mailt küld a megadott címedre, és utána már be tudsz jelentkezni.
+        Ha még nincs fiókod, lent az <b>„Új fiók létrehozása”</b> résszel tudsz regisztrálni ugyanazzal az e-mail címmel.
       </div>
 
       <div class="status info" id="statusBox"></div>
@@ -274,7 +274,7 @@
 
       <label for="pass">Jelszó</label>
       <input id="pass" type="password" autocomplete="current-password" placeholder="••••••••" />
-      <div class="hint">Ha most vásároltál, és még nincs jelszavad, ne itt próbálkozz először. Előbb állíts be jelszót lent.</div>
+      <div class="hint">Ha még nincs fiókod, lent regisztrálj.</div>
 
       <div class="row">
         <button class="pill primary" id="btnLogin" type="button">Belépés</button>
@@ -283,18 +283,24 @@
 
       <div class="sep"></div>
 
-      <div class="section-title">Új vásárló vagy?</div>
+      <div class="section-title">Új fiók létrehozása</div>
       <p class="sub" style="margin-bottom:10px;">
-        Ha a Stripe fizetés után érkeztél ide, ezzel a gombbal tudsz jelszót beállítani az e-mail címedhez.
-      </p>
+       
+
+      <label for="regEmail">E-mail</label>
+      <input id="regEmail" type="email" autocomplete="email" placeholder="email@domain.com" />
+
+      <label for="regPass">Jelszó</label>
+      <input id="regPass" type="password" autocomplete="new-password" placeholder="Legalább 6 karakter" />
+
+      <label for="regPass2">Jelszó újra</label>
+      <input id="regPass2" type="password" autocomplete="new-password" placeholder="Írd be újra a jelszót" />
 
       <div class="row" style="margin-top:0;">
-        <button class="pill secondary" id="btnSetPassword" type="button">Jelszó beállítása / visszaállítása</button>
+        <button class="pill secondary" id="btnRegister" type="button">Új fiók létrehozása</button>
       </div>
-
-      <div class="mini">
-        Ugyanarra az e-mail címre kérd a linket, amivel a vásárlást indítottad.
-      </div>
+    </div>
+   
     </div>
 
     <footer>
@@ -349,6 +355,39 @@
       );
     }
 
+    async function getAuthContext(fb){
+      const authModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
+      const auth =
+        fb.auth ||
+        fb.firebaseAuth ||
+        fb.getAuthInstance?.() ||
+        fb.getAuth?.();
+
+      if (!auth) {
+        throw new Error("Nem található Firebase Auth példány a shared/firebase.js-ben.");
+      }
+
+      return { authModule, auth };
+    }
+
+    async function createUserViaFallback(fb, email, password){
+      if (typeof fb.createUserEmailPassword === "function") {
+        return await fb.createUserEmailPassword(email, password);
+      }
+      if (typeof fb.registerEmailPassword === "function") {
+        return await fb.registerEmailPassword(email, password);
+      }
+      if (typeof fb.signUpEmailPassword === "function") {
+        return await fb.signUpEmailPassword(email, password);
+      }
+      if (typeof fb.signupEmailPassword === "function") {
+        return await fb.signupEmailPassword(email, password);
+      }
+
+      const { authModule, auth } = await getAuthContext(fb);
+      return await authModule.createUserWithEmailAndPassword(auth, email, password);
+    }
+
     async function sendResetViaFallback(email){
       const authModule = await import("https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js");
       const fb = await import("../shared/firebase.js");
@@ -373,11 +412,12 @@
       const queryEmail = readQueryEmail();
       if (queryEmail) {
         $("#email").value = queryEmail;
+        $("#regEmail").value = queryEmail;
       }
 
       if (shouldShowPurchaseNotice()) {
         $("#purchaseNotice").classList.add("show");
-        showStatus("A fizetés rendben van. Most állíts be jelszót ugyanarra az e-mail címre, majd jelentkezz be.", "ok");
+        showStatus("A fizetés rendben van. Ha még nincs fiókod, lent hozd létre, utána automatikusan beléptet.", "ok");
       }
 
       async function routeAfterLogin(user){
@@ -422,7 +462,7 @@
             msg.includes("auth/wrong-password") ||
             msg.includes("auth/invalid-login-credentials")
           ) {
-            showStatus("Ezzel az e-mail címmel még nincs beállított jelszó, vagy hibás a belépési adat. Ha most vásároltál, előbb nyomd meg a „Jelszó beállítása / visszaállítása” gombot.", "err");
+            showStatus("Nincs ilyen felhasználó vagy hibás a jelszó. Ha még nincs fiókod, lent regisztrálj.", "err");
           } else {
             showStatus("A belépés most nem sikerült. Ellenőrizd az adatokat, majd próbáld újra.", "err");
           }
@@ -431,10 +471,74 @@
         }
       }
 
+      async function doRegister(){
+        clearStatus();
+
+        const email = ($("#regEmail").value || "").trim();
+        const pass = ($("#regPass").value || "");
+        const pass2 = ($("#regPass2").value || "");
+
+        if(!email){
+          showStatus("Add meg az e-mail címedet a regisztrációhoz.", "err");
+          $("#regEmail").focus();
+          return;
+        }
+
+        if(!pass || !pass2){
+          showStatus("Add meg kétszer a jelszót.", "err");
+          if (!pass) $("#regPass").focus();
+          else $("#regPass2").focus();
+          return;
+        }
+
+        if(pass.length < 6){
+          showStatus("A jelszónak legalább 6 karakter hosszúnak kell lennie.", "err");
+          $("#regPass").focus();
+          return;
+        }
+
+        if(pass !== pass2){
+          showStatus("A két jelszó nem egyezik.", "err");
+          $("#regPass2").focus();
+          return;
+        }
+
+        const btn = $("#btnRegister");
+        btn.disabled = true;
+
+        try{
+          const cred = await createUserViaFallback(fb, email, pass);
+
+          await fb.ensureUserDoc(cred.user.uid, email);
+
+          $("#email").value = email;
+          $("#pass").value = pass;
+
+          showStatus("Sikeres regisztráció. Beléptetés...", "ok");
+
+          await routeAfterLogin(cred.user);
+        }catch(e){
+          const msg = String(getReadableError(e) || "").toLowerCase();
+
+          if (msg.includes("auth/email-already-in-use")) {
+            showStatus("Ehhez az e-mail címhez már létezik fiók. Jelentkezz be fent vagy kérj jelszó-visszaállítást.", "err");
+          } else if (msg.includes("auth/invalid-email")) {
+            showStatus("Az e-mail cím hibás formátumú.", "err");
+          } else if (msg.includes("auth/weak-password")) {
+            showStatus("A jelszó túl gyenge.", "err");
+          } else {
+            showStatus("A regisztráció most nem sikerült. Próbáld újra.", "err");
+          }
+
+          console.error("Register error:", getReadableError(e), e);
+          btn.disabled = false;
+        }
+      }
+
       async function doForgotPassword(){
         clearStatus();
 
-        const email = ($("#email").value || "").trim();
+        const email = ($("#email").value || $("#regEmail").value || "").trim();
 
         if(!email){
           showStatus("Írd be az e-mail címedet a jelszó-visszaállításhoz.", "err");
@@ -443,9 +547,7 @@
         }
 
         const btnForgot = $("#btnForgot");
-        const btnSetPassword = $("#btnSetPassword");
         btnForgot.disabled = true;
-        btnSetPassword.disabled = true;
 
         try{
           if (typeof fb.sendPasswordResetEmail === "function") {
@@ -460,22 +562,30 @@
             await sendResetViaFallback(email);
           }
 
-          showStatus("Elküldtük a jelszó linket. Nézd meg az e-mail fiókodat, állítsd be a jelszót, majd gyere vissza és jelentkezz be.", "ok");
+          showStatus("Elküldtük a jelszó linket. Nézd meg az e-mail fiókodat, állítsd be a jelszót, majd jelentkezz be.", "ok");
         } catch (e) {
-          showStatus("A jelszó-visszaállítás most nem sikerült. Kérlek próbáld újra később.", "err");
+          const msg = String(getReadableError(e) || "").toLowerCase();
+          if (msg.includes("auth/user-not-found")) {
+            showStatus("Ehhez az e-mail címhez még nincs fiók. Regisztrálj lent.", "err");
+          } else {
+            showStatus("A jelszó-visszaállítás most nem sikerült. Kérlek próbáld újra később.", "err");
+          }
           console.error("Forgot password error:", getReadableError(e), e);
         } finally {
           btnForgot.disabled = false;
-          btnSetPassword.disabled = false;
         }
       }
 
       $("#btnLogin").addEventListener("click", doLogin);
       $("#btnForgot").addEventListener("click", doForgotPassword);
-      $("#btnSetPassword").addEventListener("click", doForgotPassword);
+      $("#btnRegister").addEventListener("click", doRegister);
 
       $("#pass").addEventListener("keydown", (e)=>{
         if(e.key === "Enter") doLogin();
+      });
+
+      $("#regPass2").addEventListener("keydown", (e)=>{
+        if(e.key === "Enter") doRegister();
       });
 
       $("#email").addEventListener("keydown", (e)=>{
@@ -493,7 +603,11 @@
 
     }catch(e){
       console.error("Login module error:", e);
-      showStatus("A bejelentkező modul most nem töltött be rendesen. Kérlek frissítsd az oldalt.", "err");
+      const box = $("#statusBox");
+      if (box) {
+        box.textContent = "A bejelentkező modul most nem töltött be rendesen. Kérlek frissítsd az oldalt.";
+        box.className = "status show err";
+      }
     }
   </script>
 </body>
