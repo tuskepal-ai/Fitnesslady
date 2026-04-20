@@ -1,4 +1,3 @@
-<!-- FILE: /hu/admin/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -414,7 +413,6 @@
       white-space: nowrap;
     }
 
-    /* ✅ Check-in cards */
     .checkinCards{
       display:grid;
       gap: 12px;
@@ -675,6 +673,7 @@
               <div class="actions">
                 <button class="pill primary" id="btnSaveUser" type="button">💾 Mentés</button>
                 <button class="pill primary" id="btnOpenChatInline" type="button">💬 Küldés / Chat</button>
+                <button class="pill danger" id="btnDeleteUser" type="button">🗑 Felhasználó törlése</button>
               </div>
 
               <hr class="hr" />
@@ -862,7 +861,6 @@
           </div>
         </div>
 
-        <!-- ✅ PAGE: CHECK-IN -->
         <div class="page" id="page_checkin">
           <h2>Check-in</h2>
           <p class="sub">A kiválasztott user heti check-injei: testsúly, közérzet, energia, alvás, mérések, megjegyzés és kép.</p>
@@ -967,6 +965,10 @@
       onAuth, logout, toLogin, toApp,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
+    import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-functions.js";
+
+    const fns = getFunctions(undefined, "us-central1");
+    const deleteUserFullFn = httpsCallable(fns, "deleteUserFull");
 
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
@@ -1425,7 +1427,7 @@
           const saved = loadSel();
           if(saved && raw.some(x=>x.id===saved)){
             await pickUser(saved);
-          } else {
+          } else if (items[0]) {
             await pickUser(items[0].id);
           }
         }
@@ -1494,6 +1496,11 @@
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
     });
 
+    async function deleteUserFully(uid){
+      const result = await deleteUserFullFn({ uid });
+      return result?.data || {};
+    }
+
     $("#btnSaveUser").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1521,6 +1528,63 @@
           openChatFor(SEL_UID);
         }
       }catch(e){ console.error(e); err(e.message || String(e)); }
+    });
+
+    $("#btnDeleteUser").addEventListener("click", async ()=>{
+      try{
+        if(!SEL_UID) return err("Nincs user kiválasztva.");
+
+        const email = trimStr($("#u_email").value);
+        const name = trimStr($("#u_name").value);
+        const label = name || email || SEL_UID;
+
+        const yes = window.confirm(
+          `Biztosan törlöd ezt a felhasználót?\n\n${label}\nuid=${SEL_UID}\n\nEz törli a Firestore adatokat ÉS a Firebase Authentication felhasználót is.`
+        );
+        if(!yes) return;
+
+        const uidToDelete = SEL_UID;
+
+        await deleteUserFully(uidToDelete);
+
+        USERS_CACHE.delete(uidToDelete);
+
+        SEL_UID = null;
+        localStorage.removeItem(SEL_KEY);
+        $("#selUser").textContent = "—";
+
+        $("#u_email").value = "";
+        $("#u_name").value = "";
+        $("#u_role").value = "user";
+        $("#u_status").value = "active";
+        $("#u_lang").value = "hu";
+        $("#u_level").value = "2";
+        $("#u_goal").value = "";
+        setPlanUI("start_v1");
+        $("#u_lifetime").value = "true";
+        $("#u_cycleStart").value = "";
+        $("#u_cycleEnd").value = "";
+        $("#w_title").value = "";
+        $("#w_text").value = "";
+        $("#w_video").value = "";
+        $("#m_title").value = "";
+        $("#m_text").value = "";
+        clearTechVaultFields();
+
+        $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
+        $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
+        $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
+
+        renderCheckins([]);
+        closeChat();
+
+        await loadUsersList(false);
+
+        ok("Felhasználó teljesen törölve");
+      }catch(e){
+        console.error(e);
+        err(e.message || String(e));
+      }
     });
 
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
@@ -1779,7 +1843,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    /* ✅ Check-ins */
     let LAST_CHECKINS = [];
 
     function fmtDateAny(v){
@@ -1977,4 +2040,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
