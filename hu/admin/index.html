@@ -128,9 +128,10 @@
       box-shadow: 0 16px 44px rgba(0,0,0,.45);
     }
     .pill:disabled{
-      opacity:.55;
+      opacity:.6;
       cursor:not-allowed;
       transform:none !important;
+      box-shadow: 0 12px 34px rgba(0,0,0,.25);
     }
     .pill.primary{
       background: linear-gradient(135deg, var(--pink), var(--pink2));
@@ -929,7 +930,7 @@
     const USERS_CACHE = new Map();
     function setUserCache(uid, name, email){
       if(!uid) return;
-      USERS_CACHE.set(uid, { name: (name||"").trim(), email: (email||"").trim() });
+      USERS_CACHE.set(uid, { name: (name || "").trim(), email: (email || "").trim() });
     }
     function getUserCache(uid){
       return USERS_CACHE.get(uid) || { name:"", email:"" };
@@ -1168,6 +1169,26 @@
 
     const userPick = $("#userPick");
 
+    function normalizeUserItem(d){
+      return {
+        id: d.id,
+        email: String(d.email || "").trim(),
+        name: String(d.name || "").trim(),
+        role: String(d.role || "user").trim(),
+        status: String(d.status || "active").trim(),
+        lang: String(d.lang || "hu").trim(),
+        level: Number(d.level || 2),
+        goal: String(d.goal || "").trim(),
+        planId: String(d.planId || "start_v1").trim(),
+        lifetimeAccess: !!d.lifetimeAccess,
+        cycleStart: d.cycleStart || "",
+        cycleEnd: d.cycleEnd || "",
+        welcomeCard: d.welcomeCard || null,
+        motivationCard: d.motivationCard || null,
+        techVault: d.techVault || d.techniqueVault || null
+      };
+    }
+
     function fillUserPickDropdown(items){
       const keep = userPick.value || "";
       userPick.innerHTML = `<option value="">— válassz —</option>`;
@@ -1189,42 +1210,12 @@
       await pickUser(uid);
     });
 
-    function normalizeUserItem(d){
-      return {
-        id: d.id,
-        email: String(d.email || "").trim(),
-        name: String(d.name || "").trim(),
-        role: String(d.role || "user").trim(),
-        status: String(d.status || "active").trim(),
-        lang: String(d.lang || "hu").trim(),
-        level: Number(d.level || 2),
-        goal: String(d.goal || "").trim(),
-        planId: String(d.planId || "start_v1").trim(),
-        lifetimeAccess: !!d.lifetimeAccess,
-        cycleStart: d.cycleStart || "",
-        cycleEnd: d.cycleEnd || "",
-        welcomeCard: d.welcomeCard || null,
-        motivationCard: d.motivationCard || null,
-        techVault: d.techVault || d.techniqueVault || null
-      };
-    }
-
     async function loadUsersList(keepSelection=false){
       setDebug({count:null, error:null});
       try{
         const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
         const col = fs.collection(db, "users");
-
-        let snap = null;
-        try{
-          snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(300)));
-        }catch(e1){
-          try{
-            snap = await fs.getDocs(fs.query(col, fs.orderBy("createdAt"), fs.limit(300)));
-          }catch(e2){
-            snap = await fs.getDocs(fs.query(col, fs.limit(300)));
-          }
-        }
+        const snap = await fs.getDocs(col);
 
         const raw = snap.docs.map(d => normalizeUserItem({ id:d.id, ...d.data() }));
 
@@ -1233,20 +1224,22 @@
           const be = (b.email || "").toLowerCase();
           const an = (a.name || "").toLowerCase();
           const bn = (b.name || "").toLowerCase();
-          if(ae && be && ae !== be) return ae.localeCompare(be, "hu");
-          if(an && bn && an !== bn) return an.localeCompare(bn, "hu");
+
+          if (ae && be && ae !== be) return ae.localeCompare(be, "hu");
+          if (an && bn && an !== bn) return an.localeCompare(bn, "hu");
           return String(a.id).localeCompare(String(b.id), "hu");
         });
 
         raw.forEach(u => setUserCache(u.id, u.name, u.email));
+
         setDebug({count: raw.length, error: null});
         fillUserPickDropdown(raw);
 
         const items = raw.filter(u=>{
           if(!qtxt) return true;
-          const em = String(u.email||"").toLowerCase();
-          const nm = String(u.name||"").toLowerCase();
-          const id = String(u.id||"").toLowerCase();
+          const em = String(u.email || "").toLowerCase();
+          const nm = String(u.name || "").toLowerCase();
+          const id = String(u.id || "").toLowerCase();
           return em.includes(qtxt) || nm.includes(qtxt) || id.includes(qtxt);
         });
 
@@ -1284,7 +1277,7 @@
           li.innerHTML = `
             <div>
               <div class="title">${escapeHtml(titleLine)}</div>
-              <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role||"user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId||"—")}</span></div>
+              <div class="desc">uid: <span class="mono">${escapeHtml(u.id)}</span> • role: ${escapeHtml(u.role || "user")} • planId: <span style="color:var(--gold); font-weight:bold;">${escapeHtml(u.planId || "—")}</span></div>
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
               <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
@@ -1304,12 +1297,12 @@
           const saved = loadSel();
           if(saved && raw.some(x=>x.id===saved)){
             await pickUser(saved);
-          } else if (items[0]) {
+          } else if(items[0]) {
             await pickUser(items[0].id);
           }
         }
       }catch(e){
-        console.error(e);
+        console.error("loadUsersList error:", e);
         const msg = e?.code || e?.message || String(e);
         setDebug({count: 0, error: msg});
         err(msg);
@@ -1407,13 +1400,11 @@
         if(!yes) return;
 
         const uidToDelete = SEL_UID;
-
         $("#btnDeleteUser").disabled = true;
 
         await deleteUserFullFn({ uid: uidToDelete });
 
         USERS_CACHE.delete(uidToDelete);
-
         SEL_UID = null;
         localStorage.removeItem(SEL_KEY);
         $("#selUser").textContent = "—";
@@ -1436,15 +1427,12 @@
         $("#m_title").value = "";
         $("#m_text").value = "";
         clearTechVaultFields();
-
         $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
 
         closeChat();
-
         await loadUsersList(false);
-
         ok("Felhasználó teljesen törölve");
       }catch(e){
         console.error(e);
@@ -1766,4 +1754,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
