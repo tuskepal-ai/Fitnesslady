@@ -967,7 +967,7 @@
     } from "../shared/firebase.js";
     import { getFunctions, httpsCallable } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-functions.js";
 
-    const fns = getFunctions(undefined, "us-central1");
+    const fns = getFunctions(undefined, "europe-west1");
     const deleteUserFullFn = httpsCallable(fns, "deleteUserFull");
 
     const $ = (s, r=document) => r.querySelector(s);
@@ -1352,26 +1352,49 @@
       await pickUser(uid);
     });
 
+    function normalizeUserListItem(d){
+      return {
+        id: d.id,
+        email: String(d.email || "").trim(),
+        name: String(d.name || "").trim(),
+        role: String(d.role || "user").trim(),
+        planId: String(d.planId || "").trim(),
+        createdAt: d.createdAt || null,
+        updatedAt: d.updatedAt || null
+      };
+    }
+
+    async function getUsersDocsSafe(){
+      const col = fs.collection(db, "users");
+
+      try{
+        const snap = await fs.getDocs(fs.query(col, fs.limit(500)));
+        return snap.docs.map(d => normalizeUserListItem({ id:d.id, ...d.data() }));
+      }catch(e){
+        console.error("getUsersDocsSafe error:", e);
+        throw e;
+      }
+    }
+
     async function loadUsersList(keepSelection=false){
       setDebug({count:null, error:null});
       try{
         const qtxt = ($("#userSearch").value || "").trim().toLowerCase();
-        const col = fs.collection(db, "users");
 
-        let snap = null;
-        try{
-          snap = await fs.getDocs(fs.query(col, fs.orderBy("email"), fs.limit(300)));
-        }catch(e1){
-          try{
-            snap = await fs.getDocs(fs.query(col, fs.orderBy("createdAt"), fs.limit(300)));
-          }catch(e2){
-            snap = await fs.getDocs(fs.query(col, fs.limit(300)));
-          }
-        }
-
-        const raw = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        const raw = await getUsersDocsSafe();
 
         raw.forEach(u=> setUserCache(u.id, u.name || "", u.email || ""));
+
+        raw.sort((a, b)=>{
+          const ae = (a.email || "").toLowerCase();
+          const be = (b.email || "").toLowerCase();
+          const an = (a.name || "").toLowerCase();
+          const bn = (b.name || "").toLowerCase();
+
+          if(ae && be && ae !== be) return ae.localeCompare(be, "hu");
+          if(an && bn && an !== bn) return an.localeCompare(bn, "hu");
+          return String(a.id).localeCompare(String(b.id), "hu");
+        });
 
         setDebug({count: raw.length, error: null});
         fillUserPickDropdown(raw);
@@ -1387,12 +1410,26 @@
         const ul = $("#usersList");
         ul.innerHTML = "";
 
+        if(raw.length === 0){
+          ul.innerHTML = `
+            <li class="li">
+              <div>
+                <div class="title">A Firestore users collection üres</div>
+                <div class="desc">
+                  Az admin oldal csak a <span class="mono">users</span> collection dokumentumait listázza.
+                  Ha a user csak Authentication-ben létezik, de nincs <span class="mono">users/{uid}</span> doc, itt nem fog megjelenni.
+                </div>
+              </div>
+            </li>`;
+          return;
+        }
+
         if(items.length === 0){
           ul.innerHTML = `
             <li class="li">
               <div>
-                <div class="title">Nincs találat / nincs user</div>
-                <div class="desc">A listát a <span class="mono">users</span> collectionből olvassuk.</div>
+                <div class="title">Nincs találat</div>
+                <div class="desc">Próbálj más emailt, nevet vagy uid-t keresni.</div>
               </div>
             </li>`;
           return;
