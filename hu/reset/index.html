@@ -9,160 +9,284 @@
 <meta name="theme-color" content="#0b0613">
 
 <style>
-
 *{
-box-sizing:border-box;
-margin:0;
-padding:0;
-font-family:Arial, Helvetica, sans-serif;
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:Arial, Helvetica, sans-serif;
 }
 
 body{
-background:linear-gradient(180deg,#0b0613,#14071c);
-color:white;
-min-height:100vh;
-display:flex;
-flex-direction:column;
+  background:linear-gradient(180deg,#0b0613,#14071c);
+  color:white;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
 }
 
 .topbar{
-display:flex;
-justify-content:space-between;
-align-items:center;
-padding:20px;
-font-weight:600;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px;
+  font-weight:600;
 }
 
 .brand{
-display:flex;
-align-items:center;
-gap:8px;
-font-size:18px;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:18px;
 }
 
 .brand-dot{
-width:10px;
-height:10px;
-border-radius:50%;
-background:#ff4fd8;
+  width:10px;
+  height:10px;
+  border-radius:50%;
+  background:#ff4fd8;
 }
 
 .back{
-color:#ccc;
-text-decoration:none;
-font-size:14px;
+  color:#ccc;
+  text-decoration:none;
+  font-size:14px;
 }
 
 .container{
-flex:1;
-display:flex;
-justify-content:center;
-align-items:center;
-padding:20px;
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
 }
 
 .card{
-background:rgba(255,255,255,0.05);
-border-radius:20px;
-padding:40px;
-max-width:420px;
-width:100%;
-backdrop-filter:blur(20px);
+  background:rgba(255,255,255,0.05);
+  border-radius:20px;
+  padding:40px;
+  max-width:420px;
+  width:100%;
+  backdrop-filter:blur(20px);
 }
 
 h1{
-font-size:42px;
-margin-bottom:20px;
+  font-size:42px;
+  margin-bottom:20px;
 }
 
 .desc{
-color:#cfcfcf;
-margin-bottom:30px;
-line-height:1.5;
+  color:#cfcfcf;
+  margin-bottom:30px;
+  line-height:1.5;
 }
 
 label{
-display:block;
-margin-bottom:8px;
-margin-top:15px;
+  display:block;
+  margin-bottom:8px;
+  margin-top:15px;
 }
 
 input{
-width:100%;
-padding:14px;
-border-radius:12px;
-border:none;
-background:rgba(255,255,255,0.08);
-color:white;
-font-size:14px;
+  width:100%;
+  padding:14px;
+  border-radius:12px;
+  border:none;
+  background:rgba(255,255,255,0.08);
+  color:white;
+  font-size:14px;
 }
 
 button{
-margin-top:20px;
-padding:14px 24px;
-border:none;
-border-radius:25px;
-background:linear-gradient(90deg,#ff4fd8,#b14cff);
-color:white;
-font-weight:bold;
-cursor:pointer;
+  margin-top:20px;
+  padding:14px 24px;
+  border:none;
+  border-radius:25px;
+  background:linear-gradient(90deg,#ff4fd8,#b14cff);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+  width:100%;
+}
+
+button:disabled{
+  opacity:.6;
+  cursor:not-allowed;
+}
+
+.status{
+  display:none;
+  margin-bottom:18px;
+  padding:12px 14px;
+  border-radius:12px;
+  font-size:14px;
+  line-height:1.5;
+}
+
+.status.show{
+  display:block;
+}
+
+.status.ok{
+  background:rgba(125,255,179,.14);
+  color:#dfffea;
+  border:1px solid rgba(125,255,179,.22);
+}
+
+.status.err{
+  background:rgba(255,143,143,.12);
+  color:#ffe2e2;
+  border:1px solid rgba(255,143,143,.22);
 }
 
 .footer{
-display:flex;
-justify-content:space-between;
-padding:20px;
-font-size:12px;
-color:#888;
+  display:flex;
+  justify-content:space-between;
+  padding:20px;
+  font-size:12px;
+  color:#888;
 }
 
+@media (max-width:640px){
+  h1{
+    font-size:34px;
+  }
+
+  .card{
+    padding:26px 18px;
+  }
+
+  .topbar{
+    padding:16px;
+    gap:12px;
+    flex-wrap:wrap;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <div class="topbar">
+  <div class="brand">
+    <div class="brand-dot"></div>
+    FitnessLady
+  </div>
 
-<div class="brand">
-<div class="brand-dot"></div>
-FitnessLady
+  <a class="back" href="/hu/login/">← Vissza a belépéshez</a>
 </div>
-
-<a class="back" href="/hu/login/">← Vissza a belépéshez</a>
-
-</div>
-
 
 <div class="container">
+  <div class="card">
+    <h1>Jelszó visszaállítás</h1>
 
-<div class="card">
+    <p class="desc">
+      Add meg az új jelszavadat, majd mentsd el.
+      Ezután a belépési oldalon be tudsz jelentkezni.
+    </p>
 
-<h1>Jelszó visszaállítás</h1>
+    <div id="status" class="status"></div>
 
-<p class="desc">
-Add meg az új jelszavadat, majd mentsd el.  
-Ezután a belépési oldalon be tudsz jelentkezni.
-</p>
+    <label for="newPass">Új jelszó</label>
+    <input id="newPass" type="password" placeholder="Új jelszó">
 
-<label>Új jelszó</label>
-<input type="password" placeholder="Új jelszó">
+    <label for="newPass2">Új jelszó újra</label>
+    <input id="newPass2" type="password" placeholder="Új jelszó újra">
 
-<label>Új jelszó újra</label>
-<input type="password" placeholder="Új jelszó újra">
-
-<button>Mentés</button>
-
-</div>
-
+    <button id="saveBtn" type="button">Mentés</button>
+  </div>
 </div>
 
 <div class="footer">
-
-<div>© 2026 FitnessLady</div>
-
-<div>Tüske web design</div>
-
+  <div>© 2026 FitnessLady</div>
+  <div>Tüske web design</div>
 </div>
+
+<script type="module">
+  import { confirmPasswordReset, getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import "../shared/firebase.js";
+
+  const params = new URLSearchParams(window.location.search);
+  const oobCode = params.get("oobCode");
+
+  const newPassInput = document.getElementById("newPass");
+  const newPass2Input = document.getElementById("newPass2");
+  const saveBtn = document.getElementById("saveBtn");
+  const statusBox = document.getElementById("status");
+
+  function showStatus(message, type = "err"){
+    statusBox.textContent = message;
+    statusBox.className = `status show ${type}`;
+  }
+
+  async function doReset(){
+    const newPass = (newPassInput.value || "").trim();
+    const newPass2 = (newPass2Input.value || "").trim();
+
+    if(!oobCode){
+      showStatus("A jelszó-visszaállító link hibás vagy hiányzik.", "err");
+      return;
+    }
+
+    if(!newPass || !newPass2){
+      showStatus("Add meg kétszer az új jelszót.", "err");
+      return;
+    }
+
+    if(newPass.length < 6){
+      showStatus("A jelszónak legalább 6 karakter hosszúnak kell lennie.", "err");
+      newPassInput.focus();
+      return;
+    }
+
+    if(newPass !== newPass2){
+      showStatus("A két jelszó nem egyezik.", "err");
+      newPass2Input.focus();
+      return;
+    }
+
+    saveBtn.disabled = true;
+
+    try{
+      const auth = getAuth();
+      await confirmPasswordReset(auth, oobCode, newPass);
+
+      showStatus("A jelszó sikeresen be lett állítva. Átirányítás a belépéshez...", "ok");
+
+      setTimeout(() => {
+        window.location.href = "/hu/login/";
+      }, 1800);
+
+    }catch(e){
+      const msg = String(e?.code || e?.message || "").toLowerCase();
+
+      if(msg.includes("expired")){
+        showStatus("Ez a jelszó-visszaállító link lejárt. Kérj új linket.", "err");
+      }else if(msg.includes("invalid-action-code") || msg.includes("invalid") || msg.includes("oob")){
+        showStatus("A jelszó-visszaállító link érvénytelen vagy már fel lett használva.", "err");
+      }else if(msg.includes("weak-password")){
+        showStatus("A megadott jelszó túl gyenge.", "err");
+      }else{
+        showStatus("A jelszó-visszaállítás most nem sikerült. Próbáld újra.", "err");
+      }
+
+      console.error("Password reset error:", e);
+      saveBtn.disabled = false;
+    }
+  }
+
+  saveBtn.addEventListener("click", doReset);
+
+  newPass2Input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      doReset();
+    }
+  });
+
+  if(!oobCode){
+    showStatus("Hiányzó vagy hibás jelszó-visszaállító link.", "err");
+    saveBtn.disabled = true;
+  }
+</script>
 
 </body>
 </html>
