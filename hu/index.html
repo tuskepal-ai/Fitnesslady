@@ -1,4 +1,3 @@
-<!-- FILE: /hu/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
@@ -24,14 +23,11 @@
       --shadow: 0 18px 55px rgba(0,0,0,.55);
       --max: 1180px;
 
-      /* ✅ BASE PATH kompatibilitás (JS állítja be szükség esetén) */
       --hero-url: url("/hero.png");
 
-      /* ✅ ugyanaz a logika mint DE-ben: háttér pozíció finomhangolás */
       --hero-pos-x: 78%;
       --hero-pos-y: 18%;
 
-      /* topbar magasság */
       --topbar-h: 64px;
     }
 
@@ -54,7 +50,6 @@
       text-rendering: geometricPrecision;
     }
 
-    /* ===== FULL-PAGE BACKGROUND: hero.png végig az egész oldalon ===== */
     body::before{
       content:"";
       position: fixed;
@@ -71,7 +66,6 @@
     a{ color:inherit; text-decoration:none; }
     button{ font:inherit; }
 
-    /* ========= Layout helpers ========= */
     .container{
       width: min(var(--max), 92vw);
       margin: 0 auto;
@@ -95,7 +89,6 @@
       font-size: 15px;
     }
 
-    /* ========= Topbar (DE-hez igazítva) ========= */
     .topbar{
       position: fixed;
       top:0; left:0; right:0;
@@ -191,7 +184,6 @@
       flex: 0 0 auto;
     }
 
-    /* ========= Hero ========= */
     .hero{
       position: relative;
       min-height: 100vh;
@@ -380,6 +372,40 @@
       font-weight: 900;
       letter-spacing:.2px;
     }
+
+    .about-layout{
+      display:grid;
+      grid-template-columns: 230px 1fr;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .about-photo{
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      background: rgba(255,255,255,.04);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 44px rgba(0,0,0,.34);
+    }
+
+    .about-photo img{
+      display:block;
+      width:100%;
+      aspect-ratio: 4 / 5;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .about-photo::after{
+      content:"";
+      position:absolute;
+      inset:auto 0 0 0;
+      height: 34%;
+      background: linear-gradient(to top, rgba(7,6,11,.45), rgba(7,6,11,0));
+      pointer-events:none;
+    }
+
     .about-text{
       margin:0;
       color: var(--muted);
@@ -632,7 +658,6 @@
 
     @media (max-width: 980px){
       :root{
-        /* ✅ mobil háttér pozíció (DE-szerű) */
         --hero-pos-x: 75%;
         --hero-pos-y: 10%;
         --topbar-h: 56px;
@@ -643,10 +668,16 @@
       .nav{ display:none; }
       .what-grid{ grid-template-columns: 1fr; }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
+      .about-layout{ grid-template-columns: 1fr; }
 
       .topbar{ padding: 10px 12px; }
       .cta-pill{ max-width: 108px; padding: 9px 14px; font-weight: 900; font-size: 14px; }
       .btn{ padding: 11px 14px; }
+
+      .about-photo{
+        max-width: 320px;
+        margin: 0 auto;
+      }
     }
 
     @media (max-width: 420px){
@@ -657,7 +688,6 @@
 </head>
 
 <body>
-  <!-- TOP BAR -->
   <header class="topbar">
     <div class="container topbar-inner">
       <a class="brand" href="#top" aria-label="Fitness Lady">
@@ -675,7 +705,6 @@
       <div style="display:flex; align-items:center; gap:10px; min-width:0;">
         <button class="menu-btn" id="menuBtn" aria-label="Menü">☰</button>
 
-        <!-- Saját oldalam marad login -->
         <a class="btn interactive" data-route="/hu/login/" href="/hu/login/" style="padding:10px 14px;">Saját oldalam</a>
 
         <a class="cta-pill" href="mailto:Fitnesslady92@gmail.com?subject=Fitness%20Lady%20-%20Ingyenes%20konzult%C3%A1ci%C3%B3" title="Email">Email</a>
@@ -683,7 +712,6 @@
     </div>
   </header>
 
-  <!-- HERO -->
   <main id="top" class="hero">
     <div class="hero-overlay" aria-hidden="true"></div>
 
@@ -707,7 +735,6 @@
 
             <a class="btn ghost interactive" href="https://tally.so/r/LZpRXG" target="_blank" rel="noopener">Írj véleményt</a>
 
-            <!-- ✅ PWA install gomb (csak támogatott böngészőn látszik) -->
             <button class="btn ghost interactive" id="installAppBtn" type="button" style="display:none;">
               App telepítése
             </button>
@@ -726,7 +753,13 @@
               <div class="about-title">Rólam</div>
               <div class="tag">Edina</div>
             </div>
-            <p class="about-text" id="aboutText">
+
+            <div class="about-layout">
+              <div class="about-photo">
+                <img src="/hu/assets/edina-about.jpg" alt="Edina - Fitness Lady" />
+              </div>
+
+              <p class="about-text" id="aboutText">
 Nem csak formát építek – nevet, bizalmat és jövőt.
 
 Edina vagyok, a Fitnesz Lady megálmodója. Abban hiszek, hogy a test egy erőforrás, amely megfelelő iránnyal, tudatossággal és rendszerrel látványos és tartós eredményeket hoz.
@@ -740,7 +773,8 @@ A Fitnesz Lady mögött tapasztalat, következetes munka és emberközpontú hoz
 Ha olyan támogatást keresel, amely egyszerre hatékony, motiváló és fenntartható, jó helyen vagy.
 
 Edina • Fitnesz Lady
-            </p>
+              </p>
+            </div>
           </div>
 
           <div class="glass interactive what-card reveal" data-delay="2">
@@ -922,7 +956,6 @@ Edina • Fitnesz Lady
     </div>
   </section>
 
-  <!-- ✅ JOGI: külön oldalak gombokkal -->
   <section id="jogi" class="section">
     <div class="container">
       <div class="section-title reveal">Jogi</div>
@@ -994,30 +1027,27 @@ Edina • Fitnesz Lady
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
 
-    /* =========================================================
-      ✅ BASE PATH FIX
-      - custom domainon base = ""
-      - github.io-n base = "/Fitnesslady"
-    ========================================================== */
     (function applyBasePath(){
       const isGitHub = location.hostname.endsWith("github.io");
       const base = isGitHub ? "/Fitnesslady" : "";
       window.__BASE_PATH = base;
 
-      // hero.png útvonal javítása github.io alatt
       if(base){
         document.documentElement.style.setProperty("--hero-url", `url("${base}/hero.png")`);
       }
 
-      // data-route linkek basePath-osítása (csak belső route-okra)
       document.querySelectorAll("[data-route]").forEach(a=>{
         const route = a.getAttribute("data-route");
         if(!route) return;
         a.setAttribute("href", base + route);
       });
+
+      const aboutImg = document.querySelector('.about-photo img');
+      if(aboutImg && base){
+        aboutImg.src = base + "/hu/assets/edina-about.jpg";
+      }
     })();
 
-    /* ===== Scroll performance: glow/hover anim OFF scroll közben (AZ ÜVEG MARAD) ===== */
     (() => {
       let t = null;
       const onScroll = () => {
@@ -1032,7 +1062,6 @@ Edina • Fitnesz Lady
       window.addEventListener('scroll', onScroll, { passive: true });
     })();
 
-    /* ========= Mobile menu ========= */
     const menuBtn = document.getElementById("menuBtn");
     let open = false;
 
@@ -1078,7 +1107,6 @@ Edina • Fitnesz Lady
       }
     });
 
-    /* ========= Touch “active” glow ========= */
     function enableTapGlow(selector=".interactive"){
       document.querySelectorAll(selector).forEach(el=>{
         el.addEventListener("touchstart", ()=>{
@@ -1090,7 +1118,6 @@ Edina • Fitnesz Lady
     }
     enableTapGlow();
 
-    /* ========= Scroll reveal ========= */
     (() => {
       const els = document.querySelectorAll('.reveal');
       if(!els.length) return;
@@ -1105,7 +1132,6 @@ Edina • Fitnesz Lady
       els.forEach(el=>io.observe(el));
     })();
 
-    /* ========= Active nav underline based on scroll ========= */
     (() => {
       const links = Array.from(document.querySelectorAll('.nav a'))
         .filter(a=>a.getAttribute('href')?.startsWith('#'));
@@ -1127,7 +1153,6 @@ Edina • Fitnesz Lady
       sections.forEach(s=>io.observe(s));
     })();
 
-    /* ========= Rating animation (tap/click) ========= */
     (() => {
       const r = document.getElementById('avgRating');
       if(!r) return;
@@ -1140,7 +1165,6 @@ Edina • Fitnesz Lady
       r.addEventListener('touchstart', kick, {passive:true});
     })();
 
-    /* ========= Reviews (változatlan) ========= */
     const SHEET_CSV_URL =
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vSlH-tTccqy_yetPGUaqZ3wULe74ZVSzCX6wA7kZV-iWDu0l1I4_IBjTFggNS2xpZFqQwTXj3mnZeag/pub?gid=0&single=true&output=csv";
 
@@ -1389,11 +1413,6 @@ Edina • Fitnesz Lady
     refreshBtn?.addEventListener('click', loadReviews);
     loadReviews();
 
-    /* =========================================================
-      ✅ PWA install gomb (landingről)
-      - csak olyan böngészőn jelenik meg, ami támogatja (Android Chrome)
-      - ha nincs prompt (pl. iOS), fallback: átvisz az appra
-    ========================================================== */
     (function setupInstallButton(){
       const btn = document.getElementById("installAppBtn");
       if(!btn) return;
