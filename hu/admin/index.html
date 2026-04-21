@@ -138,19 +138,15 @@
       font-weight: 950;
     }
     .pill.ghost{ background: rgba(255,255,255,.06); }
-    .pill.danger{
-      background: linear-gradient(135deg, rgba(255,90,90,.18), rgba(255,79,216,.14));
-      border-color: rgba(255,120,120,.28);
-    }
+    .pill.danger{ background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.16); }
     .pill.warn{
-      background: linear-gradient(135deg, rgba(255,116,116,.28), rgba(255,86,86,.18));
-      border-color: rgba(255,135,135,.35);
-      color: #fff4f4;
-      box-shadow: 0 18px 46px rgba(255,86,86,.16);
+      background: linear-gradient(135deg, rgba(255,90,110,.25), rgba(255,79,216,.16));
+      border-color: rgba(255,120,140,.26);
+      color:#fff;
       font-weight: 950;
     }
     .pill:disabled{
-      opacity:.55;
+      opacity:.58;
       cursor:not-allowed;
       transform:none !important;
       box-shadow:none !important;
@@ -307,7 +303,7 @@
     }
     @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
 
-    /* ===== Users list ===== */
+    /* ===== Users list (optional) ===== */
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .li{
       display:grid;
@@ -367,7 +363,7 @@
       color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    /* ===== Chat window ===== */
+    /* ===== Chat window (like client: floating modal) ===== */
     .chatWin{
       position: fixed;
       right: 18px;
@@ -506,6 +502,7 @@
   </header>
 
   <main class="appShell">
+    <!-- SIDEBAR -->
     <aside class="glass sidebar">
       <div class="sideHead">
         <div class="t"><span class="dot"></span><span style="font-weight:950;">Menü</span></div>
@@ -526,11 +523,13 @@
       </div>
     </aside>
 
+    <!-- CONTENT -->
     <section class="glass content">
       <h1 class="pageTitle">Felhasználók</h1>
       <p class="pageSub">A /hu/register/ után regisztrált vevőket itt kezeled: profil, chat, étrend, motiváció, technika, template + override.</p>
 
       <div class="grid2" id="sec-users">
+        <!-- LEFT: User selection -->
         <div class="section">
           <h2 class="sectionTitle">Kiválasztás</h2>
           <p class="sub">Válassz felhasználót a legördülőből. (A találat lista lent csak extra, ha kell.)</p>
@@ -553,10 +552,12 @@
 
           <div class="debugBox" id="debugBox"><b>DEBUG</b>: users count: — • last error: —</div>
 
+          <!-- Optional list (you can hide later if you want) -->
           <div class="sub" style="margin-top:12px;">Találatok (opcionális):</div>
           <ul class="list" id="usersList"></ul>
         </div>
 
+        <!-- RIGHT: Selected user card -->
         <div class="section">
           <h2 class="sectionTitle">User profil</h2>
           <p class="sub">A kiválasztott user adatai + chat megnyitás + teljes törlés.</p>
@@ -654,11 +655,12 @@
           </div>
 
           <div class="debugBox" style="margin-top:12px;">
-            <b>Törlés</b>: Auth user + users doc + chat + override adatok törlése. A saját admin account törlése tiltva van.
+            <b>Törlés</b>: az Auth user törlését a deployolt admin endpoint végzi. Utána az admin oldal letörli a Firestore user doc / chat / override adatokat is. A saját admin account törlése tiltva van.
           </div>
         </div>
       </div>
 
+      <!-- PLAN TEMPLATE -->
       <div class="section" id="sec-plan">
         <h2 class="sectionTitle">Plan template</h2>
         <p class="sub">Csomag meta + heti fix edzések (dinamikusan ment: csak a kitöltött edzések kerülnek a Firestore-ba).</p>
@@ -711,6 +713,7 @@
         </div>
       </div>
 
+      <!-- WELCOME -->
       <div class="section">
         <h2 class="sectionTitle">Üdvözlő kártya</h2>
         <p class="sub">Személyes üzenet + videó (külön kártya a vevőnél).</p>
@@ -724,6 +727,7 @@
         </div>
       </div>
 
+      <!-- DIET -->
       <div class="section" id="sec-diet">
         <h2 class="sectionTitle">Étrend — 4 hét / napi</h2>
         <p class="sub">Napi étkezések (a vevőnél prémium kártyákban jelenik meg).</p>
@@ -765,6 +769,7 @@
         </div>
       </div>
 
+      <!-- MOTIVATION -->
       <div class="section" id="sec-mot">
         <h2 class="sectionTitle">Fix motiváció kártya</h2>
         <p class="sub">Mindig látszik a vevőnél.</p>
@@ -777,6 +782,7 @@
         </div>
       </div>
 
+      <!-- OVERRIDES -->
       <div class="section" id="sec-ov">
         <h2 class="sectionTitle">Személyre szabás (Overrides)</h2>
         <p class="sub">Heti extra videók / üzenetek a kiválasztott userhez.</p>
@@ -816,6 +822,7 @@
         </div>
       </div>
 
+      <!-- TECH VAULT -->
       <div class="section" id="sec-tech">
         <h2 class="sectionTitle">Technika Vault</h2>
         <p class="sub">Technikai anyagok a vevő „Technika Vault” kártyájához.</p>
@@ -860,6 +867,7 @@
 
   <div class="toast" id="toast"></div>
 
+  <!-- ✅ Chat window (floating, like client) -->
   <aside class="chatWin" id="chatDrawer" aria-hidden="true">
     <div class="chatHead">
       <div>
@@ -883,12 +891,9 @@
       onAuth, logout, toLogin, toApp,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
-    import { getAuth } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
-
-    const auth = getAuth();
 
     const escapeHtml = (s) => String(s ?? "")
       .replaceAll("&","&amp;")
@@ -908,7 +913,7 @@
       toast.__t = window.setTimeout(()=>toast.classList.remove("is-on"), ms);
     }
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
-    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 4200); }
+    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 3800); }
 
     const dbg = $("#debugBox");
     function setDebug({count=null, error=null}={}){
@@ -919,6 +924,7 @@
 
     $("#y").textContent = new Date().getFullYear();
 
+    // ✅ Sidebar scroll + active
     const nav = $("#sideNav");
     function setActiveNav(btn){
       $$("#sideNav .navBtn").forEach(x=>x.classList.remove("active"));
@@ -943,14 +949,18 @@
     $("#btnTopLogout").addEventListener("click", doLogout);
     $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
 
+    // ✅ state
     let SEL_UID = null;
+    let CURRENT_AUTH_USER = null;
     let USERS_CACHE = [];
 
+    // ✅ remember selected user
     const SEL_KEY = "fl_admin_sel_uid_v1";
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
-    function clearSel(){ localStorage.removeItem(SEL_KEY); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
+    function clearSel(){ localStorage.removeItem(SEL_KEY); }
 
+    // ✅ Chat (Firestore)
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -1025,6 +1035,10 @@
             bub.textContent = m.text || "";
             row.appendChild(bub);
 
+            if(mine){
+              // no avatar on mine
+            }
+
             chatBody.appendChild(row);
           });
           chatBody.scrollTop = chatBody.scrollHeight + 9999;
@@ -1062,6 +1076,7 @@
     });
     $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
+    // 🔥 Dinamikus 5 fix edzés box (UI 5, mentés dinamikus: csak kitöltött megy)
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -1091,12 +1106,14 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
+    // ✅ Helpers for HU/DE objects
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
       return val.hu || val.de || "";
     };
 
+    // ✅ planId select + custom
     const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
@@ -1159,6 +1176,35 @@
       $("#tv3_title").value = ""; $("#tv3_video").value = ""; $("#tv3_text").value = "";
     }
 
+    function clearSelectedProfileUI(){
+      $("#selUser").textContent = "—";
+      $("#u_email").value = "";
+      $("#u_name").value = "";
+      $("#u_role").value = "user";
+      $("#u_status").value = "active";
+      $("#u_lang").value = "hu";
+      $("#u_level").value = 2;
+      $("#u_goal").value = "";
+      setPlanUI("start_v1");
+      $("#u_lifetime").value = "true";
+      $("#u_cycleStart").value = "";
+      $("#u_cycleEnd").value = "";
+      $("#m_title").value = "";
+      $("#m_text").value = "";
+      $("#w_title").value = "";
+      $("#w_text").value = "";
+      $("#w_video").value = "";
+      clearTechVaultFields();
+      $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
+      $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
+      $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
+      $("#d_breakfast").value = "";
+      $("#d_snack1").value = "";
+      $("#d_lunch").value = "";
+      $("#d_snack2").value = "";
+      $("#d_dinner").value = "";
+    }
+
     function fillProfileForm(doc){
       $("#u_email").value = doc?.email || "";
       $("#u_name").value = doc?.name || "";
@@ -1182,35 +1228,8 @@
       fillTechVaultForm(doc);
     }
 
-    function clearProfileForm(){
-      $("#u_email").value = "";
-      $("#u_name").value = "";
-      $("#u_role").value = "user";
-      $("#u_status").value = "active";
-      $("#u_lang").value = "hu";
-      $("#u_level").value = 2;
-      $("#u_goal").value = "";
-      setPlanUI("start_v1");
-      $("#u_lifetime").value = "true";
-      $("#u_cycleStart").value = "";
-      $("#u_cycleEnd").value = "";
-      $("#m_title").value = "";
-      $("#m_text").value = "";
-      $("#w_title").value = "";
-      $("#w_text").value = "";
-      $("#w_video").value = "";
-      clearTechVaultFields();
-      setDietFields(null);
-      $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
-      $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
-      $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
-    }
-
+    // ✅ USERS LIST
     const userPick = $("#userPick");
-
-    function getUserByUid(uid){
-      return USERS_CACHE.find(x => x.id === uid) || null;
-    }
 
     function fillUserPickDropdown(items){
       const keep = userPick.value || "";
@@ -1225,6 +1244,10 @@
       });
       if(keep && items.some(x=>x.id===keep)) userPick.value = keep;
       else if(SEL_UID && items.some(x=>x.id===SEL_UID)) userPick.value = SEL_UID;
+    }
+
+    function getCachedUser(uid){
+      return USERS_CACHE.find(x => x.id === uid) || null;
     }
 
     userPick.addEventListener("change", async ()=>{
@@ -1290,7 +1313,7 @@
             </div>
             <div style="display:flex; gap:8px; flex-wrap:wrap; justify-content:flex-end;">
               <button class="pill ghost" data-pick="${escapeHtml(u.id)}" type="button">Kiválaszt</button>
-              <button class="pill warn" data-del="${escapeHtml(u.id)}" type="button">Törlés</button>
+              <button class="pill warn" data-delete-user="${escapeHtml(u.id)}" type="button">Törlés</button>
             </div>
           `;
           ul.appendChild(li);
@@ -1303,10 +1326,10 @@
           });
         });
 
-        $$("[data-del]").forEach(b=>{
+        $$("[data-delete-user]").forEach(b=>{
           b.addEventListener("click", async ()=>{
-            const uid = b.getAttribute("data-del");
-            await deleteUserFlow(uid);
+            const uid = b.getAttribute("data-delete-user");
+            await deleteUserByUid(uid);
           });
         });
 
@@ -1314,7 +1337,7 @@
           const saved = loadSel();
           if(saved && raw.some(x=>x.id===saved)){
             await pickUser(saved);
-          } else if(items[0]?.id){
+          } else {
             await pickUser(items[0].id);
           }
         }
@@ -1372,92 +1395,54 @@
       }
     }
 
-    function resetAfterDelete(){
-      SEL_UID = null;
-      CHAT_UID = null;
-      clearSel();
-      userPick.value = "";
-      $("#selUser").textContent = "—";
-      clearProfileForm();
-      closeChat();
-      chatUnsub?.();
-      chatUnsub = null;
+    $("#btnRefreshUsers").addEventListener("click", ()=>loadUsersList(true));
+    $("#userSearch").addEventListener("input", ()=>{
+      window.clearTimeout(window.__su);
+      window.__su = window.setTimeout(()=>loadUsersList(true), 220);
+    });
+
+    async function getAdminDeleteEndpoint(){
+      return (
+        trimStr(window.FITNESSLADY_DELETE_USER_URL) ||
+        trimStr(localStorage.getItem("fitnesslady_delete_user_url")) ||
+        trimStr(localStorage.getItem("fl_delete_user_url")) ||
+        "/api/admin-delete-user"
+      );
     }
 
     async function getAdminIdToken(){
-      const user = auth.currentUser;
-      if(!user) throw new Error("Nincs bejelentkezett admin user.");
-      return await user.getIdToken(true);
+      if(!CURRENT_AUTH_USER) throw new Error("Nincs bejelentkezett admin user.");
+      return await CURRENT_AUTH_USER.getIdToken(true);
     }
 
-    function getDeleteEndpointCandidates(){
-      const fromWindow = trimStr(window.FITNESSLADY_DELETE_USER_URL || "");
-      const fromStorage = trimStr(localStorage.getItem("fl_delete_user_url") || "");
-      const unique = new Set([
-        fromWindow,
-        fromStorage,
-        "/api/adminDeleteUser",
-        "/api/deleteUser",
-        "/adminDeleteUser",
-        "/deleteUser"
-      ].filter(Boolean));
-      return Array.from(unique);
-    }
-
-    async function callDeleteUserEndpoint({ uid, email }){
+    async function callDeleteEndpoint(uid, email){
+      const url = await getAdminDeleteEndpoint();
       const token = await getAdminIdToken();
-      const endpoints = getDeleteEndpointCandidates();
 
-      let lastErr = null;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify({ uid, email })
+      });
 
-      for(const url of endpoints){
-        try{
-          const res = await fetch(url, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              uid,
-              email,
-              data: { uid, email }
-            })
-          });
-
-          let body = null;
-          try{ body = await res.json(); }catch(_){ body = null; }
-
-          if(!res.ok){
-            const msg = body?.error || body?.message || `${res.status} ${res.statusText}`;
-            throw new Error(msg);
-          }
-
-          const okLike =
-            body == null ||
-            body.ok === true ||
-            body.success === true ||
-            body.result === "ok" ||
-            body.status === "ok" ||
-            body.deleted === true ||
-            body?.data?.ok === true ||
-            body?.data?.success === true ||
-            body?.data?.deleted === true;
-
-          if(!okLike && body?.error){
-            throw new Error(body.error);
-          }
-
-          return { url, body };
-        }catch(e){
-          lastErr = e;
-        }
+      let data = null;
+      try{
+        data = await res.json();
+      }catch(_){
+        data = null;
       }
 
-      throw new Error(lastErr?.message || "A deployolt delete endpoint nem érhető el.");
+      if(!res.ok){
+        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+      }
+
+      return data;
     }
 
-    async function deleteCollectionDocs(colRef){
+    async function deleteSubcollectionDocs(colRef){
       while(true){
         const snap = await fs.getDocs(fs.query(colRef, fs.limit(200)));
         if(snap.empty) break;
@@ -1466,73 +1451,66 @@
       }
     }
 
-    async function cleanupUserFirestore(uid){
-      const overridesCol = fs.collection(db, "users", uid, "overridesWeeks");
-      const chatMsgsCol = fs.collection(db, "chats", uid, "messages");
+    async function cleanupFirestoreUserData(uid){
+      await deleteSubcollectionDocs(fs.collection(db, "users", uid, "overridesWeeks"));
+      await deleteSubcollectionDocs(fs.collection(db, "chats", uid, "messages"));
 
-      await deleteCollectionDocs(overridesCol);
-      await deleteCollectionDocs(chatMsgsCol);
-
-      const userRef = fs.doc(db, "users", uid);
-      const chatRef = fs.doc(db, "chats", uid);
-
-      const tasks = [];
-      tasks.push(fs.deleteDoc(userRef).catch(()=>{}));
-      tasks.push(fs.deleteDoc(chatRef).catch(()=>{}));
-      await Promise.all(tasks);
+      try{ await fs.deleteDoc(fs.doc(db, "chats", uid)); }catch(_){}
+      try{ await fs.deleteDoc(fs.doc(db, "users", uid)); }catch(_){}
     }
 
-    async function deleteUserFlow(uidArg=null){
-      const uid = trimStr(uidArg || SEL_UID || "");
-      if(!uid) return err("Nincs user kiválasztva.");
-
-      const currentAdmin = auth.currentUser;
-      if(currentAdmin?.uid === uid){
-        return err("A saját admin fiók törlése tiltva van.");
-      }
-
-      const u = getUserByUid(uid);
-      const email = trimStr(u?.email || $("#u_email").value || "");
-      const name = trimStr(u?.name || $("#u_name").value || "");
-      const label = name ? `${name} — ${email || uid}` : (email || uid);
-
-      const first = window.confirm(`Biztosan törlöd ezt a felhasználót?\n\n${label}\n\nEz Auth + Firestore törlés.`);
-      if(!first) return;
-
-      const typed = window.prompt(`Biztonsági megerősítéshez írd be pontosan ezt:\nTORLES\n\nUser: ${label}`, "");
-      if(trimStr(typed).toUpperCase() !== "TORLES"){
-        return err("Törlés megszakítva.");
-      }
-
-      const btns = [$("#btnDeleteUser"), ...$$("[data-del]")];
-      btns.forEach(b => b.disabled = true);
-
+    async function deleteUserByUid(uid){
       try{
-        await callDeleteUserEndpoint({ uid, email });
-        await cleanupUserFirestore(uid);
+        uid = trimStr(uid);
+        if(!uid) return err("Nincs user kiválasztva.");
+
+        if(CURRENT_AUTH_USER && uid === CURRENT_AUTH_USER.uid){
+          return err("A saját admin fiók törlése tiltva van.");
+        }
+
+        const cached = getCachedUser(uid);
+        const email = trimStr(cached?.email || (SEL_UID === uid ? $("#u_email").value : ""));
+        const name = trimStr(cached?.name || (SEL_UID === uid ? $("#u_name").value : ""));
+        const label = name ? `${name} — ${email || uid}` : (email || uid);
+
+        const confirmed = window.confirm(
+          `Biztosan törlöd ezt a felhasználót?\n\n${label}\n\nEz az Auth usert és a Firestore user adatokat is törli.`
+        );
+        if(!confirmed) return;
+
+        const typed = window.prompt("Biztonsági megerősítéshez írd be pontosan: TORLES", "");
+        if(trimStr(typed).toUpperCase() !== "TORLES"){
+          return err("Törlés megszakítva.");
+        }
+
+        $("#btnDeleteUser").disabled = true;
+        $$("[data-delete-user]").forEach(b => b.disabled = true);
+
+        await callDeleteEndpoint(uid, email);
+        await cleanupFirestoreUserData(uid);
 
         if(SEL_UID === uid){
-          resetAfterDelete();
+          SEL_UID = null;
+          CHAT_UID = null;
+          clearSel();
+          clearSelectedProfileUI();
+          if(chatDrawer.classList.contains("on")) closeChat();
+          userPick.value = "";
         }
 
         await loadUsersList(true);
-        ok(`Felhasználó törölve: ${label}`);
+        ok("Felhasználó törölve");
       }catch(e){
         console.error(e);
-        err(`Törlés sikertelen: ${e.message || String(e)}`);
+        err(e.message || String(e));
       }finally{
-        btns.forEach(b => b.disabled = false);
+        $("#btnDeleteUser").disabled = false;
+        $$("[data-delete-user]").forEach(b => b.disabled = false);
       }
     }
 
     $("#btnDeleteUser").addEventListener("click", async ()=>{
-      await deleteUserFlow(SEL_UID);
-    });
-
-    $("#btnRefreshUsers").addEventListener("click", ()=>loadUsersList(true));
-    $("#userSearch").addEventListener("input", ()=>{
-      window.clearTimeout(window.__su);
-      window.__su = window.setTimeout(()=>loadUsersList(true), 220);
+      await deleteUserByUid(SEL_UID);
     });
 
     $("#btnSaveUser").addEventListener("click", async ()=>{
@@ -1558,6 +1536,7 @@
       }catch(e){ console.error(e); err(e.message || String(e)); }
     });
 
+    // ✅ Welcome
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1574,6 +1553,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
+    // ✅ Diet
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -1629,6 +1609,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
+    // ✅ Motivation
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1640,6 +1621,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
+    // ✅ Plan meta
     async function loadPlanMeta(){
       const planId = trimStr($("#p_planId").value);
       if(!planId) return err("Csomag neve (Plan ID) üres.");
@@ -1710,6 +1692,7 @@
       }catch(e){ err(e.message || String(e)); }
     }
 
+    // ✅ Dinamikus mentés: csak a kitöltött edzések kerülnek a workouts[] tömbbe
     async function saveTemplateWeek(){
       try{
         const planId = trimStr($("#p_planId").value);
@@ -1723,6 +1706,7 @@
           const vid   = trimStr($(`#t_w${i}_vid`).value);
           const dur   = trimStr($(`#t_w${i}_dur`).value);
 
+          // dinamikus: ha bármi ki van töltve, mentjük
           if(title || desc || vid || dur){
             workouts.push({
               id: `w${i}`,
@@ -1759,6 +1743,7 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
+    // ✅ Overrides
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -1814,6 +1799,7 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
+    // ✅ Tech Vault
     async function loadTechVault(){
       try{
         if(!SEL_UID) return;
@@ -1848,8 +1834,11 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
+    // ✅ AUTH BOOT
     onAuth(async (user)=>{
       try{
+        CURRENT_AUTH_USER = user || null;
+
         if(!user){ toLogin("hu"); return; }
 
         const ud = await ensureUserDoc(user.uid, user.email || "");
