@@ -1,5 +1,3 @@
-// FILE: /hu/admin/modules/admin-upgrades.js
-
 import { db, fs } from "../../shared/firebase.js";
 
 const EXERCISES_COL = "fixedExerciseTemplates";
@@ -25,19 +23,25 @@ export default async function initAdminUpgrades() {
   if (state.booted) return;
   state.booted = true;
 
-  injectStyles();
-  injectLauncher();
-  injectOverlay();
-  bindStaticEvents();
+  try {
+    injectStyles();
+    injectLauncher();
+    injectOverlay();
+    bindStaticEvents();
+    resetForm();
 
-  await ensureSeedExercises();
-  await Promise.all([
-    loadExercises(),
-    loadUsers()
-  ]);
+    await ensureSeedExercisesSafe();
+    await Promise.all([
+      loadExercisesSafe(),
+      loadUsersSafe()
+    ]);
 
-  renderExercises();
-  renderAssignedUsersPanel();
+    renderExercises();
+    renderAssignedUsersPanel();
+  } catch (e) {
+    console.error("Admin upgrades init hiba:", e);
+    safeAlert(`Admin upgrades hiba: ${extractErrorMessage(e)}`);
+  }
 }
 
 // ==============================
@@ -410,6 +414,17 @@ function injectStyles() {
       font-size:12px;
       line-height:1.55;
     }
+
+    .fx-error{
+      padding:14px 16px;
+      margin-bottom:14px;
+      border-radius:16px;
+      background:rgba(255,80,110,.10);
+      border:1px solid rgba(255,80,110,.18);
+      color:#ffdfe5;
+      font-size:13px;
+      line-height:1.5;
+    }
   `;
   document.head.appendChild(style);
 }
@@ -488,6 +503,8 @@ function injectOverlay() {
             <div class="fx-sub">Itt látod az összes fix edzést. Kereshető, szűrhető, szerkeszthető és userhez rendelhető.</div>
           </div>
           <div class="fx-card-body">
+            <div id="fxTopError"></div>
+
             <div class="fx-toolbar">
               <input class="fx-input" id="fxSearch" type="text" placeholder="Keresés névre, leírásra, kategóriára..." />
               <select class="fx-select" id="fxDifficultyFilter">
@@ -676,37 +693,58 @@ function closeOverlay() {
 // FIRESTORE
 // ==============================
 
-async function ensureSeedExercises() {
-  const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
-  if (!snap.empty) return;
+async function ensureSeedExercisesSafe() {
+  try {
+    const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
+    if (!snap.empty) return;
 
-  const seed = buildSeedExercises();
+    const seed = buildSeedExercises();
 
-  for (const item of seed) {
-    const ref = fs.doc(fs.collection(db, EXERCISES_COL));
-    await fs.setDoc(ref, {
-      ...item,
-      createdAt: fs.serverTimestamp(),
-      updatedAt: fs.serverTimestamp()
-    });
+    for (const item of seed) {
+      const ref = fs.doc(fs.collection(db, EXERCISES_COL));
+      await fs.setDoc(ref, {
+        ...item,
+        createdAt: fs.serverTimestamp(),
+        updatedAt: fs.serverTimestamp()
+      });
+    }
+  } catch (e) {
+    console.error("Seed hiba:", e);
+    showTopError(
+      "A fix edzések seedelése nem sikerült. Valószínűleg hiányzik a Firestore jogosultság a fixedExerciseTemplates kollekcióra."
+    );
   }
 }
 
-async function loadExercises() {
-  const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
-  state.exercises = snap.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() || {})
-  }));
+async function loadExercisesSafe() {
+  try {
+    const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
+    state.exercises = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() || {})
+    }));
+  } catch (e) {
+    console.error("Edzéslista betöltési hiba:", e);
+    state.exercises = [];
+    showTopError(
+      "A fix edzések nem tölthetők be. Ellenőrizd a Firestore rules-t a fixedExerciseTemplates útvonalra."
+    );
+  }
 }
 
-async function loadUsers() {
-  const snap = await fs.getDocs(fs.collection(db, "users"));
-  state.users = snap.docs.map((d) => ({
-    id: d.id,
-    ...(d.data() || {})
-  }));
-  state.filteredUsers = [...state.users];
+async function loadUsersSafe() {
+  try {
+    const snap = await fs.getDocs(fs.collection(db, "users"));
+    state.users = snap.docs.map((d) => ({
+      id: d.id,
+      ...(d.data() || {})
+    }));
+    state.filteredUsers = [...state.users];
+  } catch (e) {
+    console.error("Users betöltési hiba:", e);
+    state.users = [];
+    state.filteredUsers = [];
+  }
 }
 
 async function saveExercise() {
@@ -714,32 +752,32 @@ async function saveExercise() {
     const payload = getFormPayload();
 
     if (!payload.name) {
-      alert("Az edzés neve kötelező.");
+      safeAlert("Az edzés neve kötelező.");
       return;
     }
 
     if (!payload.desc) {
-      alert("A leírás kötelező.");
+      safeAlert("A leírás kötelező.");
       return;
     }
 
     if (!payload.category) {
-      alert("A kategória kötelező.");
+      safeAlert("A kategória kötelező.");
       return;
     }
 
-    if (!payload.workSec || payload.workSec < 0) {
-      alert("A munkaidő legyen 0 vagy nagyobb.");
+    if (payload.workSec < 0) {
+      safeAlert("A munkaidő legyen 0 vagy nagyobb.");
       return;
     }
 
-    if (!payload.restSec || payload.restSec < 0) {
-      alert("A pihenőidő legyen 0 vagy nagyobb.");
+    if (payload.restSec < 0) {
+      safeAlert("A pihenőidő legyen 0 vagy nagyobb.");
       return;
     }
 
     if (!payload.rounds || payload.rounds < 1) {
-      alert("A körök száma minimum 1.");
+      safeAlert("A körök száma minimum 1.");
       return;
     }
 
@@ -761,13 +799,13 @@ async function saveExercise() {
       });
     }
 
-    await loadExercises();
+    await loadExercisesSafe();
     renderExercises();
     resetForm();
-    alert("Mentve.");
+    safeAlert("Mentve.");
   } catch (e) {
     console.error(e);
-    alert(`Mentési hiba: ${extractErrorMessage(e)}`);
+    safeAlert(`Mentési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -778,13 +816,13 @@ async function deleteExercise(exerciseId) {
 
   try {
     await fs.deleteDoc(fs.doc(db, EXERCISES_COL, exerciseId));
-    await loadExercises();
+    await loadExercisesSafe();
     renderExercises();
 
     if (state.editingId === exerciseId) resetForm();
   } catch (e) {
     console.error(e);
-    alert(`Törlési hiba: ${extractErrorMessage(e)}`);
+    safeAlert(`Törlési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -816,20 +854,20 @@ async function assignExerciseToUser(uid, exerciseId) {
       { merge: true }
     );
 
-    alert("Edzés hozzárendelve.");
+    safeAlert("Edzés hozzárendelve.");
   } catch (e) {
     console.error(e);
-    alert(`Hozzárendelési hiba: ${extractErrorMessage(e)}`);
+    safeAlert(`Hozzárendelési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
 async function removeExerciseFromUser(uid, exerciseId) {
   try {
     await fs.deleteDoc(fs.doc(db, "users", uid, USER_ASSIGN_SUBCOL, exerciseId));
-    alert("Edzés eltávolítva a felhasználótól.");
+    safeAlert("Edzés eltávolítva a felhasználótól.");
   } catch (e) {
     console.error(e);
-    alert(`Eltávolítási hiba: ${extractErrorMessage(e)}`);
+    safeAlert(`Eltávolítási hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -844,14 +882,19 @@ function renderExercises() {
   const items = getFilteredExercises();
 
   if (!items.length) {
-    list.innerHTML = `<div class="fx-empty">Nincs találat.</div>`;
+    list.innerHTML = `<div class="fx-empty">Nincs találat vagy a kollekció még üres.</div>`;
     return;
   }
 
   list.innerHTML = items.map((item) => `
     <div class="fx-item">
       <div class="fx-thumb">
-        <img src="${escapeHtml(item.imageUrl || makeExerciseArt(item.name, item.category, item.difficulty))}" alt="${escapeHtml(item.name)}" />
+        <img
+          src="${escapeHtml(item.imageUrl || makeExerciseArt(item.name, item.category, item.difficulty))}"
+          alt="${escapeHtml(item.name)}"
+          loading="lazy"
+          onerror="this.onerror=null;this.src='${escapeHtml(makeExerciseArt(item.name, item.category, item.difficulty))}';"
+        />
       </div>
 
       <div>
@@ -987,7 +1030,7 @@ function resetForm() {
   setVal("fxReps", "");
   setVal("fxType", "nem-videós");
   setVal("fxDifficulty", "közepes");
-  setVal("fxSortOrder", state.exercises.length + 1);
+  setVal("fxSortOrder", Math.max(1, state.exercises.length + 1));
 
   const active = document.getElementById("fxActive");
   if (active) active.checked = true;
@@ -1080,6 +1123,20 @@ function getVal(id) {
 
 function extractErrorMessage(e) {
   return e?.message || String(e);
+}
+
+function safeAlert(message) {
+  try {
+    alert(message);
+  } catch {
+    console.log(message);
+  }
+}
+
+function showTopError(message) {
+  const box = document.getElementById("fxTopError");
+  if (!box) return;
+  box.innerHTML = `<div class="fx-error">${escapeHtml(message)}</div>`;
 }
 
 function escapeHtml(value) {
@@ -1252,6 +1309,84 @@ function buildSeedExercises() {
       difficulty: "könnyű",
       active: true,
       sortOrder: 12
+    },
+    {
+      name: "Falülés",
+      desc: "Statikus alsótest terhelés, comb- és farizom fókusz.",
+      category: "Alsótest",
+      workSec: 45,
+      restSec: 20,
+      rounds: 3,
+      repsText: "",
+      type: "nem-videós",
+      difficulty: "közepes",
+      active: true,
+      sortOrder: 13
+    },
+    {
+      name: "Donkey Kick",
+      desc: "Farizom aktiválás négykézláb helyzetből, kontrollált mozgással.",
+      category: "Farizom",
+      workSec: 35,
+      restSec: 15,
+      rounds: 3,
+      repsText: "12/oldal",
+      type: "nem-videós",
+      difficulty: "könnyű",
+      active: true,
+      sortOrder: 14
+    },
+    {
+      name: "Tricepsz tolódzkodás széken",
+      desc: "Kar hátulsó részének erősítése székkel vagy paddal.",
+      category: "Kar",
+      workSec: 30,
+      restSec: 20,
+      rounds: 3,
+      repsText: "10 ismétlés",
+      type: "nem-videós",
+      difficulty: "közepes",
+      active: true,
+      sortOrder: 15
+    },
+    {
+      name: "Magastérd futás",
+      desc: "Pulzusemelő cardio gyakorlat gyors, rövid blokkokra.",
+      category: "Cardio",
+      workSec: 25,
+      restSec: 15,
+      rounds: 4,
+      repsText: "",
+      type: "nem-videós",
+      difficulty: "közepes",
+      active: true,
+      sortOrder: 16
+    },
+    {
+      name: "Csípőemelés egy lábbal",
+      desc: "Farizom és hátsó lánc célzott erősítése egyoldalas terheléssel.",
+      category: "Farizom",
+      workSec: 35,
+      restSec: 20,
+      rounds: 3,
+      repsText: "10/oldal",
+      type: "nem-videós",
+      difficulty: "közepes",
+      active: true,
+      sortOrder: 17
+    },
+    {
+      name: "Ollózás",
+      desc: "Alsó has és csípőhajlító munka folyamatos feszes törzzsel.",
+      category: "Hasizom",
+      workSec: 30,
+      restSec: 15,
+      rounds: 3,
+      repsText: "",
+      type: "nem-videós",
+      difficulty: "közepes",
+      active: true,
+      sortOrder: 18
     }
   ];
 
