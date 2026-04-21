@@ -1235,8 +1235,23 @@
       return d ? d.toISOString().slice(0,10) : "";
     }
 
+    /* ✅ CHECK-IN javítás: stabil dátumnormalizálás */
+    function normalizeIsoDateInput(v){
+      if(!v) return "";
+      const raw = String(v).trim();
+      if(!raw) return "";
+
+      if(/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
+
+      const d = new Date(raw);
+      if(!Number.isNaN(d.getTime())) return d.toISOString().slice(0,10);
+
+      return "";
+    }
+
     function addDaysIso(baseIso, add){
-      const d = new Date(`${baseIso}T12:00:00`);
+      const safeBase = normalizeIsoDateInput(baseIso) || todayISO();
+      const d = new Date(`${safeBase}T12:00:00`);
       d.setDate(d.getDate() + add);
       return d.toISOString().slice(0,10);
     }
@@ -1344,20 +1359,23 @@
 
     function calcWeekIndex(p){
       if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
-      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+      const startIso = normalizeIsoDateInput(p.cycleStart);
+      const endIso = normalizeIsoDateInput(p.cycleEnd);
+      if(!startIso || !endIso) return 0;
+
+      const totalDays = Math.max(1, daysBetween(startIso, endIso));
+      const passedDays = clamp(daysBetween(startIso, todayISO()), 0, totalDays);
       const weeks = planMeta?.weeks ?? 4;
       const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
       return week - 1;
     }
 
+    /* ✅ CHECK-IN javítás: biztos ISO bázisdátum */
     function getCheckinBaseIso(){
-      return (
-        String(profile?.cycleStart || "").trim() ||
-        String(profile?.startDate || "").trim() ||
-        isoDateFromAny(profile?.createdAt) ||
-        todayISO()
-      );
+      const cycleStart = normalizeIsoDateInput(profile?.cycleStart);
+      const startDate  = normalizeIsoDateInput(profile?.startDate);
+      const createdAt  = normalizeIsoDateInput(isoDateFromAny(profile?.createdAt));
+      return cycleStart || startDate || createdAt || todayISO();
     }
 
     async function loadWeeklyCheckins(){
@@ -1380,9 +1398,19 @@
       }
     }
 
+    /* ✅ CHECK-IN javítás: stabil státuszszámolás */
     function getCurrentCheckinMeta(){
       const baseIso = getCheckinBaseIso();
-      const passedDays = Math.max(0, daysBetween(baseIso, todayISO()));
+      const today = todayISO();
+
+      let passedDays = 0;
+      try{
+        passedDays = Math.max(0, daysBetween(baseIso, today));
+      }catch(e){
+        console.error("Check-in daysBetween hiba:", e);
+        passedDays = 0;
+      }
+
       state.currentCheckinBase = baseIso;
 
       if(passedDays < 7){
@@ -1392,11 +1420,12 @@
           currentIndex: 0,
           dueAt: addDaysIso(baseIso, 7),
           status: "upcoming",
-          daysUntilDue: 7 - passedDays
+          daysUntilDue: Math.max(0, 7 - passedDays),
+          doc: null
         };
       }
 
-      const currentIndex = Math.floor(passedDays / 7);
+      const currentIndex = Math.max(1, Math.floor(passedDays / 7));
       const dueAt = addDaysIso(baseIso, currentIndex * 7);
       const mod = passedDays % 7;
       const doc = state.checkinsByIndex[currentIndex] || null;
@@ -1512,64 +1541,98 @@
       box.style.display = "block";
     }
 
+    /* ✅ CHECK-IN javítás: mindig kapjon UI állapotot */
     function renderWeeklyCheckin(){
-      const meta = getCurrentCheckinMeta();
-      state.currentCheckinIndex = meta.currentIndex;
-      state.currentCheckinDueAt = meta.dueAt;
-      state.currentCheckinDoc = meta.doc || null;
+      try{
+        const meta = getCurrentCheckinMeta();
+        state.currentCheckinIndex = meta.currentIndex;
+        state.currentCheckinDueAt = meta.dueAt;
+        state.currentCheckinDoc = meta.doc || null;
 
-      const pill = $("#weeklyCheckinStatusPill");
-      const title = $("#weeklyCheckinTitle");
-      const text = $("#weeklyCheckinText");
-      const due = $("#weeklyCheckinDueLabel");
-      const next = $("#weeklyCheckinNextLabel");
-      const btnOpen = $("#btnOpenWeeklyCheckin");
-      const btnEdit = $("#btnEditWeeklyCheckin");
+        const pill = $("#weeklyCheckinStatusPill");
+        const title = $("#weeklyCheckinTitle");
+        const text = $("#weeklyCheckinText");
+        const due = $("#weeklyCheckinDueLabel");
+        const next = $("#weeklyCheckinNextLabel");
+        const btnOpen = $("#btnOpenWeeklyCheckin");
+        const btnEdit = $("#btnEditWeeklyCheckin");
 
-      btnOpen.style.display = "none";
-      btnEdit.style.display = "none";
+        btnOpen.style.display = "none";
+        btnEdit.style.display = "none";
 
-      if(meta.status === "upcoming"){
+        if(meta.status === "upcoming"){
+          pill.className = "status-pill warn";
+          pill.textContent = "Még nem esedékes";
+          title.textContent = "Következő heti check-in";
+          text.textContent = `A check-in a program indulásától számítva 7 naponta jelenik meg. A következő ${humanDueText(meta.daysUntilDue).toLowerCase()}.`;
+          due.textContent = humanDateLabel(meta.dueAt);
+          next.textContent = humanDueText(meta.daysUntilDue);
+          renderWeeklyCheckinSummary(null);
+          return;
+        }
+
+        if(meta.status === "due"){
+          pill.className = "status-pill ok";
+          pill.textContent = "Új check-in elérhető";
+          title.textContent = `Check-in #${meta.currentIndex}`;
+          text.textContent = "Töltsd ki most a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.";
+          due.textContent = `${humanDateLabel(meta.dueAt)} • Ma`;
+          next.textContent = "Beküldés után 7 nap múlva";
+          btnOpen.style.display = "inline-flex";
+          renderWeeklyCheckinSummary(null);
+          return;
+        }
+
+        if(meta.status === "pending"){
+          pill.className = "status-pill danger";
+          pill.textContent = "Check-in függőben";
+          title.textContent = `Check-in #${meta.currentIndex}`;
+          text.textContent = "A heti check-in már esedékes. Kérlek töltsd ki, hogy lássam az aktuális állapotodat.";
+          due.textContent = `${humanDateLabel(meta.dueAt)} • Függőben`;
+          next.textContent = humanDueText(meta.daysUntilDue);
+          btnOpen.style.display = "inline-flex";
+          renderWeeklyCheckinSummary(null);
+          return;
+        }
+
+        if(meta.status === "submitted"){
+          pill.className = "status-pill ok";
+          pill.textContent = "Check-in elküldve";
+          title.textContent = `Check-in #${meta.currentIndex} rendben`;
+          text.textContent = "Az aktuális heti check-in megérkezett. A következő automatikusan 7 nap múlva lesz elérhető.";
+          due.textContent = `${humanDateLabel(meta.dueAt)} • Beküldve`;
+          next.textContent = humanDueText(meta.daysUntilDue);
+          btnEdit.style.display = "inline-flex";
+          renderWeeklyCheckinSummary(meta.doc);
+          return;
+        }
+
         pill.className = "status-pill warn";
-        pill.textContent = "Még nem esedékes";
-        title.textContent = "Következő heti check-in";
-        text.textContent = `A check-in a program indulásától számítva 7 naponta jelenik meg. A következő ${humanDueText(meta.daysUntilDue).toLowerCase()}.`;
+        pill.textContent = "Check-in állapot";
+        title.textContent = "Heti check-in";
+        text.textContent = "A check-in állapot kiszámolása megtörtént, de nincs külön megjeleníthető státusz.";
         due.textContent = humanDateLabel(meta.dueAt);
-        next.textContent = humanDueText(meta.daysUntilDue);
-        renderWeeklyCheckinSummary(null);
-      }
+        next.textContent = humanDueText(meta.daysUntilDue || 0);
+        renderWeeklyCheckinSummary(meta.doc || null);
+      }catch(err){
+        console.error("renderWeeklyCheckin hiba:", err);
+        const pill = $("#weeklyCheckinStatusPill");
+        const title = $("#weeklyCheckinTitle");
+        const text = $("#weeklyCheckinText");
+        const due = $("#weeklyCheckinDueLabel");
+        const next = $("#weeklyCheckinNextLabel");
+        const btnOpen = $("#btnOpenWeeklyCheckin");
+        const btnEdit = $("#btnEditWeeklyCheckin");
 
-      if(meta.status === "due"){
-        pill.className = "status-pill ok";
-        pill.textContent = "Új check-in elérhető";
-        title.textContent = `Check-in #${meta.currentIndex}`;
-        text.textContent = "Töltsd ki most a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.";
-        due.textContent = `${humanDateLabel(meta.dueAt)} • Ma`;
-        next.textContent = "Beküldés után 7 nap múlva";
-        btnOpen.style.display = "inline-flex";
-        renderWeeklyCheckinSummary(null);
-      }
-
-      if(meta.status === "pending"){
         pill.className = "status-pill danger";
-        pill.textContent = "Check-in függőben";
-        title.textContent = `Check-in #${meta.currentIndex}`;
-        text.textContent = "A heti check-in már esedékes. Kérlek töltsd ki, hogy lássam az aktuális állapotodat.";
-        due.textContent = `${humanDateLabel(meta.dueAt)} • Függőben`;
-        next.textContent = humanDueText(meta.daysUntilDue);
-        btnOpen.style.display = "inline-flex";
+        pill.textContent = "Check-in hiba";
+        title.textContent = "Heti check-in";
+        text.textContent = "Hiba történt a check-in állapot betöltésénél.";
+        due.textContent = "—";
+        next.textContent = "—";
+        btnOpen.style.display = "none";
+        btnEdit.style.display = "none";
         renderWeeklyCheckinSummary(null);
-      }
-
-      if(meta.status === "submitted"){
-        pill.className = "status-pill ok";
-        pill.textContent = "Check-in elküldve";
-        title.textContent = `Check-in #${meta.currentIndex} rendben`;
-        text.textContent = "Az aktuális heti check-in megérkezett. A következő automatikusan 7 nap múlva lesz elérhető.";
-        due.textContent = `${humanDateLabel(meta.dueAt)} • Beküldve`;
-        next.textContent = humanDueText(meta.daysUntilDue);
-        btnEdit.style.display = "inline-flex";
-        renderWeeklyCheckinSummary(meta.doc);
       }
     }
 
@@ -2198,4 +2261,4 @@
     });
   </script>
 </body>
-  </html>
+</html>
