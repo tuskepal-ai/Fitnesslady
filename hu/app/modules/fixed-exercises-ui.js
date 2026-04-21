@@ -5,17 +5,16 @@ const USER_ASSIGN_SUBCOL = "fixedExercises";
 
 const state = {
   uid: "",
+  mounted: false,
   items: [],
-  timers: new Map(), // exerciseId -> timer state
-  mounted: false
-};
-
-const els = {
-  section: null,
-  list: null,
-  detailOverlay: null,
-  detailTitle: null,
-  detailBody: null
+  timers: new Map(),
+  els: {
+    section: null,
+    list: null,
+    detailOverlay: null,
+    detailTitle: null,
+    detailBody: null
+  }
 };
 
 export async function initFixedExercisesUI({ uid }) {
@@ -24,10 +23,14 @@ export async function initFixedExercisesUI({ uid }) {
 
   injectSection();
   injectDetailModal();
-  bindStaticEvents();
 
   await loadAssignedExercises();
   render();
+
+  if (!state.mounted) {
+    bindStaticEvents();
+    state.mounted = true;
+  }
 }
 
 async function loadAssignedExercises() {
@@ -39,166 +42,201 @@ async function loadAssignedExercises() {
       )
     );
 
-    state.items = snap.docs.map((d) => {
-      const raw = d.data() || {};
-      return {
-        id: d.id,
-        exerciseId: raw.exerciseId || d.id,
-        name: raw.name || "—",
-        desc: raw.desc || "",
-        category: raw.category || "Általános",
-        imageUrl: raw.imageUrl || "",
-        workSec: Number(raw.workSec || 0),
-        restSec: Number(raw.restSec || 0),
-        rounds: Math.max(1, Number(raw.rounds || 1)),
-        repsText: raw.repsText || "",
-        type: raw.type || "nem-videós",
-        difficulty: raw.difficulty || "közepes",
-        active: raw.active !== false,
-        sortOrder: Number(raw.sortOrder || 0)
-      };
-    }).filter(x => x.active !== false);
+    state.items = snap.docs
+      .map((docSnap) => {
+        const raw = docSnap.data() || {};
+        return {
+          id: docSnap.id,
+          exerciseId: raw.exerciseId || docSnap.id,
+          name: String(raw.name || "").trim() || "—",
+          desc: String(raw.desc || "").trim(),
+          category: String(raw.category || "").trim() || "Általános",
+          imageUrl: String(raw.imageUrl || "").trim(),
+          workSec: Math.max(0, Number(raw.workSec || 0)),
+          restSec: Math.max(0, Number(raw.restSec || 0)),
+          rounds: Math.max(1, Number(raw.rounds || 1)),
+          repsText: String(raw.repsText || "").trim(),
+          type: String(raw.type || "nem-videós").trim(),
+          difficulty: String(raw.difficulty || "közepes").trim(),
+          active: raw.active !== false,
+          sortOrder: Number(raw.sortOrder || 0)
+        };
+      })
+      .filter((x) => x.active !== false);
+
+    syncTimersToItems();
   } catch (e) {
     console.error("Fix edzések betöltési hiba:", e);
     state.items = [];
   }
 }
 
-function injectSection() {
-  if (document.getElementById("fixedExercisesSection")) {
-    els.section = document.getElementById("fixedExercisesSection");
-    els.list = document.getElementById("fixedExercisesList");
-    return;
+function syncTimersToItems() {
+  const validIds = new Set(state.items.map((x) => x.id));
+
+  for (const [id, timer] of state.timers.entries()) {
+    if (!validIds.has(id)) {
+      clearTimer(timer);
+      state.timers.delete(id);
+    }
   }
 
-  const nav = document.querySelector(".nav");
-  if (nav && !nav.querySelector('[href="#fixed-exercises"]')) {
-    const a = document.createElement("a");
-    a.href = "#fixed-exercises";
-    a.setAttribute("data-nav", "");
-    a.textContent = "Fix edzések";
-    nav.appendChild(a);
-  }
+  state.items.forEach((item) => {
+    if (!state.timers.has(item.id)) {
+      state.timers.set(item.id, createDefaultTimer(item));
+    }
+  });
+}
 
-  const target = document.getElementById("technika");
-  if (!target) return;
+function createDefaultTimer(item) {
+  return {
+    id: item.id,
+    running: false,
+    paused: false,
+    completed: false,
+    phase: "work",
+    currentRound: 1,
+    remainingSec: item.workSec,
+    totalPhaseSec: Math.max(1, item.workSec),
+    intervalId: null
+  };
+}
 
-  const section = document.createElement("section");
-  section.id = "fixed-exercises";
-  section.className = "glass card";
-  section.innerHTML = `
-    <div id="fixedExercisesSection" class="fx-wrap">
-      <div class="fx-head">
-        <div class="fx-head-left">
-          <div class="fx-kicker">
-            <span class="fx-kicker-dot"></span>
-            <span>Fix edzések</span>
-          </div>
-          <h3 class="fx-title">Saját fix edzéseid</h3>
-          <p class="fx-sub">
-            Az admin által hozzád rendelt képes edzések. Indítható stopperrel, körökkel és pihenő szakaszokkal.
-          </p>
-        </div>
-
-        <div class="fx-toolbar">
-          <button class="pill ghost" id="fxReloadBtn" type="button">Frissítés</button>
-        </div>
-      </div>
-
-      <div id="fixedExercisesList" class="fx-grid"></div>
-    </div>
-  `;
-  target.parentNode.insertBefore(section, target);
-
-  els.section = section.querySelector("#fixedExercisesSection");
-  els.list = section.querySelector("#fixedExercisesList");
-
-  const reloadBtn = section.querySelector("#fxReloadBtn");
+function bindStaticEvents() {
+  const reloadBtn = document.getElementById("fixedExercisesReloadBtn");
   if (reloadBtn) {
     reloadBtn.addEventListener("click", async () => {
       await loadAssignedExercises();
       render();
     });
   }
+
+  const overlay = document.getElementById("fixedExerciseDetailOverlay");
+  if (overlay) {
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeDetailModal();
+    });
+  }
+
+  const closeBtn = document.getElementById("fixedExerciseDetailClose");
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeDetailModal);
+  }
 }
 
-function injectDetailModal() {
-  if (document.getElementById("fxDetailOverlay")) {
-    els.detailOverlay = document.getElementById("fxDetailOverlay");
-    els.detailTitle = document.getElementById("fxDetailTitle");
-    els.detailBody = document.getElementById("fxDetailBody");
+function injectSection() {
+  if (document.getElementById("fixedExercisesMount")) {
+    state.els.section = document.getElementById("fixedExercisesSection");
+    state.els.list = document.getElementById("fixedExercisesList");
+    ensureNavLink();
     return;
   }
 
-  const wrap = document.createElement("div");
-  wrap.className = "modal-overlay";
-  wrap.id = "fxDetailOverlay";
-  wrap.setAttribute("aria-hidden", "true");
-  wrap.innerHTML = `
-    <div class="glass modal" role="dialog" aria-modal="true" aria-labelledby="fxDetailTitle">
-      <div class="modal-header">
-        <h2 class="modal-title" id="fxDetailTitle">Edzés részletei</h2>
-        <button class="modal-close" id="fxDetailClose" type="button" aria-label="Bezárás">✕</button>
+  ensureNavLink();
+
+  const technika = document.getElementById("technika");
+  if (!technika) return;
+
+  const wrapper = document.createElement("section");
+  wrapper.id = "fixedExercisesMount";
+  wrapper.className = "glass card";
+  wrapper.innerHTML = `
+    <div id="fixedExercisesSection">
+      <div style="display:flex; align-items:flex-start; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-bottom:14px;">
+        <div>
+          <div class="chip" style="margin-bottom:10px;">• Fix edzések</div>
+          <h3 style="margin-bottom:6px;">Saját fix edzéseid</h3>
+          <p class="sub" style="margin-bottom:0;">Az admin által hozzád rendelt képes edzések. Indítható stopperrel, körökkel és pihenő szakaszokkal.</p>
+        </div>
+
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+          <button class="pill ghost" id="fixedExercisesReloadBtn" type="button">Frissítés</button>
+        </div>
       </div>
-      <div class="modal-body" id="fxDetailBody"></div>
+
+      <div id="fixedExercisesList" class="fix-list"></div>
     </div>
   `;
-  document.body.appendChild(wrap);
 
-  els.detailOverlay = wrap;
-  els.detailTitle = wrap.querySelector("#fxDetailTitle");
-  els.detailBody = wrap.querySelector("#fxDetailBody");
+  technika.parentNode.insertBefore(wrapper, technika);
 
-  wrap.querySelector("#fxDetailClose")?.addEventListener("click", closeDetail);
-  wrap.addEventListener("click", (e) => {
-    if (e.target === wrap) closeDetail();
-  });
+  state.els.section = wrapper.querySelector("#fixedExercisesSection");
+  state.els.list = wrapper.querySelector("#fixedExercisesList");
 }
 
-function bindStaticEvents() {
-  if (state.mounted) return;
-  state.mounted = true;
+function ensureNavLink() {
+  const nav = document.querySelector(".nav");
+  if (!nav) return;
+
+  const exists = Array.from(nav.querySelectorAll("a")).some(
+    (a) => (a.getAttribute("href") || "") === "#fixedExercisesMount"
+  );
+  if (exists) return;
+
+  const a = document.createElement("a");
+  a.href = "#fixedExercisesMount";
+  a.setAttribute("data-nav", "");
+  a.textContent = "Fix edzések";
+  nav.insertBefore(a, nav.querySelector('a[href="#technika"]') || null);
+}
+
+function injectDetailModal() {
+  if (document.getElementById("fixedExerciseDetailOverlay")) {
+    state.els.detailOverlay = document.getElementById("fixedExerciseDetailOverlay");
+    state.els.detailTitle = document.getElementById("fixedExerciseDetailTitle");
+    state.els.detailBody = document.getElementById("fixedExerciseDetailBody");
+    return;
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "modal-overlay";
+  overlay.id = "fixedExerciseDetailOverlay";
+  overlay.setAttribute("aria-hidden", "true");
+  overlay.innerHTML = `
+    <div class="glass modal" role="dialog" aria-modal="true" aria-labelledby="fixedExerciseDetailTitle">
+      <div class="modal-header">
+        <h2 class="modal-title" id="fixedExerciseDetailTitle">Edzés részletei</h2>
+        <button class="modal-close" id="fixedExerciseDetailClose" type="button" aria-label="Bezárás">✕</button>
+      </div>
+      <div class="modal-body" id="fixedExerciseDetailBody"></div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+
+  state.els.detailOverlay = overlay;
+  state.els.detailTitle = overlay.querySelector("#fixedExerciseDetailTitle");
+  state.els.detailBody = overlay.querySelector("#fixedExerciseDetailBody");
 }
 
 function render() {
-  if (!els.list) return;
+  const list = state.els.list;
+  if (!list) return;
 
   if (!state.items.length) {
-    els.list.innerHTML = `
-      <div class="fx-empty">
-        Jelenleg nincs hozzád rendelt fix edzés.
+    list.innerHTML = `
+      <div class="row">
+        <div>
+          <div class="title">Nincs hozzád rendelt fix edzés</div>
+          <div class="desc">Az admin oldalon lehet fix edzést hozzárendelni a felhasználóhoz.</div>
+        </div>
       </div>
     `;
     return;
   }
 
-  els.list.innerHTML = state.items.map((item) => renderCard(item)).join("");
+  list.innerHTML = state.items.map(renderCard).join("");
 
-  els.list.querySelectorAll("[data-fx-start]").forEach((btn) => {
+  list.querySelectorAll("[data-fx-detail]").forEach((btn) => {
     btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-fx-start");
+      const id = btn.getAttribute("data-fx-detail") || "";
+      openDetailModal(id);
+    });
+  });
+
+  list.querySelectorAll("[data-fx-start]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fx-start") || "";
       startExercise(id);
-    });
-  });
-
-  els.list.querySelectorAll("[data-fx-pause]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-fx-pause");
-      togglePause(id);
-    });
-  });
-
-  els.list.querySelectorAll("[data-fx-reset]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-fx-reset");
-      resetExercise(id);
-    });
-  });
-
-  els.list.querySelectorAll("[data-fx-detail]").forEach((btn) => {
-    btn.addEventListener("click", () => {
-      const id = btn.getAttribute("data-fx-detail");
-      openDetail(id);
     });
   });
 }
@@ -206,89 +244,48 @@ function render() {
 function renderCard(item) {
   const asset = getExerciseAsset(item.exerciseId || item.id || item.name);
   const timer = ensureTimer(item);
-  const displayImage = item.imageUrl || asset.image;
-  const progressDeg = timer.totalPhaseSec > 0
-    ? `${Math.max(0, Math.min(360, ((timer.totalPhaseSec - timer.remainingSec) / timer.totalPhaseSec) * 360))}deg`
-    : "0deg";
 
-  const statusLabel =
-    timer.completed
-      ? "Kész"
-      : timer.phase === "rest"
-        ? "Pihenő"
-        : "Munkaidő";
-
-  const running = timer.running ? "true" : "false";
-  const gradient = asset.gradient || "linear-gradient(135deg, #ff4fd8, #b14cff)";
-  const glow = asset.glow || "rgba(255,79,216,.20)";
+  const imageSrc = item.imageUrl || asset.image || "";
+  const progressDeg = calculateProgressDegrees(timer);
+  const timeText = formatTime(timer.remainingSec);
+  const phaseLabel = timer.completed ? "kész" : timer.phase === "rest" ? "pihenőidő" : "munkaidő";
+  const badgeLabel = item.category || "Általános";
 
   return `
-    <article class="fx-card" data-running="${running}" style="--fx-card-glow:${escapeAttr(glow)};">
-      <div class="fx-card-inner">
-        <div class="fx-visual" style="background:${escapeAttr(gradient)};">
-          <img class="fx-visual-img" src="${escapeAttr(displayImage)}" alt="${escapeAttr(item.name)}" />
-          <div class="fx-visual-badge">FL</div>
-        </div>
+    <article class="fix-card">
+      <div class="fix-img" style="background:${escapeAttr(asset.cardBackground || "radial-gradient(circle at 30% 30%, #ff4fd8, #3b0a3f)")};">
+        <img src="${escapeAttr(imageSrc)}" alt="${escapeAttr(item.name)}" />
+      </div>
 
-        <div class="fx-content">
-          <div class="fx-name-row">
-            <h4 class="fx-name">${escapeHtml(item.name)}</h4>
-            <span class="fx-muscle">${escapeHtml(item.category)}</span>
+      <div class="fix-content">
+        <div>
+          <div class="fix-title-row">
+            <div class="fix-title">${escapeHtml(item.name)}</div>
+            <div class="fix-badge">${escapeHtml(badgeLabel)}</div>
           </div>
 
-          <p class="fx-desc">${escapeHtml(item.desc)}</p>
+          <div class="fix-desc">${escapeHtml(item.desc || "")}</div>
 
-          <div class="fx-meta">
-            <span class="fx-meta-chip"><span class="icon">⏱</span>${item.workSec} mp munka</span>
-            <span class="fx-meta-chip"><span class="icon">◔</span>${item.restSec} mp pihenő</span>
-            <span class="fx-meta-chip"><span class="icon">↻</span>${item.rounds} kör</span>
-            ${item.repsText ? `<span class="fx-meta-chip"><span class="icon">#</span>${escapeHtml(item.repsText)}</span>` : ""}
-            <span class="fx-meta-chip"><span class="icon">●</span>${escapeHtml(item.difficulty)}</span>
-          </div>
-
-          <div class="fx-actions">
-            <button class="fx-btn secondary" type="button" data-fx-detail="${escapeAttr(item.id)}">Részletek</button>
-            <button class="fx-btn primary" type="button" data-fx-start="${escapeAttr(item.id)}" style="background:${escapeAttr(gradient)};">
-              ${timer.completed ? "Újraindítás" : timer.running ? "Fut" : "Indítás"}
-            </button>
-            <button class="fx-btn small" type="button" data-fx-pause="${escapeAttr(item.id)}">
-              ${timer.paused ? "Folytatás" : "Szünet"}
-            </button>
-            <button class="fx-btn small" type="button" data-fx-reset="${escapeAttr(item.id)}">Reset</button>
+          <div class="fix-meta">
+            <div class="fix-chip">⏱ ${item.workSec} mp munka</div>
+            <div class="fix-chip">◔ ${item.restSec} mp pihenő</div>
+            <div class="fix-chip">↻ ${item.rounds} kör</div>
           </div>
         </div>
 
-        <div class="fx-timer-col">
-          <div class="fx-session">
-            <div class="fx-ring" style="--progress:${progressDeg}; --ring-accent:${extractAccentColor(gradient)}; --ring-glow:${escapeAttr(glow)};">
-              <div class="fx-ring-content">
-                <span class="fx-ring-time">${formatSec(timer.remainingSec)}</span>
-                <span class="fx-ring-label">${escapeHtml(statusLabel)}</span>
-                <span class="fx-ring-round">Kör ${Math.min(timer.currentRound, item.rounds)}/${item.rounds}</span>
-              </div>
-            </div>
+        <div class="fix-actions">
+          <button class="fix-btn secondary" type="button" data-fx-detail="${escapeAttr(item.id)}">Részletek</button>
+          <button class="fix-btn primary" type="button" data-fx-start="${escapeAttr(item.id)}">
+            ${timer.running ? "Fut" : timer.completed ? "Újraindítás" : "Indítás"}
+          </button>
+        </div>
+      </div>
 
-            <div class="fx-session-box">
-              <div class="fx-session-top">
-                <div>
-                  <h5 class="fx-session-title">${escapeHtml(item.name)}</h5>
-                  <p class="fx-session-sub">Munka + pihenő körvezérlés</p>
-                </div>
-                <span class="fx-session-status ${timer.completed ? "done" : timer.phase === "rest" ? "rest" : "work"}">
-                  ${timer.completed ? "Edzés kész" : timer.phase === "rest" ? "Pihenő szakasz" : "Munka szakasz"}
-                </span>
-              </div>
-
-              <div class="fx-mini-note">
-                ${timer.completed
-                  ? "Minden kör befejezve."
-                  : timer.paused
-                    ? "A stopper szünetel. A „Folytatás” gombbal indítható tovább."
-                    : timer.running
-                      ? "Az edzés most aktív."
-                      : "Nyomd meg az Indítás gombot a kezdéshez."}
-              </div>
-            </div>
+      <div class="fix-timer">
+        <div class="fix-timer-circle" style="--progress:${progressDeg}deg;">
+          <div class="fix-timer-inner">
+            <div class="fix-time">${escapeHtml(timeText)}</div>
+            <div class="fix-label">${escapeHtml(phaseLabel)}</div>
           </div>
         </div>
       </div>
@@ -298,236 +295,182 @@ function renderCard(item) {
 
 function ensureTimer(item) {
   if (!state.timers.has(item.id)) {
-    state.timers.set(item.id, {
-      exerciseId: item.id,
-      phase: "work",
-      running: false,
-      paused: false,
-      currentRound: 1,
-      remainingSec: item.workSec,
-      totalPhaseSec: item.workSec,
-      intervalId: null,
-      completed: false
-    });
+    state.timers.set(item.id, createDefaultTimer(item));
   }
   return state.timers.get(item.id);
 }
 
 function startExercise(id) {
-  const item = state.items.find(x => x.id === id);
+  const item = state.items.find((x) => x.id === id);
   if (!item) return;
 
   const timer = ensureTimer(item);
 
-  if (timer.completed) {
-    clearExerciseInterval(timer);
-    timer.phase = "work";
-    timer.running = true;
-    timer.paused = false;
-    timer.currentRound = 1;
-    timer.remainingSec = item.workSec;
-    timer.totalPhaseSec = item.workSec;
-    timer.completed = false;
-    runTimer(item, timer);
-    render();
-    return;
-  }
+  if (timer.running) return;
 
-  if (timer.running && !timer.paused) return;
+  if (timer.completed) {
+    resetTimerState(timer, item);
+  }
 
   timer.running = true;
   timer.paused = false;
 
-  if (timer.remainingSec <= 0) {
+  clearTimer(timer);
+  timer.intervalId = window.setInterval(() => {
+    tickExercise(item.id);
+  }, 1000);
+
+  render();
+}
+
+function tickExercise(id) {
+  const item = state.items.find((x) => x.id === id);
+  if (!item) return;
+
+  const timer = ensureTimer(item);
+  if (!timer.running) return;
+
+  timer.remainingSec -= 1;
+
+  if (timer.remainingSec > 0) {
+    render();
+    return;
+  }
+
+  if (timer.phase === "work" && item.restSec > 0) {
+    timer.phase = "rest";
+    timer.remainingSec = item.restSec;
+    timer.totalPhaseSec = Math.max(1, item.restSec);
+    render();
+    return;
+  }
+
+  if (timer.currentRound < item.rounds) {
+    timer.currentRound += 1;
     timer.phase = "work";
     timer.remainingSec = item.workSec;
-    timer.totalPhaseSec = item.workSec;
-  }
-
-  runTimer(item, timer);
-  render();
-}
-
-function togglePause(id) {
-  const item = state.items.find(x => x.id === id);
-  if (!item) return;
-
-  const timer = ensureTimer(item);
-  if (timer.completed) return;
-
-  if (!timer.running) {
-    timer.running = true;
-    timer.paused = false;
-    runTimer(item, timer);
+    timer.totalPhaseSec = Math.max(1, item.workSec);
     render();
     return;
   }
 
-  timer.paused = !timer.paused;
-  if (timer.paused) {
-    clearExerciseInterval(timer);
-  } else {
-    runTimer(item, timer);
-  }
-  render();
-}
-
-function resetExercise(id) {
-  const item = state.items.find(x => x.id === id);
-  if (!item) return;
-
-  const timer = ensureTimer(item);
-  clearExerciseInterval(timer);
-
-  timer.phase = "work";
+  timer.completed = true;
   timer.running = false;
   timer.paused = false;
-  timer.currentRound = 1;
+  timer.phase = "work";
   timer.remainingSec = item.workSec;
-  timer.totalPhaseSec = item.workSec;
-  timer.completed = false;
+  timer.totalPhaseSec = Math.max(1, item.workSec);
 
+  clearTimer(timer);
   render();
 }
 
-function runTimer(item, timer) {
-  clearExerciseInterval(timer);
-
-  timer.intervalId = window.setInterval(() => {
-    if (timer.paused || !timer.running) return;
-
-    timer.remainingSec -= 1;
-
-    if (timer.remainingSec > 0) {
-      render();
-      return;
-    }
-
-    if (timer.phase === "work") {
-      if (item.restSec > 0) {
-        timer.phase = "rest";
-        timer.remainingSec = item.restSec;
-        timer.totalPhaseSec = item.restSec;
-      } else {
-        moveToNextRound(item, timer);
-      }
-    } else {
-      moveToNextRound(item, timer);
-    }
-
-    render();
-  }, 1000);
-}
-
-function moveToNextRound(item, timer) {
-  if (timer.currentRound >= item.rounds) {
-    clearExerciseInterval(timer);
-    timer.running = false;
-    timer.paused = false;
-    timer.completed = true;
-    timer.phase = "work";
-    timer.remainingSec = 0;
-    timer.totalPhaseSec = item.workSec;
-    return;
-  }
-
-  timer.currentRound += 1;
+function resetTimerState(timer, item) {
+  clearTimer(timer);
+  timer.running = false;
+  timer.paused = false;
+  timer.completed = false;
   timer.phase = "work";
+  timer.currentRound = 1;
   timer.remainingSec = item.workSec;
-  timer.totalPhaseSec = item.workSec;
+  timer.totalPhaseSec = Math.max(1, item.workSec);
 }
 
-function clearExerciseInterval(timer) {
-  if (timer.intervalId) {
+function clearTimer(timer) {
+  if (timer?.intervalId) {
     clearInterval(timer.intervalId);
     timer.intervalId = null;
   }
 }
 
-function openDetail(id) {
-  const item = state.items.find(x => x.id === id);
-  if (!item || !els.detailOverlay || !els.detailBody || !els.detailTitle) return;
+function openDetailModal(id) {
+  const item = state.items.find((x) => x.id === id);
+  if (!item || !state.els.detailOverlay || !state.els.detailBody || !state.els.detailTitle) return;
 
   const asset = getExerciseAsset(item.exerciseId || item.id || item.name);
-  const displayImage = item.imageUrl || asset.image;
+  const imageSrc = item.imageUrl || asset.image || "";
+  const timer = ensureTimer(item);
 
-  els.detailTitle.textContent = item.name;
-  els.detailBody.innerHTML = `
-    <div class="fx-detail">
-      <div class="fx-detail-media" style="background:${escapeAttr(asset.gradient || "linear-gradient(135deg, #ff4fd8, #b14cff)")};">
-        <img src="${escapeAttr(displayImage)}" alt="${escapeAttr(item.name)}" />
+  state.els.detailTitle.textContent = item.name;
+  state.els.detailBody.innerHTML = `
+    <div style="display:grid; gap:16px;">
+      <div style="display:grid; grid-template-columns:140px 1fr; gap:16px; align-items:start;">
+        <div style="width:140px; height:140px; border-radius:20px; display:flex; align-items:center; justify-content:center; background:${escapeAttr(asset.cardBackground || "radial-gradient(circle at 30% 30%, #ff4fd8, #3b0a3f)")}; box-shadow:0 0 30px rgba(255,79,216,.35);">
+          <img src="${escapeAttr(imageSrc)}" alt="${escapeAttr(item.name)}" style="width:80%; height:auto;" />
+        </div>
+
+        <div>
+          <div style="display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:6px;">
+            <strong style="font-size:22px;">${escapeHtml(item.name)}</strong>
+            <span style="font-size:12px; padding:5px 10px; border-radius:999px; background:rgba(255,79,216,.15); border:1px solid rgba(255,79,216,.35); color:#ff91ea;">${escapeHtml(item.category)}</span>
+          </div>
+
+          <div style="color:rgba(255,255,255,.72); line-height:1.6; margin-bottom:12px;">
+            ${escapeHtml(item.desc || "")}
+          </div>
+
+          <div style="display:flex; flex-wrap:wrap; gap:10px;">
+            <span class="chip">⏱ ${item.workSec} mp munka</span>
+            <span class="chip">◔ ${item.restSec} mp pihenő</span>
+            <span class="chip">↻ ${item.rounds} kör</span>
+            ${item.repsText ? `<span class="chip"># ${escapeHtml(item.repsText)}</span>` : ""}
+            <span class="chip">${escapeHtml(item.difficulty)}</span>
+            <span class="chip">${escapeHtml(item.type)}</span>
+          </div>
+        </div>
       </div>
 
-      <div class="fx-detail-box">
-        <h3 class="fx-detail-title">${escapeHtml(item.name)}</h3>
-        <p class="fx-detail-desc">${escapeHtml(item.desc)}</p>
+      <div class="glass" style="padding:16px;">
+        <div style="display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; align-items:center;">
+          <div>
+            <div style="font-weight:800; margin-bottom:4px;">Aktuális állapot</div>
+            <div style="color:rgba(255,255,255,.70); font-size:13px;">
+              Kör: ${timer.currentRound}/${item.rounds} • ${timer.completed ? "kész" : timer.phase === "rest" ? "pihenő szakasz" : "munka szakasz"}
+            </div>
+          </div>
 
-        <div class="fx-detail-grid">
-          <div class="fx-detail-stat">
-            <b>Kategória</b>
-            <span>${escapeHtml(item.category)}</span>
-          </div>
-          <div class="fx-detail-stat">
-            <b>Nehézség</b>
-            <span>${escapeHtml(item.difficulty)}</span>
-          </div>
-          <div class="fx-detail-stat">
-            <b>Munkaidő</b>
-            <span>${item.workSec} mp</span>
-          </div>
-          <div class="fx-detail-stat">
-            <b>Pihenőidő</b>
-            <span>${item.restSec} mp</span>
-          </div>
-          <div class="fx-detail-stat">
-            <b>Körök</b>
-            <span>${item.rounds}</span>
-          </div>
-          <div class="fx-detail-stat">
-            <b>Ismétlés</b>
-            <span>${escapeHtml(item.repsText || "Nincs megadva")}</span>
+          <div style="font-size:28px; font-weight:900; color:#fff;">
+            ${escapeHtml(formatTime(timer.remainingSec))}
           </div>
         </div>
+      </div>
 
-        <div class="fx-actions">
-          <button class="fx-btn primary" type="button" id="fxDetailStartBtn" style="background:${escapeAttr(asset.gradient || "linear-gradient(135deg, #ff4fd8, #b14cff)")};">
-            Indítás
-          </button>
-          <button class="fx-btn secondary" type="button" id="fxDetailCloseBtn">
-            Bezárás
-          </button>
-        </div>
+      <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <button class="pill primary" id="fixedExerciseDetailStartBtn" type="button">${timer.completed ? "Újraindítás" : timer.running ? "Fut" : "Indítás"}</button>
+        <button class="pill ghost" id="fixedExerciseDetailCloseBtn" type="button">Bezárás</button>
       </div>
     </div>
   `;
 
-  els.detailOverlay.classList.add("is-open");
-  els.detailOverlay.setAttribute("aria-hidden", "false");
+  state.els.detailOverlay.classList.add("is-open");
+  state.els.detailOverlay.setAttribute("aria-hidden", "false");
 
-  els.detailBody.querySelector("#fxDetailCloseBtn")?.addEventListener("click", closeDetail);
-  els.detailBody.querySelector("#fxDetailStartBtn")?.addEventListener("click", () => {
-    closeDetail();
+  state.els.detailBody.querySelector("#fixedExerciseDetailStartBtn")?.addEventListener("click", () => {
     startExercise(item.id);
-    document.getElementById("fixed-exercises")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    openDetailModal(item.id);
   });
+
+  state.els.detailBody.querySelector("#fixedExerciseDetailCloseBtn")?.addEventListener("click", closeDetailModal);
 }
 
-function closeDetail() {
-  if (!els.detailOverlay) return;
-  els.detailOverlay.classList.remove("is-open");
-  els.detailOverlay.setAttribute("aria-hidden", "true");
+function closeDetailModal() {
+  if (!state.els.detailOverlay) return;
+  state.els.detailOverlay.classList.remove("is-open");
+  state.els.detailOverlay.setAttribute("aria-hidden", "true");
 }
 
-function formatSec(total) {
-  const sec = Math.max(0, Number(total || 0));
-  const m = Math.floor(sec / 60);
-  const s = sec % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+function calculateProgressDegrees(timer) {
+  if (!timer || timer.totalPhaseSec <= 0) return 0;
+  const passed = timer.totalPhaseSec - timer.remainingSec;
+  const ratio = Math.max(0, Math.min(1, passed / timer.totalPhaseSec));
+  return Math.round(ratio * 360);
 }
 
-function extractAccentColor(gradient) {
-  const match = String(gradient || "").match(/#([0-9a-fA-F]{3,8})/);
-  return match ? `#${match[1]}` : "#ff4fd8";
+function formatTime(totalSec) {
+  const s = Math.max(0, Number(totalSec || 0));
+  const m = Math.floor(s / 60);
+  const sec = s % 60;
+  return `${String(m).padStart(2, "0")}:${String(sec).padStart(2, "0")}`;
 }
 
 function escapeAttr(value) {
@@ -536,4 +479,4 @@ function escapeAttr(value) {
     .replaceAll('"', "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
-      }
+}
