@@ -48,7 +48,6 @@
     a{ color:inherit; text-decoration:none; }
     button,input,textarea,select{ font:inherit; }
 
-    /* ===== Shell ===== */
     .appShell{
       width:min(var(--max), 94vw);
       margin: 16px auto 54px;
@@ -61,7 +60,6 @@
       .appShell{ grid-template-columns: 1fr; width: min(var(--max), 94vw); }
     }
 
-    /* ===== Glass ===== */
     .glass{
       background: linear-gradient(180deg, var(--glass0), var(--glass1));
       border: 1px solid var(--line);
@@ -76,7 +74,6 @@
       border-radius: var(--radius2);
     }
 
-    /* ===== Topbar ===== */
     .topbar{
       position: sticky;
       top:0;
@@ -153,7 +150,6 @@
     }
     .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
 
-    /* ===== Sidebar ===== */
     .sidebar{
       position: sticky;
       top: 78px;
@@ -224,7 +220,6 @@
       opacity:.95;
     }
 
-    /* ===== Main content ===== */
     .content{
       padding: 16px;
     }
@@ -294,8 +289,6 @@
 
     .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
 
-    .hr{ border:none; height:1px; background:rgba(255,255,255,.08); margin:14px 0; }
-
     .miniRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -303,7 +296,6 @@
     }
     @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
 
-    /* ===== Users list (optional) ===== */
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .li{
       display:grid;
@@ -330,13 +322,12 @@
     }
     .debugBox b{ color:#fff; }
 
-    /* ===== Toast ===== */
     .toast{
       position: fixed;
       right: 14px;
       bottom: 14px;
       z-index: 250;
-      width: min(520px, calc(100vw - 28px));
+      width: min(560px, calc(100vw - 28px));
       padding: 12px 14px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.12);
@@ -349,7 +340,6 @@
     .toast.is-on{ display:block; }
     .toast b{ font-weight: 950; }
 
-    /* ===== Footer ===== */
     footer{
       padding: 18px 0 46px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -363,7 +353,6 @@
       color:rgba(255,255,255,.70); font-size:13px;
     }
 
-    /* ===== Chat window (like client: floating modal) ===== */
     .chatWin{
       position: fixed;
       right: 18px;
@@ -502,7 +491,6 @@
   </header>
 
   <main class="appShell">
-    <!-- SIDEBAR -->
     <aside class="glass sidebar">
       <div class="sideHead">
         <div class="t"><span class="dot"></span><span style="font-weight:950;">Menü</span></div>
@@ -523,13 +511,11 @@
       </div>
     </aside>
 
-    <!-- CONTENT -->
     <section class="glass content">
       <h1 class="pageTitle">Felhasználók</h1>
       <p class="pageSub">A /hu/register/ után regisztrált vevőket itt kezeled: profil, chat, étrend, motiváció, technika, template + override.</p>
 
       <div class="grid2" id="sec-users">
-        <!-- LEFT: User selection -->
         <div class="section">
           <h2 class="sectionTitle">Kiválasztás</h2>
           <p class="sub">Válassz felhasználót a legördülőből. (A találat lista lent csak extra, ha kell.)</p>
@@ -552,12 +538,10 @@
 
           <div class="debugBox" id="debugBox"><b>DEBUG</b>: users count: — • last error: —</div>
 
-          <!-- Optional list (you can hide later if you want) -->
           <div class="sub" style="margin-top:12px;">Találatok (opcionális):</div>
           <ul class="list" id="usersList"></ul>
         </div>
 
-        <!-- RIGHT: Selected user card -->
         <div class="section">
           <h2 class="sectionTitle">User profil</h2>
           <p class="sub">A kiválasztott user adatai + chat megnyitás + teljes törlés.</p>
@@ -660,7 +644,6 @@
         </div>
       </div>
 
-      <!-- PLAN TEMPLATE -->
       <div class="section" id="sec-plan">
         <h2 class="sectionTitle">Plan template</h2>
         <p class="sub">Csomag meta + heti fix edzések (dinamikusan ment: csak a kitöltött edzések kerülnek a Firestore-ba).</p>
@@ -713,7 +696,6 @@
         </div>
       </div>
 
-      <!-- WELCOME -->
       <div class="section">
         <h2 class="sectionTitle">Üdvözlő kártya</h2>
         <p class="sub">Személyes üzenet + videó (külön kártya a vevőnél).</p>
@@ -727,7 +709,6 @@
         </div>
       </div>
 
-      <!-- DIET -->
       <div class="section" id="sec-diet">
         <h2 class="sectionTitle">Étrend — 4 hét / napi</h2>
         <p class="sub">Napi étkezések (a vevőnél prémium kártyákban jelenik meg).</p>
@@ -769,7 +750,6 @@
         </div>
       </div>
 
-      <!-- MOTIVATION -->
       <div class="section" id="sec-mot">
         <h2 class="sectionTitle">Fix motiváció kártya</h2>
         <p class="sub">Mindig látszik a vevőnél.</p>
@@ -782,7 +762,6 @@
         </div>
       </div>
 
-      <!-- OVERRIDES -->
       <div class="section" id="sec-ov">
         <h2 class="sectionTitle">Személyre szabás (Overrides)</h2>
         <p class="sub">Heti extra videók / üzenetek a kiválasztott userhez.</p>
@@ -822,7 +801,6 @@
         </div>
       </div>
 
-      <!-- TECH VAULT -->
       <div class="section" id="sec-tech">
         <h2 class="sectionTitle">Technika Vault</h2>
         <p class="sub">Technikai anyagok a vevő „Technika Vault” kártyájához.</p>
@@ -867,7 +845,6 @@
 
   <div class="toast" id="toast"></div>
 
-  <!-- ✅ Chat window (floating, like client) -->
   <aside class="chatWin" id="chatDrawer" aria-hidden="true">
     <div class="chatHead">
       <div>
@@ -895,6 +872,8 @@
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
+    const DELETE_USER_ENDPOINT = "https://deleteuserfull-i4dq2zk5pa-uc.a.run.app";
+
     const escapeHtml = (s) => String(s ?? "")
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
@@ -913,7 +892,7 @@
       toast.__t = window.setTimeout(()=>toast.classList.remove("is-on"), ms);
     }
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
-    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 3800); }
+    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 4200); }
 
     const dbg = $("#debugBox");
     function setDebug({count=null, error=null}={}){
@@ -924,7 +903,6 @@
 
     $("#y").textContent = new Date().getFullYear();
 
-    // ✅ Sidebar scroll + active
     const nav = $("#sideNav");
     function setActiveNav(btn){
       $$("#sideNav .navBtn").forEach(x=>x.classList.remove("active"));
@@ -949,18 +927,15 @@
     $("#btnTopLogout").addEventListener("click", doLogout);
     $("#btnTopChat").addEventListener("click", ()=> openChatFor(SEL_UID));
 
-    // ✅ state
     let SEL_UID = null;
     let CURRENT_AUTH_USER = null;
     let USERS_CACHE = [];
 
-    // ✅ remember selected user
     const SEL_KEY = "fl_admin_sel_uid_v1";
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
     function clearSel(){ localStorage.removeItem(SEL_KEY); }
 
-    // ✅ Chat (Firestore)
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
     const chatInput = $("#chatInput");
@@ -1035,10 +1010,6 @@
             bub.textContent = m.text || "";
             row.appendChild(bub);
 
-            if(mine){
-              // no avatar on mine
-            }
-
             chatBody.appendChild(row);
           });
           chatBody.scrollTop = chatBody.scrollHeight + 9999;
@@ -1076,7 +1047,6 @@
     });
     $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
-    // 🔥 Dinamikus 5 fix edzés box (UI 5, mentés dinamikus: csak kitöltött megy)
     const workoutsContainer = $("#workouts_container");
     let workoutsHTML = "";
     for(let i=1; i<=5; i++){
@@ -1106,14 +1076,12 @@
     }
     workoutsContainer.innerHTML = workoutsHTML;
 
-    // ✅ Helpers for HU/DE objects
     const getStr = (val) => {
       if(!val) return "";
       if(typeof val === "string") return val;
       return val.hu || val.de || "";
     };
 
-    // ✅ planId select + custom
     const PLAN_PRESETS = ["start_v1","balance_v1","pro_v1"];
     const planSel = $("#u_planIdSelect");
     const planCustomWrap = $("#u_planIdCustomWrap");
@@ -1228,7 +1196,6 @@
       fillTechVaultForm(doc);
     }
 
-    // ✅ USERS LIST
     const userPick = $("#userPick");
 
     function fillUserPickDropdown(items){
@@ -1401,31 +1368,24 @@
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
     });
 
-    async function getAdminDeleteEndpoint(){
-      return (
-        trimStr(window.FITNESSLADY_DELETE_USER_URL) ||
-        trimStr(localStorage.getItem("fitnesslady_delete_user_url")) ||
-        trimStr(localStorage.getItem("fl_delete_user_url")) ||
-        "/api/admin-delete-user"
-      );
-    }
-
     async function getAdminIdToken(){
       if(!CURRENT_AUTH_USER) throw new Error("Nincs bejelentkezett admin user.");
       return await CURRENT_AUTH_USER.getIdToken(true);
     }
 
     async function callDeleteEndpoint(uid, email){
-      const url = await getAdminDeleteEndpoint();
       const token = await getAdminIdToken();
 
-      const res = await fetch(url, {
+      const res = await fetch(DELETE_USER_ENDPOINT, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           "Authorization": `Bearer ${token}`
         },
-        body: JSON.stringify({ uid, email })
+        body: JSON.stringify({
+          uid,
+          email
+        })
       });
 
       let data = null;
@@ -1437,6 +1397,10 @@
 
       if(!res.ok){
         throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
+      }
+
+      if(data?.ok === false){
+        throw new Error(data?.error || "A törlés endpoint hibát adott vissza.");
       }
 
       return data;
@@ -1536,7 +1500,6 @@
       }catch(e){ console.error(e); err(e.message || String(e)); }
     });
 
-    // ✅ Welcome
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1553,7 +1516,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Diet
     function dietRefs(){
       const week = ($("#d_week").value || "1").trim();
       const day = ($("#d_day").value || "mon").trim();
@@ -1609,7 +1571,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Motivation
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
@@ -1621,7 +1582,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Plan meta
     async function loadPlanMeta(){
       const planId = trimStr($("#p_planId").value);
       if(!planId) return err("Csomag neve (Plan ID) üres.");
@@ -1692,7 +1652,6 @@
       }catch(e){ err(e.message || String(e)); }
     }
 
-    // ✅ Dinamikus mentés: csak a kitöltött edzések kerülnek a workouts[] tömbbe
     async function saveTemplateWeek(){
       try{
         const planId = trimStr($("#p_planId").value);
@@ -1706,7 +1665,6 @@
           const vid   = trimStr($(`#t_w${i}_vid`).value);
           const dur   = trimStr($(`#t_w${i}_dur`).value);
 
-          // dinamikus: ha bármi ki van töltve, mentjük
           if(title || desc || vid || dur){
             workouts.push({
               id: `w${i}`,
@@ -1743,7 +1701,6 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
-    // ✅ Overrides
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
@@ -1799,7 +1756,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ Tech Vault
     async function loadTechVault(){
       try{
         if(!SEL_UID) return;
@@ -1834,7 +1790,6 @@
       }catch(e){ err(e.message || String(e)); }
     });
 
-    // ✅ AUTH BOOT
     onAuth(async (user)=>{
       try{
         CURRENT_AUTH_USER = user || null;
