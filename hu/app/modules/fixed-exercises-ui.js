@@ -1,5 +1,3 @@
-// FILE: /hu/app/modules/fixed-exercises-ui.js
-
 import { db, fs, escapeHtml } from "../../shared/firebase.js";
 import { getExerciseAsset } from "./fixed-exercises-assets.js";
 
@@ -11,9 +9,10 @@ const state = {
   activeIndex: 0,
   items: [],
   timers: new Map(),
+  snapUnsub: null,
+  scrollRaf: null,
   els: {
-    root: null,
-    list: null,
+    mount: null,
     track: null,
     refreshBtn: null,
     detailOverlay: null,
@@ -24,7 +23,6 @@ const state = {
 
 export async function initFixedExercisesUI({ uid }) {
   if (!uid) return;
-
   state.uid = uid;
 
   ensureMount();
@@ -33,7 +31,7 @@ export async function initFixedExercisesUI({ uid }) {
 
   await loadAssignedExercises();
   render();
-  syncActiveCardToCenter(true);
+  centerActiveCard(false);
 }
 
 async function loadAssignedExercises() {
@@ -48,12 +46,11 @@ async function loadAssignedExercises() {
     state.items = snap.docs
       .map((docSnap) => {
         const raw = docSnap.data() || {};
-        const id = docSnap.id;
-        const asset = getExerciseAsset(raw.exerciseId || raw.name || id);
+        const asset = getExerciseAsset(raw.exerciseId || raw.name || docSnap.id);
 
         return {
-          id,
-          exerciseId: String(raw.exerciseId || id),
+          id: docSnap.id,
+          exerciseId: String(raw.exerciseId || docSnap.id),
           name: String(raw.name || "").trim() || "Edzés",
           desc: String(raw.desc || "").trim(),
           category: String(raw.category || "").trim() || "Általános",
@@ -64,19 +61,22 @@ async function loadAssignedExercises() {
           repsText: String(raw.repsText || "").trim(),
           difficulty: String(raw.difficulty || "közepes").trim(),
           type: String(raw.type || "nem-videós").trim(),
-          sortOrder: Number(raw.sortOrder || 0),
           active: raw.active !== false,
+          sortOrder: Number(raw.sortOrder || 0),
           accent: asset.accent || "#ff4fd8",
           accent2: asset.accent2 || "#b14cff",
           cardBackground:
             asset.cardBackground ||
-            "radial-gradient(circle at 28% 18%, rgba(255,255,255,.18), transparent 30%), linear-gradient(135deg, rgba(255,79,216,.28), rgba(177,76,255,.12))"
+            "radial-gradient(circle at 20% 10%, rgba(255,255,255,.14), transparent 28%), linear-gradient(180deg, rgba(255,79,216,.16), rgba(177,76,255,.08))"
         };
       })
       .filter((item) => item.active !== false);
 
     syncTimers();
-    if (state.activeIndex > state.items.length - 1) state.activeIndex = 0;
+
+    if (state.activeIndex > state.items.length - 1) {
+      state.activeIndex = 0;
+    }
   } catch (error) {
     console.error("Fix edzések betöltési hiba:", error);
     state.items = [];
@@ -89,7 +89,7 @@ function syncTimers() {
 
   for (const [id, timer] of state.timers.entries()) {
     if (!validIds.has(id)) {
-      stopTimerInterval(timer);
+      stopTimer(timer);
       state.timers.delete(id);
     }
   }
@@ -128,7 +128,7 @@ function ensureMount() {
   }
 
   mount.innerHTML = `
-    <div class="fe-root" id="feRoot">
+    <div class="fe-root">
       <div class="fe-header">
         <div>
           <div class="chip" style="margin-bottom:10px;">• Fix edzések</div>
@@ -147,7 +147,7 @@ function ensureMount() {
     </div>
   `;
 
-  state.els.root = mount.querySelector("#feRoot");
+  state.els.mount = mount;
   state.els.track = mount.querySelector("#feTrack");
   state.els.refreshBtn = mount.querySelector("#feRefreshBtn");
 }
@@ -187,10 +187,17 @@ function bindStaticEvents() {
   state.els.refreshBtn?.addEventListener("click", async () => {
     await loadAssignedExercises();
     render();
-    syncActiveCardToCenter(true);
+    centerActiveCard(true);
   });
 
-  state.els.track?.addEventListener("scroll", handleTrackScroll, { passive: true });
+  state.els.track?.addEventListener(
+    "scroll",
+    () => {
+      if (state.scrollRaf) cancelAnimationFrame(state.scrollRaf);
+      state.scrollRaf = requestAnimationFrame(handleTrackScroll);
+    },
+    { passive: true }
+  );
 
   state.els.detailOverlay?.addEventListener("click", (e) => {
     if (e.target === state.els.detailOverlay) closeDetailModal();
@@ -199,7 +206,7 @@ function bindStaticEvents() {
   document.getElementById("feDetailClose")?.addEventListener("click", closeDetailModal);
 
   window.addEventListener("resize", () => {
-    syncActiveCardToCenter(false);
+    centerActiveCard(false);
   });
 }
 
@@ -225,8 +232,8 @@ function render() {
   state.els.track.querySelectorAll(".fe-card").forEach((card) => {
     card.addEventListener("click", (e) => {
       if (e.target.closest(".fe-btn")) return;
-      const index = Number(card.getAttribute("data-index") || 0);
-      setActiveIndex(index, true);
+      const index = Number(card.getAttribute("data-index") || "0");
+      activateCard(index);
     });
   });
 
@@ -254,7 +261,7 @@ function renderCard(item, index, isActive) {
   const phaseText = timer.completed
     ? "kész"
     : timer.phase === "rest"
-      ? "pihenő"
+      ? "pihenőidő"
       : "munkaidő";
 
   return `
@@ -262,12 +269,8 @@ function renderCard(item, index, isActive) {
       class="fe-card ${isActive ? "active" : ""}"
       data-index="${index}"
       data-id="${escapeAttr(item.id)}"
-      style="box-shadow:${isActive ? `0 20px 50px rgba(255,0,150,0.18), 0 0 0 1px rgba(255,80,200,0.12)` : "none"};"
     >
-      <div
-        class="fe-card-img"
-        style="background:${escapeAttr(item.cardBackground)};"
-      >
+      <div class="fe-card-img" style="background:${escapeAttr(item.cardBackground)};">
         ${item.imageUrl ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}">` : ""}
       </div>
 
@@ -284,7 +287,7 @@ function renderCard(item, index, isActive) {
       <div class="fe-timer">
         <div
           class="fe-timer-circle"
-          style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg); box-shadow:0 0 28px color-mix(in srgb, ${escapeAttr(item.accent)} 45%, transparent);"
+          style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg); box-shadow:0 0 28px rgba(255,79,216,.20);"
         >
           <div class="fe-timer-inner">
             <div class="fe-time">${escapeHtml(timeText)}</div>
@@ -310,6 +313,60 @@ function ensureTimer(item) {
   return state.timers.get(item.id);
 }
 
+function activateCard(index) {
+  const safeIndex = Math.max(0, Math.min(index, state.items.length - 1));
+  if (safeIndex === state.activeIndex) {
+    centerActiveCard(true);
+    return;
+  }
+
+  state.activeIndex = safeIndex;
+  render();
+  centerActiveCard(true);
+}
+
+function centerActiveCard(smooth = true) {
+  if (!state.els.track) return;
+  const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
+  const activeCard = cards[state.activeIndex];
+  if (!activeCard) return;
+
+  const targetLeft =
+    activeCard.offsetLeft - (state.els.track.clientWidth / 2 - activeCard.clientWidth / 2);
+
+  state.els.track.scrollTo({
+    left: Math.max(0, targetLeft),
+    behavior: smooth ? "smooth" : "auto"
+  });
+}
+
+function handleTrackScroll() {
+  if (!state.els.track) return;
+
+  const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
+  if (!cards.length) return;
+
+  const centerX = state.els.track.scrollLeft + state.els.track.clientWidth / 2;
+
+  let nearestIndex = 0;
+  let nearestDistance = Number.POSITIVE_INFINITY;
+
+  cards.forEach((card, index) => {
+    const cardCenter = card.offsetLeft + card.clientWidth / 2;
+    const distance = Math.abs(centerX - cardCenter);
+
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = index;
+    }
+  });
+
+  if (nearestIndex !== state.activeIndex) {
+    state.activeIndex = nearestIndex;
+    render();
+  }
+}
+
 function toggleStart(itemId) {
   const item = state.items.find((x) => x.id === itemId);
   if (!item) return;
@@ -323,7 +380,7 @@ function toggleStart(itemId) {
   }
 
   timer.running = true;
-  stopTimerInterval(timer);
+  stopTimer(timer);
 
   timer.intervalId = window.setInterval(() => {
     tick(itemId);
@@ -366,15 +423,16 @@ function tick(itemId) {
   timer.running = false;
   timer.completed = true;
   timer.phase = "work";
+  timer.currentRound = 1;
   timer.remainingSec = item.workSec;
   timer.totalSec = Math.max(1, item.workSec);
-  stopTimerInterval(timer);
+  stopTimer(timer);
 
   render();
 }
 
 function resetTimer(timer, item) {
-  stopTimerInterval(timer);
+  stopTimer(timer);
   timer.running = false;
   timer.completed = false;
   timer.phase = "work";
@@ -383,7 +441,7 @@ function resetTimer(timer, item) {
   timer.totalSec = Math.max(1, item.workSec);
 }
 
-function stopTimerInterval(timer) {
+function stopTimer(timer) {
   if (timer?.intervalId) {
     clearInterval(timer.intervalId);
     timer.intervalId = null;
@@ -400,8 +458,8 @@ function openDetailModal(itemId) {
   state.els.detailBody.innerHTML = `
     <div style="display:grid; gap:16px;">
       <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:start;">
-        <div style="width:120px; height:120px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:${escapeAttr(item.cardBackground)};">
-          ${item.imageUrl ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" style="max-width:80%; max-height:80%;">` : ""}
+        <div style="width:120px; height:120px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:${escapeAttr(item.cardBackground)}; overflow:hidden;">
+          ${item.imageUrl ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" style="width:100%; height:100%; object-fit:cover;">` : ""}
         </div>
 
         <div>
@@ -462,55 +520,6 @@ function closeDetailModal() {
   if (!state.els.detailOverlay) return;
   state.els.detailOverlay.classList.remove("is-open");
   state.els.detailOverlay.setAttribute("aria-hidden", "true");
-}
-
-function handleTrackScroll() {
-  if (!state.els.track) return;
-
-  if (handleTrackScroll._raf) cancelAnimationFrame(handleTrackScroll._raf);
-  handleTrackScroll._raf = requestAnimationFrame(() => {
-    const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
-    if (!cards.length) return;
-
-    const center = state.els.track.scrollLeft + state.els.track.clientWidth / 2;
-
-    let bestIndex = 0;
-    let bestDistance = Number.POSITIVE_INFINITY;
-
-    cards.forEach((card, index) => {
-      const cardCenter = card.offsetLeft + card.clientWidth / 2;
-      const dist = Math.abs(center - cardCenter);
-      if (dist < bestDistance) {
-        bestDistance = dist;
-        bestIndex = index;
-      }
-    });
-
-    if (bestIndex !== state.activeIndex) {
-      state.activeIndex = bestIndex;
-      render();
-    }
-  });
-}
-
-function setActiveIndex(index, scrollToCard = false) {
-  const safeIndex = Math.max(0, Math.min(index, state.items.length - 1));
-  state.activeIndex = safeIndex;
-  render();
-  if (scrollToCard) syncActiveCardToCenter(true);
-}
-
-function syncActiveCardToCenter(smooth = true) {
-  if (!state.els.track) return;
-  const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
-  const active = cards[state.activeIndex];
-  if (!active) return;
-
-  const left = active.offsetLeft - (state.els.track.clientWidth / 2 - active.clientWidth / 2);
-  state.els.track.scrollTo({
-    left,
-    behavior: smooth ? "smooth" : "auto"
-  });
 }
 
 function calcProgressDeg(timer) {
