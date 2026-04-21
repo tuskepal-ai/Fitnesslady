@@ -1238,63 +1238,22 @@ footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-a
         console.error(e);  
       }  
     }  
-function getCurrentCheckinMeta(){
-  let baseIso = getCheckinBaseIso();
 
-  if(!baseIso || typeof baseIso !== "string" || !/^\d{4}-\d{2}-\d{2}$/.test(baseIso)){
-    baseIso = todayISO();
-  }
+    function getCurrentCheckinMeta(){  
+      const baseIso = getCheckinBaseIso();  
+      const passedDays = Math.max(0, daysBetween(baseIso, todayISO()));  
+      state.currentCheckinBase = baseIso;  
 
-  let passedDays = 0;
-  try{
-    passedDays = Math.max(0, daysBetween(baseIso, todayISO()));
-    if(!Number.isFinite(passedDays)) passedDays = 0;
-  }catch(e){
-    console.error("Check-in daysBetween hiba:", e);
-    passedDays = 0;
-  }
-
-  state.currentCheckinBase = baseIso;
-
-  if(passedDays < 7){
-    return {
-      baseIso,
-      passedDays,
-      currentIndex: 0,
-      dueAt: addDaysIso(baseIso, 7),
-      status: "upcoming",
-      daysUntilDue: 7 - passedDays
-    };
-  }
-
-  const currentIndex = Math.floor(passedDays / 7);
-  const dueAt = addDaysIso(baseIso, currentIndex * 7);
-  const mod = passedDays % 7;
-  const doc = state.checkinsByIndex[currentIndex] || null;
-
-  if(doc){
-    return {
-      baseIso,
-      passedDays,
-      currentIndex,
-      dueAt,
-      status: "submitted",
-      daysUntilDue: mod === 0 ? 7 : 7 - mod,
-      doc
-    };
-  }
-
-  return {
-    baseIso,
-    passedDays,
-    currentIndex,
-    dueAt,
-    status: mod === 0 ? "due" : "pending",
-    daysUntilDue: mod === 0 ? 0 : 7 - mod,
-    doc: null
-  };
-}
-    
+      if(passedDays < 7){  
+        return {  
+          baseIso,  
+          passedDays,  
+          currentIndex: 0,  
+          dueAt: addDaysIso(baseIso, 7),  
+          status: "upcoming",  
+          daysUntilDue: 7 - passedDays  
+        };  
+      }  
 
       const currentIndex = Math.floor(passedDays / 7);  
       const dueAt = addDaysIso(baseIso, currentIndex * 7);  
