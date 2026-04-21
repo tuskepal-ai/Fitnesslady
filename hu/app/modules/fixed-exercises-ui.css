@@ -1,188 +1,255 @@
-/* ================================
-   FITNESS LADY — FIX EXERCISES UI (PRO)
-================================ */
+/* =========================
+   FIXED EXERCISES — CAROUSEL UI (NO MIX)
+   ========================= */
 
-/* GRID WRAP */
-.fix-list {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-}
-
-/* CARD */
-.fix-card {
-  display: grid;
-  grid-template-columns: 110px 1fr 130px;
-  gap: 16px;
-  padding: 16px;
-  border-radius: 22px;
-  background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
-  border: 1px solid rgba(255,255,255,0.08);
-  box-shadow: 0 20px 60px rgba(0,0,0,0.6);
-  backdrop-filter: blur(10px);
+.fe-root {
+  margin-top: 28px;
   position: relative;
-  overflow: hidden;
 }
 
-/* LEFT IMAGE */
-.fix-img {
-  width: 100%;
-  height: 100%;
-  border-radius: 18px;
-  background: radial-gradient(circle at 30% 30%, #ff4fd8, #3b0a3f);
+/* TITLE */
+.fe-header {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 30px rgba(255,79,216,0.4);
-}
-
-.fix-img img {
-  width: 80%;
-  height: auto;
-  opacity: 0.9;
-}
-
-/* CONTENT */
-.fix-content {
-  display: flex;
-  flex-direction: column;
   justify-content: space-between;
-}
-
-/* TITLE ROW */
-.fix-title-row {
-  display: flex;
   align-items: center;
-  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.fix-title {
-  font-size: 18px;
-  font-weight: 700;
-  color: white;
-}
-
-.fix-badge {
-  font-size: 12px;
-  padding: 4px 10px;
-  border-radius: 999px;
-  background: rgba(255,79,216,0.15);
-  border: 1px solid rgba(255,79,216,0.4);
-  color: #ff4fd8;
-}
-
-/* DESC */
-.fix-desc {
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  margin-top: 4px;
-}
-
-/* META */
-.fix-meta {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-  flex-wrap: wrap;
-}
-
-.fix-chip {
-  font-size: 12px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.08);
-  color: rgba(255,255,255,0.85);
-}
-
-/* ACTIONS */
-.fix-actions {
-  display: flex;
-  gap: 10px;
-  margin-top: 12px;
-}
-
-.fix-btn {
-  flex: 1;
-  padding: 12px;
-  border-radius: 14px;
-  font-size: 14px;
+.fe-title {
+  font-size: 22px;
   font-weight: 600;
-  border: none;
-  cursor: pointer;
+  color: #fff;
 }
 
-/* DETAILS BTN */
-.fix-btn.secondary {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid rgba(255,255,255,0.1);
-  color: white;
+.fe-refresh {
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.04);
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: #ff4fd8;
+  font-size: 13px;
 }
 
-/* START BTN */
-.fix-btn.primary {
-  background: linear-gradient(90deg, #ff4fd8, #b14cff);
-  color: white;
-  box-shadow: 0 0 25px rgba(255,79,216,0.5);
-}
+/* =========================
+   CAROUSEL
+   ========================= */
 
-/* RIGHT TIMER */
-.fix-timer {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-/* CIRCLE */
-.fix-timer-circle {
-  width: 110px;
-  height: 110px;
-  border-radius: 50%;
+.fe-carousel {
+  overflow: hidden;
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+}
 
-  background:
-    radial-gradient(circle at center, rgba(255,255,255,0.08), transparent 60%),
-    conic-gradient(#ff4fd8 0deg, #ff4fd8 var(--progress, 0deg), rgba(255,255,255,0.08) var(--progress, 0deg));
+.fe-track {
+  display: flex;
+  gap: 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 8px;
+}
+
+.fe-track::-webkit-scrollbar {
+  display: none;
+}
+
+/* =========================
+   CARD BASE
+   ========================= */
+
+.fe-card {
+  flex: 0 0 78%;
+  scroll-snap-align: center;
+
+  background: linear-gradient(
+    180deg,
+    rgba(255,255,255,0.06),
+    rgba(255,255,255,0.02)
+  );
+
+  border-radius: 22px;
+  padding: 16px;
+
+  border: 1px solid rgba(255,255,255,0.08);
+
+  transition: all 0.35s ease;
+
+  transform: scale(0.9);
+  opacity: 0.55;
+
+  position: relative;
+}
+
+/* ACTIVE CARD */
+.fe-card.active {
+  transform: scale(1);
+  opacity: 1;
+  z-index: 3;
 
   box-shadow:
-    0 0 40px rgba(255,79,216,0.4),
-    inset 0 0 25px rgba(255,255,255,0.08);
+    0 0 0 1px rgba(255,80,200,0.2),
+    0 20px 50px rgba(255,0,150,0.25);
 }
 
-/* INNER TEXT */
-.fix-timer-inner {
+/* =========================
+   IMAGE
+   ========================= */
+
+.fe-card-img {
+  width: 100%;
+  height: 160px;
+  border-radius: 16px;
+  background: radial-gradient(
+    circle at top left,
+    rgba(255,80,200,0.25),
+    transparent
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 12px;
+}
+
+.fe-card-img img {
+  max-height: 100%;
+  max-width: 100%;
+  opacity: 0.95;
+}
+
+/* =========================
+   TEXT
+   ========================= */
+
+.fe-card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+  margin-bottom: 4px;
+}
+
+.fe-card-sub {
+  font-size: 12px;
+  color: #ff4fd8;
+  margin-bottom: 6px;
+}
+
+.fe-card-desc {
+  font-size: 13px;
+  color: rgba(255,255,255,0.75);
+  margin-bottom: 10px;
+}
+
+/* =========================
+   META
+   ========================= */
+
+.fe-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.fe-pill {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 999px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.8);
+}
+
+/* =========================
+   TIMER (ONLY ACTIVE)
+   ========================= */
+
+.fe-timer {
+  display: none;
+}
+
+.fe-card.active .fe-timer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 14px 0;
+}
+
+.fe-timer-circle {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+
+  background:
+    conic-gradient(#ff4fd8 0deg, rgba(255,255,255,0.08) 0deg);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.fe-timer-inner {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: #0b0b12;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.fe-time {
+  font-size: 18px;
+  font-weight: 600;
+  color: #fff;
+}
+
+.fe-time-sub {
+  font-size: 10px;
+  color: rgba(255,255,255,0.6);
+}
+
+/* =========================
+   ACTIONS
+   ========================= */
+
+.fe-actions {
+  display: none;
+}
+
+.fe-card.active .fe-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.fe-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: 12px;
+  font-size: 13px;
   text-align: center;
 }
 
-.fix-time {
-  font-size: 20px;
-  font-weight: 700;
-  color: white;
+.fe-btn.secondary {
+  background: rgba(255,255,255,0.05);
+  color: #fff;
 }
 
-.fix-label {
-  font-size: 11px;
-  color: rgba(255,255,255,0.7);
+.fe-btn.primary {
+  background: linear-gradient(
+    90deg,
+    #ff4fd8,
+    #b14cff
+  );
+  color: #fff;
+  font-weight: 500;
 }
 
-/* MOBILE */
-@media (max-width: 768px) {
-  .fix-card {
-    grid-template-columns: 1fr;
-  }
+/* =========================
+   RESPONSIVE
+   ========================= */
 
-  .fix-img {
-    height: 120px;
-  }
-
-  .fix-timer {
-    margin-top: 10px;
-  }
-
-  .fix-actions {
-    flex-direction: column;
+@media (min-width: 700px) {
+  .fe-card {
+    flex: 0 0 420px;
   }
 }
