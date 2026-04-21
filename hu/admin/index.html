@@ -68,11 +68,6 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
     }
-    .panel{
-      background: rgba(0,0,0,.18);
-      border: 1px solid rgba(255,255,255,.10);
-      border-radius: var(--radius2);
-    }
 
     .topbar{
       position: sticky;
@@ -102,7 +97,13 @@
       background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
       box-shadow: 0 0 18px rgba(255,79,216,.7);
     }
-    .top-actions{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+    .top-actions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
 
     .pill{
       display:inline-flex;
@@ -148,7 +149,9 @@
       transform:none !important;
       box-shadow:none !important;
     }
-    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; }
+    .mono{
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+    }
 
     .sidebar{
       position: sticky;
@@ -159,7 +162,10 @@
       .sidebar{ position: relative; top:auto; }
     }
     .sideHead{
-      display:flex; align-items:center; justify-content:space-between; gap:10px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
       padding: 12px 12px;
       border-radius: 18px;
       border: 1px solid rgba(255,255,255,.10);
@@ -220,9 +226,7 @@
       opacity:.95;
     }
 
-    .content{
-      padding: 16px;
-    }
+    .content{ padding: 16px; }
     .pageTitle{
       margin: 6px 0 12px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
@@ -275,7 +279,12 @@
     }
 
     .field{ display:grid; gap:6px; margin: 10px 0; }
-    label{ color: rgba(255,255,255,.72); font-size: 12.8px; font-weight: 850; letter-spacing:.2px; }
+    label{
+      color: rgba(255,255,255,.72);
+      font-size: 12.8px;
+      font-weight: 850;
+      letter-spacing:.2px;
+    }
     input, select, textarea{
       width: 100%;
       padding: 11px 12px;
@@ -285,16 +294,27 @@
       color: rgba(255,255,255,.92);
       outline: none;
     }
-    textarea{ min-height: 96px; resize: vertical; line-height: 1.55; }
+    textarea{
+      min-height: 96px;
+      resize: vertical;
+      line-height: 1.55;
+    }
 
-    .actions{ display:flex; flex-wrap:wrap; gap:10px; margin-top: 10px; }
+    .actions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      margin-top: 10px;
+    }
 
     .miniRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap: 10px;
     }
-    @media (max-width: 780px){ .miniRow{ grid-template-columns: 1fr; } }
+    @media (max-width: 780px){
+      .miniRow{ grid-template-columns: 1fr; }
+    }
 
     .list{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
     .li{
@@ -307,8 +327,17 @@
       background: rgba(0,0,0,.18);
       border: 1px solid rgba(255,255,255,.10);
     }
-    .li .title{ font-weight: 950; letter-spacing:.2px; font-size: 13.5px; }
-    .li .desc{ color: rgba(255,255,255,.70); font-size: 12.8px; margin-top: 4px; line-height: 1.45; }
+    .li .title{
+      font-weight: 950;
+      letter-spacing:.2px;
+      font-size: 13.5px;
+    }
+    .li .desc{
+      color: rgba(255,255,255,.70);
+      font-size: 12.8px;
+      margin-top: 4px;
+      line-height: 1.45;
+    }
 
     .debugBox{
       margin-top: 10px;
@@ -327,7 +356,7 @@
       right: 14px;
       bottom: 14px;
       z-index: 250;
-      width: min(560px, calc(100vw - 28px));
+      width: min(620px, calc(100vw - 28px));
       padding: 12px 14px;
       border-radius: 16px;
       border: 1px solid rgba(255,255,255,.12);
@@ -349,8 +378,12 @@
     .footer-inner{
       width:min(var(--max), 94vw);
       margin:0 auto;
-      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      color:rgba(255,255,255,.70); font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
     }
 
     .chatWin{
@@ -437,9 +470,7 @@
       background: linear-gradient(135deg, rgba(255,79,216,.22), rgba(177,76,255,.18));
       border-color: rgba(255,79,216,.24);
     }
-    .theirs .bubble{
-      border-color: rgba(255,211,138,.18);
-    }
+    .theirs .bubble{ border-color: rgba(255,211,138,.18); }
     .chatFoot{
       padding: 10px;
       border-top: 1px solid rgba(255,255,255,.10);
@@ -639,7 +670,7 @@
           </div>
 
           <div class="debugBox" style="margin-top:12px;">
-            <b>Törlés</b>: az Auth user törlését a deployolt admin endpoint végzi. Utána az admin oldal letörli a Firestore user doc / chat / override adatokat is. A saját admin account törlése tiltva van.
+            <b>Törlés</b>: a callable <span class="mono">deleteUserFull</span> function törli az Auth usert, az admin oldal pedig utána kitakarítja a Firestore user / chat / override adatokat is. A saját admin account törlése tiltva van.
           </div>
         </div>
       </div>
@@ -832,7 +863,6 @@
           <button class="pill danger" id="btnClearTechVault" type="button">🗑 Ürítés</button>
         </div>
       </div>
-
     </section>
   </main>
 
@@ -864,15 +894,21 @@
 
   <script type="module">
     import {
-      db, fs,
+      app, db, fs,
       onAuth, logout, toLogin, toApp,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
 
+    import {
+      getFunctions,
+      httpsCallable
+    } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-functions.js";
+
     const $ = (s, r=document) => r.querySelector(s);
     const $$ = (s, r=document) => Array.from(r.querySelectorAll(s));
 
-    const DELETE_USER_ENDPOINT = "https://deleteuserfull-i4dq2zk5pa-uc.a.run.app";
+    const functions = getFunctions(app, "us-central1");
+    const deleteUserFullCallable = httpsCallable(functions, "deleteUserFull");
 
     const escapeHtml = (s) => String(s ?? "")
       .replaceAll("&","&amp;")
@@ -902,7 +938,10 @@
           input.details,
           input.reason,
           input.status,
-          input.code
+          input.code,
+          input?.data?.message,
+          input?.data?.error,
+          input?.data?.details
         ].filter(v => v != null);
 
         for(const c of candidates){
@@ -918,12 +957,6 @@
       }
 
       return String(input);
-    }
-
-    async function parseResponseBody(res){
-      const text = await res.text();
-      if(!text) return null;
-      try{ return JSON.parse(text); } catch(_){ return text; }
     }
 
     const toast = $("#toast");
@@ -994,6 +1027,7 @@
         createdAt: fs.serverTimestamp()
       }, { merge:true });
     }
+
     function listenChatMessages(uid, cb){
       const col = fs.collection(db, "chats", uid, "messages");
       const q = fs.query(col, fs.orderBy("createdAt", "asc"), fs.limit(200));
@@ -1002,6 +1036,7 @@
         cb(items);
       });
     }
+
     async function sendChatText(uid, sender, text){
       const col = fs.collection(db, "chats", uid, "messages");
       await fs.addDoc(col, {
@@ -1066,7 +1101,9 @@
       chatDrawer.classList.remove("on");
       chatDrawer.setAttribute("aria-hidden", "true");
     }
+
     $("#btnChatClose").addEventListener("click", closeChat);
+
     $("#btnChatSend").addEventListener("click", async ()=>{
       try{
         if(!CHAT_UID) return err("Nincs chat user.");
@@ -1083,10 +1120,12 @@
         err(extractErrorMessage(e));
       }
     });
+
     chatInput.addEventListener("keydown", (e)=>{
       if(e.key === "Enter") $("#btnChatSend").click();
       if(e.key === "Escape") closeChat();
     });
+
     $("#btnOpenChatInline").addEventListener("click", ()=> openChatFor(SEL_UID));
 
     const workoutsContainer = $("#workouts_container");
@@ -1136,6 +1175,7 @@
       }
       return v || "start_v1";
     }
+
     function setPlanUI(planIdRaw){
       const planId = String(planIdRaw || "").trim() || "start_v1";
       if(PLAN_PRESETS.includes(planId)){
@@ -1148,6 +1188,7 @@
         planCustom.value = planId;
       }
     }
+
     planSel.addEventListener("change", ()=>{
       if(planSel.value === "custom"){
         planCustomWrap.style.display = "block";
@@ -1164,22 +1205,27 @@
       $("#w_text").value = wc?.text || "";
       $("#w_video").value = wc?.video || wc?.vimeoId || "";
     }
+
     function fillTechVaultForm(doc){
       const tv = doc?.techVault || doc?.techniqueVault || null;
       const items = Array.isArray(tv?.items) ? tv.items : [];
       const i1 = items[0] || {};
       const i2 = items[1] || {};
       const i3 = items[2] || {};
+
       $("#tv1_title").value = i1.title || "";
       $("#tv1_video").value = i1.video || "";
       $("#tv1_text").value  = i1.text  || "";
+
       $("#tv2_title").value = i2.title || "";
       $("#tv2_video").value = i2.video || "";
       $("#tv2_text").value  = i2.text  || "";
+
       $("#tv3_title").value = i3.title || "";
       $("#tv3_video").value = i3.video || "";
       $("#tv3_text").value  = i3.text  || "";
     }
+
     function clearTechVaultFields(){
       $("#tv1_title").value = ""; $("#tv1_video").value = ""; $("#tv1_text").value = "";
       $("#tv2_title").value = ""; $("#tv2_video").value = ""; $("#tv2_text").value = "";
@@ -1205,9 +1251,11 @@
       $("#w_text").value = "";
       $("#w_video").value = "";
       clearTechVaultFields();
+
       $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
       $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
       $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
+
       $("#d_breakfast").value = "";
       $("#d_snack1").value = "";
       $("#d_lunch").value = "";
@@ -1251,6 +1299,7 @@
         opt.textContent = nm ? `${nm} — ${em || u.id}` : (em || u.id);
         userPick.appendChild(opt);
       });
+
       if(keep && items.some(x=>x.id===keep)) userPick.value = keep;
       else if(SEL_UID && items.some(x=>x.id===SEL_UID)) userPick.value = SEL_UID;
     }
@@ -1366,6 +1415,7 @@
 
       const ref = fs.doc(db, "users", uid);
       const snap = await fs.getDoc(ref);
+
       if(!snap.exists()){
         await fs.setDoc(ref, {
           email: "",
@@ -1410,67 +1460,12 @@
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
     });
 
-    async function getAdminIdToken(){
-      if(!CURRENT_AUTH_USER) throw new Error("Nincs bejelentkezett admin user.");
-      return await CURRENT_AUTH_USER.getIdToken(true);
-    }
-
-    async function callDeleteEndpoint(uid, email){
-      const token = await getAdminIdToken();
-
-      const payloadVariants = [
-        { uid, email },
-        { uid, email, token },
-        { uid, email, idToken: token },
-        { data: { uid, email }, token },
-        { data: { uid, email }, idToken: token }
-      ];
-
-      let lastError = null;
-
-      for(const payload of payloadVariants){
-        try{
-          const res = await fetch(DELETE_USER_ENDPOINT, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Authorization": `Bearer ${token}`
-            },
-            body: JSON.stringify(payload)
-          });
-
-          const data = await parseResponseBody(res);
-
-          if(!res.ok){
-            throw new Error(extractErrorMessage(data) || `HTTP ${res.status}`);
-          }
-
-          if(
-            data == null ||
-            data === "" ||
-            data?.ok === true ||
-            data?.success === true ||
-            data?.deleted === true ||
-            data?.status === "ok" ||
-            data?.result === "ok" ||
-            data?.data?.ok === true ||
-            data?.data?.success === true
-          ){
-            return data;
-          }
-
-          if(data?.ok === false || data?.success === false || data?.error){
-            throw new Error(extractErrorMessage(data));
-          }
-
-          return data;
-        }catch(e){
-          lastError = e;
-          console.error("deleteUserFull payload variant failed:", payload, e);
-        }
-      }
-
-      throw new Error(extractErrorMessage(lastError));
+    async function callDeleteCallable(uid, email){
+      const res = await deleteUserFullCallable({
+        uid,
+        email
+      });
+      return res?.data ?? null;
     }
 
     async function deleteSubcollectionDocs(colRef){
@@ -1517,7 +1512,12 @@
         $("#btnDeleteUser").disabled = true;
         $$("[data-delete-user]").forEach(b => b.disabled = true);
 
-        await callDeleteEndpoint(uid, email);
+        const fnRes = await callDeleteCallable(uid, email);
+
+        if(fnRes && (fnRes.ok === false || fnRes.success === false || fnRes.error)){
+          throw new Error(extractErrorMessage(fnRes));
+        }
+
         await cleanupFirestoreUserData(uid);
 
         if(SEL_UID === uid){
@@ -1564,7 +1564,10 @@
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Profil mentve");
         await loadUsersList(true);
-      }catch(e){ console.error(e); err(extractErrorMessage(e)); }
+      }catch(e){
+        console.error(e);
+        err(extractErrorMessage(e));
+      }
     });
 
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
@@ -1580,7 +1583,9 @@
         };
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Üdvözlő kártya mentve");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     function dietRefs(){
@@ -1588,6 +1593,7 @@
       const day = ($("#d_day").value || "mon").trim();
       return { week, day, wKey: `w${week}` };
     }
+
     function setDietFields(obj){
       $("#d_breakfast").value = obj?.breakfast || "";
       $("#d_snack1").value = obj?.snack1 || "";
@@ -1595,6 +1601,7 @@
       $("#d_snack2").value = obj?.snack2 || "";
       $("#d_dinner").value = obj?.dinner || "";
     }
+
     async function loadDietDay(){
       if(!SEL_UID) return;
       const { wKey, day } = dietRefs();
@@ -1602,7 +1609,12 @@
       const dayObj = (snap.data() || {})?.dietPlan?.[wKey]?.[day] || null;
       setDietFields(dayObj);
     }
-    $("#btnLoadDietDay").addEventListener("click", async ()=>{ await loadDietDay(); ok("Étrend nap betöltve"); });
+
+    $("#btnLoadDietDay").addEventListener("click", async ()=>{
+      await loadDietDay();
+      ok("Étrend nap betöltve");
+    });
+
     $("#d_week").addEventListener("change", loadDietDay);
     $("#d_day").addEventListener("change", loadDietDay);
 
@@ -1622,7 +1634,9 @@
           updatedAt: fs.serverTimestamp()
         });
         ok("Étrend (nap) mentve");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     $("#btnClearDietDay").addEventListener("click", async ()=>{
@@ -1635,18 +1649,25 @@
         });
         setDietFields(null);
         ok("Étrend (nap) törölve");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
       try{
         if(!SEL_UID) return err("Nincs user kiválasztva.");
         await fs.updateDoc(fs.doc(db, "users", SEL_UID), {
-          motivationCard: { title: trimStr($("#m_title").value), text: ($("#m_text").value || "").toString() },
+          motivationCard: {
+            title: trimStr($("#m_title").value),
+            text: ($("#m_text").value || "").toString()
+          },
           updatedAt: fs.serverTimestamp()
         });
         ok("Motiváció kártya mentve");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     async function loadPlanMeta(){
@@ -1661,16 +1682,22 @@
       $("#p_weeks").value = (snap.data() || {}).weeks ?? 4;
       ok(`Csomag meta betöltve: ${planId}`);
     }
+
     async function savePlanMeta(){
       try{
         const planId = trimStr($("#p_planId").value);
         if(!planId) return err("Csomag neve (Plan ID) üres.");
         const weeks = clamp(parseInt($("#p_weeks").value || "4", 10), 1, 24);
         await fs.setDoc(fs.doc(db, "planTemplates", planId), {
-          id: planId, weeks, name: { hu: planId, de: planId }, updatedAt: fs.serverTimestamp()
+          id: planId,
+          weeks,
+          name: { hu: planId, de: planId },
+          updatedAt: fs.serverTimestamp()
         }, { merge:true });
         ok(`Csomag (${planId}) elmentve ${weeks} héttel!`);
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     }
 
     function clearTemplateWeekFields(){
@@ -1682,6 +1709,7 @@
       }
       $("#t_slots_count").value = "3";
     }
+
     $("#btnClearTemplateWeek").addEventListener("click", ()=>{
       clearTemplateWeekFields();
       ok("Hét mezők ürítve");
@@ -1716,7 +1744,9 @@
         });
 
         ok(`Csomag hét (${weekNo}) betöltve.`);
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     }
 
     async function saveTemplateWeek(){
@@ -1760,7 +1790,9 @@
         }, { merge:true });
 
         ok(`Sablon hét (${weekNo}) elmentve!`);
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     }
 
     $("#btnLoadPlanMeta").addEventListener("click", loadPlanMeta);
@@ -1784,9 +1816,16 @@
         if(slots["1"]) { $("#ov_slot1_vid").value = slots["1"].vimeoId || ""; $("#ov_slot1_note").value = getStr(slots["1"].note); }
         if(slots["2"]) { $("#ov_slot2_vid").value = slots["2"].vimeoId || ""; $("#ov_slot2_note").value = getStr(slots["2"].note); }
         if(slots["3"]) { $("#ov_slot3_vid").value = slots["3"].vimeoId || ""; $("#ov_slot3_note").value = getStr(slots["3"].note); }
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     }
-    $("#btnLoadOverride").addEventListener("click", async ()=>{ await loadOverride(); ok("Személyre szabott rész betöltve"); });
+
+    $("#btnLoadOverride").addEventListener("click", async ()=>{
+      await loadOverride();
+      ok("Személyre szabott rész betöltve");
+    });
+
     $("#ov_week").addEventListener("change", loadOverride);
 
     $("#btnSaveOverride").addEventListener("click", async ()=>{
@@ -1805,10 +1844,14 @@
         if(s3_vid || s3_note) slots["3"] = { vimeoId: s3_vid, note: { hu: s3_note, de: s3_note } };
 
         await fs.setDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)), {
-          weekNo, slots, updatedAt: fs.serverTimestamp()
+          weekNo,
+          slots,
+          updatedAt: fs.serverTimestamp()
         }, { merge:true });
         ok("Személyre szabott videók mentve!");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     $("#btnDeleteOverride").addEventListener("click", async ()=>{
@@ -1820,7 +1863,9 @@
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
         ok("Override törölve a hétről.");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     async function loadTechVault(){
@@ -1828,10 +1873,20 @@
         if(!SEL_UID) return;
         const snap = await fs.getDoc(fs.doc(db, "users", SEL_UID));
         fillTechVaultForm(snap.data() || {});
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     }
-    $("#btnLoadTechVault").addEventListener("click", async ()=>{ await loadTechVault(); ok("Technika betöltve"); });
-    $("#btnClearTechVault").addEventListener("click", ()=>{ clearTechVaultFields(); ok("Technika mezők ürítve"); });
+
+    $("#btnLoadTechVault").addEventListener("click", async ()=>{
+      await loadTechVault();
+      ok("Technika betöltve");
+    });
+
+    $("#btnClearTechVault").addEventListener("click", ()=>{
+      clearTechVaultFields();
+      ok("Technika mezők ürítve");
+    });
 
     $("#btnSaveTechVault").addEventListener("click", async ()=>{
       try{
@@ -1854,19 +1909,26 @@
 
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Technika Vault mentve");
-      }catch(e){ err(extractErrorMessage(e)); }
+      }catch(e){
+        err(extractErrorMessage(e));
+      }
     });
 
     onAuth(async (user)=>{
       try{
         CURRENT_AUTH_USER = user || null;
 
-        if(!user){ toLogin("hu"); return; }
+        if(!user){
+          toLogin("hu");
+          return;
+        }
 
         const ud = await ensureUserDoc(user.uid, user.email || "");
         const role = (await getUserRole(user.uid)) || ud?.role || "user";
+
         if((String(role).toLowerCase() !== "admin") && !isAdminEmail(user.email || "")){
-          toApp("hu"); return;
+          toApp("hu");
+          return;
         }
 
         $("#whoami").textContent = `${user.email || "admin"} • uid=${user.uid}`;
