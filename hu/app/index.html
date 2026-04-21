@@ -980,16 +980,23 @@ const DAYS = [
 { id:"thu", name:"Cs" }, { id:"fri", name:"Pé" }, { id:"sat", name:"Szo" }, { id:"sun", name:"Va" }
 ];
 
-function vimeoEmbedSrc(raw){
-const v = String(raw || "").trim();
-if(!v) return "";
-if(v.includes("player.vimeo.com/video/")) return v;
-const m1 = v.match(/vimeo.com/(?:video/)?(\d+)/i);
-if(m1 && m1[1]) return https://player.vimeo.com/video/${m1[1]};
-const m2 = v.match(/^(\d{6,})$/);
-if(m2 && m2[1]) return https://player.vimeo.com/video/${m2[1]};
-if(/^https?:///i.test(v)) return v;
-return "";
+function vimeoEmbedSrc(raw){    
+  const v = String(raw || "").trim();    
+  if(!v) return "";    
+
+  const params = "?autoplay=1&muted=0&playsinline=1&fullscreen=1";    
+
+  if(v.includes("player.vimeo.com/video/")) return v + params;    
+
+  const m1 = v.match(/vimeo\.com\/(?:video\/)?(\d+)/i);    
+  if(m1 && m1[1]) return `https://player.vimeo.com/video/${m1[1]}${params}`;    
+
+  const m2 = v.match(/^(\d{6,})$/);    
+  if(m2 && m2[1]) return `https://player.vimeo.com/video/${m2[1]}${params}`;    
+
+  if(/^https?:\/\//i.test(v)) return v + params;    
+
+  return "";    
 }
 
 function pickLang(obj, lang, fallback="—"){
