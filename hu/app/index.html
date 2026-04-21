@@ -1399,18 +1399,18 @@
     }
 
     /* ✅ CHECK-IN javítás: stabil státuszszámolás */
-    function getCurrentCheckinMeta(){
-      const baseIso = getCheckinBaseIso();
-      const today = todayISO();
+    
+   function getCurrentCheckinMeta(){
+  const baseIso = getCheckinBaseIso();
+  const today = todayISO();
 
-      let passedDays = 0;
-      try{
-        passedDays = Math.max(0, daysBetween(baseIso, today));
-      }catch(e){
-        console.error("Check-in daysBetween hiba:", e);
-        passedDays = 0;
-      }
-
+  let passedDays = 0;
+  try{
+    passedDays = Math.max(0, daysBetween(today, baseIso)); // ✅ FIX
+  }catch(e){
+    console.error("Check-in daysBetween hiba:", e);
+    passedDays = 0;
+  }
       state.currentCheckinBase = baseIso;
 
       if(passedDays < 7){
