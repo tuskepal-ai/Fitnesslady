@@ -797,7 +797,7 @@ async function saveExercise() {
 
 async function deleteExercise(exerciseId) {
   const item = state.exercises.find((x) => x.id === exerciseId);
-  if (!confirm(\`Biztosan törlöd ezt az edzést?\\n\\n\${item?.name || "Ismeretlen edzés"}\`)) return;
+  if (!confirm(`Biztosan törlöd ezt az edzést?\n\n${item?.name || "Ismeretlen edzés"}`)) return;
 
   try {
     await fs.deleteDoc(fs.doc(db, EXERCISES_COL, exerciseId));
@@ -806,7 +806,7 @@ async function deleteExercise(exerciseId) {
     if (state.editingId === exerciseId) resetForm();
   } catch (e) {
     console.error(e);
-    alert(\`Törlési hiba: \${extractErrorMessage(e)}\`);
+    alert(`Törlési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -819,7 +819,7 @@ async function assignExerciseToUser(uid, exerciseId) {
       fs.doc(db, "users", uid, USER_ASSIGN_SUBCOL, exerciseId),
       {
         exerciseId,
-        templateRef: \`\${EXERCISES_COL}/\${exerciseId}\`,
+        templateRef: `${EXERCISES_COL}/${exerciseId}`,
         name: item.name || "",
         desc: item.desc || "",
         category: item.category || "",
@@ -841,7 +841,7 @@ async function assignExerciseToUser(uid, exerciseId) {
     alert("Edzés hozzárendelve.");
   } catch (e) {
     console.error(e);
-    alert(\`Hozzárendelési hiba: \${extractErrorMessage(e)}\`);
+    alert(`Hozzárendelési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -851,7 +851,7 @@ async function removeExerciseFromUser(uid, exerciseId) {
     alert("Edzés eltávolítva a felhasználótól.");
   } catch (e) {
     console.error(e);
-    alert(\`Eltávolítási hiba: \${extractErrorMessage(e)}\`);
+    alert(`Eltávolítási hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -862,7 +862,7 @@ function renderExercises() {
   const items = getFilteredExercises();
 
   if (!items.length) {
-    list.innerHTML = \`<div class="fx-empty">Nincs találat vagy a kollekció még üres.</div>\`;
+    list.innerHTML = `<div class="fx-empty">Nincs találat vagy a kollekció még üres.</div>`;
     return;
   }
 
@@ -920,14 +920,14 @@ function renderAssignedUsersPanel() {
   const exercise = state.exercises.find((x) => x.id === state.selectedExerciseId);
 
   if (!exercise) {
-    wrap.innerHTML = \`<div class="fx-empty">Először válassz ki egy edzést a listából a „Hozzárendelés” gombbal.</div>\`;
+    wrap.innerHTML = `<div class="fx-empty">Először válassz ki egy edzést a listából a „Hozzárendelés” gombbal.</div>`;
     return;
   }
 
   const items = state.filteredUsers.length ? state.filteredUsers : state.users;
 
   if (!items.length) {
-    wrap.innerHTML = \`<div class="fx-empty">Nincs felhasználó.</div>\`;
+    wrap.innerHTML = `<div class="fx-empty">Nincs felhasználó.</div>`;
     return;
   }
 
@@ -1080,7 +1080,7 @@ function getFilteredExercises() {
 function renderError(message) {
   const box = document.getElementById("fxErrorBox");
   if (!box) return;
-  box.innerHTML = message ? \`<div class="fx-error">\${escapeHtml(message)}</div>\` : "";
+  box.innerHTML = message ? `<div class="fx-error">${escapeHtml(message)}</div>` : "";
 }
 
 function setVal(id, value) {
@@ -1100,7 +1100,7 @@ function slugify(text) {
   return String(text || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 }
