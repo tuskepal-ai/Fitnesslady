@@ -1941,6 +1941,23 @@
         err(extractErrorMessage(e));
       }
     });
-  </script>
+    </script>
+
+<!-- 🔥 ADMIN UPGRADES LOADER -->
+<link rel="stylesheet" href="./modules/admin-upgrades.css">
+
+<script type="module">
+  import initAdminUpgrades from "./modules/admin-upgrades.js";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    try {
+      initAdminUpgrades();
+      console.log("✅ Admin upgrades betöltve");
+    } catch (e) {
+      console.error("❌ Admin upgrades hiba:", e);
+    }
+  });
+</script>
+
 </body>
 </html>
