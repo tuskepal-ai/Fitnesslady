@@ -884,6 +884,48 @@
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const trimStr = (v) => String(v ?? "").trim();
 
+    function extractErrorMessage(input){
+      if(input == null) return "Ismeretlen hiba";
+      if(typeof input === "string") return input;
+      if(input instanceof Error) return input.message || String(input);
+      if(typeof input === "number" || typeof input === "boolean") return String(input);
+
+      if(Array.isArray(input)){
+        const parts = input.map(extractErrorMessage).filter(Boolean);
+        return parts.join(" | ") || "Ismeretlen hiba";
+      }
+
+      if(typeof input === "object"){
+        const candidates = [
+          input.message,
+          input.error,
+          input.details,
+          input.reason,
+          input.status,
+          input.code
+        ].filter(v => v != null);
+
+        for(const c of candidates){
+          const msg = extractErrorMessage(c);
+          if(msg && msg !== "[object Object]") return msg;
+        }
+
+        try{
+          return JSON.stringify(input);
+        }catch(_){
+          return String(input);
+        }
+      }
+
+      return String(input);
+    }
+
+    async function parseResponseBody(res){
+      const text = await res.text();
+      if(!text) return null;
+      try{ return JSON.parse(text); } catch(_){ return text; }
+    }
+
     const toast = $("#toast");
     function showToast(html, ms=2400){
       toast.innerHTML = html;
@@ -892,7 +934,7 @@
       toast.__t = window.setTimeout(()=>toast.classList.remove("is-on"), ms);
     }
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
-    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 4200); }
+    function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 5200); }
 
     const dbg = $("#debugBox");
     function setDebug({count=null, error=null}={}){
@@ -1016,7 +1058,7 @@
         });
       }).catch(e=>{
         console.error(e);
-        err(e.message || String(e));
+        err(extractErrorMessage(e));
       });
     }
 
@@ -1038,7 +1080,7 @@
       }catch(e){
         $("#btnChatSend").disabled = false;
         console.error(e);
-        err(e.message || String(e));
+        err(extractErrorMessage(e));
       }
     });
     chatInput.addEventListener("keydown", (e)=>{
@@ -1310,7 +1352,7 @@
         }
       }catch(e){
         console.error(e);
-        const msg = e?.code || e?.message || String(e);
+        const msg = extractErrorMessage(e);
         setDebug({count: 0, error: msg});
         err(msg);
       }
@@ -1376,34 +1418,59 @@
     async function callDeleteEndpoint(uid, email){
       const token = await getAdminIdToken();
 
-      const res = await fetch(DELETE_USER_ENDPOINT, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          uid,
-          email
-        })
-      });
+      const payloadVariants = [
+        { uid, email },
+        { uid, email, token },
+        { uid, email, idToken: token },
+        { data: { uid, email }, token },
+        { data: { uid, email }, idToken: token }
+      ];
 
-      let data = null;
-      try{
-        data = await res.json();
-      }catch(_){
-        data = null;
+      let lastError = null;
+
+      for(const payload of payloadVariants){
+        try{
+          const res = await fetch(DELETE_USER_ENDPOINT, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": `Bearer ${token}`
+            },
+            body: JSON.stringify(payload)
+          });
+
+          const data = await parseResponseBody(res);
+
+          if(!res.ok){
+            throw new Error(extractErrorMessage(data) || `HTTP ${res.status}`);
+          }
+
+          if(
+            data == null ||
+            data === "" ||
+            data?.ok === true ||
+            data?.success === true ||
+            data?.deleted === true ||
+            data?.status === "ok" ||
+            data?.result === "ok" ||
+            data?.data?.ok === true ||
+            data?.data?.success === true
+          ){
+            return data;
+          }
+
+          if(data?.ok === false || data?.success === false || data?.error){
+            throw new Error(extractErrorMessage(data));
+          }
+
+          return data;
+        }catch(e){
+          lastError = e;
+          console.error("deleteUserFull payload variant failed:", payload, e);
+        }
       }
 
-      if(!res.ok){
-        throw new Error(data?.error || data?.message || `HTTP ${res.status}`);
-      }
-
-      if(data?.ok === false){
-        throw new Error(data?.error || "A törlés endpoint hibát adott vissza.");
-      }
-
-      return data;
+      throw new Error(extractErrorMessage(lastError));
     }
 
     async function deleteSubcollectionDocs(colRef){
@@ -1466,7 +1533,7 @@
         ok("Felhasználó törölve");
       }catch(e){
         console.error(e);
-        err(e.message || String(e));
+        err(extractErrorMessage(e));
       }finally{
         $("#btnDeleteUser").disabled = false;
         $$("[data-delete-user]").forEach(b => b.disabled = false);
@@ -1497,7 +1564,7 @@
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Profil mentve");
         await loadUsersList(true);
-      }catch(e){ console.error(e); err(e.message || String(e)); }
+      }catch(e){ console.error(e); err(extractErrorMessage(e)); }
     });
 
     $("#btnSaveWelcome").addEventListener("click", async ()=>{
@@ -1513,7 +1580,7 @@
         };
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Üdvözlő kártya mentve");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     function dietRefs(){
@@ -1555,7 +1622,7 @@
           updatedAt: fs.serverTimestamp()
         });
         ok("Étrend (nap) mentve");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     $("#btnClearDietDay").addEventListener("click", async ()=>{
@@ -1568,7 +1635,7 @@
         });
         setDietFields(null);
         ok("Étrend (nap) törölve");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     $("#btnSaveMotivation").addEventListener("click", async ()=>{
@@ -1579,7 +1646,7 @@
           updatedAt: fs.serverTimestamp()
         });
         ok("Motiváció kártya mentve");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     async function loadPlanMeta(){
@@ -1603,7 +1670,7 @@
           id: planId, weeks, name: { hu: planId, de: planId }, updatedAt: fs.serverTimestamp()
         }, { merge:true });
         ok(`Csomag (${planId}) elmentve ${weeks} héttel!`);
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     }
 
     function clearTemplateWeekFields(){
@@ -1649,7 +1716,7 @@
         });
 
         ok(`Csomag hét (${weekNo}) betöltve.`);
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     }
 
     async function saveTemplateWeek(){
@@ -1693,7 +1760,7 @@
         }, { merge:true });
 
         ok(`Sablon hét (${weekNo}) elmentve!`);
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     }
 
     $("#btnLoadPlanMeta").addEventListener("click", loadPlanMeta);
@@ -1717,7 +1784,7 @@
         if(slots["1"]) { $("#ov_slot1_vid").value = slots["1"].vimeoId || ""; $("#ov_slot1_note").value = getStr(slots["1"].note); }
         if(slots["2"]) { $("#ov_slot2_vid").value = slots["2"].vimeoId || ""; $("#ov_slot2_note").value = getStr(slots["2"].note); }
         if(slots["3"]) { $("#ov_slot3_vid").value = slots["3"].vimeoId || ""; $("#ov_slot3_note").value = getStr(slots["3"].note); }
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     }
     $("#btnLoadOverride").addEventListener("click", async ()=>{ await loadOverride(); ok("Személyre szabott rész betöltve"); });
     $("#ov_week").addEventListener("change", loadOverride);
@@ -1741,7 +1808,7 @@
           weekNo, slots, updatedAt: fs.serverTimestamp()
         }, { merge:true });
         ok("Személyre szabott videók mentve!");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     $("#btnDeleteOverride").addEventListener("click", async ()=>{
@@ -1753,7 +1820,7 @@
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
         ok("Override törölve a hétről.");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     async function loadTechVault(){
@@ -1761,7 +1828,7 @@
         if(!SEL_UID) return;
         const snap = await fs.getDoc(fs.doc(db, "users", SEL_UID));
         fillTechVaultForm(snap.data() || {});
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     }
     $("#btnLoadTechVault").addEventListener("click", async ()=>{ await loadTechVault(); ok("Technika betöltve"); });
     $("#btnClearTechVault").addEventListener("click", ()=>{ clearTechVaultFields(); ok("Technika mezők ürítve"); });
@@ -1787,7 +1854,7 @@
 
         await fs.setDoc(fs.doc(db, "users", SEL_UID), payload, { merge:true });
         ok("Technika Vault mentve");
-      }catch(e){ err(e.message || String(e)); }
+      }catch(e){ err(extractErrorMessage(e)); }
     });
 
     onAuth(async (user)=>{
@@ -1809,7 +1876,7 @@
         await loadPlanMeta();
       }catch(e){
         console.error(e);
-        err(e.message || String(e));
+        err(extractErrorMessage(e));
       }
     });
   </script>
