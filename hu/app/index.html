@@ -132,6 +132,78 @@
     .field label{ color: rgba(255,255,255,.7); font-size: 12.5px; font-weight: 700; }
     .field input{ height: 44px; border-radius: 12px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.3); color: #fff; padding: 0 12px; outline: none; }
 
+    /* ✅ CSAK videó megjelenítés javítás */
+    .video-overlay{
+      position: fixed;
+      inset: 0;
+      z-index: 95;
+      background: rgba(0,0,0,.84);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .video-overlay.is-open{ display:flex; }
+
+    .video-shell{
+      position: relative;
+      width: 100vw;
+      height: 100dvh;
+      background: #000;
+      overflow: hidden;
+    }
+
+    .video-close{
+      position: absolute;
+      top: max(12px, env(safe-area-inset-top));
+      right: 12px;
+      z-index: 2;
+      width: 42px;
+      height: 42px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.14);
+      background: rgba(0,0,0,.45);
+      color: #fff;
+      cursor: pointer;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .video-frame{
+      position: relative;
+      width: 100%;
+      height: 100%;
+      background: #000;
+    }
+
+    .video-frame iframe{
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+      background: #000;
+    }
+
+    @media (min-width: 981px){
+      .video-overlay{
+        padding: 24px;
+      }
+      .video-shell{
+        width: min(560px, 96vw);
+        height: min(96dvh, 980px);
+        border-radius: 24px;
+        border: 1px solid rgba(255,255,255,.10);
+        box-shadow: 0 30px 120px rgba(0,0,0,.70);
+      }
+    }
+
     footer{ padding: 18px 0 36px; border-top:1px solid rgba(255,255,255,.05); text-align:center; font-size:13px; color:var(--muted); }
 
     /* =========================
@@ -952,6 +1024,14 @@
     </div>
   </div>
 
+  <!-- ✅ CSAK videóhoz külön fullscreen overlay -->
+  <div class="video-overlay" id="videoOverlay" aria-hidden="true">
+    <div class="video-shell" role="dialog" aria-modal="true" aria-label="Videó lejátszás">
+      <button class="video-close" id="videoClose" type="button" aria-label="Bezárás">✕</button>
+      <div class="video-frame" id="videoFrame"></div>
+    </div>
+  </div>
+
   <div class="ios-install-bar" id="iosInstallBar" aria-hidden="true">
     <div class="ios-install-row">
       <div class="ios-install-icon" id="iosInstallIcon" aria-hidden="true">FL</div>
@@ -1028,13 +1108,52 @@
 
     const settingsOverlay = $("#settingsOverlay");
     const infoOverlay = $("#infoOverlay");
+    const videoOverlay = $("#videoOverlay");
+    const videoFrame = $("#videoFrame");
+    const videoClose = $("#videoClose");
+
     function openOverlay(ov){ ov.classList.add("is-open"); }
     function closeOverlay(ov){ ov.classList.remove("is-open"); }
     function openInfo(title, html){ $("#infoTitle").textContent = title; $("#infoBody").innerHTML = html; openOverlay(infoOverlay); }
 
+    function closeVideoPlayer(){
+      videoOverlay.classList.remove("is-open");
+      videoOverlay.setAttribute("aria-hidden", "true");
+      videoFrame.innerHTML = "";
+    }
+
+    function openVideoPlayer(rawSrc){
+      const src = String(rawSrc || "").trim();
+      if(!src) return openInfo("Info", "Ehhez még nincs videó beállítva.");
+
+      const joiner = src.includes("?") ? "&" : "?";
+      const finalSrc = `${src}${joiner}title=0&byline=0&portrait=0&dnt=1`;
+
+      videoFrame.innerHTML = `
+        <iframe
+          src="${escapeHtml(finalSrc)}"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowfullscreen
+          referrerpolicy="strict-origin-when-cross-origin">
+        </iframe>
+      `;
+      videoOverlay.classList.add("is-open");
+      videoOverlay.setAttribute("aria-hidden", "false");
+    }
+
     $("#settingsClose").addEventListener("click", ()=>closeOverlay(settingsOverlay));
     $("#infoClose").addEventListener("click", ()=>{ closeOverlay(infoOverlay); $("#infoBody").innerHTML = ""; });
     $("#btnOpenSettings").addEventListener("click", ()=>openOverlay(settingsOverlay));
+
+    videoClose.addEventListener("click", closeVideoPlayer);
+    videoOverlay.addEventListener("click", (e)=>{ if(e.target === videoOverlay) closeVideoPlayer(); });
+    document.addEventListener("keydown", (e)=>{
+      if(e.key === "Escape"){
+        closeOverlay(settingsOverlay);
+        closeOverlay(infoOverlay);
+        closeVideoPlayer();
+      }
+    });
 
     const k = (uid, key) => `fl_${uid}_${key}_v1`;
     const lsGet = (uid, key, fallback) => safeJsonParse(localStorage.getItem(k(uid,key)), fallback);
@@ -1551,13 +1670,7 @@
       $("#introText").textContent = text || "";
       if(src){
         $("#btnPlayIntro").style.display = "inline-flex";
-        $("#btnPlayIntro").onclick = () => {
-          openInfo($("#introTitle").textContent || "Bemutatkozó", `
-            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
-              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
-            </div>
-          `);
-        };
+        $("#btnPlayIntro").onclick = () => openVideoPlayer(src);
       } else {
         $("#btnPlayIntro").style.display = "none";
       }
@@ -1642,12 +1755,7 @@
       $$("[data-play]").forEach(b=>{
         b.addEventListener("click", ()=>{
           const src = b.getAttribute("data-play");
-          if(!src) return openInfo("Info", "Ehhez még nincs videó beállítva.");
-          openInfo("Lejátszás", `
-            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
-              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
-            </div>
-          `);
+          openVideoPlayer(src);
         });
       });
 
@@ -1696,11 +1804,7 @@
       $$("[data-tech-play]").forEach(b=>{
         b.addEventListener("click", ()=>{
           const src = b.getAttribute("data-tech-play") || "";
-          if(!src) return openInfo("Info", "Ehhez még nincs videó beállítva.");
-          openInfo("Lejátszás", `
-            <div style="border:1px solid rgba(255,255,255,.12); border-radius:18px; overflow:hidden; background:rgba(0,0,0,.25)">
-              <iframe src="${escapeHtml(src)}" width="100%" height="480" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen style="display:block"></iframe>
-            </div>`);
+          openVideoPlayer(src);
         });
       });
     }
@@ -2094,4 +2198,4 @@
     });
   </script>
 </body>
-</html>
+  </html>
