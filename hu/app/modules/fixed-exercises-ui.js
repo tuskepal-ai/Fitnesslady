@@ -1,3 +1,5 @@
+// FILE: /hu/app/modules/fixed-exercises-ui.js
+
 import { db, fs, escapeHtml } from "../../shared/firebase.js";
 import { getExerciseAsset } from "./fixed-exercises-assets.js";
 
@@ -32,19 +34,20 @@ export async function initFixedExercisesUI({ uid }) {
   await loadAssignedExercises();
   render();
 
+  // első render után középre tesszük az aktív kártyát
   setTimeout(() => {
     centerActiveCard(false);
-  }, 50);
+  }, 40);
 }
 
 async function loadAssignedExercises() {
   try {
-    const queryRef = fs.query(
+    const q = fs.query(
       fs.collection(db, "users", state.uid, USER_ASSIGN_SUBCOL),
       fs.orderBy("sortOrder", "asc")
     );
 
-    const snap = await fs.getDocs(queryRef);
+    const snap = await fs.getDocs(q);
 
     state.items = snap.docs
       .map((docSnap) => {
@@ -243,14 +246,16 @@ function render() {
   state.els.track.querySelectorAll("[data-fe-detail]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
-      openDetailModal(btn.getAttribute("data-fe-detail") || "");
+      const id = btn.getAttribute("data-fe-detail") || "";
+      openDetailModal(id);
     });
   });
 
   state.els.track.querySelectorAll("[data-fe-start]").forEach((btn) => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
-      toggleStart(btn.getAttribute("data-fe-start") || "");
+      const id = btn.getAttribute("data-fe-start") || "";
+      toggleStart(id);
     });
   });
 }
@@ -282,7 +287,10 @@ function renderCard(item, index, isActive) {
       </div>
 
       <div class="fe-timer">
-        <div class="fe-timer-circle" style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg);">
+        <div
+          class="fe-timer-circle"
+          style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg);"
+        >
           <div class="fe-timer-inner">
             <div class="fe-time">${escapeHtml(timeText)}</div>
             <div class="fe-time-sub">${escapeHtml(phaseText)}</div>
@@ -303,8 +311,13 @@ function renderCard(item, index, isActive) {
 function activateCard(index) {
   const safeIndex = Math.max(0, Math.min(index, state.items.length - 1));
   state.activeIndex = safeIndex;
+
   render();
-  setTimeout(() => centerActiveCard(true), 20);
+
+  // újra render után garantáltan középre tesszük
+  requestAnimationFrame(() => {
+    centerActiveCard(true);
+  });
 }
 
 function centerActiveCard(smooth = true) {
@@ -314,7 +327,8 @@ function centerActiveCard(smooth = true) {
   const card = cards[state.activeIndex];
   if (!card) return;
 
-  const targetLeft = card.offsetLeft - (state.els.track.clientWidth / 2 - card.clientWidth / 2);
+  const targetLeft =
+    card.offsetLeft - (state.els.track.clientWidth / 2 - card.clientWidth / 2);
 
   state.els.track.scrollTo({
     left: Math.max(0, targetLeft),
@@ -328,14 +342,15 @@ function handleTrackScroll() {
   const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
   if (!cards.length) return;
 
-  const centerX = state.els.track.scrollLeft + state.els.track.clientWidth / 2;
+  const trackCenter = state.els.track.scrollLeft + state.els.track.clientWidth / 2;
 
   let nearestIndex = 0;
   let nearestDistance = Infinity;
 
   cards.forEach((card, index) => {
     const cardCenter = card.offsetLeft + card.clientWidth / 2;
-    const distance = Math.abs(centerX - cardCenter);
+    const distance = Math.abs(cardCenter - trackCenter);
+
     if (distance < nearestDistance) {
       nearestDistance = distance;
       nearestIndex = index;
@@ -344,7 +359,11 @@ function handleTrackScroll() {
 
   if (nearestIndex !== state.activeIndex) {
     state.activeIndex = nearestIndex;
-    render();
+
+    // itt már nem renderelünk mindent újra sokszor, csak class váltás
+    cards.forEach((card, idx) => {
+      card.classList.toggle("active", idx === nearestIndex);
+    });
   }
 }
 
@@ -375,6 +394,11 @@ function toggleStart(itemId) {
   }, 1000);
 
   render();
+
+  // indulás után is maradjon fókuszban
+  requestAnimationFrame(() => {
+    centerActiveCard(false);
+  });
 }
 
 function tick(itemId) {
@@ -388,6 +412,7 @@ function tick(itemId) {
 
   if (timer.remainingSec > 0) {
     render();
+    requestAnimationFrame(() => centerActiveCard(false));
     return;
   }
 
@@ -396,6 +421,7 @@ function tick(itemId) {
     timer.remainingSec = item.restSec;
     timer.totalSec = Math.max(1, item.restSec);
     render();
+    requestAnimationFrame(() => centerActiveCard(false));
     return;
   }
 
@@ -405,6 +431,7 @@ function tick(itemId) {
     timer.remainingSec = item.workSec;
     timer.totalSec = Math.max(1, item.workSec);
     render();
+    requestAnimationFrame(() => centerActiveCard(false));
     return;
   }
 
@@ -415,7 +442,9 @@ function tick(itemId) {
   timer.remainingSec = item.workSec;
   timer.totalSec = Math.max(1, item.workSec);
   stopTimer(timer);
+
   render();
+  requestAnimationFrame(() => centerActiveCard(false));
 }
 
 function resetTimer(timer, item) {
