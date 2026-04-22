@@ -1,5 +1,3 @@
-// FILE: /hu/app/modules/fixed-exercises-ui.js
-
 import { db, fs, escapeHtml } from "../../shared/firebase.js";
 import { getExerciseAsset } from "./fixed-exercises-assets.js";
 
@@ -34,7 +32,6 @@ export async function initFixedExercisesUI({ uid }) {
   await loadAssignedExercises();
   render();
 
-  // első render után középre tesszük az aktív kártyát
   setTimeout(() => {
     centerActiveCard(false);
   }, 40);
@@ -311,10 +308,8 @@ function renderCard(item, index, isActive) {
 function activateCard(index) {
   const safeIndex = Math.max(0, Math.min(index, state.items.length - 1));
   state.activeIndex = safeIndex;
-
   render();
 
-  // újra render után garantáltan középre tesszük
   requestAnimationFrame(() => {
     centerActiveCard(true);
   });
@@ -360,7 +355,6 @@ function handleTrackScroll() {
   if (nearestIndex !== state.activeIndex) {
     state.activeIndex = nearestIndex;
 
-    // itt már nem renderelünk mindent újra sokszor, csak class váltás
     cards.forEach((card, idx) => {
       card.classList.toggle("active", idx === nearestIndex);
     });
@@ -395,7 +389,6 @@ function toggleStart(itemId) {
 
   render();
 
-  // indulás után is maradjon fókuszban
   requestAnimationFrame(() => {
     centerActiveCard(false);
   });
