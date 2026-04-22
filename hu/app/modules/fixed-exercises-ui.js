@@ -108,6 +108,7 @@ function createTimer(item) {
   return {
     itemId: item.id,
     running: false,
+    paused: false,
     completed: false,
     phase: "work",
     currentRound: 1,
@@ -255,6 +256,22 @@ function render() {
       toggleStart(id);
     });
   });
+
+  state.els.track.querySelectorAll("[data-fe-pause]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-fe-pause") || "";
+      togglePause(id);
+    });
+  });
+
+  state.els.track.querySelectorAll("[data-fe-reset]").forEach((btn) => {
+    btn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const id = btn.getAttribute("data-fe-reset") || "";
+      resetExerciseTimer(id);
+    });
+  });
 }
 
 function renderCard(item, index, isActive) {
@@ -304,8 +321,15 @@ function renderCard(item, index, isActive) {
       <div class="fe-actions">
         <button class="fe-btn secondary" type="button" data-fe-detail="${escapeAttr(item.id)}">Részletek</button>
         <button class="fe-btn primary" type="button" data-fe-start="${escapeAttr(item.id)}">
-          ${timer.running ? "Fut" : timer.completed ? "Újraindítás" : "Indítás"}
+          ${timer.completed ? "Újraindítás" : timer.running ? "Fut" : timer.paused ? "Folytatás" : "Indítás"}
         </button>
+      </div>
+
+      <div class="fe-actions fe-actions-secondary">
+        <button class="fe-btn secondary" type="button" data-fe-pause="${escapeAttr(item.id)}">
+          ${timer.paused ? "Szünetelve" : "Pause"}
+        </button>
+        <button class="fe-btn secondary" type="button" data-fe-reset="${escapeAttr(item.id)}">Reset</button>
       </div>
     </article>
   `;
@@ -387,12 +411,54 @@ function toggleStart(itemId) {
   }
 
   timer.running = true;
+  timer.paused = false;
   stopTimer(timer);
 
   timer.intervalId = window.setInterval(() => {
     tick(itemId);
   }, 1000);
 
+  render();
+
+  requestAnimationFrame(() => {
+    centerActiveCard(false);
+  });
+}
+
+function togglePause(itemId) {
+  const item = state.items.find((x) => x.id === itemId);
+  if (!item) return;
+
+  const timer = ensureTimer(item);
+  if (timer.completed) return;
+
+  if (timer.running) {
+    timer.running = false;
+    timer.paused = true;
+    stopTimer(timer);
+  } else if (timer.paused) {
+    timer.running = true;
+    timer.paused = false;
+    stopTimer(timer);
+
+    timer.intervalId = window.setInterval(() => {
+      tick(itemId);
+    }, 1000);
+  }
+
+  render();
+
+  requestAnimationFrame(() => {
+    centerActiveCard(false);
+  });
+}
+
+function resetExerciseTimer(itemId) {
+  const item = state.items.find((x) => x.id === itemId);
+  if (!item) return;
+
+  const timer = ensureTimer(item);
+  resetTimer(timer, item);
   render();
 
   requestAnimationFrame(() => {
@@ -415,10 +481,14 @@ function tick(itemId) {
     return;
   }
 
+  vibratePhone();
+
   if (timer.phase === "work" && item.restSec > 0) {
     timer.phase = "rest";
     timer.remainingSec = item.restSec;
     timer.totalSec = Math.max(1, item.restSec);
+    timer.running = true;
+    timer.paused = false;
     render();
     requestAnimationFrame(() => centerActiveCard(false));
     return;
@@ -429,12 +499,15 @@ function tick(itemId) {
     timer.phase = "work";
     timer.remainingSec = item.workSec;
     timer.totalSec = Math.max(1, item.workSec);
+    timer.running = true;
+    timer.paused = false;
     render();
     requestAnimationFrame(() => centerActiveCard(false));
     return;
   }
 
   timer.running = false;
+  timer.paused = false;
   timer.completed = true;
   timer.phase = "work";
   timer.currentRound = 1;
@@ -449,6 +522,7 @@ function tick(itemId) {
 function resetTimer(timer, item) {
   stopTimer(timer);
   timer.running = false;
+  timer.paused = false;
   timer.completed = false;
   timer.phase = "work";
   timer.currentRound = 1;
@@ -460,6 +534,16 @@ function stopTimer(timer) {
   if (timer?.intervalId) {
     clearInterval(timer.intervalId);
     timer.intervalId = null;
+  }
+}
+
+function vibratePhone() {
+  try {
+    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+      navigator.vibrate([180, 120, 180]);
+    }
+  } catch (error) {
+    console.warn("Vibrálás nem elérhető:", error);
   }
 }
 
@@ -507,7 +591,7 @@ function openDetailModal(itemId) {
           <div>
             <div style="font-weight:900; color:#fff; margin-bottom:4px;">Aktuális állapot</div>
             <div style="font-size:13px; color:rgba(255,255,255,.7);">
-              Kör: ${timer.currentRound}/${item.rounds} • ${timer.completed ? "kész" : timer.phase === "rest" ? "pihenő szakasz" : "munka szakasz"}
+              Kör: ${timer.currentRound}/${item.rounds} • ${timer.completed ? "kész" : timer.paused ? "szünet" : timer.phase === "rest" ? "pihenő szakasz" : "munka szakasz"}
             </div>
           </div>
 
@@ -518,7 +602,9 @@ function openDetailModal(itemId) {
       </div>
 
       <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="pill primary" id="feDetailStartBtn" type="button">${timer.running ? "Fut" : timer.completed ? "Újraindítás" : "Indítás"}</button>
+        <button class="pill primary" id="feDetailStartBtn" type="button">${timer.completed ? "Újraindítás" : timer.running ? "Fut" : timer.paused ? "Folytatás" : "Indítás"}</button>
+        <button class="pill ghost" id="feDetailPauseBtn" type="button">${timer.paused ? "Szünetelve" : "Pause"}</button>
+        <button class="pill ghost" id="feDetailResetBtn" type="button">Reset</button>
         <button class="pill ghost" id="feDetailCloseBtn" type="button">Bezárás</button>
       </div>
     </div>
@@ -529,6 +615,16 @@ function openDetailModal(itemId) {
 
   state.els.detailBody.querySelector("#feDetailStartBtn")?.addEventListener("click", () => {
     toggleStart(item.id);
+    openDetailModal(item.id);
+  });
+
+  state.els.detailBody.querySelector("#feDetailPauseBtn")?.addEventListener("click", () => {
+    togglePause(item.id);
+    openDetailModal(item.id);
+  });
+
+  state.els.detailBody.querySelector("#feDetailResetBtn")?.addEventListener("click", () => {
+    resetExerciseTimer(item.id);
     openDetailModal(item.id);
   });
 
