@@ -269,8 +269,14 @@ function renderCard(item, index, isActive) {
 
   return `
     <article class="fe-card ${isActive ? "active" : ""}" data-index="${index}" data-id="${escapeAttr(item.id)}">
-      <div class="fe-card-img" style="background:${escapeAttr(item.cardBackground)};">
-        ${item.imageUrl ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}">` : ""}
+      <div class="fe-card-img-wrap">
+        <div class="fe-card-img" style="background:${escapeAttr(item.cardBackground)};">
+          ${
+            item.imageUrl
+              ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" loading="lazy">`
+              : `<div class="fe-card-placeholder">Nincs kép</div>`
+          }
+        </div>
       </div>
 
       <div class="fe-card-title">${escapeHtml(item.name)}</div>
@@ -468,7 +474,11 @@ function openDetailModal(itemId) {
     <div style="display:grid; gap:16px;">
       <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:start;">
         <div style="width:120px; height:120px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:${escapeAttr(item.cardBackground)}; overflow:hidden;">
-          ${item.imageUrl ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" style="width:100%; height:100%; object-fit:cover;">` : ""}
+          ${
+            item.imageUrl
+              ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" style="width:100%; height:100%; object-fit:cover;">`
+              : `<div style="color:rgba(255,255,255,.58); font-size:12px;">Nincs kép</div>`
+          }
         </div>
 
         <div>
