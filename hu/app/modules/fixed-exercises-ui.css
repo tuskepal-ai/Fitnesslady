@@ -290,6 +290,17 @@
   width:100%;
 }
 
+.fe-actions-secondary{
+  display:none;
+}
+
+.fe-card.active .fe-actions-secondary{
+  display:flex;
+  gap:10px;
+  margin-top:10px;
+  width:100%;
+}
+
 .fe-btn{
   flex:1 1 0;
   min-width:0;
