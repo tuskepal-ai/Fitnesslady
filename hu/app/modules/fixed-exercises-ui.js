@@ -34,6 +34,15 @@ function escapeHtml(value) {
     .replaceAll("'", "&#039;");
 }
 
+function slugify(text) {
+  return String(text || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
 function injectStyles() {
   if (document.getElementById("fixed-exercises-ui-inline-style")) return;
 
@@ -388,12 +397,22 @@ function ensureRoot() {
   return root;
 }
 
-function resolveImage(item) {
-  const direct = String(item?.imageUrl || "").trim();
-  if (direct) return direct;
+function getExerciseKey(item) {
+  return String(item?.exerciseId || item?.id || "").trim();
+}
 
-  const id = String(item?.exerciseId || item?.id || "").trim();
-  return IMAGE_MAP[id] || "";
+function getMappedImage(item) {
+  const key = getExerciseKey(item);
+  if (IMAGE_MAP[key]) return IMAGE_MAP[key];
+
+  const nameSlug = slugify(item?.name || "");
+  if (IMAGE_MAP[nameSlug]) return IMAGE_MAP[nameSlug];
+
+  return "";
+}
+
+function getPrimaryImage(item) {
+  return String(item?.imageUrl || "").trim();
 }
 
 function formatTime(totalSec) {
@@ -485,10 +504,12 @@ function startTimer(id, item) {
 }
 
 function buildCard(item) {
-  const id = String(item.exerciseId || item.id || "");
-  const imageUrl = resolveImage(item);
-  const timer = getTimerState(id, item);
+  const id = getExerciseKey(item);
+  const primaryImage = getPrimaryImage(item);
+  const mappedImage = getMappedImage(item);
+  const firstImage = primaryImage || mappedImage;
 
+  const timer = getTimerState(id, item);
   const rounds = Number(item.rounds || 1);
   const workSec = Number(item.workSec || 0);
   const restSec = Number(item.restSec || 0);
@@ -498,8 +519,15 @@ function buildCard(item) {
       <div class="fxu-image-wrap">
         <div class="fxu-fl">FL</div>
         ${
-          imageUrl
-            ? `<img class="fxu-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name || "")}" data-fxu-img="${escapeHtml(id)}">`
+          firstImage
+            ? `<img
+                class="fxu-image"
+                src="${escapeHtml(firstImage)}"
+                alt="${escapeHtml(item.name || "")}"
+                data-fxu-img="${escapeHtml(id)}"
+                data-primary-src="${escapeHtml(primaryImage)}"
+                data-mapped-src="${escapeHtml(mappedImage)}"
+              >`
             : `<div class="fxu-image-fallback">${escapeHtml(item.name || "Fix edzés")}</div>`
         }
       </div>
@@ -552,7 +580,7 @@ function bindCardEvents() {
   document.querySelectorAll("[data-fxu-start]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-fxu-start");
-      const item = state.items.find(x => String(x.exerciseId || x.id) === id);
+      const item = state.items.find(x => getExerciseKey(x) === id);
       if (!item) return;
       startTimer(id, item);
     });
@@ -568,7 +596,7 @@ function bindCardEvents() {
   document.querySelectorAll("[data-fxu-reset]").forEach((btn) => {
     btn.addEventListener("click", () => {
       const id = btn.getAttribute("data-fxu-reset");
-      const item = state.items.find(x => String(x.exerciseId || x.id) === id);
+      const item = state.items.find(x => getExerciseKey(x) === id);
       if (!item) return;
       resetTimer(id, item);
     });
@@ -585,13 +613,22 @@ function bindCardEvents() {
 
   document.querySelectorAll("[data-fxu-img]").forEach((img) => {
     img.addEventListener("error", () => {
+      const primary = String(img.dataset.primarySrc || "").trim();
+      const mapped = String(img.dataset.mappedSrc || "").trim();
+      const current = String(img.getAttribute("src") || "").trim();
+
+      if (mapped && current !== mapped) {
+        img.setAttribute("src", mapped);
+        return;
+      }
+
       const wrap = img.closest(".fxu-image-wrap");
       if (!wrap) return;
       wrap.innerHTML = `
         <div class="fxu-fl">FL</div>
         <div class="fxu-image-fallback">Nincs kép</div>
       `;
-    }, { once: true });
+    });
   });
 
   document.getElementById("fxuRefreshBtn")?.addEventListener("click", async () => {
@@ -649,7 +686,7 @@ async function loadItems() {
     });
 
     state.items.forEach((item) => {
-      const id = String(item.exerciseId || item.id || "");
+      const id = getExerciseKey(item);
       getTimerState(id, item);
     });
   } catch (err) {
