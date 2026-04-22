@@ -233,6 +233,10 @@ function render() {
     .map((item, index) => renderCard(item, index, index === state.activeIndex))
     .join("");
 
+  bindCardEvents();
+}
+
+function bindCardEvents() {
   state.els.track.querySelectorAll(".fe-card").forEach((card) => {
     card.addEventListener("click", (e) => {
       if (e.target.closest(".fe-btn")) return;
@@ -280,9 +284,11 @@ function renderCard(item, index, isActive) {
   const timeText = formatTime(timer.remainingSec);
   const phaseText = timer.completed
     ? "kész"
-    : timer.phase === "rest"
-      ? "pihenőidő"
-      : "munkaidő";
+    : timer.paused
+      ? "szünet"
+      : timer.phase === "rest"
+        ? "pihenőidő"
+        : "munkaidő";
 
   return `
     <article class="fe-card ${isActive ? "active" : ""}" data-index="${index}" data-id="${escapeAttr(item.id)}">
@@ -309,11 +315,12 @@ function renderCard(item, index, isActive) {
       <div class="fe-timer">
         <div
           class="fe-timer-circle"
+          data-fe-timer-circle="${escapeAttr(item.id)}"
           style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg);"
         >
           <div class="fe-timer-inner">
-            <div class="fe-time">${escapeHtml(timeText)}</div>
-            <div class="fe-time-sub">${escapeHtml(phaseText)}</div>
+            <div class="fe-time" data-fe-time="${escapeAttr(item.id)}">${escapeHtml(timeText)}</div>
+            <div class="fe-time-sub" data-fe-phase="${escapeAttr(item.id)}">${escapeHtml(phaseText)}</div>
           </div>
         </div>
       </div>
@@ -408,6 +415,8 @@ function toggleStart(itemId) {
 
   if (timer.completed) {
     resetTimer(timer, item);
+    render();
+    return;
   }
 
   timer.running = true;
@@ -419,10 +428,6 @@ function toggleStart(itemId) {
   }, 1000);
 
   render();
-
-  requestAnimationFrame(() => {
-    centerActiveCard(false);
-  });
 }
 
 function togglePause(itemId) {
@@ -447,10 +452,6 @@ function togglePause(itemId) {
   }
 
   render();
-
-  requestAnimationFrame(() => {
-    centerActiveCard(false);
-  });
 }
 
 function resetExerciseTimer(itemId) {
@@ -460,10 +461,6 @@ function resetExerciseTimer(itemId) {
   const timer = ensureTimer(item);
   resetTimer(timer, item);
   render();
-
-  requestAnimationFrame(() => {
-    centerActiveCard(false);
-  });
 }
 
 function tick(itemId) {
@@ -476,8 +473,7 @@ function tick(itemId) {
   timer.remainingSec -= 1;
 
   if (timer.remainingSec > 0) {
-    render();
-    requestAnimationFrame(() => centerActiveCard(false));
+    patchTimerUI(item.id);
     return;
   }
 
@@ -489,8 +485,7 @@ function tick(itemId) {
     timer.totalSec = Math.max(1, item.restSec);
     timer.running = true;
     timer.paused = false;
-    render();
-    requestAnimationFrame(() => centerActiveCard(false));
+    patchTimerUI(item.id);
     return;
   }
 
@@ -501,8 +496,7 @@ function tick(itemId) {
     timer.totalSec = Math.max(1, item.workSec);
     timer.running = true;
     timer.paused = false;
-    render();
-    requestAnimationFrame(() => centerActiveCard(false));
+    patchTimerUI(item.id);
     return;
   }
 
@@ -516,7 +510,35 @@ function tick(itemId) {
   stopTimer(timer);
 
   render();
-  requestAnimationFrame(() => centerActiveCard(false));
+}
+
+function patchTimerUI(itemId) {
+  const item = state.items.find((x) => x.id === itemId);
+  const timer = state.timers.get(itemId);
+  if (!item || !timer) return;
+
+  const timeEl = document.querySelector(`[data-fe-time="${cssEscape(itemId)}"]`);
+  const phaseEl = document.querySelector(`[data-fe-phase="${cssEscape(itemId)}"]`);
+  const circleEl = document.querySelector(`[data-fe-timer-circle="${cssEscape(itemId)}"]`);
+
+  if (timeEl) {
+    timeEl.textContent = formatTime(timer.remainingSec);
+  }
+
+  if (phaseEl) {
+    phaseEl.textContent = timer.completed
+      ? "kész"
+      : timer.paused
+        ? "szünet"
+        : timer.phase === "rest"
+          ? "pihenőidő"
+          : "munkaidő";
+  }
+
+  if (circleEl) {
+    const progressDeg = calcProgressDeg(timer);
+    circleEl.style.background = `conic-gradient(${item.accent} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg)`;
+  }
 }
 
 function resetTimer(timer, item) {
@@ -649,6 +671,13 @@ function formatTime(sec) {
   const m = Math.floor(total / 60);
   const s = total % 60;
   return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function cssEscape(value) {
+  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
+    return CSS.escape(value);
+  }
+  return String(value).replace(/"/g, '\\"');
 }
 
 function escapeAttr(value) {
