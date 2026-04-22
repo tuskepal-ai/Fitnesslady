@@ -1,4 +1,4 @@
-<!-- FILE: /hu/admin/index.html -->
+
 <!doctype html>
 <html lang="hu">
 <head>
@@ -1395,7 +1395,7 @@
           const saved = loadSel();
           if(saved && raw.some(x=>x.id===saved)){
             await pickUser(saved);
-          } else {
+          } else if (items[0]) {
             await pickUser(items[0].id);
           }
         }
@@ -1941,19 +1941,26 @@
         err(extractErrorMessage(e));
       }
     });
-    </script>
+  </script>
 
-<!-- 🔥 ADMIN UPGRADES LOADER -->
-<script type="module">
-  import initAdminUpgrades from "./modules/admin-upgrades.js";
+  <script type="module">
+    import initAdminUpgrades from "./modules/admin-upgrades.js";
 
-  try {
-    await initAdminUpgrades();
-    console.log("✅ Admin upgrades betöltve");
-  } catch (e) {
-    console.error("❌ Admin upgrades hiba:", e);
-  }
-</script>
+    const bootAdminUpgrades = async () => {
+      try {
+        await initAdminUpgrades();
+        console.log("✅ Admin upgrades betöltve");
+      } catch (e) {
+        console.error("❌ Admin upgrades hiba:", e);
+      }
+    };
+
+    if (document.readyState === "loading") {
+      window.addEventListener("DOMContentLoaded", bootAdminUpgrades, { once: true });
+    } else {
+      bootAdminUpgrades();
+    }
+  </script>
 
 </body>
 </html>
