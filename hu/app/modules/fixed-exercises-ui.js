@@ -411,7 +411,7 @@ function getMappedImage(item) {
   return "";
 }
 
-function getPrimaryImage(item) {
+function getFirestoreImage(item) {
   return String(item?.imageUrl || "").trim();
 }
 
@@ -505,9 +505,9 @@ function startTimer(id, item) {
 
 function buildCard(item) {
   const id = getExerciseKey(item);
-  const primaryImage = getPrimaryImage(item);
   const mappedImage = getMappedImage(item);
-  const firstImage = primaryImage || mappedImage;
+  const firestoreImage = getFirestoreImage(item);
+  const firstImage = mappedImage || firestoreImage;
 
   const timer = getTimerState(id, item);
   const rounds = Number(item.rounds || 1);
@@ -525,8 +525,8 @@ function buildCard(item) {
                 src="${escapeHtml(firstImage)}"
                 alt="${escapeHtml(item.name || "")}"
                 data-fxu-img="${escapeHtml(id)}"
-                data-primary-src="${escapeHtml(primaryImage)}"
-                data-mapped-src="${escapeHtml(mappedImage)}"
+                data-primary-src="${escapeHtml(mappedImage || "")}"
+                data-secondary-src="${escapeHtml(firestoreImage || "")}"
               >`
             : `<div class="fxu-image-fallback">${escapeHtml(item.name || "Fix edzés")}</div>`
         }
@@ -614,11 +614,16 @@ function bindCardEvents() {
   document.querySelectorAll("[data-fxu-img]").forEach((img) => {
     img.addEventListener("error", () => {
       const primary = String(img.dataset.primarySrc || "").trim();
-      const mapped = String(img.dataset.mappedSrc || "").trim();
+      const secondary = String(img.dataset.secondarySrc || "").trim();
       const current = String(img.getAttribute("src") || "").trim();
 
-      if (mapped && current !== mapped) {
-        img.setAttribute("src", mapped);
+      if (primary && current !== primary) {
+        img.setAttribute("src", primary);
+        return;
+      }
+
+      if (secondary && current !== secondary) {
+        img.setAttribute("src", secondary);
         return;
       }
 
