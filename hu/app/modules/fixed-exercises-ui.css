@@ -118,16 +118,6 @@
     0 26px 80px rgba(255,0,150,.18),
     0 40px 100px rgba(0,0,0,.26),
     inset 0 1px 0 rgba(255,255,255,.08);
-  animation:feFloatActive 3.6s ease-in-out infinite;
-}
-
-@keyframes feFloatActive{
-  0%,100%{
-    transform:translateY(-8px) scale(1);
-  }
-  50%{
-    transform:translateY(-14px) scale(1.01);
-  }
 }
 
 .fe-card-img-wrap{
