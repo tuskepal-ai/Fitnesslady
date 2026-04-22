@@ -1,8 +1,85 @@
 import { db, fs } from "../../shared/firebase.js";
-import { FIXED_EXERCISES_HU } from "./fixed-exercises.data.js";
 
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
+
+const FALLBACK_EXERCISES_HU = [
+  {
+    id: "guggolas",
+    name: "Guggolás",
+    desc: "Alsótest erősítés, fókuszban a comb és a farizom.",
+    category: "Alsótest",
+    workSec: 40,
+    restSec: 20,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 1,
+    imageUrl: ""
+  },
+  {
+    id: "fekvotamasz",
+    name: "Fekvőtámasz",
+    desc: "Mell, váll és tricepsz erősítése. Figyelj a stabil törzsre.",
+    category: "Felsőtest",
+    workSec: 30,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 2,
+    imageUrl: ""
+  },
+  {
+    id: "plank",
+    name: "Plank",
+    desc: "Törzs stabilizálás és core erősítés. Egyenes testtartással tartsd.",
+    category: "Hasizom",
+    workSec: 45,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 3,
+    imageUrl: ""
+  },
+  {
+    id: "kitores",
+    name: "Kitörés",
+    desc: "Comb és farizom fejlesztése, váltott lábbal, kontrollált mozgással.",
+    category: "Alsótest",
+    workSec: 35,
+    restSec: 20,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 4,
+    imageUrl: ""
+  },
+  {
+    id: "mountain-climber",
+    name: "Mountain Climber",
+    desc: "Állóképesség és core. Tartsd feszesen a törzset gyors tempó mellett is.",
+    category: "Kardió",
+    workSec: 30,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 5,
+    imageUrl: ""
+  }
+];
 
 const state = {
   booted: false,
@@ -23,20 +100,27 @@ export default async function initAdminUpgrades() {
   if (state.booted) return;
   state.booted = true;
 
-  injectStyles();
-  injectLauncher();
-  injectOverlay();
-  bindStaticEvents();
+  try {
+    injectStyles();
+    injectOverlay();
+    injectLauncher();
+    bindStaticEvents();
 
-  await Promise.all([
-    ensureSeedExercises(),
-    loadUsers()
-  ]);
+    await Promise.all([
+      ensureSeedExercises(),
+      loadUsers()
+    ]);
 
-  await loadExercises();
-  resetForm();
-  renderExercises();
-  renderAssignedUsersPanel();
+    await loadExercises();
+    resetForm();
+    renderExercises();
+    renderAssignedUsersPanel();
+
+    console.log("✅ Fix edzések modul aktív");
+  } catch (e) {
+    console.error("❌ initAdminUpgrades hiba:", e);
+    safeFallbackLauncher();
+  }
 }
 
 function injectStyles() {
@@ -65,6 +149,18 @@ function injectStyles() {
     #fx-launcher:hover{
       border-color:rgba(255,255,255,.18);
       background:linear-gradient(180deg, rgba(255,79,216,.22), rgba(177,76,255,.12));
+    }
+
+    #fx-floating-wrap{
+      position:fixed;
+      right:16px;
+      bottom:16px;
+      z-index:9998;
+      width:min(260px, calc(100vw - 32px));
+      display:none;
+    }
+    #fx-floating-wrap.show{
+      display:block;
     }
 
     #fx-overlay{
@@ -253,15 +349,9 @@ function injectStyles() {
       border:1px solid rgba(255,255,255,.08);
       background:rgba(0,0,0,.20);
       transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-      will-change:transform;
     }
     @media (max-width: 840px){
       .fx-item{ grid-template-columns:1fr; }
-    }
-    .fx-item:hover{
-      transform:translateY(-4px);
-      box-shadow:0 25px 60px rgba(0,0,0,.35);
-      border-color:rgba(255,255,255,.14);
     }
 
     .fx-thumb{
@@ -275,13 +365,11 @@ function injectStyles() {
       align-items:center;
       justify-content:center;
       flex:0 0 auto;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     }
     .fx-thumb img{
       width:100%;
       height:100%;
       object-fit:cover;
-      object-position:center;
       display:block;
     }
     .fx-thumb-empty{
@@ -296,8 +384,6 @@ function injectStyles() {
       font-size:12px;
       font-weight:800;
       line-height:1.35;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
     }
 
     .fx-title{
@@ -445,27 +531,46 @@ function injectStyles() {
 function injectLauncher() {
   if (document.getElementById("fx-launcher")) return;
 
-  const mount = document.getElementById("fxLauncherMount");
   const btn = document.createElement("button");
   btn.id = "fx-launcher";
   btn.type = "button";
   btn.innerHTML = `<span>💪</span><span>Fix edzések</span>`;
   btn.addEventListener("click", openOverlay);
 
+  const mount = document.getElementById("fxLauncherMount");
   if (mount) {
     mount.innerHTML = "";
     mount.appendChild(btn);
     return;
   }
 
-  const fallback = document.createElement("div");
-  fallback.style.position = "fixed";
-  fallback.style.left = "16px";
-  fallback.style.right = "16px";
-  fallback.style.bottom = "16px";
-  fallback.style.zIndex = "9998";
-  fallback.appendChild(btn);
-  document.body.appendChild(fallback);
+  safeFallbackLauncher(btn);
+}
+
+function safeFallbackLauncher(existingBtn = null) {
+  let wrap = document.getElementById("fx-floating-wrap");
+  if (!wrap) {
+    wrap = document.createElement("div");
+    wrap.id = "fx-floating-wrap";
+    document.body.appendChild(wrap);
+  }
+  wrap.classList.add("show");
+
+  if (!existingBtn && !document.getElementById("fx-launcher")) {
+    const btn = document.createElement("button");
+    btn.id = "fx-launcher";
+    btn.type = "button";
+    btn.innerHTML = `<span>💪</span><span>Fix edzések</span>`;
+    btn.addEventListener("click", openOverlay);
+    wrap.innerHTML = "";
+    wrap.appendChild(btn);
+    return;
+  }
+
+  if (existingBtn) {
+    wrap.innerHTML = "";
+    wrap.appendChild(existingBtn);
+  }
 }
 
 function injectOverlay() {
@@ -680,11 +785,10 @@ async function ensureSeedExercises() {
   const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
   if (!snap.empty) return;
 
-  for (const item of FIXED_EXERCISES_HU) {
+  for (const item of FALLBACK_EXERCISES_HU) {
     const docRef = fs.doc(db, EXERCISES_COL, item.id);
     await fs.setDoc(docRef, {
       ...item,
-      imageUrl: "",
       createdAt: fs.serverTimestamp(),
       updatedAt: fs.serverTimestamp()
     });
