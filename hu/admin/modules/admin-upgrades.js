@@ -1,3 +1,4 @@
+
 import { db, fs } from "../../shared/firebase.js";
 import { FIXED_EXERCISES_HU } from "./fixed-exercises.data.js";
 
@@ -776,13 +777,13 @@ async function saveExercise() {
     alert("Mentve.");
   } catch (e) {
     console.error(e);
-    alert(\`Mentési hiba: \${extractErrorMessage(e)}\`);
+    alert(`Mentési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
 async function deleteExercise(exerciseId) {
   const item = state.exercises.find((x) => x.id === exerciseId);
-  if (!confirm(\`Biztosan törlöd ezt az edzést?\\n\\n\${item?.name || "Ismeretlen edzés"}\`)) return;
+  if (!confirm(`Biztosan törlöd ezt az edzést?\n\n${item?.name || "Ismeretlen edzés"}`)) return;
 
   try {
     await fs.deleteDoc(fs.doc(db, EXERCISES_COL, exerciseId));
@@ -791,7 +792,7 @@ async function deleteExercise(exerciseId) {
     if (state.editingId === exerciseId) resetForm();
   } catch (e) {
     console.error(e);
-    alert(\`Törlési hiba: \${extractErrorMessage(e)}\`);
+    alert(`Törlési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -804,7 +805,7 @@ async function assignExerciseToUser(uid, exerciseId) {
       fs.doc(db, "users", uid, USER_ASSIGN_SUBCOL, exerciseId),
       {
         exerciseId,
-        templateRef: \`\${EXERCISES_COL}/\${exerciseId}\`,
+        templateRef: `${EXERCISES_COL}/${exerciseId}`,
         name: item.name || "",
         desc: item.desc || "",
         category: item.category || "",
@@ -826,7 +827,7 @@ async function assignExerciseToUser(uid, exerciseId) {
     alert("Edzés hozzárendelve.");
   } catch (e) {
     console.error(e);
-    alert(\`Hozzárendelési hiba: \${extractErrorMessage(e)}\`);
+    alert(`Hozzárendelési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -836,7 +837,7 @@ async function removeExerciseFromUser(uid, exerciseId) {
     alert("Edzés eltávolítva a felhasználótól.");
   } catch (e) {
     console.error(e);
-    alert(\`Eltávolítási hiba: \${extractErrorMessage(e)}\`);
+    alert(`Eltávolítási hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -847,43 +848,43 @@ function renderExercises() {
   const items = getFilteredExercises();
 
   if (!items.length) {
-    list.innerHTML = \`<div class="fx-empty">Nincs találat vagy a kollekció még üres.</div>\`;
+    list.innerHTML = `<div class="fx-empty">Nincs találat vagy a kollekció még üres.</div>`;
     return;
   }
 
-  list.innerHTML = items.map((item) => \`
+  list.innerHTML = items.map((item) => `
     <div class="fx-item">
       <div class="fx-thumb">
-        \${
+        ${
           item.imageUrl
-            ? \`<img src="\${escapeHtml(item.imageUrl)}" alt="\${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />\`
-            : \`<div class="fx-thumb-empty">Nincs kép</div>\`
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />`
+            : `<div class="fx-thumb-empty">Nincs kép</div>`
         }
       </div>
 
       <div>
-        <div class="fx-title">\${escapeHtml(item.name || "—")}</div>
-        <div class="fx-desc">\${escapeHtml(item.desc || "")}</div>
+        <div class="fx-title">${escapeHtml(item.name || "—")}</div>
+        <div class="fx-desc">${escapeHtml(item.desc || "")}</div>
 
         <div class="fx-meta">
-          <span class="fx-chip">\${Number(item.workSec || 0)} mp munka</span>
-          <span class="fx-chip">\${Number(item.restSec || 0)} mp pihenő</span>
-          <span class="fx-chip">\${Number(item.rounds || 1)} kör</span>
-          \${item.repsText ? \`<span class="fx-chip">\${escapeHtml(item.repsText)}</span>\` : ""}
-          <span class="fx-chip">\${escapeHtml(item.category || "Általános")}</span>
-          <span class="fx-chip">\${escapeHtml(item.difficulty || "közepes")}</span>
-          <span class="fx-chip">\${escapeHtml(item.type || "nem-videós")}</span>
-          <span class="fx-chip \${item.active !== false ? "ok" : "off"}">\${item.active !== false ? "Aktív" : "Inaktív"}</span>
+          <span class="fx-chip">${Number(item.workSec || 0)} mp munka</span>
+          <span class="fx-chip">${Number(item.restSec || 0)} mp pihenő</span>
+          <span class="fx-chip">${Number(item.rounds || 1)} kör</span>
+          ${item.repsText ? `<span class="fx-chip">${escapeHtml(item.repsText)}</span>` : ""}
+          <span class="fx-chip">${escapeHtml(item.category || "Általános")}</span>
+          <span class="fx-chip">${escapeHtml(item.difficulty || "közepes")}</span>
+          <span class="fx-chip">${escapeHtml(item.type || "nem-videós")}</span>
+          <span class="fx-chip ${item.active !== false ? "ok" : "off"}">${item.active !== false ? "Aktív" : "Inaktív"}</span>
         </div>
       </div>
 
       <div class="fx-actions">
-        <button class="fx-btn" type="button" data-fx-edit="\${item.id}">Szerk.</button>
-        <button class="fx-btn" type="button" data-fx-assign="\${item.id}">Hozzárendelés</button>
-        <button class="fx-btn danger" type="button" data-fx-del="\${item.id}">Törlés</button>
+        <button class="fx-btn" type="button" data-fx-edit="${item.id}">Szerk.</button>
+        <button class="fx-btn" type="button" data-fx-assign="${item.id}">Hozzárendelés</button>
+        <button class="fx-btn danger" type="button" data-fx-del="${item.id}">Törlés</button>
       </div>
     </div>
-  \`).join("");
+  `).join("");
 
   list.querySelectorAll("[data-fx-edit]").forEach((btn) => {
     btn.addEventListener("click", () => startEdit(btn.getAttribute("data-fx-edit")));
@@ -909,14 +910,14 @@ function renderAssignedUsersPanel() {
   const exercise = state.exercises.find((x) => x.id === state.selectedExerciseId);
 
   if (!exercise) {
-    wrap.innerHTML = \`<div class="fx-empty">Először válassz ki egy edzést a listából a „Hozzárendelés” gombbal.</div>\`;
+    wrap.innerHTML = `<div class="fx-empty">Először válassz ki egy edzést a listából a „Hozzárendelés” gombbal.</div>`;
     return;
   }
 
   const items = state.filteredUsers.length ? state.filteredUsers : state.users;
 
   if (!items.length) {
-    wrap.innerHTML = \`<div class="fx-empty">Nincs felhasználó.</div>\`;
+    wrap.innerHTML = `<div class="fx-empty">Nincs felhasználó.</div>`;
     return;
   }
 
@@ -930,20 +931,20 @@ function renderAssignedUsersPanel() {
     const email = String(u.email || "").trim();
     const planId = String(u.planId || "").trim();
 
-    return \`
+    return `
       <div class="fx-user">
         <div>
-          <strong>\${escapeHtml(displayName)}</strong>
-          <span>\${escapeHtml(email || "nincs email")}</span>
-          <span>uid: \${escapeHtml(u.id)}\${planId ? \` • planId: \${escapeHtml(planId)}\` : ""}</span>
+          <strong>${escapeHtml(displayName)}</strong>
+          <span>${escapeHtml(email || "nincs email")}</span>
+          <span>uid: ${escapeHtml(u.id)}${planId ? ` • planId: ${escapeHtml(planId)}` : ""}</span>
         </div>
 
         <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="fx-btn primary" type="button" data-fx-user-add="\${u.id}">Hozzáadás</button>
-          <button class="fx-btn danger" type="button" data-fx-user-remove="\${u.id}">Levétel</button>
+          <button class="fx-btn primary" type="button" data-fx-user-add="${u.id}">Hozzáadás</button>
+          <button class="fx-btn danger" type="button" data-fx-user-remove="${u.id}">Levétel</button>
         </div>
       </div>
-    \`;
+    `;
   }).join("");
 
   wrap.querySelectorAll("[data-fx-user-add]").forEach((btn) => {
@@ -1069,7 +1070,7 @@ function getFilteredExercises() {
 function renderError(message) {
   const box = document.getElementById("fxErrorBox");
   if (!box) return;
-  box.innerHTML = message ? \`<div class="fx-error">\${escapeHtml(message)}</div>\` : "";
+  box.innerHTML = message ? `<div class="fx-error">${escapeHtml(message)}</div>` : "";
 }
 
 function setVal(id, value) {
@@ -1089,7 +1090,16 @@ function slugify(text) {
   return String(text || "")
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\\u0300-\\u036f]/g, "")
+    .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
