@@ -16,8 +16,7 @@ const FALLBACK_EXERCISES_HU = [
     type: "nem-videós",
     difficulty: "közepes",
     active: true,
-    sortOrder: 1,
-    imageUrl: ""
+    sortOrder: 1
   },
   {
     id: "fekvotamasz",
@@ -31,8 +30,7 @@ const FALLBACK_EXERCISES_HU = [
     type: "nem-videós",
     difficulty: "közepes",
     active: true,
-    sortOrder: 2,
-    imageUrl: ""
+    sortOrder: 2
   },
   {
     id: "plank",
@@ -46,8 +44,7 @@ const FALLBACK_EXERCISES_HU = [
     type: "nem-videós",
     difficulty: "könnyű",
     active: true,
-    sortOrder: 3,
-    imageUrl: ""
+    sortOrder: 3
   },
   {
     id: "kitores",
@@ -61,8 +58,7 @@ const FALLBACK_EXERCISES_HU = [
     type: "nem-videós",
     difficulty: "közepes",
     active: true,
-    sortOrder: 4,
-    imageUrl: ""
+    sortOrder: 4
   },
   {
     id: "mountain-climber",
@@ -76,10 +72,167 @@ const FALLBACK_EXERCISES_HU = [
     type: "nem-videós",
     difficulty: "közepes",
     active: true,
-    sortOrder: 5,
-    imageUrl: ""
+    sortOrder: 5
+  },
+  {
+    id: "burpee",
+    name: "Burpee",
+    desc: "Teljes testes gyakorlat, magas pulzus és erős metabolikus terhelés.",
+    category: "Teljes test",
+    workSec: 40,
+    restSec: 20,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "nehéz",
+    active: true,
+    sortOrder: 6
+  },
+  {
+    id: "glute-bridge",
+    name: "Csípőemelés",
+    desc: "Farizom aktiválás és alsótest stabilitás. Lassú, kontrollált emeléssel.",
+    category: "Farizom",
+    workSec: 40,
+    restSec: 20,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 7
+  },
+  {
+    id: "oldalemeles",
+    name: "Oldalemelés",
+    desc: "Váll izoláció. Kis súllyal, kontrollált emeléssel dolgozz.",
+    category: "Váll",
+    workSec: 35,
+    restSec: 15,
+    rounds: 3,
+    repsText: "12 ismétlés",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 8
+  },
+  {
+    id: "biciklis-haspres",
+    name: "Biciklis hasprés",
+    desc: "Ferde hasizmok és teljes core bekapcsolása váltott könyök-térd mozgással.",
+    category: "Hasizom",
+    workSec: 40,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 9
+  },
+  {
+    id: "jumping-jack",
+    name: "Jumping Jack",
+    desc: "Bemelegítéshez vagy rövid kardió blokkhoz. Könnyű, pörgős mozgás.",
+    category: "Kardió",
+    workSec: 30,
+    restSec: 10,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 10
+  },
+  {
+    id: "labemeles-fekve",
+    name: "Lábemelés fekve",
+    desc: "Alsó has fókuszú gyakorlat, lassú visszaengedéssel.",
+    category: "Hasizom",
+    workSec: 35,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 11
+  },
+  {
+    id: "vadli-emeles",
+    name: "Vádli emelés",
+    desc: "Vádli erősítése álló helyzetben, teljes mozgástartománnyal.",
+    category: "Alsótest",
+    workSec: 30,
+    restSec: 15,
+    rounds: 4,
+    repsText: "15 ismétlés",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 12
+  },
+  {
+    id: "oldalso-terdemeles",
+    name: "Oldalsó térdemelés",
+    desc: "Oldalsó core és csípő aktiválás, lassú és kontrollált kivitelezéssel.",
+    category: "Core",
+    workSec: 30,
+    restSec: 15,
+    rounds: 3,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 13
+  },
+  {
+    id: "szek-tamaszos-tricepsz",
+    name: "Szék támaszos tricepsz",
+    desc: "Tricepsz erősítés otthoni környezetben, székkel vagy paddal.",
+    category: "Kar",
+    workSec: 30,
+    restSec: 20,
+    rounds: 3,
+    repsText: "10 ismétlés",
+    type: "nem-videós",
+    difficulty: "közepes",
+    active: true,
+    sortOrder: 14
+  },
+  {
+    id: "vall-korzes",
+    name: "Vállkörzés",
+    desc: "Bemelegítő vállmobilizáció, könnyű átmozgatás edzés elejére.",
+    category: "Bemelegítés",
+    workSec: 25,
+    restSec: 10,
+    rounds: 2,
+    repsText: "",
+    type: "nem-videós",
+    difficulty: "könnyű",
+    active: true,
+    sortOrder: 15
   }
 ];
+
+const IMAGE_MAP = {
+  "guggolas": "guggolas.png",
+  "fekvotamasz": "fekvotamasz.png",
+  "plank": "plank.png",
+  "kitores": "kitores.png",
+  "mountain-climber": "mountain-climber.png",
+  "burpee": "burpee.png",
+  "glute-bridge": "csipoemeles.png",
+  "oldalemeles": "oldalemeles.png",
+  "biciklis-haspres": "biciklis-haspres.png",
+  "jumping-jack": "terpesz-zar.png",
+  "labemeles-fekve": "labemeles-fekve.png",
+  "vadli-emeles": "vadli-emeles.png",
+  "oldalso-terdemeles": "oldalso-terdemeles.png",
+  "szek-tamaszos-tricepsz": "szek-tricepsz.png",
+  "vall-korzes": "vallkorzes.png"
+};
 
 const state = {
   booted: false,
@@ -121,6 +274,16 @@ export default async function initAdminUpgrades() {
     console.error("❌ initAdminUpgrades hiba:", e);
     safeFallbackLauncher();
   }
+}
+
+function resolveImage(id, manualUrl = "") {
+  const cleanManual = String(manualUrl || "").trim();
+  if (cleanManual) return cleanManual;
+
+  const file = IMAGE_MAP[String(id || "").trim()];
+  if (!file) return "";
+
+  return `/hu/app/assets/exercises/${file}`;
 }
 
 function injectStyles() {
@@ -647,7 +810,7 @@ function injectOverlay() {
 
                 <label class="fx-label">
                   Kép URL
-                  <input class="fx-input" id="fxImage" type="text" placeholder="https://... vagy /hu/app/assets/exercises/guggolas.png" />
+                  <input class="fx-input" id="fxImage" type="text" placeholder="/hu/app/assets/exercises/guggolas.png" />
                 </label>
               </div>
 
@@ -789,6 +952,7 @@ async function ensureSeedExercises() {
     const docRef = fs.doc(db, EXERCISES_COL, item.id);
     await fs.setDoc(docRef, {
       ...item,
+      imageUrl: resolveImage(item.id, ""),
       createdAt: fs.serverTimestamp(),
       updatedAt: fs.serverTimestamp()
     });
@@ -828,6 +992,7 @@ async function loadUsers() {
 async function saveExercise() {
   try {
     const payload = getFormPayload();
+    const docId = state.editingId || slugify(payload.name);
 
     if (!payload.name) return alert("Az edzés neve kötelező.");
     if (!payload.desc) return alert("A leírás kötelező.");
@@ -836,7 +1001,7 @@ async function saveExercise() {
     if (payload.restSec < 0) return alert("A pihenőidő legyen 0 vagy nagyobb.");
     if (payload.rounds < 1) return alert("A körök száma minimum 1.");
 
-    const docId = state.editingId || slugify(payload.name);
+    payload.imageUrl = resolveImage(docId, payload.imageUrl);
 
     await fs.setDoc(
       fs.doc(db, EXERCISES_COL, docId),
@@ -878,6 +1043,8 @@ async function assignExerciseToUser(uid, exerciseId) {
     const item = state.exercises.find((x) => x.id === exerciseId);
     if (!item) return;
 
+    const finalImageUrl = resolveImage(item.id, item.imageUrl || "");
+
     await fs.setDoc(
       fs.doc(db, "users", uid, USER_ASSIGN_SUBCOL, exerciseId),
       {
@@ -886,7 +1053,7 @@ async function assignExerciseToUser(uid, exerciseId) {
         name: item.name || "",
         desc: item.desc || "",
         category: item.category || "",
-        imageUrl: item.imageUrl || "",
+        imageUrl: finalImageUrl,
         workSec: Number(item.workSec || 0),
         restSec: Number(item.restSec || 0),
         rounds: Number(item.rounds || 1),
@@ -929,39 +1096,43 @@ function renderExercises() {
     return;
   }
 
-  list.innerHTML = items.map((item) => `
-    <div class="fx-item">
-      <div class="fx-thumb">
-        ${
-          item.imageUrl
-            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />`
-            : `<div class="fx-thumb-empty">Nincs kép</div>`
-        }
-      </div>
+  list.innerHTML = items.map((item) => {
+    const finalImageUrl = resolveImage(item.id, item.imageUrl || "");
 
-      <div>
-        <div class="fx-title">${escapeHtml(item.name || "—")}</div>
-        <div class="fx-desc">${escapeHtml(item.desc || "")}</div>
+    return `
+      <div class="fx-item">
+        <div class="fx-thumb">
+          ${
+            finalImageUrl
+              ? `<img src="${escapeHtml(finalImageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />`
+              : `<div class="fx-thumb-empty">Nincs kép</div>`
+          }
+        </div>
 
-        <div class="fx-meta">
-          <span class="fx-chip">${Number(item.workSec || 0)} mp munka</span>
-          <span class="fx-chip">${Number(item.restSec || 0)} mp pihenő</span>
-          <span class="fx-chip">${Number(item.rounds || 1)} kör</span>
-          ${item.repsText ? `<span class="fx-chip">${escapeHtml(item.repsText)}</span>` : ""}
-          <span class="fx-chip">${escapeHtml(item.category || "Általános")}</span>
-          <span class="fx-chip">${escapeHtml(item.difficulty || "közepes")}</span>
-          <span class="fx-chip">${escapeHtml(item.type || "nem-videós")}</span>
-          <span class="fx-chip ${item.active !== false ? "ok" : "off"}">${item.active !== false ? "Aktív" : "Inaktív"}</span>
+        <div>
+          <div class="fx-title">${escapeHtml(item.name || "—")}</div>
+          <div class="fx-desc">${escapeHtml(item.desc || "")}</div>
+
+          <div class="fx-meta">
+            <span class="fx-chip">${Number(item.workSec || 0)} mp munka</span>
+            <span class="fx-chip">${Number(item.restSec || 0)} mp pihenő</span>
+            <span class="fx-chip">${Number(item.rounds || 1)} kör</span>
+            ${item.repsText ? `<span class="fx-chip">${escapeHtml(item.repsText)}</span>` : ""}
+            <span class="fx-chip">${escapeHtml(item.category || "Általános")}</span>
+            <span class="fx-chip">${escapeHtml(item.difficulty || "közepes")}</span>
+            <span class="fx-chip">${escapeHtml(item.type || "nem-videós")}</span>
+            <span class="fx-chip ${item.active !== false ? "ok" : "off"}">${item.active !== false ? "Aktív" : "Inaktív"}</span>
+          </div>
+        </div>
+
+        <div class="fx-actions">
+          <button class="fx-btn" type="button" data-fx-edit="${item.id}">Szerk.</button>
+          <button class="fx-btn" type="button" data-fx-assign="${item.id}">Hozzárendelés</button>
+          <button class="fx-btn danger" type="button" data-fx-del="${item.id}">Törlés</button>
         </div>
       </div>
-
-      <div class="fx-actions">
-        <button class="fx-btn" type="button" data-fx-edit="${item.id}">Szerk.</button>
-        <button class="fx-btn" type="button" data-fx-assign="${item.id}">Hozzárendelés</button>
-        <button class="fx-btn danger" type="button" data-fx-del="${item.id}">Törlés</button>
-      </div>
-    </div>
-  `).join("");
+    `;
+  }).join("");
 
   list.querySelectorAll("[data-fx-edit]").forEach((btn) => {
     btn.addEventListener("click", () => startEdit(btn.getAttribute("data-fx-edit")));
@@ -1042,7 +1213,7 @@ function startEdit(id) {
   setVal("fxName", item.name || "");
   setVal("fxDesc", item.desc || "");
   setVal("fxCategory", item.category || "");
-  setVal("fxImage", item.imageUrl || "");
+  setVal("fxImage", resolveImage(item.id, item.imageUrl || ""));
   setVal("fxWork", Number(item.workSec || 0));
   setVal("fxRest", Number(item.restSec || 0));
   setVal("fxRounds", Number(item.rounds || 1));
