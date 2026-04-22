@@ -253,19 +253,15 @@ function injectStyles() {
       border:1px solid rgba(255,255,255,.08);
       background:rgba(0,0,0,.20);
       transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
-      animation:fxFloat 6s ease-in-out infinite;
       will-change:transform;
     }
     @media (max-width: 840px){
       .fx-item{ grid-template-columns:1fr; }
     }
     .fx-item:hover{
-      transform:translateY(-6px) scale(1.01);
-      box-shadow:0 25px 60px rgba(0,0,0,.45);
+      transform:translateY(-4px);
+      box-shadow:0 25px 60px rgba(0,0,0,.35);
       border-color:rgba(255,255,255,.14);
-    }
-    .fx-item:active{
-      transform:scale(.985);
     }
 
     .fx-thumb{
@@ -274,23 +270,34 @@ function injectStyles() {
       border-radius:18px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,.08);
-      background:linear-gradient(180deg, rgba(255,79,216,.18), rgba(177,76,255,.10));
+      background:rgba(255,255,255,.04);
       display:flex;
       align-items:center;
       justify-content:center;
       flex:0 0 auto;
-      animation:fxGlow 5s ease-in-out infinite;
-      transition:transform .3s ease, box-shadow .3s ease;
-      transform-origin:center center;
-    }
-    .fx-item:hover .fx-thumb{
-      transform:scale(1.05);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
     }
     .fx-thumb img{
       width:100%;
       height:100%;
       object-fit:cover;
+      object-position:center;
       display:block;
+    }
+    .fx-thumb-empty{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      text-align:center;
+      padding:10px;
+      color:rgba(255,255,255,.45);
+      font-size:12px;
+      font-weight:800;
+      line-height:1.35;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
     }
 
     .fx-title{
@@ -431,24 +438,6 @@ function injectStyles() {
       font-size:12px;
       line-height:1.55;
     }
-
-    @keyframes fxFloat {
-      0% { transform: translateY(0px); }
-      50% { transform: translateY(-4px); }
-      100% { transform: translateY(0px); }
-    }
-
-    @keyframes fxGlow {
-      0% {
-        box-shadow: 0 0 0 rgba(255,79,216,0);
-      }
-      50% {
-        box-shadow: 0 0 25px rgba(255,79,216,0.25);
-      }
-      100% {
-        box-shadow: 0 0 0 rgba(255,79,216,0);
-      }
-    }
   `;
   document.head.appendChild(style);
 }
@@ -579,7 +568,7 @@ function injectOverlay() {
 
                 <label class="fx-label">
                   Kép URL
-                  <input class="fx-input" id="fxImage" type="text" placeholder="https://..." />
+                  <input class="fx-input" id="fxImage" type="text" placeholder="https://... vagy /hu/app/assets/exercises/guggolas.png" />
                 </label>
               </div>
 
@@ -721,7 +710,7 @@ async function ensureSeedExercises() {
     const docRef = fs.doc(db, EXERCISES_COL, item.id);
     await fs.setDoc(docRef, {
       ...item,
-      imageUrl: makeExerciseArt(item.name, item.category, item.difficulty),
+      imageUrl: item.imageUrl || "",
       createdAt: fs.serverTimestamp(),
       updatedAt: fs.serverTimestamp()
     });
@@ -768,10 +757,6 @@ async function saveExercise() {
     if (payload.workSec < 0) return alert("A munkaidő legyen 0 vagy nagyobb.");
     if (payload.restSec < 0) return alert("A pihenőidő legyen 0 vagy nagyobb.");
     if (payload.rounds < 1) return alert("A körök száma minimum 1.");
-
-    if (!payload.imageUrl) {
-      payload.imageUrl = makeExerciseArt(payload.name, payload.category, payload.difficulty);
-    }
 
     const docId = state.editingId || slugify(payload.name);
 
@@ -869,7 +854,11 @@ function renderExercises() {
   list.innerHTML = items.map((item) => `
     <div class="fx-item">
       <div class="fx-thumb">
-        <img src="${escapeHtml(item.imageUrl || makeExerciseArt(item.name, item.category, item.difficulty))}" alt="${escapeHtml(item.name)}" />
+        ${
+          item.imageUrl
+            ? `<img src="${escapeHtml(item.imageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />`
+            : `<div class="fx-thumb-empty">Nincs kép</div>`
+        }
       </div>
 
       <div>
@@ -1112,51 +1101,4 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#039;");
-}
-
-function makeExerciseArt(name, category, difficulty) {
-  const palette = {
-    könnyű: ["#8d5cff", "#ff4fd8"],
-    közepes: ["#ff4fd8", "#ff8a5b"],
-    nehéz: ["#ff5b7f", "#ff2f5b"]
-  };
-
-  const [c1, c2] = palette[difficulty] || palette.közepes;
-  const title = escapeSvg(name);
-  const sub = escapeSvg(category);
-
-  const svg = `
-    <svg xmlns="http://www.w3.org/2000/svg" width="700" height="700" viewBox="0 0 700 700">
-      <defs>
-        <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stop-color="${c1}"/>
-          <stop offset="100%" stop-color="${c2}"/>
-        </linearGradient>
-        <radialGradient id="r" cx="25%" cy="18%" r="70%">
-          <stop offset="0%" stop-color="rgba(255,255,255,0.28)"/>
-          <stop offset="100%" stop-color="rgba(255,255,255,0)"/>
-        </radialGradient>
-      </defs>
-      <rect width="700" height="700" rx="42" fill="#120d1b"/>
-      <rect x="18" y="18" width="664" height="664" rx="34" fill="url(#g)" opacity="0.18"/>
-      <circle cx="120" cy="110" r="160" fill="url(#r)"/>
-      <rect x="44" y="44" width="612" height="612" rx="28" fill="none" stroke="rgba(255,255,255,0.10)"/>
-      <text x="54" y="500" font-family="Arial, Helvetica, sans-serif" font-size="64" font-weight="800" fill="white">${title}</text>
-      <text x="56" y="560" font-family="Arial, Helvetica, sans-serif" font-size="30" font-weight="700" fill="rgba(255,255,255,0.82)">${sub}</text>
-      <circle cx="560" cy="160" r="88" fill="url(#g)" opacity="0.85"/>
-      <circle cx="560" cy="160" r="62" fill="#130c1b" opacity="0.88"/>
-      <text x="560" y="170" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="26" font-weight="800" fill="white">FL</text>
-    </svg>
-  `;
-
-  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
-}
-
-function escapeSvg(value) {
-  return String(value || "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&apos;");
 }
