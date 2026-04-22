@@ -1,4 +1,4 @@
-import { db, fs } from "../shared/firebase.js";
+import { db, fs } from "../../shared/firebase.js";
 
 const IMAGE_MAP = {
   "guggolas": "/hu/app/assets/exercises/guggolas.png",
