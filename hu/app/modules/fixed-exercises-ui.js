@@ -1,689 +1,699 @@
-import { db, fs, escapeHtml } from "../../shared/firebase.js";
-import { getExerciseAsset } from "./fixed-exercises-assets.js";
+import { db, fs } from "../shared/firebase.js";
 
-const USER_ASSIGN_SUBCOL = "fixedExercises";
+const IMAGE_MAP = {
+  "guggolas": "/hu/app/assets/exercises/guggolas.png",
+  "fekvotamasz": "/hu/app/assets/exercises/fekvotamasz.png",
+  "plank": "/hu/app/assets/exercises/plank.png",
+  "kitores": "/hu/app/assets/exercises/kitores.png",
+  "mountain-climber": "/hu/app/assets/exercises/mountain-climber.png",
+  "burpee": "/hu/app/assets/exercises/burpee.png",
+  "glute-bridge": "/hu/app/assets/exercises/csipoemeles.png",
+  "oldalemeles": "/hu/app/assets/exercises/oldalemeles.png",
+  "biciklis-haspres": "/hu/app/assets/exercises/biciklis-haspres.png",
+  "jumping-jack": "/hu/app/assets/exercises/terpesz-zar.png",
+  "labemeles-fekve": "/hu/app/assets/exercises/labemeles-fekve.png",
+  "vadli-emeles": "/hu/app/assets/exercises/vadli-emeles.png",
+  "oldalso-terdemeles": "/hu/app/assets/exercises/oldalso-terdemeles.png",
+  "szek-tamaszos-tricepsz": "/hu/app/assets/exercises/szek-tricepsz.png",
+  "vall-korzes": "/hu/app/assets/exercises/vallkorzes.png"
+};
 
 const state = {
   uid: "",
-  mounted: false,
-  activeIndex: 0,
   items: [],
   timers: new Map(),
-  scrollRaf: null,
-  els: {
-    mount: null,
-    track: null,
-    refreshBtn: null,
-    detailOverlay: null,
-    detailTitle: null,
-    detailBody: null
-  }
+  unsub: null
 };
 
-export async function initFixedExercisesUI({ uid }) {
-  if (!uid) return;
-
-  state.uid = uid;
-
-  ensureMount();
-  ensureDetailModal();
-  bindStaticEvents();
-
-  await loadAssignedExercises();
-  render();
-
-  setTimeout(() => {
-    centerActiveCard(false);
-  }, 40);
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
-async function loadAssignedExercises() {
+function injectStyles() {
+  if (document.getElementById("fixed-exercises-ui-inline-style")) return;
+
+  const style = document.createElement("style");
+  style.id = "fixed-exercises-ui-inline-style";
+  style.textContent = `
+    .fxu-section{
+      margin-top:14px;
+      padding:18px;
+      border-radius:22px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(18,12,26,.55);
+      box-shadow:0 16px 40px rgba(0,0,0,.30);
+      backdrop-filter:blur(10px);
+      -webkit-backdrop-filter:blur(10px);
+    }
+
+    .fxu-top{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-bottom:14px;
+    }
+
+    .fxu-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:rgba(255,255,255,.82);
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:10px;
+    }
+
+    .fxu-title{
+      margin:0 0 6px;
+      font-family:ui-serif, Georgia, serif;
+      font-size:32px;
+      line-height:1.05;
+      letter-spacing:-.2px;
+      color:rgba(255,255,255,.96);
+    }
+
+    .fxu-sub{
+      margin:0;
+      color:rgba(255,255,255,.70);
+      font-size:13.5px;
+      line-height:1.55;
+    }
+
+    .fxu-refresh{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      padding:9px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:#ff76e2;
+      font-weight:900;
+      cursor:pointer;
+      user-select:none;
+    }
+
+    .fxu-empty{
+      padding:18px;
+      border-radius:18px;
+      border:1px dashed rgba(255,255,255,.12);
+      background:rgba(255,255,255,.03);
+      color:rgba(255,255,255,.66);
+      text-align:center;
+    }
+
+    .fxu-track{
+      display:flex;
+      gap:18px;
+      overflow-x:auto;
+      scroll-snap-type:x proximity;
+      padding:6px 2px 4px;
+      -webkit-overflow-scrolling:touch;
+    }
+    .fxu-track::-webkit-scrollbar{ height:8px; }
+    .fxu-track::-webkit-scrollbar-thumb{
+      background:rgba(255,255,255,.12);
+      border-radius:999px;
+    }
+
+    .fxu-card{
+      flex:0 0 min(320px, 78vw);
+      scroll-snap-align:center;
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(900px 260px at 18% 0%, rgba(255,79,216,.14), transparent 55%),
+        radial-gradient(900px 260px at 86% 16%, rgba(177,76,255,.10), transparent 60%),
+        rgba(10,8,16,.92);
+      box-shadow:
+        0 24px 80px rgba(0,0,0,.48),
+        0 10px 28px rgba(255,79,216,.10);
+      padding:18px;
+      position:relative;
+      overflow:hidden;
+    }
+
+    .fxu-card::after{
+      content:"";
+      position:absolute;
+      inset:auto 18px 12px 18px;
+      height:18px;
+      border-radius:999px;
+      background:radial-gradient(circle, rgba(255,79,216,.20), transparent 70%);
+      filter:blur(12px);
+      pointer-events:none;
+    }
+
+    .fxu-image-wrap{
+      position:relative;
+      width:100%;
+      height:210px;
+      border-radius:26px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.05), rgba(255,255,255,.02)),
+        rgba(255,255,255,.03);
+      box-shadow:
+        inset 0 1px 0 rgba(255,255,255,.12),
+        0 16px 34px rgba(0,0,0,.28);
+      margin-bottom:16px;
+    }
+
+    .fxu-image{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      background:#120e18;
+    }
+
+    .fxu-image-fallback{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:flex-end;
+      justify-content:flex-start;
+      padding:16px;
+      color:#fff;
+      font-weight:900;
+      font-size:14px;
+      line-height:1.3;
+      background:
+        radial-gradient(280px 120px at 20% 0%, rgba(255,255,255,.12), transparent 60%),
+        linear-gradient(135deg, rgba(255,79,216,.18), rgba(177,76,255,.12)),
+        rgba(255,255,255,.02);
+    }
+
+    .fxu-fl{
+      position:absolute;
+      top:12px;
+      right:12px;
+      width:62px;
+      height:62px;
+      border-radius:999px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(18,12,26,.96) 0 54%, transparent 56% 100%),
+        conic-gradient(from 180deg, #ff4fd8, #ff8b6f, #b14cff, #ff4fd8);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-weight:900;
+      font-size:16px;
+      border:1px solid rgba(255,255,255,.16);
+      box-shadow:0 10px 30px rgba(0,0,0,.35);
+      z-index:2;
+    }
+
+    .fxu-name{
+      margin:0 0 8px;
+      font-size:24px;
+      line-height:1.08;
+      color:rgba(255,255,255,.97);
+      font-weight:900;
+    }
+
+    .fxu-badge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:32px;
+      padding:0 12px;
+      border-radius:999px;
+      background:rgba(255,79,216,.14);
+      border:1px solid rgba(255,79,216,.24);
+      color:#ff9be9;
+      font-size:12px;
+      font-weight:900;
+      margin-bottom:14px;
+    }
+
+    .fxu-desc{
+      color:rgba(255,255,255,.76);
+      font-size:14px;
+      line-height:1.6;
+      min-height:64px;
+      margin-bottom:14px;
+    }
+
+    .fxu-meta{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-bottom:18px;
+    }
+
+    .fxu-chip{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:6px;
+      min-height:34px;
+      padding:0 12px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.05);
+      color:rgba(255,255,255,.84);
+      font-size:12px;
+      font-weight:900;
+    }
+
+    .fxu-timer{
+      width:154px;
+      height:154px;
+      margin:0 auto 18px;
+      border-radius:999px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:
+        radial-gradient(circle at center, rgba(6,7,14,.98) 0 44%, transparent 46% 100%),
+        conic-gradient(from -90deg, rgba(255,79,216,.96), rgba(177,76,255,.96), rgba(255,255,255,.18), rgba(255,255,255,.18));
+      box-shadow:
+        0 0 40px rgba(255,79,216,.16),
+        inset 0 0 22px rgba(255,255,255,.05);
+      position:relative;
+    }
+
+    .fxu-timer-inner{
+      width:110px;
+      height:110px;
+      border-radius:999px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      background:#04060d;
+      border:1px solid rgba(255,255,255,.08);
+      box-shadow:inset 0 1px 0 rgba(255,255,255,.05);
+      text-align:center;
+    }
+
+    .fxu-time{
+      font-size:24px;
+      line-height:1;
+      font-weight:900;
+      color:#fff;
+      margin-bottom:6px;
+    }
+
+    .fxu-phase{
+      font-size:11px;
+      color:rgba(255,255,255,.62);
+      font-weight:800;
+      letter-spacing:.2px;
+    }
+
+    .fxu-actions,
+    .fxu-actions-bottom{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .fxu-actions-bottom{
+      margin-top:10px;
+    }
+
+    .fxu-btn{
+      min-height:46px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.06);
+      color:#fff;
+      font:inherit;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow:0 10px 24px rgba(0,0,0,.22);
+    }
+
+    .fxu-btn.primary{
+      background:linear-gradient(135deg, #ff4fd8, #b14cff);
+      color:#160915;
+      border-color:transparent;
+    }
+
+    .fxu-btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+      box-shadow:none;
+    }
+
+    .fxu-detail{
+      display:none;
+      margin-top:12px;
+      padding:14px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(255,255,255,.04);
+      color:rgba(255,255,255,.76);
+      font-size:13px;
+      line-height:1.55;
+    }
+
+    .fxu-detail.is-open{
+      display:block;
+    }
+  `;
+  document.head.appendChild(style);
+}
+
+function ensureRoot() {
+  let root = document.getElementById("fixedExercisesRoot");
+  if (root) return root;
+
+  const technika = document.getElementById("technika");
+  root = document.createElement("section");
+  root.id = "fixedExercisesRoot";
+  root.className = "fxu-section";
+
+  if (technika && technika.parentNode) {
+    technika.parentNode.insertBefore(root, technika);
+  } else {
+    document.querySelector("main")?.appendChild(root);
+  }
+
+  return root;
+}
+
+function resolveImage(item) {
+  const direct = String(item?.imageUrl || "").trim();
+  if (direct) return direct;
+
+  const id = String(item?.exerciseId || item?.id || "").trim();
+  return IMAGE_MAP[id] || "";
+}
+
+function formatTime(totalSec) {
+  const safe = Math.max(0, Number(totalSec || 0));
+  const m = Math.floor(safe / 60);
+  const s = safe % 60;
+  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+}
+
+function getTimerState(id, item) {
+  if (!state.timers.has(id)) {
+    state.timers.set(id, {
+      phase: "munkaidő",
+      isRunning: false,
+      isPaused: false,
+      remaining: Number(item.workSec || 0),
+      intervalId: null
+    });
+  }
+  return state.timers.get(id);
+}
+
+function stopTimer(id) {
+  const timer = state.timers.get(id);
+  if (!timer) return;
+  if (timer.intervalId) {
+    clearInterval(timer.intervalId);
+    timer.intervalId = null;
+  }
+  timer.isRunning = false;
+  timer.isPaused = false;
+}
+
+function resetTimer(id, item) {
+  stopTimer(id);
+  const timer = getTimerState(id, item);
+  timer.phase = "munkaidő";
+  timer.remaining = Number(item.workSec || 0);
+  render();
+}
+
+function pauseTimer(id) {
+  const timer = state.timers.get(id);
+  if (!timer) return;
+  if (!timer.isRunning) return;
+
+  if (timer.intervalId) {
+    clearInterval(timer.intervalId);
+    timer.intervalId = null;
+  }
+  timer.isRunning = false;
+  timer.isPaused = true;
+  render();
+}
+
+function vibratePhoneOnFinish() {
   try {
-    const q = fs.query(
-      fs.collection(db, "users", state.uid, USER_ASSIGN_SUBCOL),
-      fs.orderBy("sortOrder", "asc")
-    );
+    if (navigator?.vibrate) navigator.vibrate([200, 120, 260]);
+  } catch {}
+}
 
-    const snap = await fs.getDocs(q);
+function startTimer(id, item) {
+  const timer = getTimerState(id, item);
+  if (timer.isRunning) return;
 
-    state.items = snap.docs
-      .map((docSnap) => {
-        const raw = docSnap.data() || {};
-        const asset = getExerciseAsset(raw.exerciseId || raw.name || docSnap.id);
+  if (timer.remaining <= 0) {
+    timer.phase = "munkaidő";
+    timer.remaining = Number(item.workSec || 0);
+  }
 
-        return {
-          id: docSnap.id,
-          exerciseId: String(raw.exerciseId || docSnap.id),
-          name: String(raw.name || "").trim() || "Edzés",
-          desc: String(raw.desc || "").trim(),
-          category: String(raw.category || "").trim() || "Általános",
-          imageUrl: String(raw.imageUrl || "").trim() || asset.image || "",
-          workSec: Math.max(1, Number(raw.workSec || 30)),
-          restSec: Math.max(0, Number(raw.restSec || 15)),
-          rounds: Math.max(1, Number(raw.rounds || 3)),
-          repsText: String(raw.repsText || "").trim(),
-          difficulty: String(raw.difficulty || "közepes").trim(),
-          type: String(raw.type || "nem-videós").trim(),
-          active: raw.active !== false,
-          sortOrder: Number(raw.sortOrder || 0),
-          accent: asset.accent || "#ff4fd8",
-          accent2: asset.accent2 || "#b14cff",
-          cardBackground:
-            asset.cardBackground ||
-            "radial-gradient(circle at 20% 10%, rgba(255,255,255,.14), transparent 28%), linear-gradient(180deg, rgba(255,79,216,.16), rgba(177,76,255,.08))"
-        };
-      })
-      .filter((item) => item.active !== false);
+  timer.isRunning = true;
+  timer.isPaused = false;
 
-    syncTimers();
+  timer.intervalId = setInterval(() => {
+    timer.remaining -= 1;
 
-    if (state.activeIndex > state.items.length - 1) {
-      state.activeIndex = 0;
+    if (timer.remaining <= 0) {
+      stopTimer(id);
+      vibratePhoneOnFinish();
+      timer.remaining = 0;
+      render();
+      return;
     }
-  } catch (error) {
-    console.error("Fix edzések betöltési hiba:", error);
-    state.items = [];
-    state.activeIndex = 0;
-  }
-}
 
-function syncTimers() {
-  const validIds = new Set(state.items.map((x) => x.id));
-
-  for (const [id, timer] of state.timers.entries()) {
-    if (!validIds.has(id)) {
-      stopTimer(timer);
-      state.timers.delete(id);
-    }
-  }
-
-  state.items.forEach((item) => {
-    if (!state.timers.has(item.id)) {
-      state.timers.set(item.id, createTimer(item));
-    }
-  });
-}
-
-function createTimer(item) {
-  return {
-    itemId: item.id,
-    running: false,
-    paused: false,
-    completed: false,
-    phase: "work",
-    currentRound: 1,
-    remainingSec: item.workSec,
-    totalSec: item.workSec,
-    intervalId: null
-  };
-}
-
-function ensureMount() {
-  let mount = document.getElementById("fixedExercisesMount");
-
-  if (!mount) {
-    const technika = document.getElementById("technika");
-    if (!technika) return;
-
-    mount = document.createElement("section");
-    mount.id = "fixedExercisesMount";
-    mount.className = "glass card";
-    technika.parentNode.insertBefore(mount, technika);
-  }
-
-  mount.innerHTML = `
-    <div class="fe-root">
-      <div class="fe-header">
-        <div>
-          <div class="chip" style="margin-bottom:10px;">• Fix edzések</div>
-          <div class="fe-title">Saját fix edzéseid</div>
-          <div class="sub" style="margin-top:6px; margin-bottom:0;">
-            Az admin által hozzád rendelt képes edzések. Érintésre előtérbe kerülnek.
-          </div>
-        </div>
-
-        <button class="fe-refresh" id="feRefreshBtn" type="button">Frissítés</button>
-      </div>
-
-      <div class="fe-carousel">
-        <div class="fe-track" id="feTrack"></div>
-      </div>
-    </div>
-  `;
-
-  state.els.mount = mount;
-  state.els.track = mount.querySelector("#feTrack");
-  state.els.refreshBtn = mount.querySelector("#feRefreshBtn");
-}
-
-function ensureDetailModal() {
-  if (document.getElementById("feDetailOverlay")) {
-    state.els.detailOverlay = document.getElementById("feDetailOverlay");
-    state.els.detailTitle = document.getElementById("feDetailTitle");
-    state.els.detailBody = document.getElementById("feDetailBody");
-    return;
-  }
-
-  const overlay = document.createElement("div");
-  overlay.className = "modal-overlay";
-  overlay.id = "feDetailOverlay";
-  overlay.setAttribute("aria-hidden", "true");
-  overlay.innerHTML = `
-    <div class="glass modal" role="dialog" aria-modal="true" aria-labelledby="feDetailTitle">
-      <div class="modal-header">
-        <h2 class="modal-title" id="feDetailTitle">Edzés részletei</h2>
-        <button class="modal-close" id="feDetailClose" type="button" aria-label="Bezárás">✕</button>
-      </div>
-      <div class="modal-body" id="feDetailBody"></div>
-    </div>
-  `;
-  document.body.appendChild(overlay);
-
-  state.els.detailOverlay = overlay;
-  state.els.detailTitle = overlay.querySelector("#feDetailTitle");
-  state.els.detailBody = overlay.querySelector("#feDetailBody");
-}
-
-function bindStaticEvents() {
-  if (state.mounted) return;
-  state.mounted = true;
-
-  state.els.refreshBtn?.addEventListener("click", async () => {
-    await loadAssignedExercises();
     render();
-    centerActiveCard(true);
-  });
-
-  state.els.track?.addEventListener(
-    "scroll",
-    () => {
-      if (state.scrollRaf) cancelAnimationFrame(state.scrollRaf);
-      state.scrollRaf = requestAnimationFrame(handleTrackScroll);
-    },
-    { passive: true }
-  );
-
-  state.els.detailOverlay?.addEventListener("click", (e) => {
-    if (e.target === state.els.detailOverlay) closeDetailModal();
-  });
-
-  document.getElementById("feDetailClose")?.addEventListener("click", closeDetailModal);
-
-  window.addEventListener("resize", () => {
-    centerActiveCard(false);
-  });
-}
-
-function render() {
-  if (!state.els.track) return;
-
-  if (!state.items.length) {
-    state.els.track.innerHTML = `
-      <div class="row" style="width:100%;">
-        <div>
-          <div class="title">Nincs hozzád rendelt fix edzés</div>
-          <div class="desc">Az admin oldalon lehet fix edzést hozzárendelni a felhasználóhoz.</div>
-        </div>
-      </div>
-    `;
-    return;
-  }
-
-  state.els.track.innerHTML = state.items
-    .map((item, index) => renderCard(item, index, index === state.activeIndex))
-    .join("");
-
-  bindCardEvents();
-}
-
-function bindCardEvents() {
-  state.els.track.querySelectorAll(".fe-card").forEach((card) => {
-    card.addEventListener("click", (e) => {
-      if (e.target.closest(".fe-btn")) return;
-      const index = Number(card.getAttribute("data-index") || "0");
-      activateCard(index);
-    });
-  });
-
-  state.els.track.querySelectorAll("[data-fe-detail]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-fe-detail") || "";
-      openDetailModal(id);
-    });
-  });
-
-  state.els.track.querySelectorAll("[data-fe-start]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-fe-start") || "";
-      toggleStart(id);
-    });
-  });
-
-  state.els.track.querySelectorAll("[data-fe-pause]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-fe-pause") || "";
-      togglePause(id);
-    });
-  });
-
-  state.els.track.querySelectorAll("[data-fe-reset]").forEach((btn) => {
-    btn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      const id = btn.getAttribute("data-fe-reset") || "";
-      resetExerciseTimer(id);
-    });
-  });
-}
-
-function renderCard(item, index, isActive) {
-  const timer = ensureTimer(item);
-  const progressDeg = calcProgressDeg(timer);
-  const timeText = formatTime(timer.remainingSec);
-  const phaseText = timer.completed
-    ? "kész"
-    : timer.paused
-      ? "szünet"
-      : timer.phase === "rest"
-        ? "pihenőidő"
-        : "munkaidő";
-
-  return `
-    <article class="fe-card ${isActive ? "active" : ""}" data-index="${index}" data-id="${escapeAttr(item.id)}">
-      <div class="fe-card-img-wrap">
-        <div class="fe-card-img" style="background:${escapeAttr(item.cardBackground)};">
-          ${
-            item.imageUrl
-              ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" loading="lazy">`
-              : `<div class="fe-card-placeholder">Nincs kép</div>`
-          }
-        </div>
-      </div>
-
-      <div class="fe-card-title">${escapeHtml(item.name)}</div>
-      <div class="fe-card-sub">${escapeHtml(item.category)}</div>
-      <div class="fe-card-desc">${escapeHtml(item.desc || "")}</div>
-
-      <div class="fe-meta">
-        <div class="fe-pill">⏱ ${item.workSec} mp munka</div>
-        <div class="fe-pill">◔ ${item.restSec} mp pihenő</div>
-        <div class="fe-pill">↻ ${item.rounds} kör</div>
-      </div>
-
-      <div class="fe-timer">
-        <div
-          class="fe-timer-circle"
-          data-fe-timer-circle="${escapeAttr(item.id)}"
-          style="background:conic-gradient(${escapeAttr(item.accent)} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg);"
-        >
-          <div class="fe-timer-inner">
-            <div class="fe-time" data-fe-time="${escapeAttr(item.id)}">${escapeHtml(timeText)}</div>
-            <div class="fe-time-sub" data-fe-phase="${escapeAttr(item.id)}">${escapeHtml(phaseText)}</div>
-          </div>
-        </div>
-      </div>
-
-      <div class="fe-actions">
-        <button class="fe-btn secondary" type="button" data-fe-detail="${escapeAttr(item.id)}">Részletek</button>
-        <button class="fe-btn primary" type="button" data-fe-start="${escapeAttr(item.id)}">
-          ${timer.completed ? "Újraindítás" : timer.running ? "Fut" : timer.paused ? "Folytatás" : "Indítás"}
-        </button>
-      </div>
-
-      <div class="fe-actions fe-actions-secondary">
-        <button class="fe-btn secondary" type="button" data-fe-pause="${escapeAttr(item.id)}">
-          ${timer.paused ? "Szünetelve" : "Pause"}
-        </button>
-        <button class="fe-btn secondary" type="button" data-fe-reset="${escapeAttr(item.id)}">Reset</button>
-      </div>
-    </article>
-  `;
-}
-
-function activateCard(index) {
-  const safeIndex = Math.max(0, Math.min(index, state.items.length - 1));
-  state.activeIndex = safeIndex;
-  render();
-
-  requestAnimationFrame(() => {
-    centerActiveCard(true);
-  });
-}
-
-function centerActiveCard(smooth = true) {
-  if (!state.els.track) return;
-
-  const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
-  const card = cards[state.activeIndex];
-  if (!card) return;
-
-  const targetLeft =
-    card.offsetLeft - (state.els.track.clientWidth / 2 - card.clientWidth / 2);
-
-  state.els.track.scrollTo({
-    left: Math.max(0, targetLeft),
-    behavior: smooth ? "smooth" : "auto"
-  });
-}
-
-function handleTrackScroll() {
-  if (!state.els.track) return;
-
-  const cards = Array.from(state.els.track.querySelectorAll(".fe-card"));
-  if (!cards.length) return;
-
-  const trackCenter = state.els.track.scrollLeft + state.els.track.clientWidth / 2;
-
-  let nearestIndex = 0;
-  let nearestDistance = Infinity;
-
-  cards.forEach((card, index) => {
-    const cardCenter = card.offsetLeft + card.clientWidth / 2;
-    const distance = Math.abs(cardCenter - trackCenter);
-
-    if (distance < nearestDistance) {
-      nearestDistance = distance;
-      nearestIndex = index;
-    }
-  });
-
-  if (nearestIndex !== state.activeIndex) {
-    state.activeIndex = nearestIndex;
-
-    cards.forEach((card, idx) => {
-      card.classList.toggle("active", idx === nearestIndex);
-    });
-  }
-}
-
-function ensureTimer(item) {
-  if (!state.timers.has(item.id)) {
-    state.timers.set(item.id, createTimer(item));
-  }
-  return state.timers.get(item.id);
-}
-
-function toggleStart(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  if (!item) return;
-
-  const timer = ensureTimer(item);
-
-  if (timer.running) return;
-
-  if (timer.completed) {
-    resetTimer(timer, item);
-    render();
-    return;
-  }
-
-  timer.running = true;
-  timer.paused = false;
-  stopTimer(timer);
-
-  timer.intervalId = window.setInterval(() => {
-    tick(itemId);
   }, 1000);
 
   render();
 }
 
-function togglePause(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  if (!item) return;
+function buildCard(item) {
+  const id = String(item.exerciseId || item.id || "");
+  const imageUrl = resolveImage(item);
+  const timer = getTimerState(id, item);
 
-  const timer = ensureTimer(item);
-  if (timer.completed) return;
+  const rounds = Number(item.rounds || 1);
+  const workSec = Number(item.workSec || 0);
+  const restSec = Number(item.restSec || 0);
 
-  if (timer.running) {
-    timer.running = false;
-    timer.paused = true;
-    stopTimer(timer);
-  } else if (timer.paused) {
-    timer.running = true;
-    timer.paused = false;
-    stopTimer(timer);
+  return `
+    <article class="fxu-card">
+      <div class="fxu-image-wrap">
+        <div class="fxu-fl">FL</div>
+        ${
+          imageUrl
+            ? `<img class="fxu-image" src="${escapeHtml(imageUrl)}" alt="${escapeHtml(item.name || "")}" data-fxu-img="${escapeHtml(id)}">`
+            : `<div class="fxu-image-fallback">${escapeHtml(item.name || "Fix edzés")}</div>`
+        }
+      </div>
 
-    timer.intervalId = window.setInterval(() => {
-      tick(itemId);
-    }, 1000);
-  }
+      <h3 class="fxu-name">${escapeHtml(item.name || "—")}</h3>
+      <div class="fxu-badge">${escapeHtml(item.category || "Általános")}</div>
 
-  render();
-}
+      <div class="fxu-desc">${escapeHtml(item.desc || "")}</div>
 
-function resetExerciseTimer(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  if (!item) return;
+      <div class="fxu-meta">
+        <span class="fxu-chip">⏱ ${workSec} mp munka</span>
+        <span class="fxu-chip">◔ ${restSec} mp pihenő</span>
+        <span class="fxu-chip">↻ ${rounds} kör</span>
+      </div>
 
-  const timer = ensureTimer(item);
-  resetTimer(timer, item);
-  render();
-}
-
-function tick(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  if (!item) return;
-
-  const timer = ensureTimer(item);
-  if (!timer.running) return;
-
-  timer.remainingSec -= 1;
-
-  if (timer.remainingSec > 0) {
-    patchTimerUI(item.id);
-    return;
-  }
-
-  vibratePhone();
-
-  if (timer.phase === "work" && item.restSec > 0) {
-    timer.phase = "rest";
-    timer.remainingSec = item.restSec;
-    timer.totalSec = Math.max(1, item.restSec);
-    timer.running = true;
-    timer.paused = false;
-    patchTimerUI(item.id);
-    return;
-  }
-
-  if (timer.currentRound < item.rounds) {
-    timer.currentRound += 1;
-    timer.phase = "work";
-    timer.remainingSec = item.workSec;
-    timer.totalSec = Math.max(1, item.workSec);
-    timer.running = true;
-    timer.paused = false;
-    patchTimerUI(item.id);
-    return;
-  }
-
-  timer.running = false;
-  timer.paused = false;
-  timer.completed = true;
-  timer.phase = "work";
-  timer.currentRound = 1;
-  timer.remainingSec = item.workSec;
-  timer.totalSec = Math.max(1, item.workSec);
-  stopTimer(timer);
-
-  render();
-}
-
-function patchTimerUI(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  const timer = state.timers.get(itemId);
-  if (!item || !timer) return;
-
-  const timeEl = document.querySelector(`[data-fe-time="${cssEscape(itemId)}"]`);
-  const phaseEl = document.querySelector(`[data-fe-phase="${cssEscape(itemId)}"]`);
-  const circleEl = document.querySelector(`[data-fe-timer-circle="${cssEscape(itemId)}"]`);
-
-  if (timeEl) {
-    timeEl.textContent = formatTime(timer.remainingSec);
-  }
-
-  if (phaseEl) {
-    phaseEl.textContent = timer.completed
-      ? "kész"
-      : timer.paused
-        ? "szünet"
-        : timer.phase === "rest"
-          ? "pihenőidő"
-          : "munkaidő";
-  }
-
-  if (circleEl) {
-    const progressDeg = calcProgressDeg(timer);
-    circleEl.style.background = `conic-gradient(${item.accent} ${progressDeg}deg, rgba(255,255,255,0.08) 0deg)`;
-  }
-}
-
-function resetTimer(timer, item) {
-  stopTimer(timer);
-  timer.running = false;
-  timer.paused = false;
-  timer.completed = false;
-  timer.phase = "work";
-  timer.currentRound = 1;
-  timer.remainingSec = item.workSec;
-  timer.totalSec = Math.max(1, item.workSec);
-}
-
-function stopTimer(timer) {
-  if (timer?.intervalId) {
-    clearInterval(timer.intervalId);
-    timer.intervalId = null;
-  }
-}
-
-function vibratePhone() {
-  try {
-    if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
-      navigator.vibrate([180, 120, 180]);
-    }
-  } catch (error) {
-    console.warn("Vibrálás nem elérhető:", error);
-  }
-}
-
-function openDetailModal(itemId) {
-  const item = state.items.find((x) => x.id === itemId);
-  if (!item || !state.els.detailOverlay || !state.els.detailBody || !state.els.detailTitle) return;
-
-  const timer = ensureTimer(item);
-
-  state.els.detailTitle.textContent = item.name;
-  state.els.detailBody.innerHTML = `
-    <div style="display:grid; gap:16px;">
-      <div style="display:grid; grid-template-columns:120px 1fr; gap:16px; align-items:start;">
-        <div style="width:120px; height:120px; border-radius:18px; display:flex; align-items:center; justify-content:center; background:${escapeAttr(item.cardBackground)}; overflow:hidden;">
-          ${
-            item.imageUrl
-              ? `<img src="${escapeAttr(item.imageUrl)}" alt="${escapeAttr(item.name)}" style="width:100%; height:100%; object-fit:cover;">`
-              : `<div style="color:rgba(255,255,255,.58); font-size:12px;">Nincs kép</div>`
-          }
-        </div>
-
-        <div>
-          <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px;">
-            <strong style="font-size:22px; color:#fff;">${escapeHtml(item.name)}</strong>
-            <span class="chip">${escapeHtml(item.category)}</span>
-          </div>
-
-          <div style="color:rgba(255,255,255,.74); line-height:1.6; margin-bottom:10px;">
-            ${escapeHtml(item.desc || "")}
-          </div>
-
-          <div style="display:flex; gap:8px; flex-wrap:wrap;">
-            <span class="chip">⏱ ${item.workSec} mp munka</span>
-            <span class="chip">◔ ${item.restSec} mp pihenő</span>
-            <span class="chip">↻ ${item.rounds} kör</span>
-            ${item.repsText ? `<span class="chip">${escapeHtml(item.repsText)}</span>` : ""}
-            <span class="chip">${escapeHtml(item.difficulty)}</span>
-            <span class="chip">${escapeHtml(item.type)}</span>
-          </div>
+      <div class="fxu-timer">
+        <div class="fxu-timer-inner">
+          <div class="fxu-time">${formatTime(timer.remaining)}</div>
+          <div class="fxu-phase">${escapeHtml(timer.phase)}</div>
         </div>
       </div>
 
-      <div class="glass" style="padding:16px;">
-        <div style="display:flex; align-items:center; justify-content:space-between; gap:10px; flex-wrap:wrap;">
-          <div>
-            <div style="font-weight:900; color:#fff; margin-bottom:4px;">Aktuális állapot</div>
-            <div style="font-size:13px; color:rgba(255,255,255,.7);">
-              Kör: ${timer.currentRound}/${item.rounds} • ${timer.completed ? "kész" : timer.paused ? "szünet" : timer.phase === "rest" ? "pihenő szakasz" : "munka szakasz"}
-            </div>
-          </div>
-
-          <div style="font-size:28px; font-weight:900; color:#fff;">
-            ${escapeHtml(formatTime(timer.remainingSec))}
-          </div>
-        </div>
+      <div class="fxu-actions">
+        <button class="fxu-btn" type="button" data-fxu-detail-btn="${escapeHtml(id)}">Részletek</button>
+        <button class="fxu-btn primary" type="button" data-fxu-start="${escapeHtml(id)}">
+          ${timer.isRunning ? "Fut..." : (timer.isPaused ? "Folytatás" : "Indítás")}
+        </button>
       </div>
 
-      <div style="display:flex; gap:10px; flex-wrap:wrap;">
-        <button class="pill primary" id="feDetailStartBtn" type="button">${timer.completed ? "Újraindítás" : timer.running ? "Fut" : timer.paused ? "Folytatás" : "Indítás"}</button>
-        <button class="pill ghost" id="feDetailPauseBtn" type="button">${timer.paused ? "Szünetelve" : "Pause"}</button>
-        <button class="pill ghost" id="feDetailResetBtn" type="button">Reset</button>
-        <button class="pill ghost" id="feDetailCloseBtn" type="button">Bezárás</button>
+      <div class="fxu-actions-bottom">
+        <button class="fxu-btn" type="button" data-fxu-pause="${escapeHtml(id)}" ${timer.isRunning ? "" : "disabled"}>Pause</button>
+        <button class="fxu-btn" type="button" data-fxu-reset="${escapeHtml(id)}">Reset</button>
       </div>
+
+      <div class="fxu-detail" id="fxu-detail-${escapeHtml(id)}">
+        <strong style="display:block; margin-bottom:8px;">${escapeHtml(item.name || "Fix edzés")}</strong>
+        <div style="margin-bottom:8px;">${escapeHtml(item.desc || "")}</div>
+        <div>Munkaidő: ${workSec} mp</div>
+        <div>Pihenőidő: ${restSec} mp</div>
+        <div>Körök: ${rounds}</div>
+        ${item.repsText ? `<div>Ismétlés: ${escapeHtml(item.repsText)}</div>` : ""}
+        ${item.difficulty ? `<div>Nehézség: ${escapeHtml(item.difficulty)}</div>` : ""}
+        ${item.type ? `<div>Típus: ${escapeHtml(item.type)}</div>` : ""}
+      </div>
+    </article>
+  `;
+}
+
+function bindCardEvents() {
+  document.querySelectorAll("[data-fxu-start]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fxu-start");
+      const item = state.items.find(x => String(x.exerciseId || x.id) === id);
+      if (!item) return;
+      startTimer(id, item);
+    });
+  });
+
+  document.querySelectorAll("[data-fxu-pause]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fxu-pause");
+      pauseTimer(id);
+    });
+  });
+
+  document.querySelectorAll("[data-fxu-reset]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fxu-reset");
+      const item = state.items.find(x => String(x.exerciseId || x.id) === id);
+      if (!item) return;
+      resetTimer(id, item);
+    });
+  });
+
+  document.querySelectorAll("[data-fxu-detail-btn]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-fxu-detail-btn");
+      const panel = document.getElementById(`fxu-detail-${id}`);
+      if (!panel) return;
+      panel.classList.toggle("is-open");
+    });
+  });
+
+  document.querySelectorAll("[data-fxu-img]").forEach((img) => {
+    img.addEventListener("error", () => {
+      const wrap = img.closest(".fxu-image-wrap");
+      if (!wrap) return;
+      wrap.innerHTML = `
+        <div class="fxu-fl">FL</div>
+        <div class="fxu-image-fallback">Nincs kép</div>
+      `;
+    }, { once: true });
+  });
+
+  document.getElementById("fxuRefreshBtn")?.addEventListener("click", async () => {
+    await loadItems();
+    render();
+  });
+}
+
+function render() {
+  const root = ensureRoot();
+
+  root.innerHTML = `
+    <div class="fxu-top">
+      <div>
+        <div class="fxu-kicker">• Fix edzések</div>
+        <h2 class="fxu-title">Saját fix edzéseid</h2>
+        <p class="fxu-sub">Az admin által hozzád rendelt képes edzések. Érintésre előtérbe kerülnek.</p>
+      </div>
+      <button class="fxu-refresh" id="fxuRefreshBtn" type="button">Frissítés</button>
     </div>
+
+    ${
+      state.items.length
+        ? `<div class="fxu-track">${state.items.map(buildCard).join("")}</div>`
+        : `<div class="fxu-empty">Ehhez a profilhoz még nincs fix edzés hozzárendelve.</div>`
+    }
   `;
 
-  state.els.detailOverlay.classList.add("is-open");
-  state.els.detailOverlay.setAttribute("aria-hidden", "false");
-
-  state.els.detailBody.querySelector("#feDetailStartBtn")?.addEventListener("click", () => {
-    toggleStart(item.id);
-    openDetailModal(item.id);
-  });
-
-  state.els.detailBody.querySelector("#feDetailPauseBtn")?.addEventListener("click", () => {
-    togglePause(item.id);
-    openDetailModal(item.id);
-  });
-
-  state.els.detailBody.querySelector("#feDetailResetBtn")?.addEventListener("click", () => {
-    resetExerciseTimer(item.id);
-    openDetailModal(item.id);
-  });
-
-  state.els.detailBody.querySelector("#feDetailCloseBtn")?.addEventListener("click", closeDetailModal);
+  bindCardEvents();
 }
 
-function closeDetailModal() {
-  if (!state.els.detailOverlay) return;
-  state.els.detailOverlay.classList.remove("is-open");
-  state.els.detailOverlay.setAttribute("aria-hidden", "true");
-}
+async function loadItems() {
+  if (!state.uid) return;
 
-function calcProgressDeg(timer) {
-  if (!timer || timer.totalSec <= 0) return 0;
-  const elapsed = timer.totalSec - timer.remainingSec;
-  const ratio = Math.max(0, Math.min(1, elapsed / timer.totalSec));
-  return Math.round(ratio * 360);
-}
+  try {
+    const colRef = fs.collection(db, "users", state.uid, "fixedExercises");
 
-function formatTime(sec) {
-  const total = Math.max(0, Number(sec || 0));
-  const m = Math.floor(total / 60);
-  const s = total % 60;
-  return `${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
-}
+    let snap;
+    try {
+      snap = await fs.getDocs(fs.query(colRef, fs.orderBy("sortOrder", "asc")));
+    } catch {
+      snap = await fs.getDocs(colRef);
+    }
 
-function cssEscape(value) {
-  if (typeof CSS !== "undefined" && typeof CSS.escape === "function") {
-    return CSS.escape(value);
+    const items = snap.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data()
+    }));
+
+    state.items = items.sort((a, b) => {
+      const ao = Number(a.sortOrder || 0);
+      const bo = Number(b.sortOrder || 0);
+      if (ao !== bo) return ao - bo;
+      return String(a.name || "").localeCompare(String(b.name || ""), "hu");
+    });
+
+    state.items.forEach((item) => {
+      const id = String(item.exerciseId || item.id || "");
+      getTimerState(id, item);
+    });
+  } catch (err) {
+    console.error("Fix edzések betöltési hiba:", err);
+    state.items = [];
   }
-  return String(value).replace(/"/g, '\\"');
 }
 
-function escapeAttr(value) {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;");
+export async function initFixedExercisesUI({ uid }) {
+  state.uid = String(uid || "").trim();
+  if (!state.uid) return;
+
+  injectStyles();
+  ensureRoot();
+
+  if (state.unsub) {
+    try { state.unsub(); } catch {}
+    state.unsub = null;
+  }
+
+  await loadItems();
+  render();
+
+  try {
+    const colRef = fs.collection(db, "users", state.uid, "fixedExercises");
+    const q = fs.query(colRef, fs.orderBy("sortOrder", "asc"));
+    state.unsub = fs.onSnapshot(q, (snap) => {
+      const items = snap.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data()
+      }));
+
+      state.items = items.sort((a, b) => {
+        const ao = Number(a.sortOrder || 0);
+        const bo = Number(b.sortOrder || 0);
+        if (ao !== bo) return ao - bo;
+        return String(a.name || "").localeCompare(String(b.name || ""), "hu");
+      });
+
+      render();
+    }, (err) => {
+      console.error("Fix edzések realtime hiba:", err);
+    });
+  } catch (e) {
+    console.error("Fix edzés onSnapshot hiba:", e);
+  }
 }
