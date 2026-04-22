@@ -1,4 +1,3 @@
-
 import { db, fs } from "../../shared/firebase.js";
 import { FIXED_EXERCISES_HU } from "./fixed-exercises.data.js";
 
