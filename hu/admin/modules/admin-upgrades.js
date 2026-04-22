@@ -445,13 +445,18 @@ function injectStyles() {
 function injectLauncher() {
   if (document.getElementById("fx-launcher")) return;
 
+  const mount = document.getElementById("fxLauncherMount");
   const btn = document.createElement("button");
   btn.id = "fx-launcher";
   btn.type = "button";
   btn.innerHTML = `<span>💪</span><span>Fix edzések</span>`;
   btn.addEventListener("click", openOverlay);
 
-  if (tryInsertIntoMenu(btn)) return;
+  if (mount) {
+    mount.innerHTML = "";
+    mount.appendChild(btn);
+    return;
+  }
 
   const fallback = document.createElement("div");
   fallback.style.position = "fixed";
@@ -461,37 +466,6 @@ function injectLauncher() {
   fallback.style.zIndex = "9998";
   fallback.appendChild(btn);
   document.body.appendChild(fallback);
-}
-
-function tryInsertIntoMenu(btn) {
-  const menuItems = Array.from(document.querySelectorAll("button, a, div")).filter((el) => {
-    const txt = (el.textContent || "").trim().toLowerCase();
-    return [
-      "felhasználók",
-      "plan template",
-      "étrend",
-      "motiváció",
-      "személyre szabás",
-      "technika vault"
-    ].includes(txt);
-  });
-
-  if (menuItems.length) {
-    menuItems[menuItems.length - 1].insertAdjacentElement("afterend", btn);
-    return true;
-  }
-
-  const menuBlock = Array.from(document.querySelectorAll("div, section, aside")).find((el) => {
-    const txt = (el.textContent || "").toLowerCase();
-    return txt.includes("menü") && txt.includes("felhasználók") && txt.includes("plan template");
-  });
-
-  if (menuBlock) {
-    menuBlock.appendChild(btn);
-    return true;
-  }
-
-  return false;
 }
 
 function injectOverlay() {
