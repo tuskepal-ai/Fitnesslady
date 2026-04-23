@@ -7,7 +7,7 @@ const IMAGE_MAP = {
   "kitores": "/hu/app/assets/exercises/kitores.png",
   "mountain-climber": "/hu/app/assets/exercises/mountain-climber.png",
   "burpee": "/hu/app/assets/exercises/burpee.png",
- "glute-bridge": "/hu/app/assets/exercises/csipoemeles.png",
+  "glute-bridge": "/hu/app/assets/exercises/csipoemeles.png",
   "csipo-emeles": "/hu/app/assets/exercises/csipoemeles.png",
   "oldalemeles": "/hu/app/assets/exercises/oldalemeles.png",
   "biciklis-haspres": "/hu/app/assets/exercises/biciklis-haspres.png",
@@ -25,14 +25,7 @@ const state = {
   uid: "",
   items: [],
   timers: new Map(),
-  unsub: null,
-  debug: {
-    initialCount: 0,
-    realtimeCount: 0,
-    ids: [],
-    lastError: "",
-    lastMode: "init"
-  }
+  unsub: null
 };
 
 function escapeHtml(value) {
@@ -389,21 +382,6 @@ function injectStyles() {
     .fxu-detail.is-open{
       display:block;
     }
-
-    .fxu-debug{
-      margin-top:14px;
-      padding:12px 14px;
-      border-radius:16px;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(0,0,0,.22);
-      color:rgba(255,255,255,.72);
-      font-size:12px;
-      line-height:1.5;
-      word-break:break-word;
-    }
-    .fxu-debug b{
-      color:#fff;
-    }
   `;
   document.head.appendChild(style);
 }
@@ -702,8 +680,6 @@ function normalizeItems(items) {
     const id = getExerciseKey(item);
     getTimerState(id, item);
   });
-
-  state.debug.ids = state.items.map(item => getExerciseKey(item));
 }
 
 function render() {
@@ -724,16 +700,6 @@ function render() {
         ? `<div class="fxu-track">${state.items.map(buildCard).join("")}</div>`
         : `<div class="fxu-empty">Ehhez a profilhoz még nincs fix edzés hozzárendelve.</div>`
     }
-
-    <div class="fxu-debug">
-      <b>DEBUG</b><br>
-      uid: <b>${escapeHtml(state.uid || "—")}</b><br>
-      initialCount: <b>${escapeHtml(String(state.debug.initialCount || 0))}</b><br>
-      realtimeCount: <b>${escapeHtml(String(state.debug.realtimeCount || 0))}</b><br>
-      ids: <b>${escapeHtml((state.debug.ids || []).join(", ") || "—")}</b><br>
-      lastMode: <b>${escapeHtml(state.debug.lastMode || "—")}</b><br>
-      lastError: <b>${escapeHtml(state.debug.lastError || "—")}</b>
-    </div>
   `;
 
   bindCardEvents();
@@ -741,9 +707,6 @@ function render() {
 
 async function loadItems() {
   if (!state.uid) return;
-
-  state.debug.lastError = "";
-  state.debug.lastMode = "getDocs";
 
   try {
     const colRef = fs.collection(db, "users", state.uid, "fixedExercises");
@@ -758,14 +721,10 @@ async function loadItems() {
       };
     });
 
-    state.debug.initialCount = items.length;
     normalizeItems(items);
   } catch (err) {
     console.error("Fix edzések betöltési hiba:", err);
     state.items = [];
-    state.debug.initialCount = 0;
-    state.debug.ids = [];
-    state.debug.lastError = err?.message || String(err);
   }
 }
 
@@ -793,19 +752,14 @@ export async function initFixedExercisesUI({ uid }) {
         ...docSnap.data()
       }));
 
-      state.debug.lastMode = "onSnapshot";
-      state.debug.realtimeCount = items.length;
-      state.debug.lastError = "";
       normalizeItems(items);
       render();
     }, (err) => {
       console.error("Fix edzések realtime hiba:", err);
-      state.debug.lastError = err?.message || String(err);
       render();
     });
   } catch (e) {
     console.error("Fix edzés onSnapshot hiba:", e);
-    state.debug.lastError = e?.message || String(e);
     render();
   }
 }
