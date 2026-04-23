@@ -216,18 +216,18 @@ const FALLBACK_EXERCISES_HU = [
   },
   {
   id: "konnyu-ulesbol-felallas",
-  nev: "Könnyű ülésből felállás",
-  leiras: "Segít az alsótest erősítésében anélkül, hogy túlterhelné az ízületeket. Ülj le egy stabil székre, a talpak legyenek a talajon. Lassan állj fel, majd kontrolláltan ülj vissza. Használd a kezed segítségként, ha szükséges. Végezd nyugodt tempóban, fájdalom nélkül.",
-  kategoria: "Kímélő erősítés",
-  munka_mp: 30,
-  piheno_mp: 30,
-  korok: 2,
-  ismetles_szoveg: "6-8 ismétlés",
-  tipus: "idő alapú",
-  nehezseg: "könnyű",
-  aktiv: true,
-  sorrend: 99
-  }
+  name: "Könnyű ülésből felállás",
+  desc: "Segít az alsótest erősítésében anélkül, hogy túlterhelné az ízületeket. Ülj le egy stabil székre, a talpak legyenek a talajon. Lassan állj fel, majd kontrolláltan ülj vissza. Használd a kezed segítségként, ha szükséges. Végezd nyugodt tempóban, fájdalom nélkül.",
+  category: "Kímélő erősítés",
+  workSec: 30,
+  restSec: 30,
+  rounds: 2,
+  repsText: "6-8 ismétlés",
+  type: "nem-videós",
+  difficulty: "könnyű",
+  active: true,
+  sortOrder: 99
+}
 ];
 
 const IMAGE_MAP = {
