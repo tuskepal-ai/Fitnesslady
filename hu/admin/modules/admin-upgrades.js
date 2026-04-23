@@ -245,8 +245,8 @@ const IMAGE_MAP = {
   "vadli-emeles": "vadli-emeles.png",
   "oldalso-terdemeles": "oldalso-terdemeles.png",
   "szek-tamaszos-tricepsz": "szek-tricepsz.png",
-  "vall-korzes": "vallkorzes.png"
-  "konnyu-ulesbol-felallas": "/hu/app/assets/exercises/konnyu-ulesbol-felallas.png",
+  "vall-korzes": "vallkorzes.png", 
+  "konnyu-ulesbol-felallas": "/hu/app/assets/exercises/konnyu-ulesbol-felallas.png"
 };
 
 const state = {
