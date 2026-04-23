@@ -84,7 +84,7 @@ export const FIXED_EDZESEK = [
     sorrend: 6
   },
   {
-    id: "glute-bridge",
+    id: "csipoemeles",
     nev: "Csípőemelés",
     leiras: "Farizom aktiválás és alsótest stabilitás lassú emeléssel.",
     kategoria: "Farizom",
