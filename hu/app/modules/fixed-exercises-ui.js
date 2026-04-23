@@ -19,6 +19,7 @@ const IMAGE_MAP = {
   "szek-tricepsz": "/hu/app/assets/exercises/szek-tricepsz.png",
   "vall-korzes": "/hu/app/assets/exercises/vallkorzes.png",
   "vallkorzes": "/hu/app/assets/exercises/vallkorzes.png"
+  "konnyu-ulesbol-felallas": "/hu/app/assets/exercises/konnyu-ulesbol-felallas.png",
 };
 
 const state = {
