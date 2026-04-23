@@ -1132,13 +1132,26 @@
     }
 
     function humanDateLabel(iso){
-      if(!iso) return "—";
-      try{
-        return new Date(`${iso}T12:00:00`).toLocaleDateString("hu-HU", { year:"numeric", month:"long", day:"numeric" });
-      }catch{
-        return iso;
-      }
+  const raw = String(iso || "").trim();
+  if(!raw) return "—";
+
+  try{
+    const normalized = raw.includes("T") ? raw : `${raw}T12:00:00`;
+    const d = new Date(normalized);
+
+    if (Number.isNaN(d.getTime())) {
+      return raw;
     }
+
+    return d.toLocaleDateString("hu-HU", {
+      year: "numeric",
+      month: "long",
+      day: "numeric"
+    });
+  }catch{
+    return raw;
+  }
+}
 
     function numberOrNull(v){
       const raw = String(v ?? "").trim().replace(",", ".");
