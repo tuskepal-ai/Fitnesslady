@@ -15,7 +15,9 @@ const IMAGE_MAP = {
   "vadli-emeles": "/hu/app/assets/exercises/vadli-emeles.png",
   "oldalso-terdemeles": "/hu/app/assets/exercises/oldalso-terdemeles.png",
   "szek-tamaszos-tricepsz": "/hu/app/assets/exercises/szek-tricepsz.png",
-  "vall-korzes": "/hu/app/assets/exercises/vallkorzes.png"
+  "szek-tricepsz": "/hu/app/assets/exercises/szek-tricepsz.png",
+  "vall-korzes": "/hu/app/assets/exercises/vallkorzes.png",
+  "vallkorzes": "/hu/app/assets/exercises/vallkorzes.png"
 };
 
 const state = {
@@ -398,14 +400,20 @@ function ensureRoot() {
 }
 
 function getExerciseKey(item) {
-  return String(item?.exerciseId || item?.id || "").trim();
+  return String(item?.id || "").trim(); // Mindig a dokumentum ID-t használjuk a DOM kezeléshez
 }
 
 function getMappedImage(item) {
-  const key = getExerciseKey(item);
-  if (IMAGE_MAP[key]) return IMAGE_MAP[key];
+  // 1. Megnézi, van-e a doksiban explicit exerciseId (pl. "guggolas")
+  const exerciseId = String(item?.exerciseId || "").trim();
+  if (exerciseId && IMAGE_MAP[exerciseId]) return IMAGE_MAP[exerciseId];
 
-  const nameSlug = slugify(item?.name || "");
+  // 2. Megnézi magát a dokumentum azonosítót (ha véletlenül az lenne beszédes)
+  const docId = String(item?.id || "").trim();
+  if (IMAGE_MAP[docId]) return IMAGE_MAP[docId];
+
+  // 3. Utolsó mentsvár: generál egy slugot a megadott névből ("Guggolás" -> "guggolas")
+  const nameSlug = slugify(item?.name || item?.nev || "");
   if (IMAGE_MAP[nameSlug]) return IMAGE_MAP[nameSlug];
 
   return "";
@@ -424,11 +432,12 @@ function formatTime(totalSec) {
 
 function getTimerState(id, item) {
   if (!state.timers.has(id)) {
+    const workSec = Number(item.workSec || item.munka_mp || 0);
     state.timers.set(id, {
       phase: "munkaidő",
       isRunning: false,
       isPaused: false,
-      remaining: Number(item.workSec || 0),
+      remaining: workSec,
       intervalId: null
     });
   }
@@ -450,7 +459,7 @@ function resetTimer(id, item) {
   stopTimer(id);
   const timer = getTimerState(id, item);
   timer.phase = "munkaidő";
-  timer.remaining = Number(item.workSec || 0);
+  timer.remaining = Number(item.workSec || item.munka_mp || 0);
   render();
 }
 
@@ -478,9 +487,11 @@ function startTimer(id, item) {
   const timer = getTimerState(id, item);
   if (timer.isRunning) return;
 
+  const workSec = Number(item.workSec || item.munka_mp || 0);
+
   if (timer.remaining <= 0) {
     timer.phase = "munkaidő";
-    timer.remaining = Number(item.workSec || 0);
+    timer.remaining = workSec;
   }
 
   timer.isRunning = true;
@@ -510,9 +521,16 @@ function buildCard(item) {
   const firstImage = mappedImage || firestoreImage;
 
   const timer = getTimerState(id, item);
-  const rounds = Number(item.rounds || 1);
-  const workSec = Number(item.workSec || 0);
-  const restSec = Number(item.restSec || 0);
+  
+  const name = item.name || item.nev || "Fix edzés";
+  const desc = item.desc || item.leiras || "";
+  const category = item.category || item.kategoria || "Általános";
+  const rounds = Number(item.rounds || item.korok || 1);
+  const workSec = Number(item.workSec || item.munka_mp || 0);
+  const restSec = Number(item.restSec || item.piheno_mp || 0);
+  const repsText = item.repsText || item.ismetles_szoveg || "";
+  const difficulty = item.difficulty || item.nehezseg || "";
+  const type = item.type || item.tipus || "";
 
   return `
     <article class="fxu-card">
@@ -523,19 +541,19 @@ function buildCard(item) {
             ? `<img
                 class="fxu-image"
                 src="${escapeHtml(firstImage)}"
-                alt="${escapeHtml(item.name || "")}"
+                alt="${escapeHtml(name)}"
                 data-fxu-img="${escapeHtml(id)}"
                 data-primary-src="${escapeHtml(mappedImage || "")}"
                 data-secondary-src="${escapeHtml(firestoreImage || "")}"
               >`
-            : `<div class="fxu-image-fallback">${escapeHtml(item.name || "Fix edzés")}</div>`
+            : `<div class="fxu-image-fallback">${escapeHtml(name)}</div>`
         }
       </div>
 
-      <h3 class="fxu-name">${escapeHtml(item.name || "—")}</h3>
-      <div class="fxu-badge">${escapeHtml(item.category || "Általános")}</div>
+      <h3 class="fxu-name">${escapeHtml(name)}</h3>
+      <div class="fxu-badge">${escapeHtml(category)}</div>
 
-      <div class="fxu-desc">${escapeHtml(item.desc || "")}</div>
+      <div class="fxu-desc">${escapeHtml(desc)}</div>
 
       <div class="fxu-meta">
         <span class="fxu-chip">⏱ ${workSec} mp munka</span>
@@ -563,14 +581,14 @@ function buildCard(item) {
       </div>
 
       <div class="fxu-detail" id="fxu-detail-${escapeHtml(id)}">
-        <strong style="display:block; margin-bottom:8px;">${escapeHtml(item.name || "Fix edzés")}</strong>
-        <div style="margin-bottom:8px;">${escapeHtml(item.desc || "")}</div>
+        <strong style="display:block; margin-bottom:8px;">${escapeHtml(name)}</strong>
+        <div style="margin-bottom:8px;">${escapeHtml(desc)}</div>
         <div>Munkaidő: ${workSec} mp</div>
         <div>Pihenőidő: ${restSec} mp</div>
         <div>Körök: ${rounds}</div>
-        ${item.repsText ? `<div>Ismétlés: ${escapeHtml(item.repsText)}</div>` : ""}
-        ${item.difficulty ? `<div>Nehézség: ${escapeHtml(item.difficulty)}</div>` : ""}
-        ${item.type ? `<div>Típus: ${escapeHtml(item.type)}</div>` : ""}
+        ${repsText ? `<div>Ismétlés: ${escapeHtml(repsText)}</div>` : ""}
+        ${difficulty ? `<div>Nehézség: ${escapeHtml(difficulty)}</div>` : ""}
+        ${type ? `<div>Típus: ${escapeHtml(type)}</div>` : ""}
       </div>
     </article>
   `;
@@ -670,24 +688,23 @@ async function loadItems() {
 
   try {
     const colRef = fs.collection(db, "users", state.uid, "fixedExercises");
+    const snap = await fs.getDocs(colRef);
 
-    let snap;
-    try {
-      snap = await fs.getDocs(fs.query(colRef, fs.orderBy("sortOrder", "asc")));
-    } catch {
-      snap = await fs.getDocs(colRef);
-    }
-
-    const items = snap.docs.map((docSnap) => ({
-      id: docSnap.id,
-      ...docSnap.data()
-    }));
+    const items = snap.docs.map((docSnap) => {
+      const data = docSnap.data();
+      // Kijelezzük a konzolban, hogy pontosan mi töltődik be
+      console.log("Firebase doc betöltve:", docSnap.id, data);
+      return {
+        id: docSnap.id,
+        ...data
+      };
+    });
 
     state.items = items.sort((a, b) => {
-      const ao = Number(a.sortOrder || 0);
-      const bo = Number(b.sortOrder || 0);
+      const ao = Number(a.sortOrder || a.sorrend || 0);
+      const bo = Number(b.sortOrder || b.sorrend || 0);
       if (ao !== bo) return ao - bo;
-      return String(a.name || "").localeCompare(String(b.name || ""), "hu");
+      return String(a.name || a.nev || "").localeCompare(String(b.name || b.nev || ""), "hu");
     });
 
     state.items.forEach((item) => {
@@ -717,18 +734,18 @@ export async function initFixedExercisesUI({ uid }) {
 
   try {
     const colRef = fs.collection(db, "users", state.uid, "fixedExercises");
-    const q = fs.query(colRef, fs.orderBy("sortOrder", "asc"));
-    state.unsub = fs.onSnapshot(q, (snap) => {
+    
+    state.unsub = fs.onSnapshot(colRef, (snap) => {
       const items = snap.docs.map((docSnap) => ({
         id: docSnap.id,
         ...docSnap.data()
       }));
 
       state.items = items.sort((a, b) => {
-        const ao = Number(a.sortOrder || 0);
-        const bo = Number(b.sortOrder || 0);
+        const ao = Number(a.sortOrder || a.sorrend || 0);
+        const bo = Number(b.sortOrder || b.sorrend || 0);
         if (ao !== bo) return ao - bo;
-        return String(a.name || "").localeCompare(String(b.name || ""), "hu");
+        return String(a.name || a.nev || "").localeCompare(String(b.name || b.nev || ""), "hu");
       });
 
       render();
