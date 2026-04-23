@@ -89,7 +89,7 @@ const FALLBACK_EXERCISES_HU = [
     sortOrder: 6
   },
   {
-    id: "csipoemeles",
+    id: "Csípő emelés",
     name: "Csípőemelés",
     desc: "Farizom aktiválás és alsótest stabilitás. Lassú, kontrollált emeléssel.",
     category: "Farizom",
