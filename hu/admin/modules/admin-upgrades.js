@@ -961,9 +961,11 @@ function closeOverlay() {
 
 async function ensureSeedExercises() {
   const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
-  if (!snap.empty) return;
+  const existingIds = new Set(snap.docs.map(d => d.id));
 
   for (const item of FALLBACK_EXERCISES_HU) {
+    if (existingIds.has(item.id)) continue;
+
     const docRef = fs.doc(db, EXERCISES_COL, item.id);
     await fs.setDoc(docRef, {
       ...item,
