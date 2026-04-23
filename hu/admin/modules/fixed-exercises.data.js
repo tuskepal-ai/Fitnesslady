@@ -208,5 +208,21 @@ export const FIXED_EDZESEK = [
     nehezseg: "könnyű",
     aktiv: true,
     sorrend: 15
-  }
+  
+},
+{
+  id: "konnyu-ulesbol-felallas",
+  nev: "Könnyű ülésből felállás",
+  leiras: "Segít az alsótest erősítésében anélkül, hogy túlterhelné az ízületeket. Ülj le egy stabil székre, a talpak legyenek a talajon. Lassan állj fel, majd kontrolláltan ülj vissza. Használd a kezed segítségként, ha szükséges. Végezd nyugodt tempóban, fájdalom nélkül.",
+  kategoria: "Kímélő erősítés",
+  munka_mp: 30,
+  piheno_mp: 30,
+  korok: 2,
+  ismetles_szoveg: "6-8 ismétlés",
+  tipus: "idő alapú",
+  nehezseg: "könnyű",
+  aktiv: true,
+  sorrend: 99
+}
+  
 ];
