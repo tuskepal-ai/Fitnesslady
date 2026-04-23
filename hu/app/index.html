@@ -1120,10 +1120,23 @@
     }
 
     function addDaysIso(baseIso, add){
-      const d = new Date(`${baseIso}T12:00:00`);
-      d.setDate(d.getDate() + add);
-      return d.toISOString().slice(0,10);
-    }
+  const raw = String(baseIso || "").trim();
+  if(!raw) return "";
+
+  const normalized = raw
+    .replace(/\./g, "-")
+    .replace(/-+$/g, "");
+
+  const withTime = normalized.includes("T") ? normalized : `${normalized}T12:00:00`;
+  const d = new Date(withTime);
+
+  if (Number.isNaN(d.getTime())) {
+    return "";
+  }
+
+  d.setDate(d.getDate() + Number(add || 0));
+  return d.toISOString().slice(0,10);
+}
 
     function humanDueText(days){
       if(days <= 0) return "Ma esedékes";
