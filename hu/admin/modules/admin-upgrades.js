@@ -89,7 +89,7 @@ const FALLBACK_EXERCISES_HU = [
     sortOrder: 6
   },
   {
-    id: "glute-bridge",
+    id: "csipoemeles",
     name: "Csípőemelés",
     desc: "Farizom aktiválás és alsótest stabilitás. Lassú, kontrollált emeléssel.",
     category: "Farizom",
