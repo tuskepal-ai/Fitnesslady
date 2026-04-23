@@ -8,7 +8,7 @@ const IMAGE_MAP = {
   "mountain-climber": "/hu/app/assets/exercises/mountain-climber.png",
   "burpee": "/hu/app/assets/exercises/burpee.png",
  "glute-bridge": "/hu/app/assets/exercises/csipoemeles.png",
-  "csipoemeles": "/hu/app/assets/exercises/csipoemeles.png",
+  "csipo-emeles": "/hu/app/assets/exercises/csipoemeles.png",
   "oldalemeles": "/hu/app/assets/exercises/oldalemeles.png",
   "biciklis-haspres": "/hu/app/assets/exercises/biciklis-haspres.png",
   "jumping-jack": "/hu/app/assets/exercises/terpesz-zar.png",
