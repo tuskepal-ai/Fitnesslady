@@ -236,16 +236,24 @@ const IMAGE_MAP = {
   "plank": "plank.png",
   "kitores": "kitores.png",
   "mountain-climber": "mountain-climber.png",
-  "burpee": "burpee.png",
+  "burpee": "mountain-climber.png",
+  "mountainclimber": "mountain-climber.png",
+  "hegymaszo": "mountain-climber.png",
+  "csipoemeles": "csipoemeles.png",
+  "csipo-emeles": "csipoemeles.png",
   "glute-bridge": "csipoemeles.png",
+  "glutebridge": "csipoemeles.png",
   "oldalemeles": "oldalemeles.png",
   "biciklis-haspres": "biciklis-haspres.png",
   "jumping-jack": "terpesz-zar.png",
+  "jumpingjack": "terpesz-zar.png",
   "labemeles-fekve": "labemeles-fekve.png",
   "vadli-emeles": "vadli-emeles.png",
   "oldalso-terdemeles": "oldalso-terdemeles.png",
   "szek-tamaszos-tricepsz": "szek-tricepsz.png",
+  "szek-tricepsz": "szek-tricepsz.png",
   "vall-korzes": "vallkorzes.png", 
+  "vallkorzes": "vallkorzes.png",
   "konnyu-ulesbol-felallas": "konnyu-ulesbol-felallas.png",
 };
 
@@ -291,11 +299,16 @@ export default async function initAdminUpgrades() {
   }
 }
 
+function normalizeExerciseKey(value) {
+  return slugify(String(value || "").trim());
+}
+
 function resolveImage(id, manualUrl = "") {
   const cleanManual = String(manualUrl || "").trim();
   if (cleanManual) return cleanManual;
 
-  const file = IMAGE_MAP[String(id || "").trim()];
+  const rawId = String(id || "").trim();
+  const file = IMAGE_MAP[rawId] || IMAGE_MAP[normalizeExerciseKey(rawId)];
   if (!file) return "";
 
   return `/hu/app/assets/exercises/${file}`;

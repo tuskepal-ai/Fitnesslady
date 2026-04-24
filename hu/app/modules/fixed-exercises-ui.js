@@ -6,12 +6,17 @@ const IMAGE_MAP = {
   "plank": "/hu/app/assets/exercises/plank.png",
   "kitores": "/hu/app/assets/exercises/kitores.png",
   "mountain-climber": "/hu/app/assets/exercises/mountain-climber.png",
-  "burpee": "/hu/app/assets/exercises/burpee.png",
+  "mountainclimber": "/hu/app/assets/exercises/mountain-climber.png",
+  "hegymaszo": "/hu/app/assets/exercises/mountain-climber.png",
+  "burpee": "/hu/app/assets/exercises/mountain-climber.png",
+  "csipoemeles": "/hu/app/assets/exercises/csipoemeles.png",
   "glute-bridge": "/hu/app/assets/exercises/csipoemeles.png",
   "csipo-emeles": "/hu/app/assets/exercises/csipoemeles.png",
+  "glutebridge": "/hu/app/assets/exercises/csipoemeles.png",
   "oldalemeles": "/hu/app/assets/exercises/oldalemeles.png",
   "biciklis-haspres": "/hu/app/assets/exercises/biciklis-haspres.png",
   "jumping-jack": "/hu/app/assets/exercises/terpesz-zar.png",
+  "jumpingjack": "/hu/app/assets/exercises/terpesz-zar.png",
   "labemeles-fekve": "/hu/app/assets/exercises/labemeles-fekve.png",
   "vadli-emeles": "/hu/app/assets/exercises/vadli-emeles.png",
   "oldalso-terdemeles": "/hu/app/assets/exercises/oldalso-terdemeles.png",
@@ -412,9 +417,17 @@ function getExerciseKey(item) {
 function getMappedImage(item) {
   const exerciseId = String(item?.exerciseId || "").trim();
   if (exerciseId && IMAGE_MAP[exerciseId]) return IMAGE_MAP[exerciseId];
+  if (exerciseId) {
+    const normalizedExerciseId = slugify(exerciseId);
+    if (normalizedExerciseId && IMAGE_MAP[normalizedExerciseId]) return IMAGE_MAP[normalizedExerciseId];
+  }
 
   const docId = String(item?.id || "").trim();
   if (docId && IMAGE_MAP[docId]) return IMAGE_MAP[docId];
+  if (docId) {
+    const normalizedDocId = slugify(docId);
+    if (normalizedDocId && IMAGE_MAP[normalizedDocId]) return IMAGE_MAP[normalizedDocId];
+  }
 
   const nameSlug = slugify(item?.name || item?.nev || "");
   if (nameSlug && IMAGE_MAP[nameSlug]) return IMAGE_MAP[nameSlug];
