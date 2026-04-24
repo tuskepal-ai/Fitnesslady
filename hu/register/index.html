@@ -1,377 +1,455 @@
-<!-- FILE: /hu/register/index.html -->
 <!doctype html>
 <html lang="hu">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady — Regisztráció</title>
   <meta name="robots" content="noindex" />
-
+  <title>FitnessLady - Regisztracio</title>
   <style>
     :root{
       --bg:#07060b;
-      --text:rgba(255,255,255,.92);
+      --text:rgba(255,255,255,.94);
       --muted:rgba(255,255,255,.70);
       --pink:#ff4fd8;
       --pink2:#b14cff;
-      --stroke: rgba(255,255,255,.10);
-      --shadow: 0 18px 55px rgba(0,0,0,.55);
-      --radius:22px;
-      --max: 980px;
-      --hero-url: none;
+      --stroke:rgba(255,255,255,.10);
+      --shadow:0 22px 70px rgba(0,0,0,.55);
+      --radius:24px;
+      --hero-url:none;
     }
-    *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
     body{
       margin:0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
-      background:
-        radial-gradient(1200px 700px at 30% 10%, rgba(255,79,216,.16), transparent 60%),
-        radial-gradient(1000px 700px at 75% 20%, rgba(177,76,255,.14), transparent 60%),
-        var(--bg);
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
       color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,79,216,.18), transparent 60%),
+        radial-gradient(1000px 700px at 80% 18%, rgba(177,76,255,.16), transparent 62%),
+        linear-gradient(180deg, rgba(7,6,11,.80), rgba(7,6,11,.94)),
+        var(--bg);
       overflow-x:hidden;
     }
     body::before{
       content:"";
-      position: fixed;
-      inset: 0;
-      z-index: -1;
-      background-image: var(--hero-url);
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-      opacity:.92;
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background-image:var(--hero-url);
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:.22;
+      filter:saturate(.95);
     }
-    .container{ width:min(var(--max), 92vw); margin:0 auto; padding: 18px 0 44px; }
+    .wrap{
+      width:min(940px,92vw);
+      margin:0 auto;
+      padding:20px 0 40px;
+    }
     .top{
-      display:flex; align-items:center; justify-content:space-between; gap:12px;
-      padding: 14px 0;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      padding:10px 0 18px;
     }
-    .brand{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
-    .dot{ width:10px;height:10px;border-radius:999px; background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink)); box-shadow: 0 0 18px rgba(255,79,216,.7); }
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .dot{
+      width:10px;
+      height:10px;
+      border-radius:999px;
+      background:radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));
+      box-shadow:0 0 18px rgba(255,79,216,.7);
+    }
     .pill{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding: 10px 14px;
-      border-radius: 999px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(20,12,26,.55);
-      color: var(--text);
-      box-shadow: 0 12px 34px rgba(0,0,0,.35);
-      cursor:pointer;
-      user-select:none;
-      white-space: nowrap;
-      text-decoration:none;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
       gap:8px;
-    }
-    .pill.primary{
-      background: linear-gradient(135deg, var(--pink), var(--pink2));
-      color:#140813;
-      border-color: rgba(255,255,255,.18);
-      font-weight: 900;
+      padding:10px 14px;
+      border-radius:999px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(20,12,26,.55);
+      box-shadow:0 12px 34px rgba(0,0,0,.35);
+      color:var(--text);
+      text-decoration:none;
+      white-space:nowrap;
     }
     .card{
-      margin-top: 10px;
-      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02));
-      border: 1px solid var(--stroke);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 16px;
+      background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));
+      border:1px solid var(--stroke);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      padding:18px;
     }
-    h1{
-      margin: 0 0 8px;
-      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
-      letter-spacing: -.3px;
-      font-size: 38px;
-    }
-    .sub{ margin:0 0 14px; color: var(--muted); line-height:1.6; }
-
     .chip{
       display:inline-flex;
       align-items:center;
       gap:8px;
-      padding: 8px 12px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.06);
-      border: 1px solid rgba(255,255,255,.10);
-      font-weight: 850;
-      font-size: 13px;
-      color: rgba(255,255,255,.88);
-      user-select:none;
-      margin-bottom: 10px;
-      width: fit-content;
+      padding:8px 12px;
+      border-radius:999px;
+      background:rgba(255,255,255,.06);
+      border:1px solid rgba(255,255,255,.10);
+      font-size:13px;
+      font-weight:850;
+      margin-bottom:12px;
     }
-
-    label{ display:block; margin: 10px 0 6px; color: rgba(255,255,255,.72); font-weight:800; }
+    h1{
+      margin:0 0 8px;
+      font-family:ui-serif,Georgia,"Times New Roman",serif;
+      font-size:40px;
+      line-height:1.05;
+      letter-spacing:-.4px;
+    }
+    .sub{
+      margin:0 0 18px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+    .grid{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+    }
+    .panel{
+      background:rgba(0,0,0,.18);
+      border:1px solid rgba(255,255,255,.09);
+      border-radius:20px;
+      padding:16px;
+    }
+    .panel h2{
+      margin:0 0 8px;
+      font-size:15px;
+      letter-spacing:.02em;
+    }
+    label{
+      display:block;
+      margin:12px 0 6px;
+      color:rgba(255,255,255,.76);
+      font-weight:800;
+    }
     input{
       width:100%;
-      padding: 14px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.14);
-      background: rgba(255,255,255,.06);
-      color: var(--text);
-      outline: none;
-      font-size: 15px;
+      padding:14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(255,255,255,.06);
+      color:var(--text);
+      outline:none;
+      font-size:15px;
     }
-
-    .row{ display:flex; gap:10px; flex-wrap:wrap; margin-top: 14px; }
-
-    .msg{
-      margin-top: 12px;
-      padding: 12px 14px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.12);
-      background: rgba(0,0,0,.25);
-      color: rgba(255,255,255,.86);
-      display:none;
-      white-space: pre-wrap;
-      line-height: 1.55;
+    input[readonly]{
+      opacity:.86;
+      cursor:not-allowed;
     }
-    .msg.ok{ border-color: rgba(130,255,200,.35); }
-    .msg.err{ border-color: rgba(255,120,140,.35); }
-
-    footer{
-      margin-top: 16px;
-      padding: 14px 0 0;
-      display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap;
-      color: rgba(255,255,255,.70);
+    input:focus{
+      border-color:rgba(255,79,216,.38);
+      box-shadow:0 0 0 4px rgba(255,79,216,.12);
     }
-
-    .hint{
-      margin-top: 10px;
-      color: rgba(255,255,255,.65);
-      font-size: 13px;
-      line-height: 1.5;
-    }
-
-    /* ✅ 1 db kötelező pipa */
     .legal{
-      margin-top: 12px;
-      padding: 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(0,0,0,.18);
+      margin-top:14px;
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.10);
+      background:rgba(255,255,255,.04);
     }
     .legal-row{
       display:flex;
       gap:10px;
       align-items:flex-start;
     }
-    .legal input[type="checkbox"]{
-      width: 18px;
-      height: 18px;
-      margin-top: 2px;
-      accent-color: var(--pink);
+    .legal-row input{
+      width:18px;
+      height:18px;
+      margin-top:2px;
+      accent-color:var(--pink);
     }
-    .legal p{
+    .legal-row p{
       margin:0;
-      color: rgba(255,255,255,.78);
-      font-size: 13px;
-      line-height: 1.55;
+      font-size:13px;
+      line-height:1.55;
+      color:rgba(255,255,255,.78);
     }
-    .legal a{
-      text-decoration: underline;
-      text-decoration-thickness: 1px;
-      text-underline-offset: 2px;
-      opacity: .95;
+    .legal-row a{
+      color:#ffd38a;
+      text-underline-offset:2px;
+    }
+    .actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:16px;
+    }
+    button{
+      appearance:none;
+      border:0;
+      cursor:pointer;
+      padding:13px 16px;
+      border-radius:999px;
+      font-weight:900;
+      letter-spacing:.2px;
+      min-width:210px;
+      color:#120813;
+      background:linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow:0 18px 46px rgba(255,79,216,.24);
+    }
+    button:disabled{
+      opacity:.6;
+      cursor:not-allowed;
+    }
+    .ghost{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:210px;
+      padding:13px 16px;
+      border-radius:999px;
+      text-decoration:none;
+      color:var(--text);
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(255,255,255,.05);
+    }
+    .msg{
+      display:none;
+      margin-top:14px;
+      padding:13px 14px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.12);
+      background:rgba(0,0,0,.24);
+      white-space:pre-wrap;
+      line-height:1.55;
+    }
+    .msg.show{display:block}
+    .msg.ok{border-color:rgba(125,255,179,.28); color:#dcffea}
+    .msg.err{border-color:rgba(255,143,143,.28); color:#ffe1e1}
+    .hint{
+      color:rgba(255,255,255,.68);
+      font-size:13px;
+      line-height:1.55;
+      margin-top:10px;
+    }
+    ul{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      line-height:1.65;
+    }
+    footer{
+      margin-top:16px;
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      flex-wrap:wrap;
+      color:rgba(255,255,255,.70);
+      font-size:13px;
+    }
+    @media (max-width:800px){
+      .grid{grid-template-columns:1fr}
+      h1{font-size:34px}
+      .actions > *{width:100%}
+      button,.ghost{min-width:0}
     }
   </style>
 </head>
-
 <body>
-  <div class="container">
+  <div class="wrap">
     <div class="top">
       <div class="brand"><span class="dot"></span><span>FitnessLady</span></div>
-      <a class="pill" id="btnBack" href="/hu/">← Vissza</a>
+      <a class="pill" id="btnBack" href="/hu/">Vissza</a>
     </div>
 
     <div class="card">
-      <div class="chip" id="chipPlan">Csomag: —</div>
-      <h1>Regisztráció</h1>
-      <p class="sub">Hozz létre egy fiókot az e-mail címeddel és egy jelszóval. Sikeres regisztráció után automatikusan a Saját programodba visz.</p>
+      <div class="chip" id="chipPlan">Csomag: betoltes...</div>
+      <h1>Fiok aktivalasa</h1>
+      <p class="sub">
+        A vasarlas utan kapott egyszer hasznalhato linken keresztul itt tudod letrehozni a fiokodat.
+        A sikeres aktivacio utan tovabbviszunk a bejelentkezeshez.
+      </p>
 
-      <label for="email">E-mail</label>
-      <input id="email" type="email" autocomplete="email" placeholder="email@domain.com" />
+      <div class="grid">
+        <div class="panel">
+          <h2>Regisztracios adatok</h2>
 
-      <label for="pass">Jelszó</label>
-      <input id="pass" type="password" autocomplete="new-password" placeholder="Minimum 6 karakter" />
+          <label for="email">E-mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="email@domain.com" readonly />
 
-      <!-- ✅ 1 db kötelező pipa -->
-      <div class="legal">
-        <div class="legal-row">
-          <input id="legalAccept" type="checkbox" />
-          <p>
-            Elolvastam és elfogadom az
-            <a id="lnkAfsz" href="/hu/legal/afsz/">ÁFSZ</a>,
-            az
-            <a id="lnkPrivacy" href="/hu/legal/adatkezeles/">Adatkezelési tájékoztató</a>,
-            valamint az
-            <a id="lnkMedical" href="/hu/legal/orvosi/">Orvosi nyilatkozat</a>
-            tartalmát.
-          </p>
+          <label for="displayName">Nev</label>
+          <input id="displayName" type="text" autocomplete="name" placeholder="Ahogy szolithatunk" />
+
+          <label for="pass">Jelszo</label>
+          <input id="pass" type="password" autocomplete="new-password" placeholder="Minimum 6 karakter" />
+
+          <div class="legal">
+            <div class="legal-row">
+              <input id="legalAccept" type="checkbox" />
+              <p>
+                Elolvastam es elfogadom az
+                <a id="lnkAfsz" href="/hu/legal/afsz/">AFSZ</a>,
+                az
+                <a id="lnkPrivacy" href="/hu/legal/adatkezeles/">Adatkezelesi tajekoztatot</a>,
+                valamint az
+                <a id="lnkMedical" href="/hu/legal/orvosi/">Orvosi nyilatkozatot</a>.
+              </p>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btnCreate" type="button">Fiok letrehozasa</button>
+            <a class="ghost" id="btnLogin" href="/hu/login/">Mar van fiokom</a>
+          </div>
+
+          <div class="msg" id="msgBox"></div>
+          <div class="hint">
+            Tipp: ha ezt a linket mar felhasznaltad, egyszeruen lepj be a bejelentkezesi oldalon ugyanazzal az e-mail cimmel.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Mi fog tortenni?</h2>
+          <ul>
+            <li>Ellenorizzuk a fizetesedhez tartozo aktivalo tokenedet.</li>
+            <li>Letrehozzuk a FitnessLady fiokodat a megvasarolt csomaggal.</li>
+            <li>Atiranyitunk a bejelentkezeshez, ahol mar a sajat adataiddal tudsz belepni.</li>
+          </ul>
         </div>
       </div>
-
-      <div class="row">
-        <button class="pill primary" id="btnCreate" type="button">Fiók létrehozása</button>
-        <a class="pill" id="btnLogin" href="/hu/login/">Már van fiókom</a>
-      </div>
-
-      <div class="hint" id="hintBox">Tipp: ha már van fiókod ezzel az e-maillel, válaszd a “Már van fiókom” gombot.</div>
-
-      <div class="msg" id="msgBox"></div>
     </div>
 
     <footer>
-      <div>© <span id="y"></span> FitnessLady</div>
-      <div>Tüske web design</div>
+      <div>&copy; <span id="y"></span> FitnessLady</div>
+      <div>Tuske web design</div>
     </footer>
   </div>
 
   <script type="module">
-    import { BASE_PREFIX, auth, db, fs, escapeHtml } from "../shared/firebase.js";
+    import { BASE_PREFIX } from "../shared/firebase.js";
+
+    const BACKEND_BASE_URL = "https://europe-west1-fitneady-15fd0.cloudfunctions.net";
 
     document.documentElement.style.setProperty("--hero-url", `url("${BASE_PREFIX}/hero.png")`);
     document.getElementById("y").textContent = new Date().getFullYear();
 
-    // base-aware linkek
-    const back = document.getElementById("btnBack");
-    const login = document.getElementById("btnLogin");
-    back.href = `${BASE_PREFIX}/hu/`;
-    login.href = `${BASE_PREFIX}/hu/login/`;
-
-    // legal linkek base-aware
-    document.getElementById("lnkAfsz").href = `${BASE_PREFIX}/hu/legal/afsz/`;
-    document.getElementById("lnkPrivacy").href = `${BASE_PREFIX}/hu/legal/adatkezeles/`;
-    document.getElementById("lnkMedical").href = `${BASE_PREFIX}/hu/legal/orvosi/`;
-
     const $ = (s) => document.querySelector(s);
-    const msg = $("#msgBox");
+    const token = new URL(location.href).searchParams.get("token") || "";
 
-    function showMsg(text, kind="ok"){
-      msg.className = "msg " + (kind === "err" ? "err" : "ok");
-      msg.style.display = "block";
-      msg.textContent = text;
-    }
+    $("#btnBack").href = `${BASE_PREFIX}/hu/`;
+    $("#btnLogin").href = `${BASE_PREFIX}/hu/login/`;
+    $("#lnkAfsz").href = `${BASE_PREFIX}/hu/legal/afsz/`;
+    $("#lnkPrivacy").href = `${BASE_PREFIX}/hu/legal/adatkezeles/`;
+    $("#lnkMedical").href = `${BASE_PREFIX}/hu/legal/orvosi/`;
 
-    function q(name){
-      const u = new URL(location.href);
-      return (u.searchParams.get(name) || "").trim();
-    }
+    let tokenReady = false;
+    let validatedEmail = "";
 
-    function normalizePlan(p){
-      const v = String(p || "").trim();
-      if(!v) return "start_v1";
-      if(v === "start") return "start_v1";
-      if(v === "balance") return "balance_v1";
-      if(v === "pro" || v === "por") return "pro_v1";
-      return v;
+    function escapeHtml(value){
+      return String(value || "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#39;");
     }
 
     function planLabel(planId){
       const p = String(planId || "").toLowerCase();
-      if(p.includes("balance")) return "Balance";
-      if(p.includes("pro")) return "Pro";
+      if (p.includes("balance")) return "Balance";
+      if (p.includes("pro")) return "Pro";
       return "Start";
     }
 
-    const planId = normalizePlan(q("plan"));
-    const orderId = q("order");
-    const preEmail = q("email");
-
-    $("#chipPlan").textContent = `Csomag: ${planLabel(planId)}`;
-    if(preEmail) $("#email").value = preEmail;
-
-    async function loadOrderIfAny(){
-      if(!orderId) return null;
-      const snap = await fs.getDoc(fs.doc(db, "orders", orderId));
-      if(!snap.exists()) return null;
-      return snap.data() || null;
+    function showMsg(text, kind = "ok"){
+      const box = $("#msgBox");
+      box.textContent = text;
+      box.className = `msg show ${kind === "err" ? "err" : "ok"}`;
     }
 
-    // ha van order, akkor e-mailt felvesszük belőle (ha nincs query)
-    try{
-      const od = await loadOrderIfAny();
-      if(od?.email && !preEmail){
-        $("#email").value = String(od.email || "");
+    async function postJson(url, body){
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body || {})
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || `HTTP ${res.status}`);
       }
-    }catch(e){
-      console.warn("order load failed:", e);
+      return data;
     }
 
-    async function createUserProfile(uid, email, planId){
-      const payload = {
-        email: String(email || "").trim().toLowerCase(),
-        role: "user",
-        status: "active",
-        planId: String(planId || "start_v1").trim(),
-        goal: "Formálás",
-        level: 2,
-        lang: "hu",
-        lifetimeAccess: true,
-        cycleStart: null,
-        cycleEnd: null,
-        updatedAt: fs.serverTimestamp(),
-        createdAt: fs.serverTimestamp()
-      };
-
-      await fs.setDoc(fs.doc(db, "users", uid), payload, { merge: true });
-    }
-
-    async function markOrderRegistered(orderId, uid, email){
-      if(!orderId) return;
-      await fs.setDoc(fs.doc(db, "orders", orderId), {
-        status: "registered",
-        registeredUid: uid,
-        email: String(email || "").trim().toLowerCase(),
-        updatedAt: fs.serverTimestamp()
-      }, { merge:true });
-    }
-
-    $("#btnCreate").addEventListener("click", async ()=>{
-      const email = ($("#email").value || "").trim();
-      const pass  = ($("#pass").value || "").trim();
-
-      if(!email || !email.includes("@")){
-        showMsg("Kérlek adj meg egy érvényes e-mail címet.", "err");
-        return;
-      }
-      if(!pass || pass.length < 6){
-        showMsg("A jelszó legyen minimum 6 karakter.", "err");
+    async function validateToken(){
+      if (!token) {
+        $("#btnCreate").disabled = true;
+        showMsg("Hianyzik az aktivacios token a linkbol. Nyisd meg ujra a vasarlas utan kapott e-mailt.", "err");
         return;
       }
 
-      // ✅ kötelező jogi pipa
-      if(!$("#legalAccept").checked){
-        showMsg("A regisztrációhoz fogadd el az ÁFSZ + Adatkezelés + Orvosi nyilatkozat tartalmát (1 pipa).", "err");
+      try {
+        showMsg("Aktivalo link ellenorzese...", "ok");
+        const data = await postJson(`${BACKEND_BASE_URL}/validateRegistrationToken`, { token });
+        validatedEmail = String(data.email || "").trim().toLowerCase();
+        $("#email").value = validatedEmail;
+        $("#chipPlan").textContent = `Csomag: ${data.packageName || planLabel(data.planId)}`;
+        tokenReady = true;
+        showMsg("Az aktivacios linked ervenyes. Add meg a nevedet es a jelszavadat.", "ok");
+      } catch (error) {
+        console.error(error);
+        $("#btnCreate").disabled = true;
+        showMsg(`Ez a link nem ervenyes vagy mar fel lett hasznalva.\n${escapeHtml(error?.message || String(error))}`, "err");
+      }
+    }
+
+    $("#btnCreate").addEventListener("click", async () => {
+      const displayName = ($("#displayName").value || "").trim();
+      const pass = ($("#pass").value || "").trim();
+
+      if (!tokenReady) {
+        showMsg("Az aktivacios linket elobb ellenorizni kell. Frissitsd az oldalt vagy nyisd meg ujra az e-mailbol.", "err");
+        return;
+      }
+      if (!validatedEmail || !validatedEmail.includes("@")) {
+        showMsg("Nem sikerult betolteni a fizeteshez tartozo e-mail cimet.", "err");
+        return;
+      }
+      if (!pass || pass.length < 6) {
+        showMsg("A jelszo legyen minimum 6 karakter.", "err");
+        return;
+      }
+      if (!$("#legalAccept").checked) {
+        showMsg("A fiok letrehozasahoz fogadd el a jogi dokumentumokat.", "err");
         return;
       }
 
       $("#btnCreate").disabled = true;
-      showMsg("Regisztráció…");
+      showMsg("Fiok letrehozasa...", "ok");
 
-      try{
-        const { createUserWithEmailAndPassword } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js");
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
+      try {
+        await postJson(`${BACKEND_BASE_URL}/completeRegistration`, {
+          token,
+          password: pass,
+          displayName
+        });
 
-        await createUserProfile(cred.user.uid, email, planId);
-        await markOrderRegistered(orderId, cred.user.uid, email);
-
-        showMsg("Sikeres regisztráció ✅");
-        location.replace(`${BASE_PREFIX}/hu/app/`);
-      }catch(err){
-        console.error(err);
-        const code = String(err?.code || "");
-        if(code.includes("auth/email-already-in-use")){
-          showMsg("Ezzel az e-maillel már van fiók. Menj a bejelentkezéshez: /hu/login/", "err");
-        }else{
-          showMsg(`Hiba: ${escapeHtml(err?.message || String(err))}`, "err");
-        }
+        showMsg("Sikeres aktivacio. Tovabbitunk a bejelentkezeshez...", "ok");
+        const emailQuery = encodeURIComponent(validatedEmail);
+        location.replace(`${BASE_PREFIX}/hu/login/?success=1&from=stripe&email=${emailQuery}`);
+      } catch (error) {
+        console.error(error);
+        showMsg(`Hiba: ${escapeHtml(error?.message || String(error))}`, "err");
         $("#btnCreate").disabled = false;
       }
     });
+
+    await validateToken();
   </script>
 </body>
 </html>
