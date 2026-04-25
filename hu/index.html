@@ -1282,9 +1282,16 @@
       box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
-      transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease;
-      animation: sceneFloat 9s ease-in-out infinite;
-      will-change: transform;
+      transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease, filter .45s ease;
+      animation:
+        sceneFloat 9s ease-in-out infinite,
+        sceneSpotlight 36s ease-in-out infinite;
+      --spot-on: 1.045;
+      --spot-hold: 1.055;
+      --spot-exit: .985;
+      scale: .965;
+      filter: saturate(.86) brightness(.88);
+      will-change: transform, translate, scale, filter;
       overflow:hidden;
     }
     .scene-panel:hover{
@@ -1337,7 +1344,7 @@
       height: 430px;
       z-index: 2;
       transform: rotate(-3deg);
-      animation-delay: -.8s;
+      animation-delay: -.8s, -12s;
     }
     .scene-panel-phone:hover{ transform: translateY(-8px) rotate(-2deg) scale(1.02); }
     .scene-shot{
@@ -1390,7 +1397,7 @@
       min-height: 300px;
       z-index: 5;
       transform: rotate(.8deg);
-      animation-delay: -1.9s;
+      animation-delay: -1.9s, 0s;
     }
     .scene-panel-client:hover{ transform: translateY(-9px) rotate(.3deg) scale(1.018); }
     .buyer-flow{
@@ -1422,7 +1429,7 @@
       width: 294px;
       z-index: 4;
       transform: rotate(-1.4deg);
-      animation-delay: -3s;
+      animation-delay: -3s, -24s;
     }
     .scene-panel-rhythm:hover{ transform: translateY(-8px) rotate(-.8deg) scale(1.02); }
     .scene-panel-packages{
@@ -1432,7 +1439,7 @@
       min-height: 340px;
       z-index: 6;
       transform: rotate(2.2deg);
-      animation-delay: -4.2s;
+      animation-delay: -4.2s, -30s;
     }
     .scene-panel-packages:hover{ transform: translateY(-10px) rotate(1deg) scale(1.018); }
     .package-mini-stack{
@@ -1490,7 +1497,7 @@
       width: 286px;
       z-index: 3;
       transform: rotate(3deg);
-      animation-delay: -5.3s;
+      animation-delay: -5.3s, -18s;
     }
     .scene-panel-videos:hover{ transform: translateY(-8px) rotate(1.4deg) scale(1.02); }
     .video-pill-stack{
@@ -1514,7 +1521,7 @@
       z-index: 7;
       text-align:center;
       transform: rotate(-2.2deg);
-      animation-delay: -6.4s;
+      animation-delay: -6.4s, -6s;
     }
     .scene-panel-timer:hover{ transform: translateY(-10px) rotate(-.8deg) scale(1.03); }
     .scene-panel-timer .deck-timer{
@@ -1524,6 +1531,36 @@
     @keyframes sceneFloat{
       0%, 100%{ translate: 0 0; }
       50%{ translate: 0 -8px; }
+    }
+    @keyframes sceneSpotlight{
+      0%{
+        z-index: 30;
+        scale: var(--spot-on);
+        filter: saturate(1.12) brightness(1.1);
+        border-color: rgba(255,79,216,.38);
+        box-shadow: 0 38px 92px rgba(0,0,0,.46), 0 0 58px rgba(255,79,216,.22);
+      }
+      6%, 14%{
+        z-index: 30;
+        scale: var(--spot-hold);
+        filter: saturate(1.16) brightness(1.12);
+        border-color: rgba(255,79,216,.42);
+        box-shadow: 0 42px 96px rgba(0,0,0,.48), 0 0 64px rgba(255,79,216,.24);
+      }
+      20%{
+        z-index: 8;
+        scale: var(--spot-exit);
+        filter: saturate(.92) brightness(.94);
+        border-color: rgba(255,255,255,.16);
+        box-shadow: 0 30px 72px rgba(0,0,0,.36), 0 0 36px rgba(177,76,255,.12);
+      }
+      22%, 100%{
+        z-index: 2;
+        scale: .965;
+        filter: saturate(.86) brightness(.88);
+        border-color: rgba(255,255,255,.13);
+        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+      }
     }
     .packages{
       display:grid;
@@ -1943,7 +1980,10 @@
       .scene-panel{
         padding: 12px;
         border-radius: 22px;
-        animation-duration: 10s;
+        animation-duration: 9s, 36s;
+        --spot-on: 1.018;
+        --spot-hold: 1.026;
+        --spot-exit: .98;
       }
       .scene-kicker{
         font-size: 9px;
