@@ -1,9 +1,10 @@
 import { db, fs } from "../../shared/firebase.js";
-import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_TEMPLATES_HU } from "../../shared/fixed-exercises-data.js";
+import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_IMAGE_URLS, FIXED_EXERCISE_TEMPLATES_HU } from "../../shared/fixed-exercises-data.js";
 
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
 const CANONICAL_EXERCISE_IDS = new Set(FIXED_EXERCISE_TEMPLATES_HU.map((item) => item.id));
+const EXERCISE_ASSET_VERSION = "fixed-exercises-20260426";
 const CANONICAL_EXERCISE_ALIASES = {
   "csipo-emeles": "csipoemeles",
   "csipo-emeles-fekve": "csipoemeles",
@@ -293,6 +294,7 @@ export default async function initAdminUpgrades() {
 
   try {
     injectStyles();
+    installImageFallbackHandler();
     injectOverlay();
     injectLauncher();
     bindStaticEvents();
@@ -355,6 +357,63 @@ function resolveImage(id, manualUrl = "") {
   if (!file) return "";
 
   return `/hu/app/assets/exercises/${file}`;
+}
+
+function getMappedExerciseImage(id) {
+  const rawId = getCanonicalExerciseId(id) || String(id || "").trim();
+  const normalized = normalizeExerciseKey(rawId);
+  return (
+    FIXED_EXERCISE_IMAGE_URLS[rawId] ||
+    FIXED_EXERCISE_IMAGE_URLS[normalized] ||
+    resolveImage(rawId, "")
+  );
+}
+
+function withExerciseAssetVersion(url) {
+  const clean = String(url || "").trim();
+  if (!clean) return "";
+  if (!clean.startsWith("/hu/app/assets/exercises/")) return clean;
+  if (clean.includes("?")) return clean;
+  return `${clean}?v=${EXERCISE_ASSET_VERSION}`;
+}
+
+function getDisplayImageSources(id, manualUrl = "") {
+  const candidates = [
+    String(manualUrl || "").trim(),
+    getMappedExerciseImage(id),
+    resolveImage(id, "")
+  ].filter(Boolean);
+
+  const unique = [];
+  for (const candidate of candidates) {
+    const versioned = withExerciseAssetVersion(candidate);
+    if (versioned && !unique.includes(versioned)) unique.push(versioned);
+    if (candidate && candidate !== versioned && !unique.includes(candidate)) unique.push(candidate);
+  }
+  return unique;
+}
+
+function installImageFallbackHandler() {
+  window.__fitnessLadyFixedImageFallback = (img) => {
+    const parent = img?.parentNode;
+    let fallbacks = [];
+    try {
+      fallbacks = JSON.parse(img.dataset.fallbackSrcs || "[]");
+    } catch {
+      fallbacks = [];
+    }
+
+    const next = fallbacks.shift();
+    if (next) {
+      img.dataset.fallbackSrcs = JSON.stringify(fallbacks);
+      img.src = next;
+      return;
+    }
+
+    if (parent) {
+      parent.innerHTML = '<div class="fx-thumb-empty">Nincs kép</div>';
+    }
+  };
 }
 
 function injectStyles() {
@@ -1465,14 +1524,16 @@ function renderExercises() {
   }
 
   list.innerHTML = items.map((item) => {
-    const finalImageUrl = resolveImage(item.id, item.imageUrl || "");
+    const imageSources = getDisplayImageSources(item.id, item.imageUrl || "");
+    const finalImageUrl = imageSources[0] || "";
+    const fallbackSources = imageSources.slice(1);
 
     return `
       <div class="fx-item">
         <div class="fx-thumb">
           ${
             finalImageUrl
-              ? `<img src="${escapeHtml(finalImageUrl)}" alt="${escapeHtml(item.name)}" onerror="this.remove(); this.parentNode.innerHTML='<div class=&quot;fx-thumb-empty&quot;>Nincs kép</div>';" />`
+              ? `<img src="${escapeHtml(finalImageUrl)}" alt="${escapeHtml(item.name)}" data-fallback-srcs="${escapeHtml(JSON.stringify(fallbackSources))}" onerror="window.__fitnessLadyFixedImageFallback?.(this)" />`
               : `<div class="fx-thumb-empty">Nincs kép</div>`
           }
         </div>
