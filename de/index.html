@@ -438,6 +438,507 @@
     .mini b{ display:block; margin-bottom:6px; font-size: 13px; }
     .mini span{ display:block; color:var(--muted); font-size: 12.8px; line-height:1.45; }
 
+    .system-preview-section{
+      position: relative;
+      overflow: hidden;
+      scroll-margin-top: 92px;
+    }
+    .system-preview-section::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        radial-gradient(620px 420px at 12% 18%, rgba(255,79,216,.10), transparent 60%),
+        radial-gradient(760px 540px at 88% 22%, rgba(177,76,255,.12), transparent 62%);
+      pointer-events:none;
+    }
+    .system-grid{
+      position: relative;
+      display:grid;
+      grid-template-columns: minmax(0, .92fr) minmax(0, 1.08fr);
+      gap: 26px;
+      align-items: center;
+    }
+    .system-copy,
+    .system-stage{
+      position: relative;
+      z-index: 1;
+    }
+    .system-badge{
+      margin-bottom: 14px;
+      font-weight: 900;
+      letter-spacing: .3px;
+    }
+    .system-title{
+      max-width: 12ch;
+      margin-bottom: 12px;
+      line-height: 1.02;
+    }
+    .system-lead{
+      max-width: 58ch;
+      margin-bottom: 18px;
+    }
+    .system-points{
+      display:grid;
+      gap: 12px;
+      margin: 22px 0 24px;
+    }
+    .system-point{
+      display:flex;
+      gap: 14px;
+      align-items:flex-start;
+      padding: 14px 16px;
+      border-radius: 22px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: 0 12px 30px rgba(0,0,0,.18);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    .system-point-dot{
+      width: 12px;
+      height: 12px;
+      margin-top: 8px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 16px rgba(255,79,216,.55);
+      flex: 0 0 auto;
+    }
+    .system-point strong{
+      display:block;
+      margin-bottom: 4px;
+      font-size: 14px;
+      letter-spacing: .1px;
+    }
+    .system-point span{
+      display:block;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 13px;
+    }
+    .system-note{
+      margin-top: 16px;
+      color: var(--muted2);
+      font-size: 13px;
+    }
+    .system-stage{
+      min-height: 704px;
+      padding: 8px 0 0 12px;
+    }
+    .system-one-deck{
+      position: relative;
+      min-height: 704px;
+      padding: 0;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+      overflow: visible;
+    }
+    .system-one-deck .system-showcase{
+      position: relative;
+      min-height: 704px;
+      padding: 0;
+      display:block;
+      background: transparent;
+      border: 0;
+      box-shadow: none;
+      overflow: visible;
+    }
+    .system-preview-section .system-one-deck .system-showcase::before,
+    .system-preview-section .system-one-deck .deck-orbit::before,
+    .system-preview-section .system-one-deck .deck-orbit::after{
+      content:none !important;
+      display:none !important;
+      background:none !important;
+      background-image:none !important;
+      border:0 !important;
+      box-shadow:none !important;
+    }
+    .deck-orbit{
+      position:absolute;
+      inset: 12px;
+      border-radius: 34px;
+      background:
+        radial-gradient(560px 360px at 18% 18%, rgba(255,79,216,.18), transparent 64%),
+        radial-gradient(580px 420px at 88% 10%, rgba(177,76,255,.16), transparent 68%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      overflow:hidden;
+    }
+    .deck-scene{
+      position:absolute;
+      inset:0;
+      perspective: 1100px;
+      transform-style: preserve-3d;
+      z-index:1;
+    }
+    .scene-panel{
+      position:absolute;
+      border-radius: 30px;
+      padding: 20px;
+      background:
+        linear-gradient(180deg, rgba(35,25,48,.76), rgba(10,8,17,.72)),
+        radial-gradient(420px 260px at 20% 0%, rgba(255,79,216,.14), transparent 70%);
+      border: 1px solid rgba(255,255,255,.13);
+      box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      animation:
+        sceneSpotlight 14s ease-in-out infinite,
+        sceneFocus 36s ease-in-out infinite;
+      --spot-on: 1.095;
+      --spot-hold: 1.13;
+      --spot-exit: 1.02;
+      --spot-rest: .94;
+      --spot-rest-opacity: .78;
+      --spot-depth: 140px;
+      --scene-rotation: 0deg;
+      transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+      opacity: var(--spot-rest-opacity);
+      filter: saturate(.78) brightness(.80);
+      will-change: transform, filter, opacity;
+      overflow:hidden;
+    }
+    .scene-panel::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      background: linear-gradient(135deg, rgba(255,255,255,.12), transparent 38%, rgba(177,76,255,.12));
+      opacity:.32;
+      pointer-events:none;
+    }
+    .scene-panel > *{
+      position: relative;
+      z-index: 1;
+    }
+    .scene-kicker{
+      display:block;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: 12px;
+      font-weight: 900;
+      margin-bottom: 9px;
+    }
+    .scene-panel h3,
+    .scene-panel h4{
+      margin:0;
+      line-height:1.05;
+    }
+    .scene-panel h3{
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(28px, 3.5vw, 44px);
+    }
+    .scene-panel h4{
+      font-size: 19px;
+    }
+    .scene-panel p{
+      margin: 12px 0 0;
+      color: var(--muted);
+      line-height: 1.56;
+      font-size: 13.5px;
+    }
+    .scene-panel-phone{
+      left: 24px;
+      top: 26px;
+      width: 330px;
+      height: 430px;
+      z-index: 2;
+      --scene-rotation: -3deg;
+      animation-delay: -2.6s, -12s;
+    }
+    .scene-shot{
+      height: 178px;
+      border-radius: 23px;
+      overflow:hidden;
+      border: 1px solid rgba(255,255,255,.09);
+      background: rgba(0,0,0,.24);
+      margin-bottom: 14px;
+    }
+    .scene-shot img{
+      width:100%;
+      height:100%;
+      object-fit: cover;
+      object-position: center top;
+      display:block;
+    }
+    .scene-brand-ring{
+      position:absolute;
+      right:18px;
+      top:18px;
+      width:64px;
+      height:64px;
+      border-radius:999px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(135deg, #ff79bc, var(--pink2));
+      box-shadow: 0 0 34px rgba(255,79,216,.34);
+      font-weight:1000;
+    }
+    .scene-mini-meta,
+    .video-pill-stack{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      margin-top:14px;
+    }
+    .scene-mini-meta span,
+    .video-pill-stack span{
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.09);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .scene-panel-client{
+      left: 212px;
+      top: 112px;
+      width: 430px;
+      min-height: 300px;
+      z-index: 5;
+      --scene-rotation: .8deg;
+      animation-delay: 0s, 0s;
+    }
+    .buyer-flow{
+      display:grid;
+      gap:9px;
+      margin-top:16px;
+    }
+    .buyer-flow div{
+      display:flex;
+      gap:10px;
+      align-items:flex-start;
+      color: var(--muted);
+      font-size: 13px;
+      line-height:1.42;
+    }
+    .buyer-flow div::before{
+      content:"";
+      width:10px;
+      height:10px;
+      margin-top:5px;
+      border-radius:999px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 14px rgba(255,79,216,.54);
+      flex: 0 0 auto;
+    }
+    .scene-panel-rhythm{
+      left:36px;
+      bottom:66px;
+      width:294px;
+      z-index:4;
+      --scene-rotation: -1.4deg;
+      animation-delay: -7.4s, -24s;
+    }
+    .deck-progress{
+      display:grid;
+      gap:12px;
+      margin-top:14px;
+    }
+    .deck-progress-row{
+      display:grid;
+      gap:7px;
+      color: var(--muted);
+      font-weight:850;
+      font-size:13px;
+    }
+    .deck-progress-row span{
+      display:flex;
+      justify-content:space-between;
+      gap:14px;
+    }
+    .deck-bar{
+      height:10px;
+      border-radius:999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .deck-bar i{
+      display:block;
+      height:100%;
+      border-radius:inherit;
+      background: linear-gradient(90deg, var(--pink), var(--pink2));
+    }
+    .deck-bar.gold i{
+      background: linear-gradient(90deg, #ffd38a, #ff93d5);
+    }
+    .scene-panel-packages{
+      right:26px;
+      bottom:42px;
+      width:374px;
+      min-height:340px;
+      z-index:6;
+      --scene-rotation: 2.2deg;
+      animation-delay: -9s, -30s;
+    }
+    .package-mini-stack{
+      position:relative;
+      min-height:220px;
+      margin-top:18px;
+    }
+    .package-mini{
+      position:absolute;
+      left:0;
+      right:0;
+      padding:16px;
+      border-radius:22px;
+      background: rgba(17,13,25,.78);
+      border: 1px solid rgba(255,255,255,.11);
+      box-shadow: 0 18px 38px rgba(0,0,0,.24);
+    }
+    .package-mini:nth-child(1){ top:0; opacity:.34; transform: translate(18px, 0) scale(.94); }
+    .package-mini:nth-child(2){ top:48px; opacity:.58; transform: translate(8px, 0) scale(.97); }
+    .package-mini:nth-child(3){ top:104px; background: linear-gradient(180deg, rgba(54,37,96,.92), rgba(18,13,28,.92)); }
+    .package-mini-head{
+      display:flex;
+      justify-content:space-between;
+      gap:12px;
+      font-weight:1000;
+      margin-bottom:10px;
+    }
+    .package-mini ul{
+      margin:0;
+      padding:0;
+      list-style:none;
+      display:grid;
+      gap:8px;
+      color: var(--muted);
+      font-size:12.5px;
+      line-height:1.35;
+    }
+    .package-mini li{
+      display:flex;
+      gap:9px;
+    }
+    .package-mini li::before{
+      content:"";
+      width:9px;
+      height:9px;
+      margin-top:4px;
+      border-radius:999px;
+      background: var(--pink);
+      box-shadow: 0 0 12px rgba(255,79,216,.55);
+      flex: 0 0 auto;
+    }
+    .scene-panel-videos{
+      right:46px;
+      top:56px;
+      width:286px;
+      z-index:3;
+      --scene-rotation: 3deg;
+      animation-delay: -5.2s, -18s;
+    }
+    .scene-panel-timer{
+      right:290px;
+      bottom:30px;
+      width:190px;
+      z-index:7;
+      text-align:center;
+      --scene-rotation: -2.2deg;
+      animation-delay: -1.4s, -6s;
+    }
+    .deck-timer{
+      width: min(270px, 76vw);
+      aspect-ratio: 1;
+      border-radius:50%;
+      margin-top:4px;
+      display:grid;
+      place-items:center;
+      background: conic-gradient(from 180deg, var(--pink), var(--pink2) 72%, rgba(255,255,255,.10) 72%);
+      box-shadow: 0 0 48px rgba(255,79,216,.24);
+      animation: systemPulse 4.8s ease-in-out infinite;
+    }
+    .scene-panel-timer .deck-timer{
+      width:136px;
+      margin:10px auto 0;
+    }
+    .deck-timer-inner{
+      width:64%;
+      aspect-ratio:1;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      background: rgba(5,6,13,.94);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .deck-timer-inner strong{
+      display:block;
+      font-size: clamp(30px, 4vw, 46px);
+      letter-spacing:.03em;
+    }
+    .deck-timer-inner span{
+      display:block;
+      color: var(--muted2);
+      font-weight:900;
+      margin-top:4px;
+    }
+    @keyframes systemPulse{
+      0%, 100%{ transform: scale(1); box-shadow: 0 0 30px rgba(255,79,216,.22); }
+      50%{ transform: scale(1.03); box-shadow: 0 0 44px rgba(255,79,216,.34); }
+    }
+    @keyframes sceneSpotlight{
+      0%{
+        z-index:2;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.78) brightness(.80);
+        border-color: rgba(255,255,255,.13);
+        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+      }
+      45%{
+        z-index:2;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: calc(var(--spot-rest-opacity) + .06);
+        filter: saturate(.82) brightness(.84);
+        border-color: rgba(255,255,255,.15);
+        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 40px rgba(177,76,255,.13);
+      }
+      88%, 100%{
+        z-index:2;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.78) brightness(.80);
+        border-color: rgba(255,255,255,.13);
+        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+      }
+    }
+    @keyframes sceneFocus{
+      0%, 3%{
+        z-index:60;
+        transform: translate3d(0, -8px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
+        opacity:1;
+        filter: saturate(1.22) brightness(1.18);
+        border-color: rgba(255,79,216,.55);
+        box-shadow: 0 36px 88px rgba(0,0,0,.48), 0 0 58px rgba(255,79,216,.26);
+      }
+      8%, 13%{
+        z-index:60;
+        transform: translate3d(0, -12px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+        opacity:1;
+        filter: saturate(1.24) brightness(1.2);
+        border-color: rgba(255,79,216,.62);
+        box-shadow: 0 42px 96px rgba(0,0,0,.50), 0 0 68px rgba(255,79,216,.30);
+      }
+      18%{
+        z-index:50;
+        transform: translate3d(0, -4px, 50px) rotate(var(--scene-rotation)) scale(var(--spot-exit));
+        opacity:.92;
+        filter: saturate(1) brightness(.98);
+      }
+      23%, 100%{
+        z-index:2;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.78) brightness(.80);
+      }
+    }
+
     .section-title{
       margin:0 0 10px;
       font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
@@ -731,6 +1232,194 @@
     body.is-scrolling .review-card{ box-shadow: 0 10px 30px rgba(0,0,0,.38) !important; }
 
     @media (max-width: 980px){
+      .system-grid{
+        grid-template-columns: 1fr;
+      }
+      .system-stage{
+        min-height: auto;
+        padding: 0;
+      }
+      .system-one-deck,
+      .system-one-deck .system-showcase{
+        min-height: 530px;
+        padding: 0;
+      }
+      .deck-orbit{
+        inset: 0;
+        border-radius: 26px;
+      }
+      .scene-panel{
+        padding: 12px;
+        border-radius: 22px;
+        animation-duration: 16s, 36s;
+        --spot-on: 1.105;
+        --spot-hold: 1.14;
+        --spot-exit: 1.03;
+        --spot-rest: .86;
+        --spot-rest-opacity: .24;
+        --spot-depth: 0px;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.62) brightness(.62);
+        backdrop-filter: blur(8px);
+        -webkit-backdrop-filter: blur(8px);
+      }
+      .scene-kicker{
+        font-size: 9px;
+        letter-spacing: .15em;
+        margin-bottom: 6px;
+      }
+      .scene-panel h3{
+        font-size: clamp(24px, 8vw, 32px);
+      }
+      .scene-panel h4{
+        font-size: 15px;
+      }
+      .scene-panel p{
+        margin-top: 7px;
+        font-size: 11.5px;
+        line-height: 1.38;
+      }
+      .scene-panel-phone{
+        left: 15px;
+        top: 18px;
+        width: 46%;
+        height: 218px;
+        padding: 10px;
+        border-radius: 22px;
+      }
+      .scene-shot{
+        height: 96px;
+        border-radius: 16px;
+        margin-bottom: 8px;
+      }
+      .scene-panel-phone h4{
+        font-size: 14px;
+      }
+      .scene-brand-ring{
+        width: 38px;
+        height: 38px;
+        font-size: 11px;
+        right: 10px;
+        top: 10px;
+      }
+      .scene-mini-meta{
+        gap: 5px;
+        margin-top: 8px;
+      }
+      .scene-mini-meta span{
+        padding: 5px 7px;
+        font-size: 9px;
+      }
+      .scene-panel-videos{
+        right: 14px;
+        top: 34px;
+        width: 48%;
+      }
+      .video-pill-stack{
+        gap: 6px;
+        margin-top: 10px;
+      }
+      .video-pill-stack span{
+        padding: 7px 8px;
+        font-size: 10px;
+      }
+      .scene-panel-client{
+        left: 26px;
+        right: 16px;
+        top: 164px;
+        width: auto;
+        min-height: 182px;
+        z-index: 7;
+      }
+      .buyer-flow{
+        gap: 6px;
+        margin-top: 9px;
+      }
+      .buyer-flow div{
+        gap: 7px;
+        font-size: 10.5px;
+        line-height: 1.28;
+      }
+      .buyer-flow div::before{
+        width: 7px;
+        height: 7px;
+        margin-top: 4px;
+      }
+      .scene-panel-rhythm{
+        left: 14px;
+        bottom: 24px;
+        width: 45%;
+        padding: 11px;
+        z-index: 5;
+      }
+      .scene-panel-rhythm .deck-progress{
+        gap: 7px;
+      }
+      .scene-panel-packages{
+        right: 12px;
+        bottom: 14px;
+        width: 53%;
+        min-height: 210px;
+        padding: 12px;
+        z-index: 8;
+      }
+      .package-mini-stack{
+        min-height: 142px;
+        margin-top: 10px;
+      }
+      .package-mini{
+        padding: 9px 10px;
+        border-radius: 16px;
+      }
+      .package-mini:nth-child(1){ top: 0; transform: translate(9px, 0) scale(.94); }
+      .package-mini:nth-child(2){ top: 32px; transform: translate(4px, 0) scale(.97); }
+      .package-mini:nth-child(3){ top: 68px; }
+      .package-mini-head{
+        gap: 7px;
+        margin-bottom: 6px;
+        font-size: 11px;
+      }
+      .package-mini ul{
+        gap: 5px;
+        font-size: 9.5px;
+      }
+      .package-mini li{
+        gap: 6px;
+      }
+      .package-mini li::before{
+        width: 6px;
+        height: 6px;
+        margin-top: 4px;
+      }
+      .scene-panel-timer{
+        right: 36px;
+        bottom: 88px;
+        width: 148px;
+        padding: 10px;
+        display:block;
+        z-index: 9;
+      }
+      .scene-panel-timer h4{
+        font-size: 13px;
+      }
+      .scene-panel-timer .deck-timer{
+        width: 92px;
+        margin-top: 8px;
+      }
+      .deck-progress{
+        gap: 8px;
+      }
+      .deck-progress-row{
+        gap: 5px;
+        font-size: 12px;
+      }
+      .deck-bar{
+        height: 8px;
+      }
+    }
+
+    @media (max-width: 980px){
       .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
       .badge, .btn, .meta-pill, .glass, .rating{
         backdrop-filter:none !important;
@@ -795,6 +1484,7 @@
 
       <nav class="nav" aria-label="Menü">
         <a href="#pakete">Pakete</a>
+        <a href="#system">System</a>
         <a href="#wie">So funktioniert’s</a>
         <a href="#bewertungen">Bewertungen</a>
         <a href="#recht">Rechtliches</a>
@@ -907,6 +1597,157 @@ Edina • FitnessLady</p>
       </div>
     </div>
   </main>
+
+  <section id="system" class="section system-preview-section">
+    <div class="container system-grid">
+      <div class="system-copy reveal">
+        <div class="badge system-badge">FitnessLady System</div>
+        <div class="section-title system-title">Du bekommst nicht nur einen Trainingsplan. Du bekommst ein komplettes System.</div>
+        <p class="section-sub system-lead">
+          Trainingskarten, motivierender Timer, Fortschritts&uuml;bersicht, personalisierte Videos und fixe Videos in einer Premium-Oberfl&auml;che,
+          die leicht zu folgen ist und sich stark anf&uuml;hlt.
+        </p>
+
+        <div class="system-points">
+          <div class="system-point">
+            <span class="system-point-dot"></span>
+            <div>
+              <strong>Klare t&auml;gliche Trainings</strong>
+              <span>Fixe Trainingskarten, Details und sofort startbare Routinen, damit du nicht lange &uuml;berlegen musst, sondern direkt loslegen kannst.</span>
+            </div>
+          </div>
+
+          <div class="system-point">
+            <span class="system-point-dot"></span>
+            <div>
+              <strong>Personalisierte Videos + fixe Videos</strong>
+              <span>Du bekommst nicht nur Beschreibungen, sondern visuelle Unterst&uuml;tzung f&uuml;r eine sichere Ausf&uuml;hrung und mehr Routine.</span>
+            </div>
+          </div>
+
+          <div class="system-point">
+            <span class="system-point-dot"></span>
+            <div>
+              <strong>Ein System in animierten Karten</strong>
+              <span>Kundenbereich, Pakete, Tagesrhythmus und Video-Support erscheinen als ruhige, hochwertige Deck-Ansicht.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="hero-actions">
+          <a class="btn primary interactive" href="#pakete">Pakete ansehen</a>
+          <a class="btn interactive" href="#wie">So funktioniert&rsquo;s</a>
+        </div>
+
+        <div class="system-note">Start, Balance und Pro geh&ouml;ren alle zu demselben Premium-Systemerlebnis.</div>
+      </div>
+
+      <div class="system-stage reveal" data-delay="1">
+        <div class="glass interactive system-one-deck">
+          <div class="system-showcase">
+            <div class="deck-orbit" aria-label="Animierte Vorschau des FitnessLady Systems">
+              <div class="deck-scene">
+                <article class="scene-panel scene-panel-phone">
+                  <div class="scene-shot">
+                    <img src="/de/assets/preview-card-1.jpg" alt="FitnessLady fixe Trainingskarte" />
+                  </div>
+                  <div class="scene-brand-ring">FL</div>
+                  <span class="scene-kicker">Fixe Trainings</span>
+                  <h4>Startbare Trainingskarten</h4>
+                  <p>Details, Timer, Pause und Reset in einer klaren, leicht nachvollziehbaren Oberfl&auml;che.</p>
+                  <div class="scene-mini-meta">
+                    <span>30-40 Sek. Arbeit</span>
+                    <span>Pause</span>
+                    <span>Runden</span>
+                  </div>
+                </article>
+
+                <article class="scene-panel scene-panel-videos">
+                  <span class="scene-kicker">Video-Support</span>
+                  <h4>Personalisierte und fixe Videos</h4>
+                  <p>Nicht nur Text: Die Kundin sieht, wie sie Bewegungen sauber und sicher ausf&uuml;hrt.</p>
+                  <div class="video-pill-stack">
+                    <span>Eigene Videos</span>
+                    <span>Fixe Videos</span>
+                    <span>Technik Vault</span>
+                  </div>
+                </article>
+
+                <article class="scene-panel scene-panel-client">
+                  <span class="scene-kicker">Kundenbereich</span>
+                  <h3>Eigenes System nach der Zahlung.</h3>
+                  <p>Die K&auml;uferin landet in einem geordneten Bereich, in dem klar ist, was als N&auml;chstes zu tun ist.</p>
+                  <div class="buyer-flow">
+                    <div>Aktivierter Registrierungslink nach der Stripe-Zahlung.</div>
+                    <div>Eigener Login mit dem gekauften Paket.</div>
+                    <div>Tagesziele: Wasser, Schlaf, Check-in und Fortschritt.</div>
+                    <div>Fixe Trainings, personalisierte Videos und Support an einem Ort.</div>
+                  </div>
+                </article>
+
+                <article class="scene-panel scene-panel-rhythm">
+                  <span class="scene-kicker">Tagesrhythmus</span>
+                  <h4>Fortschritt, der sichtbar wird</h4>
+                  <div class="deck-progress">
+                    <div class="deck-progress-row">
+                      <span><strong>Wasser</strong><b>6/8</b></span>
+                      <div class="deck-bar"><i style="width:75%"></i></div>
+                    </div>
+                    <div class="deck-progress-row">
+                      <span><strong>Schlaf</strong><b>7/8</b></span>
+                      <div class="deck-bar gold"><i style="width:88%"></i></div>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="scene-panel scene-panel-packages">
+                  <span class="scene-kicker">Pakete</span>
+                  <h3>Start &bull; Balance &bull; Pro</h3>
+                  <div class="package-mini-stack">
+                    <div class="package-mini">
+                      <div class="package-mini-head"><strong>Start</strong><span>4 Wochen</span></div>
+                      <ul>
+                        <li>Basis-Trainingsplan</li>
+                        <li>Klarer Einstieg</li>
+                      </ul>
+                    </div>
+                    <div class="package-mini">
+                      <div class="package-mini-head"><strong>Balance</strong><span>6 Wochen</span></div>
+                      <ul>
+                        <li>W&ouml;chentliche Begleitung</li>
+                        <li>Feinjustierung</li>
+                      </ul>
+                    </div>
+                    <div class="package-mini">
+                      <div class="package-mini-head"><strong>Pro</strong><span>12 Wochen &bull; tiefe Begleitung</span></div>
+                      <ul>
+                        <li>Das st&auml;rkste Systemerlebnis und echte Pr&auml;senz</li>
+                        <li>Engere Begleitung und mehr Kontrollpunkte</li>
+                        <li>Premium-Paket f&uuml;r Frauen, die ernsthaft vorankommen wollen</li>
+                      </ul>
+                    </div>
+                  </div>
+                </article>
+
+                <article class="scene-panel scene-panel-timer">
+                  <span class="scene-kicker">Fokus</span>
+                  <h4>Intervall-Timer</h4>
+                  <div class="deck-timer" aria-hidden="true">
+                    <div class="deck-timer-inner">
+                      <div>
+                        <strong>00:40</strong>
+                        <span>Arbeitszeit</span>
+                      </div>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section id="pakete">
     <div class="container">
@@ -1236,6 +2077,7 @@ Edina • FitnessLady</p>
         const base = window.__BASE_PATH || "";
         nav.innerHTML = `
           <a href="#pakete" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Pakete</a>
+          <a href="#system" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">System</a>
           <a href="#wie" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">So funktioniert’s</a>
           <a href="#bewertungen" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Bewertungen</a>
           <a href="#recht" style="display:block; padding:10px 10px; color:rgba(255,255,255,.86)">Rechtliches</a>
