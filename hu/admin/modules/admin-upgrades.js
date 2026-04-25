@@ -1,4 +1,5 @@
 import { db, fs } from "../../shared/firebase.js";
+import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_TEMPLATES_HU } from "../../shared/fixed-exercises-data.js";
 
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
@@ -266,6 +267,7 @@ const state = {
   editingId: "",
   filters: {
     search: "",
+    category: "",
     difficulty: "",
     type: "",
     active: ""
@@ -289,6 +291,8 @@ export default async function initAdminUpgrades() {
 
     await loadExercises();
     resetForm();
+    renderCategoryFilter();
+    renderEditSelect();
     renderExercises();
     renderAssignedUsersPanel();
 
@@ -308,7 +312,11 @@ function resolveImage(id, manualUrl = "") {
   if (cleanManual) return cleanManual;
 
   const rawId = String(id || "").trim();
-  const file = IMAGE_MAP[rawId] || IMAGE_MAP[normalizeExerciseKey(rawId)];
+  const file =
+    FIXED_EXERCISE_IMAGE_FILES[rawId] ||
+    FIXED_EXERCISE_IMAGE_FILES[normalizeExerciseKey(rawId)] ||
+    IMAGE_MAP[rawId] ||
+    IMAGE_MAP[normalizeExerciseKey(rawId)];
   if (!file) return "";
 
   return `/hu/app/assets/exercises/${file}`;
@@ -467,7 +475,7 @@ function injectStyles() {
 
     .fx-toolbar{
       display:grid;
-      grid-template-columns:1.1fr .7fr .7fr .7fr auto;
+      grid-template-columns:1.1fr .72fr .62fr .62fr .62fr auto auto;
       gap:10px;
       margin-bottom:14px;
     }
@@ -790,6 +798,9 @@ function injectOverlay() {
 
             <div class="fx-toolbar">
               <input class="fx-input" id="fxSearch" type="text" placeholder="Keresés névre, leírásra, kategóriára..." />
+              <select class="fx-select" id="fxCategoryFilter">
+                <option value="">Kategória: összes</option>
+              </select>
               <select class="fx-select" id="fxDifficultyFilter">
                 <option value="">Nehézség: összes</option>
                 <option value="könnyű">Könnyű</option>
@@ -806,6 +817,7 @@ function injectOverlay() {
                 <option value="active">Aktív</option>
                 <option value="inactive">Inaktív</option>
               </select>
+              <button class="fx-btn" id="fxSeedBtn" type="button">Alap edzések frissítése</button>
               <button class="fx-btn primary" id="fxNewBtn" type="button">+ Új</button>
             </div>
 
@@ -821,6 +833,13 @@ function injectOverlay() {
             </div>
             <div class="fx-card-body" style="display:grid; gap:10px;">
               <label class="fx-label">
+                Gyors edzés választó
+                <select class="fx-select" id="fxEditSelect">
+                  <option value="">+ Új edzés létrehozása</option>
+                </select>
+              </label>
+
+              <label class="fx-label">
                 Név
                 <input class="fx-input" id="fxName" type="text" placeholder="pl. Guggolás" />
               </label>
@@ -828,6 +847,11 @@ function injectOverlay() {
               <label class="fx-label">
                 Leírás
                 <textarea class="fx-textarea" id="fxDesc" placeholder="pl. Alsótest erősítés, comb és farizom fókusz."></textarea>
+              </label>
+
+              <label class="fx-label">
+                Részletek / helyes kivitelezés
+                <textarea class="fx-textarea" id="fxGuide" placeholder="Rövid, érthető instrukció: hogyan kezdje, mire figyeljen, mi legyen kontrollált."></textarea>
               </label>
 
               <div class="fx-grid-2">
@@ -940,6 +964,11 @@ function bindStaticEvents() {
     renderExercises();
   });
 
+  document.getElementById("fxCategoryFilter")?.addEventListener("change", (e) => {
+    state.filters.category = String(e.target.value || "").trim();
+    renderExercises();
+  });
+
   document.getElementById("fxDifficultyFilter")?.addEventListener("change", (e) => {
     state.filters.difficulty = e.target.value;
     renderExercises();
@@ -958,6 +987,12 @@ function bindStaticEvents() {
   document.getElementById("fxNewBtn")?.addEventListener("click", resetForm);
   document.getElementById("fxResetBtn")?.addEventListener("click", resetForm);
   document.getElementById("fxSaveBtn")?.addEventListener("click", saveExercise);
+  document.getElementById("fxSeedBtn")?.addEventListener("click", refreshSeedExercises);
+  document.getElementById("fxEditSelect")?.addEventListener("change", (e) => {
+    const id = String(e.target.value || "").trim();
+    if (id) startEdit(id);
+    else resetForm();
+  });
 
   document.getElementById("fxUserSearch")?.addEventListener("input", (e) => {
     filterUsers(String(e.target.value || ""));
@@ -972,20 +1007,63 @@ function closeOverlay() {
   document.getElementById("fx-overlay")?.classList.remove("is-open");
 }
 
-async function ensureSeedExercises() {
+async function ensureSeedExercises({ overwrite = false } = {}) {
   const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
-  const existingIds = new Set(snap.docs.map(d => d.id));
+  const existingById = new Map(snap.docs.map(d => [d.id, d.data() || {}]));
 
-  for (const item of FALLBACK_EXERCISES_HU) {
-    if (existingIds.has(item.id)) continue;
+  for (const item of FIXED_EXERCISE_TEMPLATES_HU) {
+    const existing = existingById.get(item.id);
+    const seedPayload = {
+      ...item,
+      imageUrl: resolveImage(item.id, item.imageUrl || ""),
+      seedVersion: 2
+    };
 
     const docRef = fs.doc(db, EXERCISES_COL, item.id);
-    await fs.setDoc(docRef, {
-      ...item,
-      imageUrl: resolveImage(item.id, ""),
-      createdAt: fs.serverTimestamp(),
-      updatedAt: fs.serverTimestamp()
-    });
+
+    if (!existing) {
+      await fs.setDoc(docRef, {
+        ...seedPayload,
+        createdAt: fs.serverTimestamp(),
+        updatedAt: fs.serverTimestamp()
+      });
+      continue;
+    }
+
+    const patch = {};
+    for (const [key, value] of Object.entries(seedPayload)) {
+      const current = existing[key];
+      if (overwrite || current === undefined || current === null || current === "") {
+        patch[key] = value;
+      }
+    }
+
+    if (Object.keys(patch).length) {
+      await fs.setDoc(docRef, {
+        ...patch,
+        updatedAt: fs.serverTimestamp()
+      }, { merge: true });
+    }
+  }
+}
+
+async function refreshSeedExercises() {
+  const ok = confirm(
+    "Frissítsem az alap fix edzés adatbázist?\n\nEz a beépített edzésneveket, képeket, leírásokat és részletes útmutatókat is ráírja a fixedExerciseTemplates kollekcióra."
+  );
+  if (!ok) return;
+
+  try {
+    await ensureSeedExercises({ overwrite: true });
+    await loadExercises();
+    resetForm();
+    renderCategoryFilter();
+    renderEditSelect();
+    renderExercises();
+    alert("Az alap fix edzések frissítve.");
+  } catch (e) {
+    console.error(e);
+    alert(`Seed frissítési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -1026,6 +1104,7 @@ async function saveExercise() {
 
     if (!payload.name) return alert("Az edzés neve kötelező.");
     if (!payload.desc) return alert("A leírás kötelező.");
+    if (!payload.guide) return alert("A részletek / helyes kivitelezés mező kötelező.");
     if (!payload.category) return alert("A kategória kötelező.");
     if (payload.workSec < 0) return alert("A munkaidő legyen 0 vagy nagyobb.");
     if (payload.restSec < 0) return alert("A pihenőidő legyen 0 vagy nagyobb.");
@@ -1045,6 +1124,8 @@ async function saveExercise() {
 
     await loadExercises();
     resetForm();
+    renderCategoryFilter();
+    renderEditSelect();
     renderExercises();
     alert("Mentve.");
   } catch (e) {
@@ -1055,16 +1136,21 @@ async function saveExercise() {
 
 async function deleteExercise(exerciseId) {
   const item = state.exercises.find((x) => x.id === exerciseId);
-  if (!confirm(`Biztosan törlöd ezt az edzést?\n\n${item?.name || "Ismeretlen edzés"}`)) return;
+  if (!confirm(`Biztosan inaktiválod ezt az edzést?\n\n${item?.name || "Ismeretlen edzés"}\n\nNem törlődik végleg, csak nem lesz aktív.`)) return;
 
   try {
-    await fs.deleteDoc(fs.doc(db, EXERCISES_COL, exerciseId));
+    await fs.setDoc(fs.doc(db, EXERCISES_COL, exerciseId), {
+      active: false,
+      updatedAt: fs.serverTimestamp()
+    }, { merge: true });
     await loadExercises();
+    renderCategoryFilter();
+    renderEditSelect();
     renderExercises();
     if (state.editingId === exerciseId) resetForm();
   } catch (e) {
     console.error(e);
-    alert(`Törlési hiba: ${extractErrorMessage(e)}`);
+    alert(`Inaktiválási hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -1082,6 +1168,7 @@ async function assignExerciseToUser(uid, exerciseId) {
         templateRef: `${EXERCISES_COL}/${exerciseId}`,
         name: item.name || "",
         desc: item.desc || "",
+        guide: item.guide || item.instructions || item.details || "",
         category: item.category || "",
         imageUrl: finalImageUrl,
         workSec: Number(item.workSec || 0),
@@ -1113,6 +1200,64 @@ async function removeExerciseFromUser(uid, exerciseId) {
     console.error(e);
     alert(`Eltávolítási hiba: ${extractErrorMessage(e)}`);
   }
+}
+
+function renderCategoryFilter() {
+  const select = document.getElementById("fxCategoryFilter");
+  if (!select) return;
+
+  const selected = state.filters.category;
+  const categories = [...new Set(
+    state.exercises
+      .map((x) => String(x.category || "").trim())
+      .filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b, "hu"));
+
+  select.innerHTML = [
+    `<option value="">Kategória: összes</option>`,
+    ...categories.map((category) => (
+      `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`
+    ))
+  ].join("");
+
+  select.value = categories.includes(selected) ? selected : "";
+  state.filters.category = select.value;
+}
+
+function renderEditSelect() {
+  const select = document.getElementById("fxEditSelect");
+  if (!select) return;
+
+  const groups = new Map();
+  [...state.exercises]
+    .sort((a, b) => {
+      const ac = String(a.category || "Általános");
+      const bc = String(b.category || "Általános");
+      const cat = ac.localeCompare(bc, "hu");
+      if (cat) return cat;
+      const ao = Number(a.sortOrder || 0);
+      const bo = Number(b.sortOrder || 0);
+      if (ao !== bo) return ao - bo;
+      return String(a.name || "").localeCompare(String(b.name || ""), "hu");
+    })
+    .forEach((item) => {
+      const category = String(item.category || "Általános").trim();
+      if (!groups.has(category)) groups.set(category, []);
+      groups.get(category).push(item);
+    });
+
+  const options = [`<option value="">+ Új edzés létrehozása</option>`];
+  groups.forEach((items, category) => {
+    options.push(`<optgroup label="${escapeHtml(category)}">`);
+    items.forEach((item) => {
+      const inactive = item.active === false ? " · inaktív" : "";
+      options.push(`<option value="${escapeHtml(item.id)}">${escapeHtml(item.name || item.id)}${inactive}</option>`);
+    });
+    options.push(`</optgroup>`);
+  });
+
+  select.innerHTML = options.join("");
+  select.value = state.editingId || "";
 }
 
 function renderExercises() {
@@ -1158,7 +1303,7 @@ function renderExercises() {
         <div class="fx-actions">
           <button class="fx-btn" type="button" data-fx-edit="${item.id}">Szerk.</button>
           <button class="fx-btn" type="button" data-fx-assign="${item.id}">Hozzárendelés</button>
-          <button class="fx-btn danger" type="button" data-fx-del="${item.id}">Törlés</button>
+          <button class="fx-btn danger" type="button" data-fx-del="${item.id}">Inaktiválás</button>
         </div>
       </div>
     `;
@@ -1242,6 +1387,7 @@ function startEdit(id) {
 
   setVal("fxName", item.name || "");
   setVal("fxDesc", item.desc || "");
+  setVal("fxGuide", item.guide || item.instructions || item.details || "");
   setVal("fxCategory", item.category || "");
   setVal("fxImage", resolveImage(item.id, item.imageUrl || ""));
   setVal("fxWork", Number(item.workSec || 0));
@@ -1254,12 +1400,16 @@ function startEdit(id) {
 
   const active = document.getElementById("fxActive");
   if (active) active.checked = item.active !== false;
+
+  const editSelect = document.getElementById("fxEditSelect");
+  if (editSelect) editSelect.value = item.id;
 }
 
 function resetForm() {
   state.editingId = "";
   setVal("fxName", "");
   setVal("fxDesc", "");
+  setVal("fxGuide", "");
   setVal("fxCategory", "");
   setVal("fxImage", "");
   setVal("fxWork", 40);
@@ -1272,12 +1422,16 @@ function resetForm() {
 
   const active = document.getElementById("fxActive");
   if (active) active.checked = true;
+
+  const editSelect = document.getElementById("fxEditSelect");
+  if (editSelect) editSelect.value = "";
 }
 
 function getFormPayload() {
   return {
     name: String(getVal("fxName")).trim(),
     desc: String(getVal("fxDesc")).trim(),
+    guide: String(getVal("fxGuide")).trim(),
     category: String(getVal("fxCategory")).trim(),
     imageUrl: String(getVal("fxImage")).trim(),
     workSec: Number(getVal("fxWork") || 0),
@@ -1315,6 +1469,7 @@ function filterUsers(q) {
 
 function getFilteredExercises() {
   const search = state.filters.search;
+  const category = state.filters.category;
   const difficulty = state.filters.difficulty;
   const type = state.filters.type;
   const active = state.filters.active;
@@ -1324,12 +1479,16 @@ function getFilteredExercises() {
       const hay = [
         x.name,
         x.desc,
+        x.guide,
+        x.instructions,
+        x.details,
         x.category,
         x.type,
         x.difficulty
       ].map((v) => String(v || "").toLowerCase()).join(" ");
 
       if (search && !hay.includes(search)) return false;
+      if (category && String(x.category || "") !== category) return false;
       if (difficulty && String(x.difficulty || "").toLowerCase() !== difficulty) return false;
       if (type && String(x.type || "").toLowerCase() !== type) return false;
       if (active === "active" && x.active === false) return false;

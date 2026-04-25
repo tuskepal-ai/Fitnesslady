@@ -546,6 +546,7 @@ function buildCard(item) {
 
   const name = item.name || item.nev || "Fix edzés";
   const desc = item.desc || item.leiras || "";
+  const guide = item.guide || item.instructions || item.details || item.utmutato || "";
   const category = item.category || item.kategoria || "Általános";
   const rounds = Number(item.rounds || item.korok || 1);
   const workSec = Number(item.workSec || item.munka_mp || 0);
@@ -605,6 +606,12 @@ function buildCard(item) {
       <div class="fxu-detail" id="fxu-detail-${escapeHtml(id)}">
         <strong style="display:block; margin-bottom:8px;">${escapeHtml(name)}</strong>
         <div style="margin-bottom:8px;">${escapeHtml(desc)}</div>
+        ${
+          guide
+            ? `<div style="margin:10px 0 8px; font-weight:900; color:#ff9be9;">Helyes kivitelezés</div>
+               <div style="margin-bottom:10px;">${escapeHtml(guide)}</div>`
+            : ""
+        }
         <div>Munkaidő: ${workSec} mp</div>
         <div>Pihenőidő: ${restSec} mp</div>
         <div>Körök: ${rounds}</div>
