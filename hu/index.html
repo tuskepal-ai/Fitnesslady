@@ -513,20 +513,20 @@
 
     .system-stage{
       position: relative;
-      min-height: 880px;
+      min-height: 900px;
       z-index: 1;
-      padding: 10px 4px 10px 18px;
+      padding: 8px 0 0 12px;
     }
     .system-video-card{
       position: relative;
       padding: 22px;
       border-radius: 34px;
       overflow: hidden;
-      min-height: 820px;
+      min-height: 840px;
       background:
         linear-gradient(180deg, rgba(255,255,255,.09), rgba(255,255,255,.03)),
-        radial-gradient(760px 420px at 20% 0%, rgba(255,79,216,.22), transparent 62%),
-        radial-gradient(760px 520px at 88% 0%, rgba(177,76,255,.18), transparent 70%);
+        radial-gradient(760px 420px at 20% 0%, rgba(255,79,216,.20), transparent 62%),
+        radial-gradient(760px 520px at 88% 0%, rgba(177,76,255,.16), transparent 70%);
     }
     .system-video-top{
       display:flex;
@@ -555,55 +555,168 @@
       background: #6ef4a7;
       box-shadow: 0 0 12px rgba(110,244,167,.7);
     }
-    .system-video-media{
-      display:block;
+    .system-showcase{
       position: relative;
-      border-radius: 30px;
+      min-height: 730px;
+      border-radius: 28px;
+      background:
+        linear-gradient(180deg, rgba(13,10,19,.82), rgba(13,10,19,.50)),
+        radial-gradient(760px 500px at 70% 8%, rgba(177,76,255,.10), transparent 70%);
+      border: 1px solid rgba(255,255,255,.08);
       overflow: hidden;
-      border: 1px solid rgba(255,255,255,.10);
-      background: rgba(10,8,14,.75);
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
     }
-    .system-video-media::after{
+    .system-showcase::before{
       content:"";
       position:absolute;
-      inset: auto 0 0 0;
-      height: 28%;
-      background: linear-gradient(to top, rgba(7,6,11,.34), rgba(7,6,11,0));
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 100% 54px, 54px 100%;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.95), rgba(0,0,0,.65));
       pointer-events:none;
     }
-    .system-video-media img{
-      display:block;
-      width:100%;
-      aspect-ratio: 4 / 5;
-      object-fit: cover;
-      object-position: center center;
+    .system-hero-card{
+      position: absolute;
+      inset: 52px 230px 226px 26px;
+      padding: 18px;
+      border-radius: 30px;
+      background: rgba(22,16,30,.90);
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 28px 60px rgba(0,0,0,.34);
+      animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) .1s both;
+      z-index: 1;
     }
-    .system-video-copy{
-      margin-top: 18px;
-      display:flex;
-      align-items:flex-start;
-      justify-content: space-between;
-      gap: 16px;
+    .system-hero-media{
+      position: relative;
+      height: 278px;
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 22%, rgba(255,79,216,.45), transparent 16%),
+        linear-gradient(135deg, rgba(16,11,21,.85), rgba(10,8,14,.98));
+      border: 1px solid rgba(255,255,255,.07);
     }
-    .system-video-copy strong{
+    .system-hero-media::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.03), transparent 24%),
+        radial-gradient(circle at 72% 70%, rgba(177,76,255,.18), transparent 20%),
+        linear-gradient(90deg, transparent 0 72%, rgba(255,255,255,.04) 72% 73%, transparent 73% 100%);
+    }
+    .system-hero-phone{
+      position:absolute;
+      left: 26px;
+      top: 20px;
+      width: 232px;
+      height: 238px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, rgba(43,28,55,.98), rgba(22,15,31,.98));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 16px 34px rgba(0,0,0,.32), 0 0 0 1px rgba(255,79,216,.12);
+      padding: 14px;
+    }
+    .system-hero-screen{
+      height: 100%;
+      border-radius: 20px;
+      background: rgba(12,9,18,.96);
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.05);
+    }
+    .system-hero-shot{
+      height: 112px;
+      background:
+        radial-gradient(circle at 18% 18%, rgba(255,79,216,.60), transparent 12%),
+        linear-gradient(135deg, rgba(15,10,18,.88), rgba(12,8,16,.98));
+      position: relative;
+    }
+    .system-hero-shot::before{
+      content:"";
+      position:absolute;
+      left: 22px;
+      top: 18px;
+      width: 8px;
+      height: 72px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255,79,216,1), rgba(255,79,216,.18));
+      box-shadow: 0 0 18px rgba(255,79,216,.42);
+    }
+    .system-hero-shot::after{
+      content:"";
+      position:absolute;
+      right: 18px;
+      bottom: 14px;
+      width: 108px;
+      height: 58px;
+      border-radius: 18px 18px 10px 10px;
+      background: linear-gradient(180deg, rgba(255,255,255,.08), rgba(255,255,255,.02));
+      border: 1px solid rgba(255,255,255,.08);
+      opacity: .55;
+    }
+    .system-hero-copy{
+      padding: 14px 14px 0;
+    }
+    .system-hero-copy strong{
       display:block;
+      font-size: 18px;
       margin-bottom: 6px;
-      font-size: 17px;
-      letter-spacing: .2px;
     }
-    .system-video-copy span{
+    .system-hero-copy span{
       display:block;
-      color: var(--muted);
+      color: var(--pink);
       font-size: 13px;
-      line-height: 1.55;
-      max-width: 42ch;
+      font-weight: 800;
+      margin-bottom: 8px;
     }
-    .system-chip-row{
+    .system-hero-copy p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.6px;
+      line-height: 1.55;
+      max-width: 30ch;
+    }
+    .system-hero-meta{
       display:flex;
       gap: 10px;
       flex-wrap: wrap;
-      justify-content:flex-end;
+      margin-top: 14px;
+    }
+    .system-hero-meta div{
+      padding: 9px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid rgba(255,255,255,.08);
+      color: var(--muted2);
+      font-size: 11.6px;
+      font-weight: 800;
+    }
+    .system-video-note{
+      right: 26px;
+      top: 72px;
+      width: 236px;
+      animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) .9s both;
+    }
+    .system-video-note h4,
+    .system-status h4,
+    .system-packages h4{
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+    .system-video-note p,
+    .system-video-note small,
+    .system-timer small{
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.8px;
+      line-height: 1.6;
+      display:block;
+    }
+    .system-video-note .system-chip-row{
+      margin-top: 14px;
+      justify-content:flex-start;
     }
     .system-chip{
       display:inline-flex;
@@ -618,52 +731,19 @@
       font-weight: 850;
       white-space: nowrap;
     }
+    .system-chip-row{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
     .system-chip .dot{
       width: 9px;
       height: 9px;
-      box-shadow: 0 0 12px rgba(255,79,216,.55);
-    }
-    .system-video-frame{
-      position:absolute;
-      inset: auto 24px 168px auto;
-      width: 176px;
-      padding: 14px 14px 12px;
-      border-radius: 24px;
-      background: rgba(14,10,20,.84);
-      border: 1px solid rgba(255,255,255,.10);
-      box-shadow: 0 18px 34px rgba(0,0,0,.28);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      z-index: 3;
-      transform: rotate(-4deg);
-    }
-    .system-video-frame strong{
-      display:block;
-      font-size: 14px;
-      margin-bottom: 10px;
-    }
-    .system-video-bars{
-      display:grid;
-      gap: 10px;
-    }
-    .system-video-bars span{
-      display:block;
-      height: 10px;
       border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      overflow:hidden;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 12px rgba(255,79,216,.55);
+      flex: 0 0 auto;
     }
-    .system-video-bars span::after{
-      content:"";
-      display:block;
-      height:100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--pink), var(--pink2));
-    }
-    .system-video-bars span:nth-child(1)::after{ width: 82%; }
-    .system-video-bars span:nth-child(2)::after{ width: 68%; background: linear-gradient(90deg, #ffd38a, #ff93d5); }
-    .system-video-bars span:nth-child(3)::after{ width: 91%; }
-
     .system-float{
       position: absolute;
       border-radius: 26px;
@@ -683,23 +763,107 @@
       text-transform: uppercase;
       letter-spacing: .16em;
     }
-    .system-float h4{
-      margin: 0 0 10px;
-      font-size: 18px;
+    .system-status{
+      left: 20px;
+      bottom: 30px;
+      width: 268px;
+      animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) .55s both;
     }
-    .system-packages{
-      right: -10px;
-      bottom: 28px;
-      width: 340px;
-      min-height: 350px;
+    .system-status-list{
+      display:grid;
+      gap: 14px;
+    }
+    .system-status-item{
+      display:grid;
+      gap: 7px;
+    }
+    .system-status-head{
+      display:flex;
+      align-items:center;
+      justify-content: space-between;
+      gap: 12px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .system-status-head strong{
+      color: var(--text);
+    }
+    .system-progress{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
       overflow: hidden;
     }
-    .system-packages h4{
-      margin-bottom: 14px;
+    .system-progress span{
+      display:block;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--pink), var(--pink2));
+    }
+    .system-progress.gold span{
+      background: linear-gradient(90deg, #ffd38a, #ff93d5);
+    }
+    .system-timer{
+      right: 44px;
+      top: 268px;
+      width: 214px;
+      text-align:center;
+      padding: 16px;
+      animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) 1.3s both;
+    }
+    .system-ring{
+      width: 126px;
+      height: 126px;
+      margin: 0 auto 12px;
+      border-radius: 50%;
+      background:
+        conic-gradient(from 180deg, var(--pink), var(--pink2) 68%, rgba(255,255,255,.08) 68%);
+      display:grid;
+      place-items:center;
+      animation: systemPulse 4.8s ease-in-out infinite;
+      box-shadow: 0 0 34px rgba(255,79,216,.28);
+    }
+    .system-ring::before{
+      content:"";
+      width: 82px;
+      height: 82px;
+      border-radius: 50%;
+      background: rgba(7,6,11,.94);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .system-ring-content{
+      position: absolute;
+      inset: 0;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      pointer-events:none;
+    }
+    .system-ring-content strong{
+      display:block;
+      font-size: 26px;
+      letter-spacing: .04em;
+    }
+    .system-ring-content span{
+      display:block;
+      color: var(--muted2);
+      font-size: 11px;
+      margin-top: 4px;
+      text-transform: uppercase;
+      letter-spacing: .16em;
+    }
+    .system-packages{
+      right: 24px;
+      bottom: 28px;
+      width: 364px;
+      min-height: 340px;
+      overflow: hidden;
+      animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) 1.8s both;
     }
     .system-package-stack{
       position: relative;
-      min-height: 258px;
+      min-height: 252px;
+      margin-top: 6px;
     }
     .system-package-card{
       position: absolute;
@@ -710,9 +874,9 @@
       background: linear-gradient(180deg, rgba(34,24,45,.95), rgba(18,13,25,.95));
       border: 1px solid rgba(255,255,255,.10);
       box-shadow: 0 18px 34px rgba(0,0,0,.24);
-      transform: translateX(26px) scale(.96);
+      transform: translateY(26px) scale(.965);
       opacity: 0;
-      animation: packageSlide 10.8s ease-in-out infinite;
+      animation: packageSlide 14s ease-in-out infinite;
     }
     .system-package-card::before{
       content:"";
@@ -723,9 +887,9 @@
       background: linear-gradient(180deg, var(--pink), var(--pink2));
       opacity: .9;
     }
-    .system-package-card:nth-child(1){ top: 4px; animation-delay: 0s; }
-    .system-package-card:nth-child(2){ top: 64px; animation-delay: 3.6s; }
-    .system-package-card:nth-child(3){ top: 124px; animation-delay: 7.2s; }
+    .system-package-card:nth-child(1){ top: 2px; animation-delay: 0s; }
+    .system-package-card:nth-child(2){ top: 44px; animation-delay: 4.6s; }
+    .system-package-card:nth-child(3){ top: 88px; animation-delay: 9.2s; }
     .system-package-head{
       display:flex;
       align-items:center;
@@ -764,125 +928,20 @@
       box-shadow: 0 0 14px rgba(255,79,216,.42);
       flex: 0 0 auto;
     }
-
-    .system-status{
-      left: -10px;
-      top: 76px;
-      width: 254px;
-    }
-    .system-status-list{
-      display:grid;
-      gap: 14px;
-    }
-    .system-status-item{
-      display:grid;
-      gap: 7px;
-    }
-    .system-status-head{
-      display:flex;
-      align-items:center;
-      justify-content: space-between;
-      gap: 12px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-    .system-status-head strong{
-      color: var(--text);
-    }
-    .system-progress{
-      height: 10px;
-      border-radius: 999px;
-      background: rgba(255,255,255,.08);
-      overflow: hidden;
-    }
-    .system-progress span{
-      display:block;
-      height: 100%;
-      border-radius: inherit;
-      background: linear-gradient(90deg, var(--pink), var(--pink2));
-    }
-    .system-progress.gold span{
-      background: linear-gradient(90deg, #ffd38a, #ff93d5);
-    }
-
-    .system-timer{
-      right: 36px;
-      top: 96px;
-      width: 204px;
-      text-align:center;
-      padding: 16px;
-    }
-    .system-ring{
-      width: 126px;
-      height: 126px;
-      margin: 0 auto 12px;
-      border-radius: 50%;
-      background:
-        conic-gradient(from 180deg, var(--pink), var(--pink2) 68%, rgba(255,255,255,.08) 68%);
-      display:grid;
-      place-items:center;
-      animation: systemPulse 4s ease-in-out infinite;
-      box-shadow: 0 0 34px rgba(255,79,216,.28);
-    }
-    .system-ring::before{
-      content:"";
-      width: 82px;
-      height: 82px;
-      border-radius: 50%;
-      background: rgba(7,6,11,.94);
-      border: 1px solid rgba(255,255,255,.08);
-    }
-    .system-ring-content{
-      position: absolute;
-      inset: 0;
-      display:grid;
-      place-items:center;
-      text-align:center;
-      pointer-events:none;
-    }
-    .system-ring-content strong{
-      display:block;
-      font-size: 26px;
-      letter-spacing: .04em;
-    }
-    .system-ring-content span{
-      display:block;
-      color: var(--muted2);
-      font-size: 11px;
-      margin-top: 4px;
-      text-transform: uppercase;
-      letter-spacing: .16em;
-    }
-    .system-timer small{
-      display:block;
-      color: var(--muted);
-      font-size: 12px;
-      line-height: 1.5;
-    }
-
     @keyframes systemPulse{
       0%, 100%{ transform: scale(1); box-shadow: 0 0 30px rgba(255,79,216,.22); }
       50%{ transform: scale(1.03); box-shadow: 0 0 44px rgba(255,79,216,.34); }
     }
-    @keyframes packageSlide{
-      0%{
-        opacity: 0;
-        transform: translateX(34px) scale(.95);
-      }
-      10%, 26%{
-        opacity: 1;
-        transform: translateX(0) scale(1);
-      }
-      33%{
-        opacity: .96;
-        transform: translateX(-6px) scale(.985);
-      }
-      42%, 100%{
-        opacity: 0;
-        transform: translateX(-26px) scale(.96);
-      }
+    @keyframes stageReveal{
+      0%{ opacity: 0; transform: translateY(26px) scale(.97); }
+      100%{ opacity: 1; transform: translateY(0) scale(1); }
     }
-
+    @keyframes packageSlide{
+      0%{ opacity: 0; transform: translateY(24px) scale(.96); }
+      10%, 28%{ opacity: 1; transform: translateY(0) scale(1); }
+      36%{ opacity: .98; transform: translateY(-4px) scale(.988); }
+      48%, 100%{ opacity: 0; transform: translateY(-18px) scale(.97); }
+    }
     .packages{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1129,45 +1188,42 @@
       .system-video-card{
         min-height: auto;
       }
-      .system-video-copy{
-        flex-direction: column;
+      .system-showcase{
+        min-height: auto;
+        display: grid;
+        gap: 14px;
+        padding: 14px;
       }
-      .system-chip-row{
-        justify-content:flex-start;
-      }
-      .system-video-frame{
-        position: relative;
-        inset: auto;
-        width: 100%;
-        margin-top: 14px;
-        transform: none;
-      }
+      .system-hero-card,
       .system-float{
         position: relative;
+        inset: auto;
         left: auto;
         right: auto;
         top: auto;
         bottom: auto;
         width: 100%;
-        margin-top: 14px;
+        margin-top: 0;
       }
-      .system-status, .system-packages, .system-timer{
+      .system-hero-card{
+        animation-duration: 1s;
+      }
+      .system-hero-media{
+        height: 250px;
+      }
+      .system-hero-phone{
+        width: calc(100% - 40px);
+        max-width: 240px;
+        height: 214px;
+      }
+      .system-video-note, .system-status, .system-packages, .system-timer{
         width: 100%;
       }
-      .system-packages{
-        min-height: auto;
-      }
       .system-package-stack{
-        min-height: auto;
-        display:grid;
-        gap: 12px;
+        min-height: 228px;
       }
       .system-package-card{
-        position: relative;
-        top: auto !important;
-        animation: none;
-        opacity: 1;
-        transform: none;
+        animation-duration: 14s;
       }
       .system-timer{
         text-align:left;
@@ -1321,7 +1377,7 @@ Edina • Fitnesz Lady
         <div class="badge system-badge">FitnessLady rendszer</div>
         <div class="section-title system-title">Nem csak edzéstervet kapsz. Egy komplett rendszert.</div>
         <p class="section-sub system-lead">
-          Edzéskártyák, motiváló időzítő, fejlődéskövetés és személyes támogatás egy olyan prémium felületen,
+          Edzéskártyák, motiváló időzítő, fejlődéskövetés, személyre szabott videók és fix videók egy olyan prémium felületen,
           amit könnyű követni és jó érzés használni.
         </p>
 
@@ -1337,16 +1393,16 @@ Edina • Fitnesz Lady
           <div class="system-point">
             <span class="system-point-dot"></span>
             <div>
-              <strong>Stopper, ritmus, fókusz</strong>
-              <span>Intervallumos köridő, látványos visszajelzés és olyan felület, ami végigvisz a teljes edzésen.</span>
+              <strong>Személyre szabott videók + fix videók</strong>
+              <span>Nem csak leírást kapsz, hanem olyan videós támogatást is, ami segít a helyes kivitelezésben és a magabiztos rutinban.</span>
             </div>
           </div>
 
           <div class="system-point">
             <span class="system-point-dot"></span>
             <div>
-              <strong>Check-in és személyes támogatás</strong>
-              <span>A rendszer nem csak edzést mutat, hanem követi a haladást és összeköt a csomagodhoz tartozó támogatással is.</span>
+              <strong>Stopper, ritmus, fókusz</strong>
+              <span>Intervallumos köridő, check-in és látványos visszajelzés egy olyan felületen, ami végigvisz a teljes edzésen.</span>
             </div>
           </div>
         </div>
@@ -1362,110 +1418,115 @@ Edina • Fitnesz Lady
       <div class="system-stage reveal" data-delay="1">
         <div class="glass interactive system-video-card">
           <div class="system-video-top">
-            <div class="tag">Rendszerelőnézet</div>
-            <div class="system-live">Animált loop</div>
+            <div class="tag">Élő rendszerelőnézet</div>
+            <div class="system-live">Lépésenként épül fel</div>
           </div>
 
-          <picture class="system-video-media">
-            <source data-asset-srcset="/hu/assets/system-preview-loop.webp" srcset="/hu/assets/system-preview-loop.webp" type="image/webp" />
-            <img data-asset-src="/hu/assets/system-preview-poster.jpg" src="/hu/assets/system-preview-poster.jpg" alt="FitnessLady rendszer előnézet" />
-          </picture>
-
-          <div class="system-video-frame">
-            <strong>Prémium rutin</strong>
-            <div class="system-video-bars">
-              <span></span>
-              <span></span>
-              <span></span>
-            </div>
-          </div>
-
-          <div class="system-video-copy">
-            <div>
-              <strong>Így néz ki a FitnessLady élmény</strong>
-              <span>Fix edzések, időzítő, csomagstruktúra és támogatás egy élő, prémium rendszerben összerakva.</span>
-            </div>
-
-            <div class="system-chip-row">
-              <div class="system-chip"><span class="dot"></span>Fix edzések</div>
-              <div class="system-chip"><span class="dot"></span>Neon stopper</div>
-              <div class="system-chip"><span class="dot"></span>Check-in rutin</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="system-float system-status">
-          <span class="system-float-label">Haladás</span>
-          <h4>Napi ritmus</h4>
-          <div class="system-status-list">
-            <div class="system-status-item">
-              <div class="system-status-head">
-                <strong>Víz</strong>
-                <span>6/8</span>
-              </div>
-              <div class="system-progress"><span style="width:72%"></span></div>
-            </div>
-            <div class="system-status-item">
-              <div class="system-status-head">
-                <strong>Alvás</strong>
-                <span>7/8</span>
-              </div>
-              <div class="system-progress gold"><span style="width:84%"></span></div>
-            </div>
-          </div>
-        </div>
-
-        <div class="system-float system-timer">
-          <span class="system-float-label">Fókusz</span>
-          <div style="position:relative; width:126px; height:126px;">
-            <div class="system-ring"></div>
-            <div class="system-ring-content">
-              <div>
-                <strong>00:35</strong>
-                <span>munkaidő</span>
+          <div class="system-showcase">
+            <div class="system-hero-card">
+              <div class="system-hero-media">
+                <div class="system-hero-phone">
+                  <div class="system-hero-screen">
+                    <div class="system-hero-shot"></div>
+                    <div class="system-hero-copy">
+                      <strong>Fekvőtámasz</strong>
+                      <span>Felsőtest</span>
+                      <p>Mell, váll és tricepsz erősítése. Tiszta kártya, stabil ritmus, prémium nézet.</p>
+                      <div class="system-hero-meta">
+                        <div>30 mp munka</div>
+                        <div>15 mp pihenő</div>
+                        <div>3 kör</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-          <small>Intervallumos köridő, ami látványosan vezeti végig az edzésedet.</small>
-        </div>
 
-        <div class="system-float system-packages">
-          <span class="system-float-label">Csomagok</span>
-          <h4>Start • Balance • Pro</h4>
-          <div class="system-package-stack">
-            <article class="system-package-card">
-              <div class="system-package-head">
-                <strong>Start</strong>
-                <span>4 hét • tiszta indulás</span>
+            <div class="system-float system-video-note">
+              <span class="system-float-label">Videós támogatás</span>
+              <h4>Személyre szabott videók és fix videók</h4>
+              <small>A rendszeredben nem csak fix edzéskártyák vannak, hanem személyre szabott videós segítség is, hogy lásd a helyes kivitelezést és magabiztosan haladj.</small>
+              <div class="system-chip-row">
+                <div class="system-chip"><span class="dot"></span>Személyre szabott videók</div>
+                <div class="system-chip"><span class="dot"></span>Fix videók</div>
               </div>
-              <div class="system-package-list">
-                <div>Személyre szabott alap edzésterv</div>
-                <div>Egyszerű, követhető napi ritmus</div>
-                <div>Gyors, tiszta belépés a rendszerbe</div>
+            </div>
+
+            <div class="system-float system-status">
+              <span class="system-float-label">Haladás</span>
+              <h4>Napi ritmus</h4>
+              <div class="system-status-list">
+                <div class="system-status-item">
+                  <div class="system-status-head">
+                    <strong>Víz</strong>
+                    <span>6/8</span>
+                  </div>
+                  <div class="system-progress"><span style="width:72%"></span></div>
+                </div>
+                <div class="system-status-item">
+                  <div class="system-status-head">
+                    <strong>Alvás</strong>
+                    <span>7/8</span>
+                  </div>
+                  <div class="system-progress gold"><span style="width:84%"></span></div>
+                </div>
               </div>
-            </article>
-            <article class="system-package-card">
-              <div class="system-package-head">
-                <strong>Balance</strong>
-                <span>6 hét • heti követés</span>
+            </div>
+
+            <div class="system-float system-timer">
+              <span class="system-float-label">Fókusz</span>
+              <div style="position:relative; width:126px; height:126px;">
+                <div class="system-ring"></div>
+                <div class="system-ring-content">
+                  <div>
+                    <strong>00:35</strong>
+                    <span>munkaidő</span>
+                  </div>
+                </div>
               </div>
-              <div class="system-package-list">
-                <div>Edzésterv videós és vizuális támogatással</div>
-                <div>Stabilabb check-in és finomhangolás</div>
-                <div>Jobb egyensúly a rutin és a haladás között</div>
+              <small>Intervallumos köridő, ami látványosan és nyugodt ritmusban vezeti végig az edzésedet.</small>
+            </div>
+
+            <div class="system-float system-packages">
+              <span class="system-float-label">Csomagok</span>
+              <h4>Start • Balance • Pro</h4>
+              <div class="system-package-stack">
+                <article class="system-package-card">
+                  <div class="system-package-head">
+                    <strong>Start</strong>
+                    <span>4 hét • tiszta indulás</span>
+                  </div>
+                  <div class="system-package-list">
+                    <div>Személyre szabott alap edzésterv</div>
+                    <div>Egyszerű, követhető napi ritmus</div>
+                    <div>Gyors, tiszta belépés a rendszerbe</div>
+                  </div>
+                </article>
+                <article class="system-package-card">
+                  <div class="system-package-head">
+                    <strong>Balance</strong>
+                    <span>6 hét • heti követés</span>
+                  </div>
+                  <div class="system-package-list">
+                    <div>Edzésterv videós és vizuális támogatással</div>
+                    <div>Stabilabb check-in és finomhangolás</div>
+                    <div>Jobb egyensúly a rutin és a haladás között</div>
+                  </div>
+                </article>
+                <article class="system-package-card">
+                  <div class="system-package-head">
+                    <strong>Pro</strong>
+                    <span>12 hét • mély támogatás</span>
+                  </div>
+                  <div class="system-package-list">
+                    <div>A legerősebb rendszerélmény és jelenlét</div>
+                    <div>Szorosabb követés és több kontrollpont</div>
+                    <div>Prémium csomag azoknak, akik komolyan haladnának</div>
+                  </div>
+                </article>
               </div>
-            </article>
-            <article class="system-package-card">
-              <div class="system-package-head">
-                <strong>Pro</strong>
-                <span>12 hét • mély támogatás</span>
-              </div>
-              <div class="system-package-list">
-                <div>A legerősebb rendszerélmény és jelenlét</div>
-                <div>Szorosabb követés és több kontrollpont</div>
-                <div>Prémium csomag azoknak, akik komolyan haladnának</div>
-              </div>
-            </article>
+            </div>
           </div>
         </div>
       </div>
