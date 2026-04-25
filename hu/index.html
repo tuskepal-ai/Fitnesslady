@@ -1572,6 +1572,92 @@
         box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
       }
     }
+    .mobile-focus-stack{
+      display:none;
+    }
+    .mobile-focus-card{
+      position:absolute;
+      inset: 0;
+      padding: 18px;
+      border-radius: 26px;
+      background:
+        linear-gradient(180deg, rgba(38,27,52,.96), rgba(10,8,17,.96)),
+        radial-gradient(420px 260px at 20% 0%, rgba(255,79,216,.18), transparent 70%);
+      border: 1px solid rgba(255,255,255,.16);
+      box-shadow: 0 28px 68px rgba(0,0,0,.48), 0 0 52px rgba(255,79,216,.20);
+      opacity: 0;
+      transform: translate3d(28px, 0, 0) scale(.955);
+      animation: mobileFocusCard 30s ease-in-out infinite;
+      overflow:hidden;
+      will-change: transform, opacity;
+    }
+    .mobile-focus-card:nth-child(1){ animation-delay: 0s; }
+    .mobile-focus-card:nth-child(2){ animation-delay: 6s; }
+    .mobile-focus-card:nth-child(3){ animation-delay: 12s; }
+    .mobile-focus-card:nth-child(4){ animation-delay: 18s; }
+    .mobile-focus-card:nth-child(5){ animation-delay: 24s; }
+    .mobile-focus-card::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.14), transparent 42%, rgba(177,76,255,.16));
+      opacity:.36;
+      pointer-events:none;
+    }
+    .mobile-focus-card > *{
+      position:relative;
+      z-index:1;
+    }
+    .mobile-focus-kicker{
+      display:block;
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: .16em;
+      font-size: 10px;
+      font-weight: 900;
+      margin-bottom: 8px;
+    }
+    .mobile-focus-card h3{
+      margin:0;
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(28px, 8vw, 36px);
+      line-height: 1.02;
+    }
+    .mobile-focus-card p{
+      margin: 10px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.46;
+    }
+    .mobile-focus-list{
+      display:grid;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .mobile-focus-list div{
+      display:flex;
+      gap: 9px;
+      align-items:flex-start;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .mobile-focus-list div::before{
+      content:"";
+      width: 8px;
+      height: 8px;
+      margin-top: 5px;
+      border-radius:999px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 14px rgba(255,79,216,.55);
+      flex:0 0 auto;
+    }
+    @keyframes mobileFocusCard{
+      0%{ opacity:0; transform: translate3d(26px, 0, 0) rotate(2deg) scale(.955); }
+      6%, 18%{ opacity:1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+      23%{ opacity:0; transform: translate3d(-22px, -4px, 0) rotate(-1.5deg) scale(.975); }
+      100%{ opacity:0; transform: translate3d(-22px, -4px, 0) rotate(-1.5deg) scale(.975); }
+    }
     .packages{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1865,7 +1951,7 @@
         margin: 0 0 12px;
       }
       .system-one-deck{
-        min-height: 600px;
+        min-height: 535px;
         padding: 10px;
       }
       .system-one-deck .system-video-top{
@@ -1873,7 +1959,7 @@
         gap: 8px;
       }
       .system-one-deck .system-showcase{
-        min-height: 530px;
+        min-height: 468px;
         padding: 0;
       }
       .deck-orbit{
@@ -1990,7 +2076,7 @@
       .scene-panel{
         padding: 12px;
         border-radius: 22px;
-        animation-duration: 9s, 36s;
+        animation: none;
         --spot-on: 1.055;
         --spot-hold: 1.075;
         --spot-exit: 1.01;
@@ -1998,7 +2084,9 @@
         --spot-rest-opacity: .72;
         --spot-depth: 90px;
         transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
-        opacity: var(--spot-rest-opacity);
+        opacity: .16;
+        filter: saturate(.72) brightness(.72);
+        pointer-events:none;
       }
       .scene-kicker{
         font-size: 9px;
@@ -2130,6 +2218,12 @@
       }
       .scene-panel-timer{
         display:none;
+      }
+      .mobile-focus-stack{
+        display:block;
+        position:absolute;
+        inset: 18px;
+        z-index: 80;
       }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
       .about-layout{ grid-template-columns: 1fr; }
@@ -2419,6 +2513,68 @@ Edina • Fitnesz Lady
                     </div>
                   </div>
                 </article>
+
+                <div class="mobile-focus-stack" aria-hidden="true">
+                  <article class="mobile-focus-card">
+                    <span class="mobile-focus-kicker">Vev&#337;i oldal</span>
+                    <h3>Saj&aacute;t rendszer, fizet&eacute;s ut&aacute;n.</h3>
+                    <p>A v&aacute;s&aacute;rl&oacute; bel&eacute;p egy rendezett fel&uuml;letre, ahol tudja, mit kell csin&aacute;lnia.</p>
+                    <div class="mobile-focus-list">
+                      <div>Aktiv&aacute;lt regisztr&aacute;ci&oacute;s link fizet&eacute;s ut&aacute;n.</div>
+                      <div>Saj&aacute;t bel&eacute;p&eacute;s a megv&aacute;s&aacute;rolt csomaggal.</div>
+                      <div>Edz&eacute;sek, check-in &eacute;s halad&aacute;s egy helyen.</div>
+                    </div>
+                  </article>
+
+                  <article class="mobile-focus-card">
+                    <span class="mobile-focus-kicker">Csomagok</span>
+                    <h3>Start, Balance &eacute;s Pro.</h3>
+                    <p>Mindegyik csomag ugyanabba a pr&eacute;mium vev&#337;i rendszerbe &eacute;rkezik.</p>
+                    <div class="mobile-focus-list">
+                      <div>Start: tiszta indul&aacute;s &eacute;s alap edz&eacute;sterv.</div>
+                      <div>Balance: heti k&ouml;vet&eacute;s &eacute;s finomhangol&aacute;s.</div>
+                      <div>Pro: m&eacute;lyebb t&aacute;mogat&aacute;s &eacute;s t&ouml;bb kontrollpont.</div>
+                    </div>
+                  </article>
+
+                  <article class="mobile-focus-card">
+                    <span class="mobile-focus-kicker">Napi ritmus</span>
+                    <h3>Halad&aacute;s, ami l&aacute;tszik.</h3>
+                    <p>Nem csak edz&eacute;s: v&iacute;z, alv&aacute;s, napi c&eacute;lok &eacute;s motiv&aacute;l&oacute; ritmus.</p>
+                    <div class="deck-progress">
+                      <div class="deck-progress-row">
+                        <span><strong>V&iacute;z</strong><b>6/8</b></span>
+                        <div class="deck-bar"><i style="width:75%"></i></div>
+                      </div>
+                      <div class="deck-progress-row">
+                        <span><strong>Alv&aacute;s</strong><b>7/8</b></span>
+                        <div class="deck-bar gold"><i style="width:88%"></i></div>
+                      </div>
+                    </div>
+                  </article>
+
+                  <article class="mobile-focus-card">
+                    <span class="mobile-focus-kicker">Vide&oacute;s t&aacute;mogat&aacute;s</span>
+                    <h3>Szem&eacute;lyre szabott &eacute;s fix vide&oacute;k.</h3>
+                    <p>A felhaszn&aacute;l&oacute; nem csak olvassa, hanem l&aacute;tja is, hogyan kell helyesen mozognia.</p>
+                    <div class="mobile-focus-list">
+                      <div>Saj&aacute;t vide&oacute;k a csomaghoz igaz&iacute;tva.</div>
+                      <div>Fix vide&oacute;k &eacute;s Technika Vault.</div>
+                      <div>Biztons&aacute;gosabb kivitelez&eacute;s, magabiztosabb rutin.</div>
+                    </div>
+                  </article>
+
+                  <article class="mobile-focus-card">
+                    <span class="mobile-focus-kicker">Fix edz&eacute;sek</span>
+                    <h3>Ind&iacute;t&aacute;s, pause, reset.</h3>
+                    <p>A k&aacute;rty&aacute;k gyorsan &eacute;rthet&#337;k, a stopper pedig vezeti az edz&eacute;s ritmus&aacute;t.</p>
+                    <div class="mobile-focus-list">
+                      <div>Munkaid&#337;, pihen&#337; &eacute;s k&ouml;r&ouml;k.</div>
+                      <div>R&eacute;szletek gomb technikai le&iacute;r&aacute;ssal.</div>
+                      <div>Letisztult dark-neon fitness app &eacute;lm&eacute;ny.</div>
+                    </div>
+                  </article>
+                </div>
               </div>
             </div>
           </div>
