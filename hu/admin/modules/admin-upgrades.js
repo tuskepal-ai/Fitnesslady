@@ -853,7 +853,7 @@ function injectOverlay() {
                 <option value="inactive">Inaktív</option>
               </select>
               <button class="fx-btn" id="fxSeedBtn" type="button">Alap edzések frissítése</button>
-              <button class="fx-btn danger" id="fxCleanupBtn" type="button">Duplák / kép nélküliek archiválása</button>
+              <button class="fx-btn danger" id="fxCleanupBtn" type="button">Duplák / kép nélküliek törlése</button>
               <button class="fx-btn primary" id="fxNewBtn" type="button">+ Új</button>
             </div>
 
@@ -1106,7 +1106,7 @@ async function refreshSeedExercises() {
 
 async function cleanupDuplicateExercises() {
   const ok = confirm(
-    "Archiváljam a duplikált vagy kép nélküli fix edzéseket?\n\nA kanonikus, képpel rendelkező edzések aktívak maradnak. A régi/hibás rekordok nem törlődnek végleg, csak archived=true és active=false állapotba kerülnek."
+    "Végleg töröljem a duplikált vagy kép nélküli fix edzéseket?\n\nMegmaradnak a képpel rendelkező fő edzések és a képpel rendelkező saját edzések. A régi duplák és kép nélküli rekordok törlődnek a Firestore-ból."
   );
   if (!ok) return;
 
@@ -1116,7 +1116,7 @@ async function cleanupDuplicateExercises() {
     const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
     const seenCanonicalIds = new Set();
     const canonicalTemplateById = new Map(FIXED_EXERCISE_TEMPLATES_HU.map((item) => [item.id, item]));
-    let archivedCount = 0;
+    let deletedCount = 0;
     let fixedCount = 0;
 
     const docs = snap.docs
@@ -1140,9 +1140,10 @@ async function cleanupDuplicateExercises() {
       const canonicalId = getCanonicalExerciseId({ id: entry.id, ...entry.data });
       const template = canonicalTemplateById.get(canonicalId);
       const hasImage = !!resolveImage(canonicalId || entry.id, entry.data.imageUrl || template?.imageUrl || "");
-      const shouldKeep = !!template && hasImage && !seenCanonicalIds.has(canonicalId) && entry.id === canonicalId;
+      const shouldKeepCanonical = !!template && hasImage && !seenCanonicalIds.has(canonicalId) && entry.id === canonicalId;
+      const shouldKeepCustom = !canonicalId && hasImage;
 
-      if (shouldKeep) {
+      if (shouldKeepCanonical) {
         seenCanonicalIds.add(canonicalId);
         await fs.setDoc(entry.docSnap.ref, {
           ...template,
@@ -1157,14 +1158,13 @@ async function cleanupDuplicateExercises() {
         continue;
       }
 
-      await fs.setDoc(entry.docSnap.ref, {
-        active: false,
-        archived: true,
-        duplicateOf: canonicalId || "",
-        cleanupReason: canonicalId ? "duplicate-or-noncanonical" : "missing-canonical-image",
-        updatedAt: fs.serverTimestamp()
-      }, { merge: true });
-      archivedCount += 1;
+      if (shouldKeepCustom) {
+        fixedCount += 1;
+        continue;
+      }
+
+      await fs.deleteDoc(entry.docSnap.ref);
+      deletedCount += 1;
     }
 
     await loadExercises();
@@ -1172,10 +1172,10 @@ async function cleanupDuplicateExercises() {
     renderCategoryFilter();
     renderEditSelect();
     renderExercises();
-    alert(`Kész. Aktív képes edzés: ${fixedCount}. Archivált régi/hibás rekord: ${archivedCount}.`);
+    alert(`Kész. Megmaradt képes edzés: ${fixedCount}. Törölt régi/hibás rekord: ${deletedCount}.`);
   } catch (e) {
     console.error(e);
-    alert(`Archiválási hiba: ${extractErrorMessage(e)}`);
+    alert(`Törlési hiba: ${extractErrorMessage(e)}`);
   }
 }
 
@@ -1189,6 +1189,7 @@ async function loadExercises() {
         ...(d.data() || {})
       }))
       .filter((item) => item.archived !== true)
+      .filter((item) => item.active !== false)
       .sort((a, b) => {
         const ac = getCanonicalExerciseId(a) || a.id;
         const bc = getCanonicalExerciseId(b) || b.id;
@@ -1201,12 +1202,13 @@ async function loadExercises() {
 
     for (const item of rawItems) {
       const canonicalId = getCanonicalExerciseId(item);
-      if (!canonicalId || uniqueByCanonicalId.has(canonicalId)) continue;
+      const dedupeKey = canonicalId || String(item.id || "").trim();
+      if (!dedupeKey || uniqueByCanonicalId.has(dedupeKey)) continue;
 
-      const imageUrl = resolveImage(canonicalId, item.imageUrl || "");
+      const imageUrl = resolveImage(canonicalId || item.id, item.imageUrl || "");
       if (!imageUrl) continue;
 
-      uniqueByCanonicalId.set(canonicalId, {
+      uniqueByCanonicalId.set(dedupeKey, {
         ...item,
         imageUrl
       });
