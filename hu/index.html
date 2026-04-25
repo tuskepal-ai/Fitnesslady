@@ -696,7 +696,9 @@
     .system-video-note{
       right: 26px;
       top: 72px;
-      width: 236px;
+      width: 336px;
+      min-height: 356px;
+      overflow: hidden;
       animation: stageReveal 1.05s cubic-bezier(.2,.75,.2,1) .9s both;
     }
     .system-video-note h4,
@@ -717,6 +719,48 @@
     .system-video-note .system-chip-row{
       margin-top: 14px;
       justify-content:flex-start;
+    }
+    .system-stack{
+      position: relative;
+      min-height: 236px;
+      margin-top: 8px;
+    }
+    .system-feature-card{
+      position: absolute;
+      left: 0;
+      right: 0;
+      padding: 16px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, rgba(34,24,45,.95), rgba(18,13,25,.95));
+      border: 1px solid rgba(255,255,255,.10);
+      box-shadow: 0 18px 34px rgba(0,0,0,.24);
+      transform: translateY(24px) scale(.965);
+      opacity: 0;
+      animation: packageSlide 14s ease-in-out infinite;
+    }
+    .system-feature-card::before{
+      content:"";
+      position:absolute;
+      inset: 0 auto 0 0;
+      width: 4px;
+      border-radius: 22px 0 0 22px;
+      background: linear-gradient(180deg, var(--pink), var(--pink2));
+      opacity: .9;
+    }
+    .system-feature-card:nth-child(1){ top: 0; animation-delay: 0s; }
+    .system-feature-card:nth-child(2){ top: 34px; animation-delay: 4.6s; }
+    .system-feature-card:nth-child(3){ top: 68px; animation-delay: 9.2s; }
+    .system-feature-card strong{
+      display:block;
+      font-size: 16px;
+      color: var(--text);
+      margin-bottom: 8px;
+    }
+    .system-feature-card p{
+      margin: 0;
+      color: var(--muted);
+      font-size: 12.8px;
+      line-height: 1.58;
     }
     .system-chip{
       display:inline-flex;
@@ -905,6 +949,21 @@
       color: var(--muted2);
       font-size: 12px;
       font-weight: 800;
+    }
+    .system-package-media{
+      display:flex;
+      gap: 10px;
+      align-items:center;
+      margin-bottom: 12px;
+    }
+    .system-package-media img{
+      width: 86px;
+      height: 86px;
+      border-radius: 18px;
+      object-fit: cover;
+      object-position: center top;
+      border: 1px solid rgba(255,255,255,.08);
+      flex: 0 0 auto;
     }
     .system-package-list{
       display:grid;
@@ -1219,6 +1278,9 @@
       .system-video-note, .system-status, .system-packages, .system-timer{
         width: 100%;
       }
+      .system-stack{
+        min-height: 214px;
+      }
       .system-package-stack{
         min-height: 228px;
       }
@@ -1375,154 +1437,132 @@ Edina • Fitnesz Lady
     <div class="container system-grid">
       <div class="system-copy reveal">
         <div class="badge system-badge">FitnessLady rendszer</div>
-        <div class="section-title system-title">Nem csak edzéstervet kapsz. Egy komplett rendszert.</div>
+        <div class="section-title system-title">Nem csak edz&eacute;stervet kapsz. Egy komplett rendszert.</div>
         <p class="section-sub system-lead">
-          Edzéskártyák, motiváló időzítő, fejlődéskövetés, személyre szabott videók és fix videók egy olyan prémium felületen,
-          amit könnyű követni és jó érzés használni.
+          Edz&eacute;sk&aacute;rty&aacute;k, motiv&aacute;l&oacute; id&#337;z&iacute;t&#337;, fejl&#337;d&eacute;sk&ouml;vet&eacute;s, szem&eacute;lyre szabott vide&oacute;k &eacute;s fix vide&oacute;k egy olyan pr&eacute;mium fel&uuml;leten,
+          amit k&ouml;nny&#369; k&ouml;vetni &eacute;s j&oacute; &eacute;rz&eacute;s haszn&aacute;lni.
         </p>
 
         <div class="system-points">
           <div class="system-point">
             <span class="system-point-dot"></span>
             <div>
-              <strong>Átlátható napi edzések</strong>
-              <span>Fix edzéskártyák, részletek és azonnal indítható rutin, hogy ne kelljen gondolkodnod, csak haladnod.</span>
+              <strong>&Aacute;tl&aacute;that&oacute; napi edz&eacute;sek</strong>
+              <span>Fix edz&eacute;sk&aacute;rty&aacute;k, r&eacute;szletek &eacute;s azonnal ind&iacute;that&oacute; rutin, hogy ne kelljen gondolkodnod, csak haladnod.</span>
             </div>
           </div>
 
           <div class="system-point">
             <span class="system-point-dot"></span>
             <div>
-              <strong>Személyre szabott videók + fix videók</strong>
-              <span>Nem csak leírást kapsz, hanem olyan videós támogatást is, ami segít a helyes kivitelezésben és a magabiztos rutinban.</span>
+              <strong>Szem&eacute;lyre szabott vide&oacute;k + fix vide&oacute;k</strong>
+              <span>Nem csak le&iacute;r&aacute;st kapsz, hanem olyan vide&oacute;s t&aacute;mogat&aacute;st is, ami seg&iacute;t a helyes kivitelez&eacute;sben &eacute;s a magabiztos rutinban.</span>
             </div>
           </div>
 
           <div class="system-point">
             <span class="system-point-dot"></span>
             <div>
-              <strong>Stopper, ritmus, fókusz</strong>
-              <span>Intervallumos köridő, check-in és látványos visszajelzés egy olyan felületen, ami végigvisz a teljes edzésen.</span>
+              <strong>Paklikban fel&eacute;p&uuml;l&#337; rendszer</strong>
+              <span>Az els&#337; k&eacute;pen l&aacute;that&oacute; funkci&oacute;k &eacute;s a csomagok is egym&aacute;s ut&aacute;n jelennek meg, egy nagy, lassabb anim&aacute;ci&oacute;s flow-ban.</span>
             </div>
           </div>
         </div>
 
         <div class="hero-actions">
-          <a class="btn primary interactive" href="#csomagok">Csomagok megtekintése</a>
-          <a class="btn interactive" href="#hogyan">Hogyan működik?</a>
+          <a class="btn primary interactive" href="#csomagok">Csomagok megtekint&eacute;se</a>
+          <a class="btn interactive" href="#hogyan">Hogyan m&#369;k&ouml;dik?</a>
         </div>
 
-        <div class="system-note">A Start, Balance és Pro csomagok mind ugyanebbe a prémium rendszerélménybe kapcsolódnak.</div>
+        <div class="system-note">A Start, Balance &eacute;s Pro csomagok mind ugyanebbe a pr&eacute;mium rendszer&eacute;lm&eacute;nybe kapcsol&oacute;dnak.</div>
       </div>
 
       <div class="system-stage reveal" data-delay="1">
         <div class="glass interactive system-video-card">
           <div class="system-video-top">
-            <div class="tag">Élő rendszerelőnézet</div>
-            <div class="system-live">Lépésenként épül fel</div>
+            <div class="tag">&Eacute;l&#337; rendszerel&#337;n&eacute;zet</div>
+            <div class="system-live">Paklikban &eacute;p&uuml;l fel</div>
           </div>
 
           <div class="system-showcase">
             <div class="system-hero-card">
-              <div class="system-hero-media">
-                <div class="system-hero-phone">
-                  <div class="system-hero-screen">
-                    <div class="system-hero-shot"></div>
-                    <div class="system-hero-copy">
-                      <strong>Fekvőtámasz</strong>
-                      <span>Felsőtest</span>
-                      <p>Mell, váll és tricepsz erősítése. Tiszta kártya, stabil ritmus, prémium nézet.</p>
-                      <div class="system-hero-meta">
-                        <div>30 mp munka</div>
-                        <div>15 mp pihenő</div>
-                        <div>3 kör</div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              <div class="system-main-media">
+                <img src="/hu/assets/preview-card-1.jpg" alt="FitnessLady edz&eacute;sk&aacute;rtya el&#337;n&eacute;zet" />
+              </div>
+              <div class="system-main-copy">
+                <strong>Fix edz&eacute;sk&aacute;rty&aacute;k, amik t&eacute;nyleg j&oacute;l n&eacute;znek ki</strong>
+                <p>Nagy, tiszta k&eacute;p, r&eacute;szletes le&iacute;r&aacute;s, stopper &eacute;s gombok ugyanabban a pr&eacute;mium vizu&aacute;lis rendszerben.</p>
+              </div>
+              <div class="system-main-chips">
+                <div>R&eacute;szletek</div>
+                <div>Ind&iacute;t&aacute;s</div>
+                <div>Stopper</div>
               </div>
             </div>
 
             <div class="system-float system-video-note">
-              <span class="system-float-label">Videós támogatás</span>
-              <h4>Személyre szabott videók és fix videók</h4>
-              <small>A rendszeredben nem csak fix edzéskártyák vannak, hanem személyre szabott videós segítség is, hogy lásd a helyes kivitelezést és magabiztosan haladj.</small>
-              <div class="system-chip-row">
-                <div class="system-chip"><span class="dot"></span>Személyre szabott videók</div>
-                <div class="system-chip"><span class="dot"></span>Fix videók</div>
+              <span class="system-float-label">Funkci&oacute;k</span>
+              <h4>Vev&#337;i oldal paklikban</h4>
+              <div class="system-stack">
+                <article class="system-feature-card">
+                  <strong>Szem&eacute;lyre szabott vide&oacute;k &eacute;s fix vide&oacute;k</strong>
+                  <p>A rendszeredben nem csak fix edz&eacute;sk&aacute;rty&aacute;k vannak, hanem szem&eacute;lyre szabott vide&oacute;s seg&iacute;ts&eacute;g is, hogy l&aacute;sd a helyes kivitelez&eacute;st.</p>
+                </article>
+                <article class="system-feature-card">
+                  <strong>Napi ritmus</strong>
+                  <p>V&iacute;z, alv&aacute;s, napi c&eacute;lok &eacute;s egy tiszta halad&aacute;si n&eacute;zet ugyanabban a fel&uuml;letben.</p>
+                </article>
+                <article class="system-feature-card">
+                  <strong>F&oacute;kusz &eacute;s intervallumos stopper</strong>
+                  <p>A l&aacute;tv&aacute;nyos k&ouml;rid&#337; nyugodt ritmusban visz v&eacute;gig az edz&eacute;sen, nem vesz el bel&#337;le.</p>
+                </article>
               </div>
-            </div>
-
-            <div class="system-float system-status">
-              <span class="system-float-label">Haladás</span>
-              <h4>Napi ritmus</h4>
-              <div class="system-status-list">
-                <div class="system-status-item">
-                  <div class="system-status-head">
-                    <strong>Víz</strong>
-                    <span>6/8</span>
-                  </div>
-                  <div class="system-progress"><span style="width:72%"></span></div>
-                </div>
-                <div class="system-status-item">
-                  <div class="system-status-head">
-                    <strong>Alvás</strong>
-                    <span>7/8</span>
-                  </div>
-                  <div class="system-progress gold"><span style="width:84%"></span></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="system-float system-timer">
-              <span class="system-float-label">Fókusz</span>
-              <div style="position:relative; width:126px; height:126px;">
-                <div class="system-ring"></div>
-                <div class="system-ring-content">
-                  <div>
-                    <strong>00:35</strong>
-                    <span>munkaidő</span>
-                  </div>
-                </div>
-              </div>
-              <small>Intervallumos köridő, ami látványosan és nyugodt ritmusban vezeti végig az edzésedet.</small>
             </div>
 
             <div class="system-float system-packages">
               <span class="system-float-label">Csomagok</span>
-              <h4>Start • Balance • Pro</h4>
+              <h4>Start &bull; Balance &bull; Pro</h4>
               <div class="system-package-stack">
                 <article class="system-package-card">
                   <div class="system-package-head">
                     <strong>Start</strong>
-                    <span>4 hét • tiszta indulás</span>
+                    <span>4 h&eacute;t &bull; tiszta indul&aacute;s</span>
                   </div>
-                  <div class="system-package-list">
-                    <div>Személyre szabott alap edzésterv</div>
-                    <div>Egyszerű, követhető napi ritmus</div>
-                    <div>Gyors, tiszta belépés a rendszerbe</div>
+                  <div class="system-package-media">
+                    <img src="/hu/assets/preview-card-1.jpg" alt="Start csomag el&#337;n&eacute;zet" />
+                    <div class="system-package-list">
+                      <div>Szem&eacute;lyre szabott alap edz&eacute;sterv</div>
+                      <div>Egyszer&#369;, k&ouml;vethet&#337; napi ritmus</div>
+                      <div>Gyors, tiszta bel&eacute;p&eacute;s a rendszerbe</div>
+                    </div>
                   </div>
                 </article>
                 <article class="system-package-card">
                   <div class="system-package-head">
                     <strong>Balance</strong>
-                    <span>6 hét • heti követés</span>
+                    <span>6 h&eacute;t &bull; heti k&ouml;vet&eacute;s</span>
                   </div>
-                  <div class="system-package-list">
-                    <div>Edzésterv videós és vizuális támogatással</div>
-                    <div>Stabilabb check-in és finomhangolás</div>
-                    <div>Jobb egyensúly a rutin és a haladás között</div>
+                  <div class="system-package-media">
+                    <img src="/hu/assets/preview-card-2.jpg" alt="Balance csomag el&#337;n&eacute;zet" />
+                    <div class="system-package-list">
+                      <div>Edz&eacute;sterv vide&oacute;s &eacute;s vizu&aacute;lis t&aacute;mogat&aacute;ssal</div>
+                      <div>Stabilabb check-in &eacute;s finomhangol&aacute;s</div>
+                      <div>Jobb egyens&uacute;ly a rutin &eacute;s a halad&aacute;s k&ouml;z&ouml;tt</div>
+                    </div>
                   </div>
                 </article>
                 <article class="system-package-card">
                   <div class="system-package-head">
                     <strong>Pro</strong>
-                    <span>12 hét • mély támogatás</span>
+                    <span>12 h&eacute;t &bull; m&eacute;ly t&aacute;mogat&aacute;s</span>
                   </div>
-                  <div class="system-package-list">
-                    <div>A legerősebb rendszerélmény és jelenlét</div>
-                    <div>Szorosabb követés és több kontrollpont</div>
-                    <div>Prémium csomag azoknak, akik komolyan haladnának</div>
+                  <div class="system-package-media">
+                    <img src="/hu/assets/preview-card-3.jpg" alt="Pro csomag el&#337;n&eacute;zet" />
+                    <div class="system-package-list">
+                      <div>A leger&#337;sebb rendszer&eacute;lm&eacute;ny &eacute;s jelenl&eacute;t</div>
+                      <div>Szorosabb k&ouml;vet&eacute;s &eacute;s t&ouml;bb kontrollpont</div>
+                      <div>Pr&eacute;mium csomag azoknak, akik komolyan haladn&aacute;nak</div>
+                    </div>
                   </div>
                 </article>
               </div>
