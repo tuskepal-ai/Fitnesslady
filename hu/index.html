@@ -1532,47 +1532,23 @@
       margin: 10px auto 0;
     }
     @keyframes sceneSpotlight{
-      0%{
+      0%, 3%{
         z-index: 60;
-        transform: translate3d(0, -10px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
+        transform: translate3d(0, -8px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
         opacity: 1;
         filter: saturate(1.22) brightness(1.18);
         border-color: rgba(255,79,216,.52);
         box-shadow: 0 48px 110px rgba(0,0,0,.56), 0 0 78px rgba(255,79,216,.34);
       }
-      6%, 14%{
+      7%, 13%{
         z-index: 60;
-        transform: translate3d(0, -12px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+        transform: translate3d(0, -10px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
         opacity: 1;
         filter: saturate(1.26) brightness(1.2);
         border-color: rgba(255,79,216,.58);
         box-shadow: 0 52px 118px rgba(0,0,0,.58), 0 0 88px rgba(255,79,216,.38);
       }
-      20%{
-        z-index: 8;
-        transform: translate3d(0, -4px, 60px) rotate(var(--scene-rotation)) scale(var(--spot-exit));
-        opacity: .9;
-        filter: saturate(.95) brightness(.94);
-        border-color: rgba(255,255,255,.16);
-        box-shadow: 0 30px 72px rgba(0,0,0,.36), 0 0 36px rgba(177,76,255,.12);
-      }
-      22%{
-        z-index: 2;
-        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
-        opacity: var(--spot-rest-opacity);
-        filter: saturate(.78) brightness(.80);
-        border-color: rgba(255,255,255,.13);
-        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
-      }
-      55%{
-        z-index: 2;
-        transform: translate3d(0, -5px, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
-        opacity: var(--spot-rest-opacity);
-        filter: saturate(.78) brightness(.80);
-        border-color: rgba(255,255,255,.13);
-        box-shadow: 0 30px 72px rgba(0,0,0,.34), 0 0 36px rgba(177,76,255,.11);
-      }
-      88%, 100%{
+      18%, 100%{
         z-index: 2;
         transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
         opacity: var(--spot-rest-opacity);
