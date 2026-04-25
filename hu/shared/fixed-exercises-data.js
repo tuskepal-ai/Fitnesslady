@@ -23,16 +23,16 @@ export const FIXED_EXERCISE_IMAGE_FILES = {
   "vall-korzes": "vallkorzes.png",
   vallkorzes: "vallkorzes.png",
   "konnyu-ulesbol-felallas": "konnyu-ulesbol-felallas.png",
-  "falnal-ules": "falnal-ules.png",
-  "terdelos-fekvotamasz": "terdelos-fekvotamasz.png",
-  oldalplank: "oldalplank.png",
-  madarkutya: "madarkutya.png",
-  "farizom-rugas": "farizom-rugas.png",
-  "oldalso-kitores": "oldalso-kitores.png",
-  "magas-terdemeles": "magas-terdemeles.png",
-  sarokerintes: "sarokerintes.png",
-  karhajlitas: "karhajlitas.png",
-  "hatso-vallnyitas": "hatso-vallnyitas.png",
+  "falnal-ules": "falnal-ules-v2.png",
+  "terdelos-fekvotamasz": "terdelos-fekvotamasz-v2.png",
+  oldalplank: "oldalplank-v2.png",
+  madarkutya: "madarkutya-v2.png",
+  "farizom-rugas": "farizom-rugas-v2.png",
+  "oldalso-kitores": "oldalso-kitores-v2.png",
+  "magas-terdemeles": "magas-terdemeles-v2.png",
+  sarokerintes: "sarokerintes-v2.png",
+  karhajlitas: "karhajlitas-v2.png",
+  "hatso-vallnyitas": "hatso-vallnyitas-v2.png",
 };
 
 export const FIXED_EXERCISE_IMAGE_URLS = Object.fromEntries(
@@ -313,7 +313,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "közepes",
     active: true,
     sortOrder: 17,
-    imageUrl: "/hu/app/assets/exercises/falnal-ules.png",
+    imageUrl: "/hu/app/assets/exercises/falnal-ules-v2.png",
   },
   {
     id: "terdelos-fekvotamasz",
@@ -329,7 +329,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 18,
-    imageUrl: "/hu/app/assets/exercises/terdelos-fekvotamasz.png",
+    imageUrl: "/hu/app/assets/exercises/terdelos-fekvotamasz-v2.png",
   },
   {
     id: "oldalplank",
@@ -345,7 +345,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "közepes",
     active: true,
     sortOrder: 19,
-    imageUrl: "/hu/app/assets/exercises/oldalplank.png",
+    imageUrl: "/hu/app/assets/exercises/oldalplank-v2.png",
   },
   {
     id: "madarkutya",
@@ -361,7 +361,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 20,
-    imageUrl: "/hu/app/assets/exercises/madarkutya.png",
+    imageUrl: "/hu/app/assets/exercises/madarkutya-v2.png",
   },
   {
     id: "farizom-rugas",
@@ -377,7 +377,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 21,
-    imageUrl: "/hu/app/assets/exercises/farizom-rugas.png",
+    imageUrl: "/hu/app/assets/exercises/farizom-rugas-v2.png",
   },
   {
     id: "oldalso-kitores",
@@ -393,7 +393,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "közepes",
     active: true,
     sortOrder: 22,
-    imageUrl: "/hu/app/assets/exercises/oldalso-kitores.png",
+    imageUrl: "/hu/app/assets/exercises/oldalso-kitores-v2.png",
   },
   {
     id: "magas-terdemeles",
@@ -409,7 +409,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "közepes",
     active: true,
     sortOrder: 23,
-    imageUrl: "/hu/app/assets/exercises/magas-terdemeles.png",
+    imageUrl: "/hu/app/assets/exercises/magas-terdemeles-v2.png",
   },
   {
     id: "sarokerintes",
@@ -425,7 +425,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 24,
-    imageUrl: "/hu/app/assets/exercises/sarokerintes.png",
+    imageUrl: "/hu/app/assets/exercises/sarokerintes-v2.png",
   },
   {
     id: "karhajlitas",
@@ -441,7 +441,7 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 25,
-    imageUrl: "/hu/app/assets/exercises/karhajlitas.png",
+    imageUrl: "/hu/app/assets/exercises/karhajlitas-v2.png",
   },
   {
     id: "hatso-vallnyitas",
@@ -457,6 +457,6 @@ export const FIXED_EXERCISE_TEMPLATES_HU = [
     difficulty: "könnyű",
     active: true,
     sortOrder: 26,
-    imageUrl: "/hu/app/assets/exercises/hatso-vallnyitas.png",
+    imageUrl: "/hu/app/assets/exercises/hatso-vallnyitas-v2.png",
   },
 ];

@@ -4,7 +4,6 @@ import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_IMAGE_URLS, FIXED_EXERCISE_T
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
 const CANONICAL_EXERCISE_IDS = new Set(FIXED_EXERCISE_TEMPLATES_HU.map((item) => item.id));
-const EXERCISE_ASSET_VERSION = "fixed-exercises-20260426-ai-v2";
 const CANONICAL_EXERCISE_ALIASES = {
   "csipo-emeles": "csipoemeles",
   "csipo-emeles-fekve": "csipoemeles",
@@ -369,14 +368,6 @@ function getMappedExerciseImage(id) {
   );
 }
 
-function withExerciseAssetVersion(url) {
-  const clean = String(url || "").trim();
-  if (!clean) return "";
-  if (!clean.startsWith("/hu/app/assets/exercises/")) return clean;
-  if (clean.includes("?")) return clean;
-  return `${clean}?v=${EXERCISE_ASSET_VERSION}`;
-}
-
 function getDisplayImageSources(id, manualUrl = "") {
   const candidates = [
     String(manualUrl || "").trim(),
@@ -386,9 +377,7 @@ function getDisplayImageSources(id, manualUrl = "") {
 
   const unique = [];
   for (const candidate of candidates) {
-    const versioned = withExerciseAssetVersion(candidate);
-    if (versioned && !unique.includes(versioned)) unique.push(versioned);
-    if (candidate && candidate !== versioned && !unique.includes(candidate)) unique.push(candidate);
+    if (candidate && !unique.includes(candidate)) unique.push(candidate);
   }
   return unique;
 }
