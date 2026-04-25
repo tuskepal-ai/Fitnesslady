@@ -1287,7 +1287,13 @@ Edina â€¢ FitnessLady</p>
         .replaceAll('"',"&quot;")
         .replaceAll("'","&#039;");
     }
-    function normalize(s){ return String(s ?? "").trim().toLowerCase(); }
+    function normalize(s){
+      return String(s ?? "")
+        .trim()
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+    }
 
     function parseCSV(text){
       const rows = [];
@@ -1463,7 +1469,10 @@ Edina â€¢ FitnessLady</p>
         const idxDate = findHeaderIndex(headers, h => h === 'submitted at' || h.includes('submitted'));
         const idxName = findHeaderIndex(headers, h => h === 'nÃ©v' || h === 'name' || h.includes('nÃ©v'));
 
-        if(idxText === -1 || idxApprove === -1){
+        const resolvedIdxText = idxText !== -1 ? idxText : findHeaderIndex(headers, h => h === 'velemenyed' || h === 'velemeny' || h.includes('velemeny'));
+        const resolvedIdxName = idxName !== -1 ? idxName : findHeaderIndex(headers, h => h === 'nev' || h === 'name' || h.includes('nev'));
+
+        if(resolvedIdxText === -1 || idxApprove === -1){
           throw new Error("Missing required columns (VÃ©lemÃ©ny / Megjelenhet?)");
         }
 
@@ -1475,7 +1484,7 @@ Edina â€¢ FitnessLady</p>
           const approved = normalize(r[idxApprove]);
           if(approved !== 'igen') continue;
 
-          const text = String(r[idxText] ?? "").trim();
+          const text = String(r[resolvedIdxText] ?? "").trim();
           if(!text) continue;
 
           const ratingRaw = idxRating !== -1 ? String(r[idxRating] ?? "").trim() : "";
@@ -1490,7 +1499,7 @@ Edina â€¢ FitnessLady</p>
           const dateRaw = idxDate !== -1 ? String(r[idxDate] ?? "").trim() : "";
           const date = dateRaw ? dateRaw.replace("T"," ").replace("Z","") : "";
 
-          const nameRaw = idxName !== -1 ? String(r[idxName] ?? "").trim() : "";
+          const nameRaw = resolvedIdxName !== -1 ? String(r[resolvedIdxName] ?? "").trim() : "";
           const name = nameRaw || "Gast";
 
           items.push({ text, stars: starsStr, date, name });
