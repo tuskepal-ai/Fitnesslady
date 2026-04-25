@@ -1001,6 +1001,251 @@
       36%{ opacity: .98; transform: translateY(-4px) scale(.988); }
       48%, 100%{ opacity: 0; transform: translateY(-18px) scale(.97); }
     }
+    .system-one-deck{
+      min-height: 760px;
+      padding: 18px;
+    }
+    .system-one-deck .system-showcase{
+      min-height: 704px;
+      padding: 18px;
+      display:block;
+    }
+    .deck-orbit{
+      position: absolute;
+      inset: 12px;
+      border-radius: 34px;
+      background:
+        radial-gradient(560px 360px at 18% 18%, rgba(255,79,216,.18), transparent 64%),
+        radial-gradient(580px 420px at 88% 10%, rgba(177,76,255,.16), transparent 68%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.018));
+      border: 1px solid rgba(255,255,255,.08);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+      overflow: hidden;
+    }
+    .deck-orbit::before{
+      content:"";
+      position:absolute;
+      inset: 0;
+      background:
+        linear-gradient(rgba(255,255,255,.055) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.035) 1px, transparent 1px);
+      background-size: 100% 58px, 58px 100%;
+      opacity: .55;
+      pointer-events:none;
+    }
+    .deck-card{
+      position:absolute;
+      inset: 34px;
+      display:grid;
+      grid-template-columns: minmax(210px, .88fr) minmax(0, 1.12fr);
+      gap: 20px;
+      align-items: stretch;
+      padding: 20px;
+      border-radius: 34px;
+      background:
+        linear-gradient(180deg, rgba(26,18,36,.94), rgba(9,7,14,.94)),
+        radial-gradient(520px 340px at 20% 0%, rgba(255,79,216,.13), transparent 70%);
+      border: 1px solid rgba(255,255,255,.12);
+      box-shadow: 0 28px 76px rgba(0,0,0,.42), 0 0 46px rgba(255,79,216,.10);
+      opacity: 0;
+      transform: translateY(34px) scale(.965);
+      animation: deckCycle 24s cubic-bezier(.2,.78,.18,1) infinite;
+      overflow: hidden;
+      isolation: isolate;
+    }
+    .deck-card::before{
+      content:"";
+      position:absolute;
+      inset: -1px;
+      background: linear-gradient(135deg, rgba(255,79,216,.28), transparent 35%, rgba(177,76,255,.22));
+      opacity: .28;
+      pointer-events:none;
+      z-index: -1;
+    }
+    .deck-card:nth-child(1){ animation-delay: 0s; }
+    .deck-card:nth-child(2){ animation-delay: 4.8s; }
+    .deck-card:nth-child(3){ animation-delay: 9.6s; }
+    .deck-card:nth-child(4){ animation-delay: 14.4s; }
+    .deck-card:nth-child(5){ animation-delay: 19.2s; }
+    .deck-media{
+      position: relative;
+      min-height: 100%;
+      border-radius: 26px;
+      overflow: hidden;
+      background: rgba(0,0,0,.24);
+      border: 1px solid rgba(255,255,255,.09);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+    }
+    .deck-media img{
+      width: 100%;
+      height: 100%;
+      min-height: 460px;
+      object-fit: cover;
+      object-position: center top;
+      display:block;
+      transform: scale(1.01);
+    }
+    .deck-media.tall img{
+      object-position: center top;
+    }
+    .deck-badge{
+      position:absolute;
+      top: 14px;
+      right: 14px;
+      width: 72px;
+      height: 72px;
+      border-radius: 999px;
+      display:grid;
+      place-items:center;
+      background: linear-gradient(135deg, #ff79bc, var(--pink2));
+      color:#fff;
+      font-weight: 1000;
+      box-shadow: 0 0 32px rgba(255,79,216,.32);
+    }
+    .deck-content{
+      display:flex;
+      flex-direction: column;
+      justify-content:center;
+      gap: 14px;
+      min-width: 0;
+    }
+    .deck-kicker{
+      color: var(--muted2);
+      text-transform: uppercase;
+      letter-spacing: .18em;
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .deck-content h3{
+      margin: 0;
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(30px, 4.2vw, 48px);
+      line-height: .98;
+    }
+    .deck-content p{
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.62;
+      font-size: 15px;
+      max-width: 42ch;
+    }
+    .deck-pills{
+      display:flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .deck-pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      padding: 11px 14px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.06);
+      border: 1px solid rgba(255,255,255,.10);
+      color: var(--text);
+      font-size: 12.6px;
+      font-weight: 900;
+      box-shadow: 0 12px 28px rgba(0,0,0,.18);
+    }
+    .deck-pill::before{
+      content:"";
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 14px rgba(255,79,216,.55);
+    }
+    .deck-progress{
+      display:grid;
+      gap: 12px;
+      margin-top: 4px;
+      max-width: 390px;
+    }
+    .deck-progress-row{
+      display:grid;
+      gap: 7px;
+      color: var(--muted);
+      font-weight: 850;
+      font-size: 13px;
+    }
+    .deck-progress-row span{
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+    }
+    .deck-bar{
+      height: 10px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.08);
+      overflow:hidden;
+    }
+    .deck-bar i{
+      display:block;
+      height:100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, var(--pink), var(--pink2));
+    }
+    .deck-bar.gold i{
+      background: linear-gradient(90deg, #ffd38a, #ff93d5);
+    }
+    .deck-timer{
+      width: min(270px, 76vw);
+      aspect-ratio: 1;
+      border-radius: 50%;
+      margin-top: 4px;
+      display:grid;
+      place-items:center;
+      background: conic-gradient(from 180deg, var(--pink), var(--pink2) 72%, rgba(255,255,255,.10) 72%);
+      box-shadow: 0 0 48px rgba(255,79,216,.24);
+      animation: systemPulse 4.8s ease-in-out infinite;
+    }
+    .deck-timer-inner{
+      width: 64%;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      background: rgba(5,6,13,.94);
+      border: 1px solid rgba(255,255,255,.08);
+    }
+    .deck-timer-inner strong{
+      display:block;
+      font-size: clamp(34px, 4vw, 50px);
+      letter-spacing: .03em;
+    }
+    .deck-timer-inner span{
+      display:block;
+      color: var(--muted2);
+      font-weight: 900;
+      margin-top: 4px;
+    }
+    .deck-package-list{
+      display:grid;
+      gap: 10px;
+      max-width: 450px;
+    }
+    .deck-package-line{
+      padding: 13px 14px;
+      border-radius: 18px;
+      background: rgba(255,255,255,.055);
+      border: 1px solid rgba(255,255,255,.085);
+      display:flex;
+      justify-content:space-between;
+      gap: 14px;
+      color: var(--muted);
+      font-weight: 850;
+    }
+    .deck-package-line strong{
+      color: var(--text);
+    }
+    @keyframes deckCycle{
+      0%{ opacity: 0; transform: translateY(34px) scale(.965); filter: blur(1px); }
+      5%, 17%{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+      22%{ opacity: 0; transform: translateY(-24px) scale(.985); filter: blur(.6px); }
+      100%{ opacity: 0; transform: translateY(-24px) scale(.985); filter: blur(.6px); }
+    }
     .packages{
       display:grid;
       grid-template-columns: repeat(3, 1fr);
@@ -1293,6 +1538,76 @@
       .system-ring{
         margin: 0 0 12px;
       }
+      .system-one-deck{
+        min-height: 650px;
+        padding: 12px;
+      }
+      .system-one-deck .system-video-top{
+        margin-bottom: 12px;
+      }
+      .system-one-deck .system-showcase{
+        min-height: 590px;
+        padding: 0;
+      }
+      .deck-orbit{
+        inset: 0;
+        border-radius: 28px;
+      }
+      .deck-card{
+        inset: 12px;
+        grid-template-columns: 1fr;
+        grid-template-rows: minmax(230px, 42%) 1fr;
+        gap: 13px;
+        padding: 13px;
+        border-radius: 26px;
+        animation-duration: 24s;
+      }
+      .deck-media{
+        min-height: 0;
+        border-radius: 22px;
+      }
+      .deck-media img{
+        min-height: 0;
+        height: 100%;
+        max-height: 270px;
+        aspect-ratio: 16 / 10;
+      }
+      .deck-media.tall img{
+        object-position: center 18%;
+      }
+      .deck-badge{
+        width: 52px;
+        height: 52px;
+        font-size: 13px;
+      }
+      .deck-content{
+        justify-content:flex-start;
+        gap: 10px;
+      }
+      .deck-kicker{
+        font-size: 10px;
+      }
+      .deck-content h3{
+        font-size: clamp(25px, 8vw, 34px);
+      }
+      .deck-content p{
+        font-size: 13px;
+        line-height: 1.5;
+      }
+      .deck-pill{
+        padding: 9px 11px;
+        font-size: 11px;
+      }
+      .deck-timer{
+        width: min(180px, 58vw);
+      }
+      .deck-timer-inner strong{
+        font-size: 30px;
+      }
+      .deck-package-line{
+        padding: 10px 11px;
+        font-size: 12px;
+      }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
       .about-layout{ grid-template-columns: 1fr; }
 
@@ -1478,94 +1793,113 @@ Edina • Fitnesz Lady
       </div>
 
       <div class="system-stage reveal" data-delay="1">
-        <div class="glass interactive system-video-card">
+        <div class="glass interactive system-video-card system-one-deck">
           <div class="system-video-top">
             <div class="tag">&Eacute;l&#337; rendszerel&#337;n&eacute;zet</div>
-            <div class="system-live">Paklikban &eacute;p&uuml;l fel</div>
+            <div class="system-live">Egy nagy anim&aacute;lt pakli</div>
           </div>
 
           <div class="system-showcase">
-            <div class="system-hero-card">
-              <div class="system-main-media">
-                <img src="/hu/assets/preview-card-1.jpg" alt="FitnessLady edz&eacute;sk&aacute;rtya el&#337;n&eacute;zet" />
-              </div>
-              <div class="system-main-copy">
-                <strong>Fix edz&eacute;sk&aacute;rty&aacute;k, amik t&eacute;nyleg j&oacute;l n&eacute;znek ki</strong>
-                <p>Nagy, tiszta k&eacute;p, r&eacute;szletes le&iacute;r&aacute;s, stopper &eacute;s gombok ugyanabban a pr&eacute;mium vizu&aacute;lis rendszerben.</p>
-              </div>
-              <div class="system-main-chips">
-                <div>R&eacute;szletek</div>
-                <div>Ind&iacute;t&aacute;s</div>
-                <div>Stopper</div>
-              </div>
-            </div>
+            <div class="deck-orbit" aria-label="FitnessLady rendszer anim&aacute;lt el&#337;n&eacute;zet">
+              <article class="deck-card">
+                <div class="deck-media">
+                  <img src="/hu/assets/preview-card-1.jpg" alt="Fekv&#337;t&aacute;masz edz&eacute;sk&aacute;rtya stopperrel" />
+                  <div class="deck-badge">FL</div>
+                </div>
+                <div class="deck-content">
+                  <span class="deck-kicker">Fix edz&eacute;sk&aacute;rtya</span>
+                  <h3>Edz&eacute;s, stopper &eacute;s r&eacute;szletek egy helyen.</h3>
+                  <p>Nagy, tiszta k&eacute;pes k&aacute;rty&aacute;k, ind&iacute;t&aacute;s, pause, reset &eacute;s r&eacute;szletek ugyanabban a pr&eacute;mium dark-neon fel&uuml;letben.</p>
+                  <div class="deck-pills">
+                    <span class="deck-pill">R&eacute;szletek</span>
+                    <span class="deck-pill">Ind&iacute;t&aacute;s</span>
+                    <span class="deck-pill">Pause + reset</span>
+                  </div>
+                </div>
+              </article>
 
-            <div class="system-float system-video-note">
-              <span class="system-float-label">Funkci&oacute;k</span>
-              <h4>Vev&#337;i oldal paklikban</h4>
-              <div class="system-stack">
-                <article class="system-feature-card">
-                  <strong>Szem&eacute;lyre szabott vide&oacute;k &eacute;s fix vide&oacute;k</strong>
-                  <p>A rendszeredben nem csak fix edz&eacute;sk&aacute;rty&aacute;k vannak, hanem szem&eacute;lyre szabott vide&oacute;s seg&iacute;ts&eacute;g is, hogy l&aacute;sd a helyes kivitelez&eacute;st.</p>
-                </article>
-                <article class="system-feature-card">
-                  <strong>Napi ritmus</strong>
-                  <p>V&iacute;z, alv&aacute;s, napi c&eacute;lok &eacute;s egy tiszta halad&aacute;si n&eacute;zet ugyanabban a fel&uuml;letben.</p>
-                </article>
-                <article class="system-feature-card">
-                  <strong>F&oacute;kusz &eacute;s intervallumos stopper</strong>
-                  <p>A l&aacute;tv&aacute;nyos k&ouml;rid&#337; nyugodt ritmusban visz v&eacute;gig az edz&eacute;sen, nem vesz el bel&#337;le.</p>
-                </article>
-              </div>
-            </div>
+              <article class="deck-card">
+                <div class="deck-media tall">
+                  <img src="/hu/assets/preview-card-2.jpg" alt="K&iacute;m&eacute;l&#337; edz&eacute;sk&aacute;rtya le&iacute;r&aacute;ssal" />
+                  <div class="deck-badge">FL</div>
+                </div>
+                <div class="deck-content">
+                  <span class="deck-kicker">Helyes kivitelez&eacute;s</span>
+                  <h3>Le&iacute;r&aacute;s, ami nem csak sz&eacute;p, hanem hasznos is.</h3>
+                  <p>A k&aacute;rty&aacute;kban megjelenhet a helyes mozg&aacute;s r&ouml;vid magyar&aacute;zata, mire figyelj, &eacute;s hogyan v&eacute;gezd biztons&aacute;gosan.</p>
+                  <div class="deck-pills">
+                    <span class="deck-pill">Technikai tippek</span>
+                    <span class="deck-pill">K&ouml;nnyen k&ouml;vethet&#337;</span>
+                  </div>
+                </div>
+              </article>
 
-            <div class="system-float system-packages">
-              <span class="system-float-label">Csomagok</span>
-              <h4>Start &bull; Balance &bull; Pro</h4>
-              <div class="system-package-stack">
-                <article class="system-package-card">
-                  <div class="system-package-head">
-                    <strong>Start</strong>
-                    <span>4 h&eacute;t &bull; tiszta indul&aacute;s</span>
-                  </div>
-                  <div class="system-package-media">
-                    <img src="/hu/assets/preview-card-1.jpg" alt="Start csomag el&#337;n&eacute;zet" />
-                    <div class="system-package-list">
-                      <div>Szem&eacute;lyre szabott alap edz&eacute;sterv</div>
-                      <div>Egyszer&#369;, k&ouml;vethet&#337; napi ritmus</div>
-                      <div>Gyors, tiszta bel&eacute;p&eacute;s a rendszerbe</div>
+              <article class="deck-card">
+                <div class="deck-media">
+                  <img src="/hu/assets/preview-card-3.jpg" alt="Guggol&aacute;s edz&eacute;sk&aacute;rtya stopperrel" />
+                  <div class="deck-badge">FL</div>
+                </div>
+                <div class="deck-content">
+                  <span class="deck-kicker">F&oacute;kusz stopper</span>
+                  <h3>Nyugodt ritmusban vezet v&eacute;gig az edz&eacute;sen.</h3>
+                  <div class="deck-timer" aria-hidden="true">
+                    <div class="deck-timer-inner">
+                      <div>
+                        <strong>00:40</strong>
+                        <span>munkaid&#337;</span>
+                      </div>
                     </div>
                   </div>
-                </article>
-                <article class="system-package-card">
-                  <div class="system-package-head">
-                    <strong>Balance</strong>
-                    <span>6 h&eacute;t &bull; heti k&ouml;vet&eacute;s</span>
+                  <div class="deck-pills">
+                    <span class="deck-pill">40 mp munka</span>
+                    <span class="deck-pill">20 mp pihen&#337;</span>
+                    <span class="deck-pill">3 k&ouml;r</span>
                   </div>
-                  <div class="system-package-media">
-                    <img src="/hu/assets/preview-card-2.jpg" alt="Balance csomag el&#337;n&eacute;zet" />
-                    <div class="system-package-list">
-                      <div>Edz&eacute;sterv vide&oacute;s &eacute;s vizu&aacute;lis t&aacute;mogat&aacute;ssal</div>
-                      <div>Stabilabb check-in &eacute;s finomhangol&aacute;s</div>
-                      <div>Jobb egyens&uacute;ly a rutin &eacute;s a halad&aacute;s k&ouml;z&ouml;tt</div>
+                </div>
+              </article>
+
+              <article class="deck-card">
+                <div class="deck-media">
+                  <img src="/hu/assets/preview-card-1.jpg" alt="FitnessLady vev&#337;i oldal el&#337;n&eacute;zet" />
+                  <div class="deck-badge">FL</div>
+                </div>
+                <div class="deck-content">
+                  <span class="deck-kicker">Vev&#337;i oldal</span>
+                  <h3>Napi ritmus, halad&aacute;s &eacute;s saj&aacute;t edz&eacute;sfel&uuml;let.</h3>
+                  <p>A felhaszn&aacute;l&oacute; nem csak fizet, hanem bel&eacute;p egy saj&aacute;t, rendezett rendszerbe: c&eacute;lok, check-in, edz&eacute;sek &eacute;s halad&aacute;s egy helyen.</p>
+                  <div class="deck-progress">
+                    <div class="deck-progress-row">
+                      <span><strong>V&iacute;z</strong><b>6/8</b></span>
+                      <div class="deck-bar"><i style="width:75%"></i></div>
+                    </div>
+                    <div class="deck-progress-row">
+                      <span><strong>Alv&aacute;s</strong><b>7/8</b></span>
+                      <div class="deck-bar gold"><i style="width:88%"></i></div>
                     </div>
                   </div>
-                </article>
-                <article class="system-package-card">
-                  <div class="system-package-head">
-                    <strong>Pro</strong>
-                    <span>12 h&eacute;t &bull; m&eacute;ly t&aacute;mogat&aacute;s</span>
+                </div>
+              </article>
+
+              <article class="deck-card">
+                <div class="deck-media tall">
+                  <img src="/hu/assets/preview-card-2.jpg" alt="FitnessLady csomagok &eacute;s vide&oacute;s t&aacute;mogat&aacute;s" />
+                  <div class="deck-badge">FL</div>
+                </div>
+                <div class="deck-content">
+                  <span class="deck-kicker">Vide&oacute;s t&aacute;mogat&aacute;s + csomagok</span>
+                  <h3>Szem&eacute;lyre szabott vide&oacute;k &eacute;s fix vide&oacute;k is.</h3>
+                  <p>A Start, Balance &eacute;s Pro csomagok ugyanabba a pr&eacute;mium rendszerbe &eacute;rkeznek, vide&oacute;s seg&iacute;ts&eacute;ggel &eacute;s &aacute;tl&aacute;that&oacute; tartalommal.</p>
+                  <div class="deck-package-list">
+                    <div class="deck-package-line"><strong>Start</strong><span>4 h&eacute;t &bull; tiszta indul&aacute;s</span></div>
+                    <div class="deck-package-line"><strong>Balance</strong><span>6 h&eacute;t &bull; heti k&ouml;vet&eacute;s</span></div>
+                    <div class="deck-package-line"><strong>Pro</strong><span>12 h&eacute;t &bull; m&eacute;ly t&aacute;mogat&aacute;s</span></div>
                   </div>
-                  <div class="system-package-media">
-                    <img src="/hu/assets/preview-card-3.jpg" alt="Pro csomag el&#337;n&eacute;zet" />
-                    <div class="system-package-list">
-                      <div>A leger&#337;sebb rendszer&eacute;lm&eacute;ny &eacute;s jelenl&eacute;t</div>
-                      <div>Szorosabb k&ouml;vet&eacute;s &eacute;s t&ouml;bb kontrollpont</div>
-                      <div>Pr&eacute;mium csomag azoknak, akik komolyan haladn&aacute;nak</div>
-                    </div>
+                  <div class="deck-pills">
+                    <span class="deck-pill">Szem&eacute;lyre szabott vide&oacute;k</span>
+                    <span class="deck-pill">Fix vide&oacute;k</span>
                   </div>
-                </article>
-              </div>
+                </div>
+              </article>
             </div>
           </div>
         </div>
