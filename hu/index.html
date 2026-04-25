@@ -1283,9 +1283,7 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       transition: transform .45s ease, border-color .45s ease, box-shadow .45s ease, filter .45s ease;
-      animation:
-        sceneFloat 9s ease-in-out infinite,
-        sceneSpotlight 36s ease-in-out infinite;
+      animation: sceneSpotlight 36s ease-in-out infinite;
       --spot-on: 1.095;
       --spot-hold: 1.13;
       --spot-exit: 1.02;
@@ -1293,8 +1291,7 @@
       --spot-rest-opacity: .78;
       --spot-depth: 140px;
       --scene-rotation: 0deg;
-      --scene-lift: 0px;
-      transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+      transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
       opacity: var(--spot-rest-opacity);
       filter: saturate(.78) brightness(.80);
       will-change: transform, filter, opacity;
@@ -1350,7 +1347,7 @@
       height: 430px;
       z-index: 2;
       --scene-rotation: -3deg;
-      animation-delay: -.8s, -12s;
+      animation-delay: -12s;
     }
     .scene-panel-phone:hover{ transform: translateY(-8px) rotate(-2deg) scale(1.02); }
     .scene-shot{
@@ -1403,7 +1400,7 @@
       min-height: 300px;
       z-index: 5;
       --scene-rotation: .8deg;
-      animation-delay: -1.9s, 0s;
+      animation-delay: 0s;
     }
     .scene-panel-client:hover{ transform: translateY(-9px) rotate(.3deg) scale(1.018); }
     .buyer-flow{
@@ -1435,7 +1432,7 @@
       width: 294px;
       z-index: 4;
       --scene-rotation: -1.4deg;
-      animation-delay: -3s, -24s;
+      animation-delay: -24s;
     }
     .scene-panel-rhythm:hover{ transform: translateY(-8px) rotate(-.8deg) scale(1.02); }
     .scene-panel-packages{
@@ -1445,7 +1442,7 @@
       min-height: 340px;
       z-index: 6;
       --scene-rotation: 2.2deg;
-      animation-delay: -4.2s, -30s;
+      animation-delay: -30s;
     }
     .scene-panel-packages:hover{ transform: translateY(-10px) rotate(1deg) scale(1.018); }
     .package-mini-stack{
@@ -1503,7 +1500,7 @@
       width: 286px;
       z-index: 3;
       --scene-rotation: 3deg;
-      animation-delay: -5.3s, -18s;
+      animation-delay: -18s;
     }
     .scene-panel-videos:hover{ transform: translateY(-8px) rotate(1.4deg) scale(1.02); }
     .video-pill-stack{
@@ -1527,21 +1524,17 @@
       z-index: 7;
       text-align:center;
       --scene-rotation: -2.2deg;
-      animation-delay: -6.4s, -6s;
+      animation-delay: -6s;
     }
     .scene-panel-timer:hover{ transform: translateY(-10px) rotate(-.8deg) scale(1.03); }
     .scene-panel-timer .deck-timer{
       width: 136px;
       margin: 10px auto 0;
     }
-    @keyframes sceneFloat{
-      0%, 100%{ --scene-lift: 0px; }
-      50%{ --scene-lift: -8px; }
-    }
     @keyframes sceneSpotlight{
       0%{
         z-index: 60;
-        transform: translate3d(0, var(--scene-lift), var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
+        transform: translate3d(0, -10px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
         opacity: 1;
         filter: saturate(1.22) brightness(1.18);
         border-color: rgba(255,79,216,.52);
@@ -1549,7 +1542,7 @@
       }
       6%, 14%{
         z-index: 60;
-        transform: translate3d(0, var(--scene-lift), var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+        transform: translate3d(0, -12px, var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
         opacity: 1;
         filter: saturate(1.26) brightness(1.2);
         border-color: rgba(255,79,216,.58);
@@ -1557,15 +1550,31 @@
       }
       20%{
         z-index: 8;
-        transform: translate3d(0, var(--scene-lift), 60px) rotate(var(--scene-rotation)) scale(var(--spot-exit));
+        transform: translate3d(0, -4px, 60px) rotate(var(--scene-rotation)) scale(var(--spot-exit));
         opacity: .9;
         filter: saturate(.95) brightness(.94);
         border-color: rgba(255,255,255,.16);
         box-shadow: 0 30px 72px rgba(0,0,0,.36), 0 0 36px rgba(177,76,255,.12);
       }
-      22%, 100%{
+      22%{
         z-index: 2;
-        transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.78) brightness(.80);
+        border-color: rgba(255,255,255,.13);
+        box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+      }
+      55%{
+        z-index: 2;
+        transform: translate3d(0, -5px, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        opacity: var(--spot-rest-opacity);
+        filter: saturate(.78) brightness(.80);
+        border-color: rgba(255,255,255,.13);
+        box-shadow: 0 30px 72px rgba(0,0,0,.34), 0 0 36px rgba(177,76,255,.11);
+      }
+      88%, 100%{
+        z-index: 2;
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
         opacity: var(--spot-rest-opacity);
         filter: saturate(.78) brightness(.80);
         border-color: rgba(255,255,255,.13);
@@ -1990,14 +1999,14 @@
       .scene-panel{
         padding: 12px;
         border-radius: 22px;
-        animation-duration: 9s, 36s;
+        animation-duration: 36s;
         --spot-on: 1.105;
         --spot-hold: 1.14;
         --spot-exit: 1.03;
         --spot-rest: .86;
         --spot-rest-opacity: .24;
         --spot-depth: 0px;
-        transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        transform: translate3d(0, 0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
         opacity: var(--spot-rest-opacity);
         filter: saturate(.62) brightness(.62);
         backdrop-filter: blur(8px);
