@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="robots" content="noindex" />
+  <title>FitnessLady - Registrierung</title>
+  <style>
+    :root{
+      --bg:#07060b;
+      --text:rgba(255,255,255,.94);
+      --muted:rgba(255,255,255,.70);
+      --pink:#ff4fd8;
+      --pink2:#b14cff;
+      --stroke:rgba(255,255,255,.10);
+      --shadow:0 22px 70px rgba(0,0,0,.55);
+      --radius:24px;
+      --hero-url:none;
+    }
+    *{box-sizing:border-box}
+    html,body{min-height:100%}
+    body{
+      margin:0;
+      font-family:ui-sans-serif,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(255,79,216,.18), transparent 60%),
+        radial-gradient(1000px 700px at 80% 18%, rgba(177,76,255,.16), transparent 62%),
+        linear-gradient(180deg, rgba(7,6,11,.80), rgba(7,6,11,.94)),
+        var(--bg);
+      overflow-x:hidden;
+    }
+    body::before{
+      content:"";
+      position:fixed;
+      inset:0;
+      z-index:-1;
+      background-image:var(--hero-url);
+      background-size:cover;
+      background-position:center;
+      background-repeat:no-repeat;
+      opacity:.22;
+      filter:saturate(.95);
+    }
+    .wrap{width:min(940px,92vw);margin:0 auto;padding:20px 0 40px}
+    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 0 18px}
+    .brand{display:flex;align-items:center;gap:10px;font-weight:900;letter-spacing:.2px}
+    .dot{width:10px;height:10px;border-radius:999px;background:radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink));box-shadow:0 0 18px rgba(255,79,216,.7)}
+    .pill{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(20,12,26,.55);box-shadow:0 12px 34px rgba(0,0,0,.35);color:var(--text);text-decoration:none;white-space:nowrap}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,.07), rgba(255,255,255,.02));border:1px solid var(--stroke);border-radius:var(--radius);box-shadow:var(--shadow);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:18px}
+    .chip{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:999px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.10);font-size:13px;font-weight:850;margin-bottom:12px}
+    h1{margin:0 0 8px;font-family:ui-serif,Georgia,"Times New Roman",serif;font-size:40px;line-height:1.05;letter-spacing:-.4px}
+    .sub{margin:0 0 18px;color:var(--muted);line-height:1.65}
+    .grid{display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+    .panel{background:rgba(0,0,0,.18);border:1px solid rgba(255,255,255,.09);border-radius:20px;padding:16px}
+    .panel h2{margin:0 0 8px;font-size:15px;letter-spacing:.02em}
+    label{display:block;margin:12px 0 6px;color:rgba(255,255,255,.76);font-weight:800}
+    input{width:100%;padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:var(--text);outline:none;font-size:15px}
+    input[readonly]{opacity:.86;cursor:not-allowed}
+    input:focus{border-color:rgba(255,79,216,.38);box-shadow:0 0 0 4px rgba(255,79,216,.12)}
+    .legal{margin-top:14px;padding:12px;border-radius:16px;border:1px solid rgba(255,255,255,.10);background:rgba(255,255,255,.04)}
+    .legal-row{display:flex;gap:10px;align-items:flex-start}
+    .legal-row input{width:18px;height:18px;margin-top:2px;accent-color:var(--pink)}
+    .legal-row p{margin:0;font-size:13px;line-height:1.55;color:rgba(255,255,255,.78)}
+    .legal-row a{color:#ffd38a;text-underline-offset:2px}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px}
+    button{appearance:none;border:0;cursor:pointer;padding:13px 16px;border-radius:999px;font-weight:900;letter-spacing:.2px;min-width:210px;color:#120813;background:linear-gradient(135deg, var(--pink), var(--pink2));box-shadow:0 18px 46px rgba(255,79,216,.24)}
+    button:disabled{opacity:.6;cursor:not-allowed}
+    .ghost{display:inline-flex;align-items:center;justify-content:center;min-width:210px;padding:13px 16px;border-radius:999px;text-decoration:none;color:var(--text);border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05)}
+    .msg{display:none;margin-top:14px;padding:13px 14px;border-radius:16px;border:1px solid rgba(255,255,255,.12);background:rgba(0,0,0,.24);white-space:pre-wrap;line-height:1.55}
+    .msg.show{display:block}
+    .msg.ok{border-color:rgba(125,255,179,.28); color:#dcffea}
+    .msg.err{border-color:rgba(255,143,143,.28); color:#ffe1e1}
+    .hint{color:rgba(255,255,255,.68);font-size:13px;line-height:1.55;margin-top:10px}
+    ul{margin:0;padding-left:18px;color:var(--muted);line-height:1.65}
+    footer{margin-top:16px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;color:rgba(255,255,255,.70);font-size:13px}
+    @media (max-width:800px){.grid{grid-template-columns:1fr}h1{font-size:34px}.actions>*{width:100%}button,.ghost{min-width:0}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="top">
+      <div class="brand"><span class="dot"></span><span>FitnessLady</span></div>
+      <a class="pill" id="btnBack" href="/de/">Zurück</a>
+    </div>
+
+    <div class="card">
+      <div class="chip" id="chipPlan">Paket: wird geladen...</div>
+      <h1>Konto aktivieren</h1>
+      <p class="sub">
+        Über den einmaligen Link aus deiner Kauf-E-Mail kannst du hier dein Konto erstellen.
+        Nach der erfolgreichen Aktivierung leiten wir dich direkt zum Login weiter.
+      </p>
+
+      <div class="grid">
+        <div class="panel">
+          <h2>Registrierungsdaten</h2>
+
+          <label for="email">E-Mail</label>
+          <input id="email" type="email" autocomplete="email" placeholder="email@domain.com" readonly />
+
+          <label for="displayName">Name</label>
+          <input id="displayName" type="text" autocomplete="name" placeholder="Wie wir dich ansprechen dürfen" />
+
+          <label for="pass">Passwort</label>
+          <input id="pass" type="password" autocomplete="new-password" placeholder="Mindestens 6 Zeichen" />
+
+          <div class="legal">
+            <div class="legal-row">
+              <input id="legalAccept" type="checkbox" />
+              <p>
+                Ich habe die
+                <a id="lnkAfsz" href="/de/legal/agb/">AGB</a>,
+                die
+                <a id="lnkPrivacy" href="/de/legal/datenschutz/">Datenschutzerklärung</a>
+                sowie den
+                <a id="lnkMedical" href="/de/legal/medizin/">medizinischen Hinweis</a>
+                gelesen und akzeptiert.
+              </p>
+            </div>
+          </div>
+
+          <div class="actions">
+            <button id="btnCreate" type="button">Konto erstellen</button>
+            <a class="ghost" id="btnLogin" href="/de/login/">Ich habe bereits ein Konto</a>
+          </div>
+
+          <div class="msg" id="msgBox"></div>
+          <div class="hint">
+            Tipp: Wenn du diesen Link bereits verwendet hast, kannst du dich einfach mit derselben E-Mail-Adresse auf der Login-Seite anmelden.
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Was passiert als Nächstes?</h2>
+          <ul>
+            <li>Wir prüfen deinen Aktivierungs-Token aus dem Kauf.</li>
+            <li>Wir erstellen dein FitnessLady Konto mit dem gekauften Paket.</li>
+            <li>Danach leiten wir dich zum Login weiter, wo du dich mit deinen Daten anmelden kannst.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <footer>
+      <div>&copy; <span id="y"></span> FitnessLady</div>
+      <div>Tüske web design</div>
+    </footer>
+  </div>
+
+  <script type="module">
+    import { BASE_PREFIX } from "../shared/firebase.js";
+
+    const BACKEND_BASE_URL = "https://europe-west1-fitneady-15fd0.cloudfunctions.net";
+    document.getElementById("y").textContent = new Date().getFullYear();
+
+    const $ = (s) => document.querySelector(s);
+    const token = new URL(location.href).searchParams.get("token") || "";
+
+    $("#btnBack").href = `${BASE_PREFIX}/de/`;
+    $("#btnLogin").href = `${BASE_PREFIX}/de/login/`;
+    $("#lnkAfsz").href = `${BASE_PREFIX}/de/legal/agb/`;
+    $("#lnkPrivacy").href = `${BASE_PREFIX}/de/legal/datenschutz/`;
+    $("#lnkMedical").href = `${BASE_PREFIX}/de/legal/medizin/`;
+
+    let tokenReady = false;
+    let validatedEmail = "";
+
+    function planLabel(planId){
+      const p = String(planId || "").toLowerCase();
+      if (p.includes("balance")) return "Balance";
+      if (p.includes("pro")) return "Pro";
+      return "Start";
+    }
+
+    function showMsg(text, kind = "ok"){
+      const box = $("#msgBox");
+      box.textContent = text;
+      box.className = `msg show ${kind === "err" ? "err" : "ok"}`;
+    }
+
+    async function postJson(url, body){
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body || {})
+      });
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data?.error || `HTTP ${res.status}`);
+      }
+      return data;
+    }
+
+    async function validateToken(){
+      if (!token) {
+        $("#btnCreate").disabled = true;
+        showMsg("Der Aktivierungs-Token fehlt im Link. Öffne bitte die E-Mail nach dem Kauf erneut.", "err");
+        return;
+      }
+
+      try {
+        showMsg("Aktivierungslink wird geprüft...", "ok");
+        const data = await postJson(`${BACKEND_BASE_URL}/validateRegistrationToken`, { token });
+        validatedEmail = String(data.email || "").trim().toLowerCase();
+        $("#email").value = validatedEmail;
+        $("#chipPlan").textContent = `Paket: ${data.packageName || planLabel(data.planId)}`;
+        tokenReady = true;
+        showMsg("Dein Aktivierungslink ist gültig. Gib jetzt deinen Namen und dein Passwort ein.", "ok");
+      } catch (error) {
+        console.error(error);
+        $("#btnCreate").disabled = true;
+        showMsg(`Dieser Link ist ungültig oder wurde bereits verwendet.\n${error?.message || String(error)}`, "err");
+      }
+    }
+
+    $("#btnCreate").addEventListener("click", async () => {
+      const displayName = ($("#displayName").value || "").trim();
+      const pass = ($("#pass").value || "").trim();
+
+      if (!tokenReady) {
+        showMsg("Der Aktivierungslink muss zuerst geprüft werden. Bitte lade die Seite neu oder öffne den Link erneut aus der E-Mail.", "err");
+        return;
+      }
+      if (!validatedEmail || !validatedEmail.includes("@")) {
+        showMsg("Die E-Mail-Adresse aus dem Kauf konnte nicht geladen werden.", "err");
+        return;
+      }
+      if (!pass || pass.length < 6) {
+        showMsg("Das Passwort muss mindestens 6 Zeichen lang sein.", "err");
+        return;
+      }
+      if (!$("#legalAccept").checked) {
+        showMsg("Bitte akzeptiere die rechtlichen Dokumente, bevor du dein Konto erstellst.", "err");
+        return;
+      }
+
+      $("#btnCreate").disabled = true;
+      showMsg("Konto wird erstellt...", "ok");
+
+      try {
+        await postJson(`${BACKEND_BASE_URL}/completeRegistration`, {
+          token,
+          password: pass,
+          displayName
+        });
+
+        showMsg("Aktivierung erfolgreich. Weiterleitung zum Login...", "ok");
+        const emailQuery = encodeURIComponent(validatedEmail);
+        location.replace(`${BASE_PREFIX}/de/login/?success=1&from=stripe&email=${emailQuery}`);
+      } catch (error) {
+        console.error(error);
+        showMsg(`Fehler: ${error?.message || String(error)}`, "err");
+        $("#btnCreate").disabled = false;
+      }
+    });
+
+    await validateToken();
+  </script>
+</body>
+</html>

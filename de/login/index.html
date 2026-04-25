@@ -163,6 +163,7 @@
 
       <div class="row">
         <button class="pill primary" id="btnLogin" type="button">Einloggen</button>
+        <button class="pill" id="btnForgot" type="button">Passwort vergessen</button>
       </div>
 
       <div class="hint">
@@ -185,6 +186,7 @@
       escapeHtml, loginEmailPassword,
       ensureUserDoc, getUserRole, isAdminEmail
     } from "../shared/firebase.js";
+    import { sendPasswordResetEmail, getAuth } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
     // Back link + footer year
     document.getElementById("btnBack").href = `${BASE_PREFIX}/de/`;
@@ -239,6 +241,30 @@
     }
 
     $("#btnLogin").addEventListener("click", doLogin);
+    $("#btnForgot").addEventListener("click", async () => {
+      const email = ($("#email").value || "").trim();
+      if(!email || !email.includes("@")){
+        showMsg("Bitte gib zuerst deine E-Mail-Adresse ein.", "err");
+        $("#email").focus();
+        return;
+      }
+
+      const btn = $("#btnForgot");
+      btn.disabled = true;
+
+      try{
+        await sendPasswordResetEmail(getAuth(), email, {
+          url: `${location.origin}${BASE_PREFIX}/de/login/`,
+          handleCodeInApp: false
+        });
+        showMsg("Die Reset-E-Mail wurde gesendet. Bitte prüfe auch Spam oder Werbung.", "ok");
+      }catch(err){
+        console.error(err);
+        showMsg(`Fehler: ${escapeHtml(err?.message || String(err))}`, "err");
+      }finally{
+        btn.disabled = false;
+      }
+    });
 
     // Enter = login
     $("#pass").addEventListener("keydown", (e)=>{
