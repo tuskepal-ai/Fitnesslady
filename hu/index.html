@@ -1291,10 +1291,13 @@
       --spot-exit: 1.02;
       --spot-rest: .94;
       --spot-rest-opacity: .78;
-      scale: var(--spot-rest);
+      --spot-depth: 140px;
+      --scene-rotation: 0deg;
+      --scene-lift: 0px;
+      transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
       opacity: var(--spot-rest-opacity);
       filter: saturate(.78) brightness(.80);
-      will-change: transform, translate, scale, filter;
+      will-change: transform, filter, opacity;
       overflow:hidden;
     }
     .scene-panel:hover{
@@ -1346,7 +1349,7 @@
       width: 330px;
       height: 430px;
       z-index: 2;
-      transform: rotate(-3deg);
+      --scene-rotation: -3deg;
       animation-delay: -.8s, -12s;
     }
     .scene-panel-phone:hover{ transform: translateY(-8px) rotate(-2deg) scale(1.02); }
@@ -1399,7 +1402,7 @@
       width: 430px;
       min-height: 300px;
       z-index: 5;
-      transform: rotate(.8deg);
+      --scene-rotation: .8deg;
       animation-delay: -1.9s, 0s;
     }
     .scene-panel-client:hover{ transform: translateY(-9px) rotate(.3deg) scale(1.018); }
@@ -1431,7 +1434,7 @@
       bottom: 66px;
       width: 294px;
       z-index: 4;
-      transform: rotate(-1.4deg);
+      --scene-rotation: -1.4deg;
       animation-delay: -3s, -24s;
     }
     .scene-panel-rhythm:hover{ transform: translateY(-8px) rotate(-.8deg) scale(1.02); }
@@ -1441,7 +1444,7 @@
       width: 374px;
       min-height: 340px;
       z-index: 6;
-      transform: rotate(2.2deg);
+      --scene-rotation: 2.2deg;
       animation-delay: -4.2s, -30s;
     }
     .scene-panel-packages:hover{ transform: translateY(-10px) rotate(1deg) scale(1.018); }
@@ -1499,7 +1502,7 @@
       top: 56px;
       width: 286px;
       z-index: 3;
-      transform: rotate(3deg);
+      --scene-rotation: 3deg;
       animation-delay: -5.3s, -18s;
     }
     .scene-panel-videos:hover{ transform: translateY(-8px) rotate(1.4deg) scale(1.02); }
@@ -1523,7 +1526,7 @@
       width: 190px;
       z-index: 7;
       text-align:center;
-      transform: rotate(-2.2deg);
+      --scene-rotation: -2.2deg;
       animation-delay: -6.4s, -6s;
     }
     .scene-panel-timer:hover{ transform: translateY(-10px) rotate(-.8deg) scale(1.03); }
@@ -1532,13 +1535,13 @@
       margin: 10px auto 0;
     }
     @keyframes sceneFloat{
-      0%, 100%{ translate: 0 0; }
-      50%{ translate: 0 -8px; }
+      0%, 100%{ --scene-lift: 0px; }
+      50%{ --scene-lift: -8px; }
     }
     @keyframes sceneSpotlight{
       0%{
         z-index: 60;
-        scale: var(--spot-on);
+        transform: translate3d(0, var(--scene-lift), var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-on));
         opacity: 1;
         filter: saturate(1.22) brightness(1.18);
         border-color: rgba(255,79,216,.52);
@@ -1546,7 +1549,7 @@
       }
       6%, 14%{
         z-index: 60;
-        scale: var(--spot-hold);
+        transform: translate3d(0, var(--scene-lift), var(--spot-depth)) rotate(var(--scene-rotation)) scale(var(--spot-hold));
         opacity: 1;
         filter: saturate(1.26) brightness(1.2);
         border-color: rgba(255,79,216,.58);
@@ -1554,7 +1557,7 @@
       }
       20%{
         z-index: 8;
-        scale: var(--spot-exit);
+        transform: translate3d(0, var(--scene-lift), 60px) rotate(var(--scene-rotation)) scale(var(--spot-exit));
         opacity: .9;
         filter: saturate(.95) brightness(.94);
         border-color: rgba(255,255,255,.16);
@@ -1562,7 +1565,7 @@
       }
       22%, 100%{
         z-index: 2;
-        scale: var(--spot-rest);
+        transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
         opacity: var(--spot-rest-opacity);
         filter: saturate(.78) brightness(.80);
         border-color: rgba(255,255,255,.13);
@@ -1993,7 +1996,8 @@
         --spot-exit: 1.01;
         --spot-rest: .91;
         --spot-rest-opacity: .72;
-        scale: var(--spot-rest);
+        --spot-depth: 90px;
+        transform: translate3d(0, var(--scene-lift), 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
         opacity: var(--spot-rest-opacity);
       }
       .scene-kicker{
