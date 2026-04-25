@@ -479,7 +479,9 @@ function injectStyles() {
     .fx-card{
       border:1px solid rgba(255,255,255,.08);
       border-radius:24px;
-      background:rgba(255,255,255,.035);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025)),
+        rgba(12,9,18,.82);
       box-shadow:0 18px 44px rgba(0,0,0,.20);
       overflow:hidden;
     }
@@ -510,12 +512,26 @@ function injectStyles() {
 
     .fx-toolbar{
       display:grid;
-      grid-template-columns:1.1fr .72fr .62fr .62fr .62fr auto auto auto;
+      grid-template-columns:repeat(4, minmax(150px, 1fr));
       gap:10px;
       margin-bottom:14px;
+      padding:12px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.07);
+      background:rgba(0,0,0,.18);
+    }
+    .fx-toolbar #fxSearch{
+      grid-column:span 2;
+    }
+    .fx-toolbar .fx-btn{
+      min-height:42px;
+      padding:0 13px;
+      white-space:nowrap;
+      font-size:12.5px;
     }
     @media (max-width: 980px){
       .fx-toolbar{ grid-template-columns:1fr; }
+      .fx-toolbar #fxSearch{ grid-column:auto; }
     }
 
     .fx-input,
@@ -528,9 +544,27 @@ function injectStyles() {
       color:#fff;
       font:inherit;
       outline:none;
+      color-scheme:dark;
     }
     .fx-input,
     .fx-select{ min-height:46px; padding:0 14px; }
+    .fx-select{
+      cursor:pointer;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.075), rgba(255,255,255,.035)),
+        #140d1f;
+    }
+    .fx-select option,
+    .fx-select optgroup{
+      background:#140d1f;
+      color:#fff;
+    }
+    .fx-select:focus,
+    .fx-input:focus,
+    .fx-textarea:focus{
+      border-color:rgba(255,79,216,.42);
+      box-shadow:0 0 0 3px rgba(255,79,216,.12);
+    }
     .fx-textarea{
       min-height:110px;
       resize:vertical;
@@ -570,28 +604,34 @@ function injectStyles() {
 
     .fx-list{
       display:grid;
-      gap:12px;
+      gap:14px;
     }
 
     .fx-item{
       display:grid;
-      grid-template-columns:110px 1fr auto;
+      grid-template-columns:96px minmax(0, 1fr);
       gap:14px;
-      align-items:center;
-      padding:14px;
-      border-radius:20px;
+      align-items:start;
+      padding:14px 14px 12px;
+      border-radius:22px;
       border:1px solid rgba(255,255,255,.08);
-      background:rgba(0,0,0,.20);
+      background:
+        radial-gradient(280px 150px at 10% 0%, rgba(255,79,216,.10), transparent 60%),
+        rgba(0,0,0,.22);
       transition:transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+    }
+    .fx-item:hover{
+      border-color:rgba(255,79,216,.22);
+      box-shadow:0 18px 42px rgba(0,0,0,.24);
     }
     @media (max-width: 840px){
       .fx-item{ grid-template-columns:1fr; }
     }
 
     .fx-thumb{
-      width:110px;
-      height:110px;
-      border-radius:18px;
+      width:96px;
+      height:96px;
+      border-radius:20px;
       overflow:hidden;
       border:1px solid rgba(255,255,255,.08);
       background:rgba(255,255,255,.04);
@@ -621,7 +661,7 @@ function injectStyles() {
     }
 
     .fx-title{
-      font-size:22px;
+      font-size:20px;
       font-weight:900;
       margin-bottom:6px;
       line-height:1.1;
@@ -631,11 +671,12 @@ function injectStyles() {
       font-size:13px;
       line-height:1.5;
       margin-bottom:10px;
+      max-width:70ch;
     }
     .fx-meta{
       display:flex;
       flex-wrap:wrap;
-      gap:8px;
+      gap:7px;
     }
     .fx-chip{
       display:inline-flex;
@@ -645,7 +686,7 @@ function injectStyles() {
       background:rgba(255,255,255,.06);
       border:1px solid rgba(255,255,255,.08);
       color:rgba(255,255,255,.88);
-      font-size:12px;
+      font-size:11.5px;
       font-weight:900;
     }
     .fx-chip.ok{
@@ -663,7 +704,18 @@ function injectStyles() {
       display:flex;
       gap:8px;
       flex-wrap:wrap;
-      justify-content:flex-end;
+      justify-content:flex-start;
+      grid-column:2 / -1;
+      padding-top:2px;
+    }
+    .fx-actions .fx-btn{
+      min-height:38px;
+      padding:0 12px;
+      border-radius:999px;
+      font-size:12px;
+    }
+    @media (max-width: 840px){
+      .fx-actions{ grid-column:auto; }
     }
 
     .fx-label{
