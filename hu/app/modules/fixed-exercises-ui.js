@@ -1,6 +1,8 @@
 import { db, fs } from "../../shared/firebase.js";
+import { FIXED_EXERCISE_IMAGE_URLS } from "../../shared/fixed-exercises-data.js";
 
 const IMAGE_MAP = {
+  ...FIXED_EXERCISE_IMAGE_URLS,
   "guggolas": "/hu/app/assets/exercises/guggolas.png",
   "fekvotamasz": "/hu/app/assets/exercises/fekvotamasz.png",
   "plank": "/hu/app/assets/exercises/plank.png",
@@ -27,6 +29,20 @@ const IMAGE_MAP = {
   "konnyu-ulesbol-felallas": "/hu/app/assets/exercises/konnyu-ulesbol-felallas.png",
 };
 
+const CANONICAL_EXERCISE_IDS = new Set(Object.keys(FIXED_EXERCISE_IMAGE_URLS));
+const CANONICAL_EXERCISE_ALIASES = {
+  "csipo-emeles": "csipoemeles",
+  "csipo-emeles-fekve": "csipoemeles",
+  "glute-bridge": "csipoemeles",
+  glutebridge: "csipoemeles",
+  mountainclimber: "mountain-climber",
+  hegymaszo: "mountain-climber",
+  "szek-tricepsz": "szek-tamaszos-tricepsz",
+  vallkorzes: "vall-korzes",
+  jumpingjack: "jumping-jack",
+  "terpesz-zar": "jumping-jack",
+};
+
 const state = {
   uid: "",
   items: [],
@@ -50,6 +66,28 @@ function slugify(text) {
     .replace(/[\u0300-\u036f]/g, "")
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
+}
+
+function getCanonicalExerciseId(itemOrId) {
+  const item = typeof itemOrId === "object" && itemOrId ? itemOrId : { id: itemOrId };
+  const candidates = [
+    item.id,
+    item.exerciseId,
+    item.name,
+    item.nev
+  ];
+
+  for (const candidate of candidates) {
+    const raw = String(candidate || "").trim();
+    if (!raw) continue;
+    if (CANONICAL_EXERCISE_IDS.has(raw)) return raw;
+
+    const normalized = slugify(raw);
+    if (CANONICAL_EXERCISE_IDS.has(normalized)) return normalized;
+    if (CANONICAL_EXERCISE_ALIASES[normalized]) return CANONICAL_EXERCISE_ALIASES[normalized];
+  }
+
+  return "";
 }
 
 function isDataImageUrl(value) {
@@ -411,7 +449,7 @@ function ensureRoot() {
 }
 
 function getExerciseKey(item) {
-  return String(item?.id || "").trim();
+  return getCanonicalExerciseId(item) || String(item?.id || "").trim();
 }
 
 function getMappedImage(item) {
@@ -690,7 +728,20 @@ function bindCardEvents() {
 }
 
 function normalizeItems(items) {
-  state.items = [...items].sort((a, b) => {
+  const uniqueItems = new Map();
+
+  for (const item of items) {
+    if (item?.active === false || item?.archived === true) continue;
+
+    const id = getExerciseKey(item);
+    if (!id) continue;
+
+    const normalizedItem = { ...item, id };
+    if (!getDisplayImage(normalizedItem)) continue;
+    if (!uniqueItems.has(id)) uniqueItems.set(id, normalizedItem);
+  }
+
+  state.items = [...uniqueItems.values()].sort((a, b) => {
     const ao = Number(a.sortOrder || a.sorrend || 0);
     const bo = Number(b.sortOrder || b.sorrend || 0);
     if (ao !== bo) return ao - bo;

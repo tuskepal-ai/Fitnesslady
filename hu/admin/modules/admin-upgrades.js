@@ -3,6 +3,19 @@ import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_TEMPLATES_HU } from "../../s
 
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
+const CANONICAL_EXERCISE_IDS = new Set(FIXED_EXERCISE_TEMPLATES_HU.map((item) => item.id));
+const CANONICAL_EXERCISE_ALIASES = {
+  "csipo-emeles": "csipoemeles",
+  "csipo-emeles-fekve": "csipoemeles",
+  "glute-bridge": "csipoemeles",
+  glutebridge: "csipoemeles",
+  mountainclimber: "mountain-climber",
+  hegymaszo: "mountain-climber",
+  "szek-tricepsz": "szek-tamaszos-tricepsz",
+  vallkorzes: "vall-korzes",
+  jumpingjack: "jumping-jack",
+  "terpesz-zar": "jumping-jack",
+};
 
 const FALLBACK_EXERCISES_HU = [
   {
@@ -307,11 +320,33 @@ function normalizeExerciseKey(value) {
   return slugify(String(value || "").trim());
 }
 
+function getCanonicalExerciseId(itemOrId) {
+  const item = typeof itemOrId === "object" && itemOrId ? itemOrId : { id: itemOrId };
+  const candidates = [
+    item.id,
+    item.exerciseId,
+    item.name,
+    item.nev
+  ];
+
+  for (const candidate of candidates) {
+    const raw = String(candidate || "").trim();
+    if (!raw) continue;
+    if (CANONICAL_EXERCISE_IDS.has(raw)) return raw;
+
+    const normalized = normalizeExerciseKey(raw);
+    if (CANONICAL_EXERCISE_IDS.has(normalized)) return normalized;
+    if (CANONICAL_EXERCISE_ALIASES[normalized]) return CANONICAL_EXERCISE_ALIASES[normalized];
+  }
+
+  return "";
+}
+
 function resolveImage(id, manualUrl = "") {
   const cleanManual = String(manualUrl || "").trim();
   if (cleanManual) return cleanManual;
 
-  const rawId = String(id || "").trim();
+  const rawId = getCanonicalExerciseId(id) || String(id || "").trim();
   const file =
     FIXED_EXERCISE_IMAGE_FILES[rawId] ||
     FIXED_EXERCISE_IMAGE_FILES[normalizeExerciseKey(rawId)] ||
@@ -475,7 +510,7 @@ function injectStyles() {
 
     .fx-toolbar{
       display:grid;
-      grid-template-columns:1.1fr .72fr .62fr .62fr .62fr auto auto;
+      grid-template-columns:1.1fr .72fr .62fr .62fr .62fr auto auto auto;
       gap:10px;
       margin-bottom:14px;
     }
@@ -818,6 +853,7 @@ function injectOverlay() {
                 <option value="inactive">Inaktív</option>
               </select>
               <button class="fx-btn" id="fxSeedBtn" type="button">Alap edzések frissítése</button>
+              <button class="fx-btn danger" id="fxCleanupBtn" type="button">Duplák / kép nélküliek archiválása</button>
               <button class="fx-btn primary" id="fxNewBtn" type="button">+ Új</button>
             </div>
 
@@ -988,6 +1024,7 @@ function bindStaticEvents() {
   document.getElementById("fxResetBtn")?.addEventListener("click", resetForm);
   document.getElementById("fxSaveBtn")?.addEventListener("click", saveExercise);
   document.getElementById("fxSeedBtn")?.addEventListener("click", refreshSeedExercises);
+  document.getElementById("fxCleanupBtn")?.addEventListener("click", cleanupDuplicateExercises);
   document.getElementById("fxEditSelect")?.addEventListener("change", (e) => {
     const id = String(e.target.value || "").trim();
     if (id) startEdit(id);
@@ -1067,13 +1104,115 @@ async function refreshSeedExercises() {
   }
 }
 
+async function cleanupDuplicateExercises() {
+  const ok = confirm(
+    "Archiváljam a duplikált vagy kép nélküli fix edzéseket?\n\nA kanonikus, képpel rendelkező edzések aktívak maradnak. A régi/hibás rekordok nem törlődnek végleg, csak archived=true és active=false állapotba kerülnek."
+  );
+  if (!ok) return;
+
+  try {
+    await ensureSeedExercises({ overwrite: true });
+
+    const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
+    const seenCanonicalIds = new Set();
+    const canonicalTemplateById = new Map(FIXED_EXERCISE_TEMPLATES_HU.map((item) => [item.id, item]));
+    let archivedCount = 0;
+    let fixedCount = 0;
+
+    const docs = snap.docs
+      .map((docSnap) => ({
+        docSnap,
+        id: docSnap.id,
+        data: docSnap.data() || {}
+      }))
+      .sort((a, b) => {
+        const ac = getCanonicalExerciseId({ id: a.id, ...a.data }) || a.id;
+        const bc = getCanonicalExerciseId({ id: b.id, ...b.data }) || b.id;
+        const canon = ac.localeCompare(bc, "hu");
+        if (canon) return canon;
+        const aCanonicalDoc = CANONICAL_EXERCISE_IDS.has(a.id) ? 0 : 1;
+        const bCanonicalDoc = CANONICAL_EXERCISE_IDS.has(b.id) ? 0 : 1;
+        if (aCanonicalDoc !== bCanonicalDoc) return aCanonicalDoc - bCanonicalDoc;
+        return String(a.data.name || a.id).localeCompare(String(b.data.name || b.id), "hu");
+      });
+
+    for (const entry of docs) {
+      const canonicalId = getCanonicalExerciseId({ id: entry.id, ...entry.data });
+      const template = canonicalTemplateById.get(canonicalId);
+      const hasImage = !!resolveImage(canonicalId || entry.id, entry.data.imageUrl || template?.imageUrl || "");
+      const shouldKeep = !!template && hasImage && !seenCanonicalIds.has(canonicalId) && entry.id === canonicalId;
+
+      if (shouldKeep) {
+        seenCanonicalIds.add(canonicalId);
+        await fs.setDoc(entry.docSnap.ref, {
+          ...template,
+          imageUrl: resolveImage(canonicalId, template.imageUrl || ""),
+          active: true,
+          archived: false,
+          duplicateOf: "",
+          cleanupReason: "",
+          updatedAt: fs.serverTimestamp()
+        }, { merge: true });
+        fixedCount += 1;
+        continue;
+      }
+
+      await fs.setDoc(entry.docSnap.ref, {
+        active: false,
+        archived: true,
+        duplicateOf: canonicalId || "",
+        cleanupReason: canonicalId ? "duplicate-or-noncanonical" : "missing-canonical-image",
+        updatedAt: fs.serverTimestamp()
+      }, { merge: true });
+      archivedCount += 1;
+    }
+
+    await loadExercises();
+    resetForm();
+    renderCategoryFilter();
+    renderEditSelect();
+    renderExercises();
+    alert(`Kész. Aktív képes edzés: ${fixedCount}. Archivált régi/hibás rekord: ${archivedCount}.`);
+  } catch (e) {
+    console.error(e);
+    alert(`Archiválási hiba: ${extractErrorMessage(e)}`);
+  }
+}
+
 async function loadExercises() {
   try {
     const snap = await fs.getDocs(fs.collection(db, EXERCISES_COL));
-    state.exercises = snap.docs.map((d) => ({
-      id: d.id,
-      ...(d.data() || {})
-    }));
+    const uniqueByCanonicalId = new Map();
+    const rawItems = snap.docs
+      .map((d) => ({
+        id: d.id,
+        ...(d.data() || {})
+      }))
+      .filter((item) => item.archived !== true)
+      .sort((a, b) => {
+        const ac = getCanonicalExerciseId(a) || a.id;
+        const bc = getCanonicalExerciseId(b) || b.id;
+        const canon = ac.localeCompare(bc, "hu");
+        if (canon) return canon;
+        const aCanonicalDoc = CANONICAL_EXERCISE_IDS.has(a.id) ? 0 : 1;
+        const bCanonicalDoc = CANONICAL_EXERCISE_IDS.has(b.id) ? 0 : 1;
+        return aCanonicalDoc - bCanonicalDoc;
+      });
+
+    for (const item of rawItems) {
+      const canonicalId = getCanonicalExerciseId(item);
+      if (!canonicalId || uniqueByCanonicalId.has(canonicalId)) continue;
+
+      const imageUrl = resolveImage(canonicalId, item.imageUrl || "");
+      if (!imageUrl) continue;
+
+      uniqueByCanonicalId.set(canonicalId, {
+        ...item,
+        imageUrl
+      });
+    }
+
+    state.exercises = [...uniqueByCanonicalId.values()];
     renderError("");
   } catch (e) {
     console.error(e);
