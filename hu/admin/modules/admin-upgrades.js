@@ -4,7 +4,7 @@ import { FIXED_EXERCISE_IMAGE_FILES, FIXED_EXERCISE_IMAGE_URLS, FIXED_EXERCISE_T
 const EXERCISES_COL = "fixedExerciseTemplates";
 const USER_ASSIGN_SUBCOL = "fixedExercises";
 const CANONICAL_EXERCISE_IDS = new Set(FIXED_EXERCISE_TEMPLATES_HU.map((item) => item.id));
-const EXERCISE_ASSET_VERSION = "fixed-exercises-20260426";
+const EXERCISE_ASSET_VERSION = "fixed-exercises-20260426-ai-v2";
 const CANONICAL_EXERCISE_ALIASES = {
   "csipo-emeles": "csipoemeles",
   "csipo-emeles-fekve": "csipoemeles",
