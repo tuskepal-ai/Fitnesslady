@@ -432,6 +432,7 @@
     .system-preview-section{
       position: relative;
       overflow: hidden;
+      scroll-margin-top: 92px;
     }
     .system-preview-section::before{
       content:"";
@@ -1022,6 +1023,18 @@
       box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
       overflow: hidden;
     }
+    .deck-orbit::after{
+      content:"";
+      position:absolute;
+      inset: 44px 18px 18px 44px;
+      border-radius: 34px;
+      background: linear-gradient(180deg, rgba(255,255,255,.045), rgba(255,255,255,.012));
+      border: 1px solid rgba(255,255,255,.075);
+      box-shadow: 0 18px 52px rgba(0,0,0,.24), 0 0 34px rgba(177,76,255,.10);
+      transform: rotate(3.5deg);
+      opacity: .58;
+      pointer-events:none;
+    }
     .deck-orbit::before{
       content:"";
       position:absolute;
@@ -1048,10 +1061,12 @@
       border: 1px solid rgba(255,255,255,.12);
       box-shadow: 0 28px 76px rgba(0,0,0,.42), 0 0 46px rgba(255,79,216,.10);
       opacity: 0;
-      transform: translateY(34px) scale(.965);
+      transform: translate3d(86px, 30px, 0) rotate(4.5deg) scale(.955);
+      transform-origin: 50% 92%;
       animation: deckCycle 24s cubic-bezier(.2,.78,.18,1) infinite;
       overflow: hidden;
       isolation: isolate;
+      z-index: 2;
     }
     .deck-card::before{
       content:"";
@@ -1241,10 +1256,11 @@
       color: var(--text);
     }
     @keyframes deckCycle{
-      0%{ opacity: 0; transform: translateY(34px) scale(.965); filter: blur(1px); }
-      5%, 17%{ opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
-      22%{ opacity: 0; transform: translateY(-24px) scale(.985); filter: blur(.6px); }
-      100%{ opacity: 0; transform: translateY(-24px) scale(.985); filter: blur(.6px); }
+      0%{ opacity: 0; transform: translate3d(92px, 34px, 0) rotate(5.5deg) scale(.955); filter: blur(1px); }
+      4%{ opacity: 1; transform: translate3d(18px, 10px, 0) rotate(1.2deg) scale(.985); filter: blur(0); }
+      7%, 17%{ opacity: 1; transform: translate3d(0, 0, 0) rotate(0deg) scale(1); filter: blur(0); }
+      22%{ opacity: 0; transform: translate3d(-88px, -30px, 0) rotate(-5deg) scale(.965); filter: blur(.7px); }
+      100%{ opacity: 0; transform: translate3d(-88px, -30px, 0) rotate(-5deg) scale(.965); filter: blur(.7px); }
     }
     .packages{
       display:grid;
@@ -1539,74 +1555,124 @@
         margin: 0 0 12px;
       }
       .system-one-deck{
-        min-height: 650px;
-        padding: 12px;
+        min-height: 600px;
+        padding: 10px;
       }
       .system-one-deck .system-video-top{
-        margin-bottom: 12px;
+        margin-bottom: 10px;
+        gap: 8px;
       }
       .system-one-deck .system-showcase{
-        min-height: 590px;
+        min-height: 530px;
         padding: 0;
       }
       .deck-orbit{
         inset: 0;
-        border-radius: 28px;
+        border-radius: 26px;
+      }
+      .deck-orbit::after{
+        inset: 30px 9px 9px 30px;
+        border-radius: 24px;
+        transform: rotate(2.8deg);
       }
       .deck-card{
-        inset: 12px;
+        inset: 11px;
         grid-template-columns: 1fr;
-        grid-template-rows: minmax(230px, 42%) 1fr;
-        gap: 13px;
-        padding: 13px;
-        border-radius: 26px;
+        grid-template-rows: 168px 1fr;
+        gap: 10px;
+        padding: 11px;
+        border-radius: 24px;
         animation-duration: 24s;
       }
       .deck-media{
         min-height: 0;
-        border-radius: 22px;
+        border-radius: 19px;
       }
       .deck-media img{
         min-height: 0;
         height: 100%;
-        max-height: 270px;
-        aspect-ratio: 16 / 10;
+        max-height: 190px;
+        aspect-ratio: 16 / 9;
+        object-position: center top;
       }
       .deck-media.tall img{
-        object-position: center 18%;
+        object-position: center top;
       }
       .deck-badge{
-        width: 52px;
-        height: 52px;
-        font-size: 13px;
+        width: 46px;
+        height: 46px;
+        font-size: 12px;
+        top: 10px;
+        right: 10px;
       }
       .deck-content{
         justify-content:flex-start;
-        gap: 10px;
+        gap: 7px;
       }
       .deck-kicker{
-        font-size: 10px;
+        font-size: 9.5px;
+        letter-spacing: .16em;
       }
       .deck-content h3{
-        font-size: clamp(25px, 8vw, 34px);
+        font-size: clamp(23px, 7vw, 30px);
+        line-height: 1.02;
       }
       .deck-content p{
-        font-size: 13px;
-        line-height: 1.5;
+        font-size: 12px;
+        line-height: 1.42;
       }
       .deck-pill{
-        padding: 9px 11px;
-        font-size: 11px;
+        padding: 7px 9px;
+        font-size: 10px;
       }
       .deck-timer{
-        width: min(180px, 58vw);
+        width: min(150px, 48vw);
+        margin-top: 0;
       }
       .deck-timer-inner strong{
-        font-size: 30px;
+        font-size: 26px;
+      }
+      .deck-timer-inner span{
+        font-size: 11px;
+      }
+      .deck-progress{
+        gap: 8px;
+      }
+      .deck-progress-row{
+        gap: 5px;
+        font-size: 12px;
+      }
+      .deck-bar{
+        height: 8px;
+      }
+      .deck-package-list{
+        gap: 7px;
       }
       .deck-package-line{
-        padding: 10px 11px;
-        font-size: 12px;
+        padding: 8px 10px;
+        font-size: 11px;
+        border-radius: 15px;
+      }
+      .deck-card-timer{
+        grid-template-rows: 154px 1fr;
+      }
+      .deck-card-timer .deck-pills{
+        display:none;
+      }
+      .deck-card-timer .deck-content{
+        align-items:flex-start;
+      }
+      .deck-card-packages{
+        grid-template-rows: 150px 1fr;
+      }
+      .deck-card-packages .deck-content p{
+        display:none;
+      }
+      .deck-card-packages .deck-pills{
+        margin-top: 2px;
+      }
+      .deck-card-client{
+        grid-template-rows: 150px 1fr;
       }
       .hero-wrap{ margin-left: auto; margin-right: auto; }
       .about-layout{ grid-template-columns: 1fr; }
@@ -1801,7 +1867,7 @@ Edina • Fitnesz Lady
 
           <div class="system-showcase">
             <div class="deck-orbit" aria-label="FitnessLady rendszer anim&aacute;lt el&#337;n&eacute;zet">
-              <article class="deck-card">
+              <article class="deck-card deck-card-workout">
                 <div class="deck-media">
                   <img src="/hu/assets/preview-card-1.jpg" alt="Fekv&#337;t&aacute;masz edz&eacute;sk&aacute;rtya stopperrel" />
                   <div class="deck-badge">FL</div>
@@ -1818,7 +1884,7 @@ Edina • Fitnesz Lady
                 </div>
               </article>
 
-              <article class="deck-card">
+              <article class="deck-card deck-card-coach">
                 <div class="deck-media tall">
                   <img src="/hu/assets/preview-card-2.jpg" alt="K&iacute;m&eacute;l&#337; edz&eacute;sk&aacute;rtya le&iacute;r&aacute;ssal" />
                   <div class="deck-badge">FL</div>
@@ -1834,7 +1900,7 @@ Edina • Fitnesz Lady
                 </div>
               </article>
 
-              <article class="deck-card">
+              <article class="deck-card deck-card-timer">
                 <div class="deck-media">
                   <img src="/hu/assets/preview-card-3.jpg" alt="Guggol&aacute;s edz&eacute;sk&aacute;rtya stopperrel" />
                   <div class="deck-badge">FL</div>
@@ -1858,7 +1924,7 @@ Edina • Fitnesz Lady
                 </div>
               </article>
 
-              <article class="deck-card">
+              <article class="deck-card deck-card-client">
                 <div class="deck-media">
                   <img src="/hu/assets/preview-card-1.jpg" alt="FitnessLady vev&#337;i oldal el&#337;n&eacute;zet" />
                   <div class="deck-badge">FL</div>
@@ -1880,7 +1946,7 @@ Edina • Fitnesz Lady
                 </div>
               </article>
 
-              <article class="deck-card">
+              <article class="deck-card deck-card-packages">
                 <div class="deck-media tall">
                   <img src="/hu/assets/preview-card-2.jpg" alt="FitnessLady csomagok &eacute;s vide&oacute;s t&aacute;mogat&aacute;s" />
                   <div class="deck-badge">FL</div>
