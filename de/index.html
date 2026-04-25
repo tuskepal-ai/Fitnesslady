@@ -823,7 +823,13 @@
               <div class="about-title">Ãœber mich</div>
               <div class="tag">Edina</div>
             </div>
-            <p class="about-text">Ich baue nicht nur Form auf â€“ ich baue Vertrauen, Struktur und Zukunft.
+
+            <div class="about-layout">
+              <div class="about-photo">
+                <img src="/hu/assets/rolam.jpg" alt="Edina - Fitness Lady" />
+              </div>
+
+              <p class="about-text">Ich baue nicht nur Form auf â€“ ich baue Vertrauen, Struktur und Zukunft.
 
 Ich bin Edina, die GrÃ¼nderin von FitnessLady. Ich glaube daran, dass der KÃ¶rper ein Kraftwerk ist: Mit der richtigen Richtung, Bewusstsein und einem klaren System entstehen sichtbare und nachhaltige Ergebnisse.
 
@@ -834,6 +840,7 @@ Meine Programme sind fÃ¼r Frauen, die sich entwickeln wollen, Struktur lieben 
 Wenn du UnterstÃ¼tzung suchst, die effektiv, motivierend und nachhaltig ist, bist du hier richtig.
 
 Edina â€¢ FitnessLady</p>
+            </div>
           </div>
 
           <div class="glass interactive what-card">
@@ -1099,6 +1106,11 @@ Edina â€¢ FitnessLady</p>
         if(!route) return;
         a.setAttribute("href", base + route);
       });
+
+      const aboutImg = document.querySelector('.about-photo img');
+      if(aboutImg && base){
+        aboutImg.src = base + "/hu/assets/rolam.jpg";
+      }
 
       const frame = document.getElementById("agbFrame");
       if(frame) frame.src = `${base}/de/legal/agb/`;
