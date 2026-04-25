@@ -885,7 +885,7 @@ Edina • FitnessLady</p>
             <li><span class="check"></span> 1× Kontrolle / Anpassung</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="https://buy.stripe.com/test_7sY4gzcfH5pDaRXbBW0RG00" target="_blank" rel="noopener">Kaufen</a>
+            <a class="btn buy-btn interactive" href="#" data-plan="start" target="_blank" rel="noopener">Kaufen</a>
             <a class="btn info-btn interactive" href="#kontakt">Ich will Infos</a>
           </div>
         </article>
@@ -902,7 +902,7 @@ Edina • FitnessLady</p>
             <li><span class="check"></span> Wöchentliches Tracking / Feinjustierung</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="https://buy.stripe.com/test_5kQ3cv2F7dW9aRX49u0RG01" target="_blank" rel="noopener">Kaufen</a>
+            <a class="btn buy-btn interactive" href="#" data-plan="balance" target="_blank" rel="noopener">Kaufen</a>
             <a class="btn info-btn interactive" href="#kontakt">Ich will Infos</a>
           </div>
         </article>
@@ -919,7 +919,7 @@ Edina • FitnessLady</p>
             <li><span class="check"></span> Häufigere Kontrolle + Struktur</li>
           </ul>
           <div class="pkg-actions">
-            <a class="btn buy-btn interactive" href="https://buy.stripe.com/test_14AdR993v7xL3pv6hC0RG03" target="_blank" rel="noopener">Kaufen</a>
+            <a class="btn buy-btn interactive" href="#" data-plan="pro" target="_blank" rel="noopener">Kaufen</a>
             <a class="btn info-btn interactive" href="#kontakt">Ich will Infos</a>
           </div>
         </article>
@@ -1081,6 +1081,7 @@ Edina • FitnessLady</p>
     </div>
   </div>
 
+  <script src="../Shared/stripe-links.js"></script>
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
 
@@ -1470,6 +1471,16 @@ Edina • FitnessLady</p>
 
     refreshBtn?.addEventListener('click', loadReviews);
     loadReviews();
+
+    (function bindStripeButtons(){
+      const mode = window.getFitnessLadyStripeMode ? window.getFitnessLadyStripeMode("live") : "live";
+      document.querySelectorAll(".buy-btn[data-plan]").forEach((button) => {
+        const href = window.getFitnessLadyStripeUrl ? window.getFitnessLadyStripeUrl(button.dataset.plan, { mode }) : "";
+        if (!href) return;
+        button.href = href;
+        button.dataset.stripeMode = mode;
+      });
+    })();
   </script>
 </body>
 </html>

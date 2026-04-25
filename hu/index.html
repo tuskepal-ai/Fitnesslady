@@ -828,7 +828,8 @@ Edina • Fitnesz Lady
           </ul>
           <div class="pkg-actions">
             <a class="btn buy-btn interactive"
-               href="https://buy.stripe.com/eVq9AT1BkaXG0Ir8Gh2Ji04"
+               href="#"
+               data-plan="start"
                target="_blank"
                rel="noopener"
                aria-label="Fizetés (Start)">Vásárlás</a>
@@ -849,7 +850,8 @@ Edina • Fitnesz Lady
           </ul>
           <div class="pkg-actions">
             <a class="btn buy-btn interactive"
-               href="https://buy.stripe.com/bJeeVdgwe2ragHpe0B2Ji05"
+               href="#"
+               data-plan="balance"
                target="_blank"
                rel="noopener"
                aria-label="Fizetés (Balance)">Vásárlás</a>
@@ -870,7 +872,8 @@ Edina • Fitnesz Lady
           </ul>
           <div class="pkg-actions">
             <a class="btn buy-btn interactive"
-               href="https://buy.stripe.com/14A9AT5RAgi0cr9aOp2Ji06"
+               href="#"
+               data-plan="pro"
                target="_blank"
                rel="noopener"
                aria-label="Fizetés (Pro)">Vásárlás</a>
@@ -1024,6 +1027,7 @@ Edina • Fitnesz Lady
     </div>
   </footer>
 
+  <script src="../Shared/stripe-links.js"></script>
   <script>
     document.getElementById("y").textContent = new Date().getFullYear();
 
@@ -1412,6 +1416,16 @@ Edina • Fitnesz Lady
 
     refreshBtn?.addEventListener('click', loadReviews);
     loadReviews();
+
+    (function bindStripeButtons(){
+      const mode = window.getFitnessLadyStripeMode ? window.getFitnessLadyStripeMode("live") : "live";
+      document.querySelectorAll(".buy-btn[data-plan]").forEach((button) => {
+        const href = window.getFitnessLadyStripeUrl ? window.getFitnessLadyStripeUrl(button.dataset.plan, { mode }) : "";
+        if (!href) return;
+        button.href = href;
+        button.dataset.stripeMode = mode;
+      });
+    })();
 
     (function setupInstallButton(){
       const btn = document.getElementById("installAppBtn");
