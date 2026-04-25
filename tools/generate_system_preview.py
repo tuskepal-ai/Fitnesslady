@@ -3,8 +3,8 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont, ImageOps
 
 
 ROOT = Path(__file__).resolve().parents[1]
-DESKTOP = Path.home() / "OneDrive" / "Desktop"
 OUT_DIR = ROOT / "hu" / "assets"
+ANDROID_ASSETS = Path.home() / "AndroidStudioProjects" / "FitnessLady" / "app" / "src" / "main" / "assets" / "exercises"
 
 
 def load_font(candidates, size):
@@ -15,45 +15,37 @@ def load_font(candidates, size):
     return ImageFont.load_default()
 
 
+FONT_DISPLAY = load_font(
+    [r"C:\Windows\Fonts\segoeuib.ttf", r"C:\Windows\Fonts\arialbd.ttf"],
+    58,
+)
 FONT_BOLD = load_font(
-    [
-        r"C:\Windows\Fonts\segoeuib.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-    ],
-    60,
+    [r"C:\Windows\Fonts\segoeuib.ttf", r"C:\Windows\Fonts\arialbd.ttf"],
+    34,
 )
 FONT_TITLE = load_font(
-    [
-        r"C:\Windows\Fonts\segoeuib.ttf",
-        r"C:\Windows\Fonts\arialbd.ttf",
-    ],
-    44,
+    [r"C:\Windows\Fonts\segoeuib.ttf", r"C:\Windows\Fonts\arialbd.ttf"],
+    42,
 )
 FONT_TEXT = load_font(
-    [
-        r"C:\Windows\Fonts\segoeui.ttf",
-        r"C:\Windows\Fonts\arial.ttf",
-    ],
-    28,
+    [r"C:\Windows\Fonts\segoeui.ttf", r"C:\Windows\Fonts\arial.ttf"],
+    27,
 )
 FONT_SMALL = load_font(
-    [
-        r"C:\Windows\Fonts\segoeui.ttf",
-        r"C:\Windows\Fonts\arial.ttf",
-    ],
-    22,
+    [r"C:\Windows\Fonts\segoeui.ttf", r"C:\Windows\Fonts\arial.ttf"],
+    21,
 )
 
 
 PINK = (255, 79, 216)
 PINK_2 = (177, 76, 255)
 GOLD = (255, 211, 138)
+GREEN = (110, 244, 167)
 BG = (8, 6, 12)
-CARD = (28, 19, 35, 238)
-CARD_2 = (20, 14, 28, 225)
+CARD = (25, 18, 33, 238)
+CARD_2 = (18, 13, 25, 228)
 WHITE = (247, 243, 250)
 MUTED = (204, 194, 216)
-LINE = (109, 95, 123, 165)
 
 
 def rounded_mask(size, radius):
@@ -63,7 +55,12 @@ def rounded_mask(size, radius):
     return mask
 
 
-def add_glow(base, xy, color, blur=42):
+def fit_image(path, size, centering=(0.5, 0.5)):
+    img = Image.open(path).convert("RGB")
+    return ImageOps.fit(img, size, method=Image.Resampling.LANCZOS, centering=centering)
+
+
+def add_glow(base, xy, color, blur=48):
     glow = Image.new("RGBA", base.size, (0, 0, 0, 0))
     draw = ImageDraw.Draw(glow)
     draw.ellipse(xy, fill=color)
@@ -71,206 +68,209 @@ def add_glow(base, xy, color, blur=42):
     base.alpha_composite(glow)
 
 
-def make_background():
-    canvas = Image.new("RGBA", (900, 1600), BG + (255,))
-    draw = ImageDraw.Draw(canvas)
-    draw.rectangle((0, 0, 900, 1600), fill=(8, 6, 12, 255))
-    add_glow(canvas, (20, 60, 450, 520), (255, 79, 216, 120), blur=100)
-    add_glow(canvas, (420, 120, 880, 720), (177, 76, 255, 110), blur=120)
-    add_glow(canvas, (220, 900, 760, 1480), (120, 35, 110, 110), blur=140)
+def add_shadow(base, box, radius=34):
+    shadow = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(shadow)
+    draw.rounded_rectangle(box, radius=radius, fill=(0, 0, 0, 170))
+    shadow = shadow.filter(ImageFilter.GaussianBlur(28))
+    base.alpha_composite(shadow)
 
-    overlay = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
-    draw_o = ImageDraw.Draw(overlay)
-    for y in range(0, 1600, 44):
-        alpha = 16 if (y // 44) % 2 == 0 else 8
-        draw_o.line((60, y, 840, y), fill=(255, 255, 255, alpha), width=1)
-    canvas.alpha_composite(overlay)
+
+def draw_text(draw, xy, text, font, fill):
+    draw.text(xy, text, font=font, fill=fill)
+
+
+def make_background():
+    canvas = Image.new("RGBA", (960, 1360), BG + (255,))
+    draw = ImageDraw.Draw(canvas)
+    add_glow(canvas, (30, 40, 420, 430), (255, 79, 216, 120), blur=110)
+    add_glow(canvas, (520, 90, 930, 620), (177, 76, 255, 105), blur=120)
+    add_glow(canvas, (200, 840, 780, 1320), (120, 34, 108, 110), blur=150)
+    for y in range(40, 1320, 52):
+        alpha = 16 if (y // 52) % 2 == 0 else 9
+        draw.line((70, y, 890, y), fill=(255, 255, 255, alpha), width=1)
     return canvas
 
 
-def find_path(patterns):
-    for pattern in patterns:
-        matches = list(DESKTOP.glob(pattern))
-        if matches:
-            return matches[0]
-    return None
+def draw_header(draw, title, subtitle, chip_left, chip_right):
+    draw.rounded_rectangle((64, 70, 286, 122), radius=25, fill=(39, 27, 50, 218), outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (92, 83), title, FONT_TITLE, WHITE)
+    draw_text(draw, (64, 144), subtitle, FONT_TEXT, MUTED)
+
+    lw = draw.textbbox((0, 0), chip_left, font=FONT_SMALL)[2] + 42
+    rw = draw.textbbox((0, 0), chip_right, font=FONT_SMALL)[2] + 42
+    draw.rounded_rectangle((64, 206, 64 + lw, 248), radius=22, fill=(49, 35, 60, 212), outline=(255, 255, 255, 16), width=1)
+    draw_text(draw, (84, 216), chip_left, FONT_SMALL, GOLD)
+    draw.rounded_rectangle((960 - 64 - rw, 206, 960 - 64, 248), radius=22, fill=(49, 35, 60, 212), outline=(255, 255, 255, 16), width=1)
+    draw_text(draw, (960 - 44 - rw, 216), chip_right, FONT_SMALL, WHITE)
 
 
-def fit_image(img, size):
-    return ImageOps.fit(img.convert("RGB"), size, method=Image.Resampling.LANCZOS, centering=(0.5, 0.5))
+def draw_meta_chip(draw, x, y, text, accent=None):
+    fill = accent if accent else MUTED
+    width = draw.textbbox((0, 0), text, font=FONT_SMALL)[2] + 40
+    draw.rounded_rectangle((x, y, x + width, y + 42), radius=21, fill=(42, 31, 54, 212), outline=(255, 255, 255, 16), width=1)
+    draw_text(draw, (x + 18, y + 10), text, FONT_SMALL, fill)
+    return width
 
 
-def draw_phone_frame(base, screenshot_path, title, subtitle, chip_text, time_label, button_label, scale=1.0):
-    screen_w, screen_h = int(360 * scale), int(760 * scale)
-    outer = Image.new("RGBA", (screen_w + 36, screen_h + 36), (0, 0, 0, 0))
-    outer_draw = ImageDraw.Draw(outer)
-    outer_draw.rounded_rectangle((0, 0, outer.width - 1, outer.height - 1), radius=52, fill=(31, 20, 42, 235), outline=(208, 92, 218, 115), width=2)
-    outer_draw.rounded_rectangle((14, 14, outer.width - 14, outer.height - 14), radius=40, fill=(14, 10, 20, 255))
-
-    screenshot = fit_image(Image.open(screenshot_path), (screen_w - 24, screen_h - 24))
-    screenshot_rgba = screenshot.convert("RGBA")
-    screenshot_rgba.putalpha(rounded_mask((screen_w - 24, screen_h - 24), 34))
-    outer.alpha_composite(screenshot_rgba, (18, 18))
-
-    phone_x = (base.width - outer.width) // 2
-    phone_y = 250
-    shadow = Image.new("RGBA", base.size, (0, 0, 0, 0))
-    sdraw = ImageDraw.Draw(shadow)
-    sdraw.rounded_rectangle((phone_x + 14, phone_y + 24, phone_x + outer.width + 8, phone_y + outer.height + 18), radius=58, fill=(0, 0, 0, 160))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(24))
-    base.alpha_composite(shadow)
-    base.alpha_composite(outer, (phone_x, phone_y))
-
-    draw = ImageDraw.Draw(base)
-    draw.rounded_rectangle((70, 84, 330, 138), radius=27, fill=(41, 28, 51, 214), outline=(255, 255, 255, 20), width=1)
-    draw.text((96, 97), title, fill=WHITE, font=FONT_TITLE)
-    draw.text((70, 154), subtitle, fill=MUTED, font=FONT_TEXT)
-
-    chip_w = draw.textbbox((0, 0), chip_text, font=FONT_SMALL)[2] + 56
-    draw.rounded_rectangle((70, 202, 70 + chip_w, 246), radius=22, fill=(52, 36, 61, 210), outline=(255, 255, 255, 18), width=1)
-    draw.text((96, 213), chip_text, fill=GOLD, font=FONT_SMALL)
-
-    bubble = (base.width - 236, 152, base.width - 72, 238)
-    draw.rounded_rectangle(bubble, radius=28, fill=(28, 20, 34, 235), outline=(255, 255, 255, 18), width=1)
-    draw.text((bubble[0] + 22, bubble[1] + 16), time_label, fill=WHITE, font=FONT_SMALL)
-    draw.text((bubble[0] + 22, bubble[1] + 45), "Glow-os interval timer", fill=MUTED, font=FONT_SMALL)
-
-    cta = (base.width - 276, 1288, base.width - 78, 1362)
-    draw.rounded_rectangle(cta, radius=38, fill=PINK + (255,), outline=(255, 255, 255, 26), width=1)
-    draw.text((cta[0] + 34, cta[1] + 19), button_label, fill=(28, 11, 25), font=FONT_TITLE)
-
-
-def draw_stat_card(base, x, y, w, h, title, rows):
+def draw_progress_card(base, x, y, title, rows):
+    w, h = 300, 210
+    add_shadow(base, (x + 6, y + 10, x + w + 6, y + h + 10), radius=30)
     card = Image.new("RGBA", (w, h), (0, 0, 0, 0))
     draw = ImageDraw.Draw(card)
-    draw.rounded_rectangle((0, 0, w - 1, h - 1), radius=32, fill=CARD, outline=(255, 255, 255, 24), width=1)
-    draw.text((28, 22), title, fill=WHITE, font=FONT_TITLE)
-    yy = 82
-    for label, value, accent in rows:
-        draw.text((28, yy), label, fill=MUTED, font=FONT_SMALL)
-        draw.text((w - 180, yy), value, fill=accent, font=FONT_SMALL)
-        draw.rounded_rectangle((28, yy + 38, w - 28, yy + 52), radius=7, fill=(54, 45, 63, 255))
-        draw.rounded_rectangle((28, yy + 38, 28 + int((w - 56) * 0.72), yy + 52), radius=7, fill=accent + (255,))
-        yy += 92
+    draw.rounded_rectangle((0, 0, w - 1, h - 1), radius=30, fill=CARD, outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (24, 20), title, FONT_TITLE, WHITE)
+    yy = 78
+    for label, value, accent, width in rows:
+      draw_text(draw, (24, yy), label, FONT_SMALL, MUTED)
+      draw_text(draw, (w - 92, yy), value, FONT_SMALL, accent)
+      draw.rounded_rectangle((24, yy + 36, w - 24, yy + 48), radius=6, fill=(60, 49, 72, 255))
+      draw.rounded_rectangle((24, yy + 36, 24 + int((w - 48) * width), yy + 48), radius=6, fill=accent + (255,))
+      yy += 74
     base.alpha_composite(card, (x, y))
 
 
-def draw_package_card(base):
+def draw_exercise_feature(base):
     draw = ImageDraw.Draw(base)
-    panel = (76, 140, 824, 1464)
-    draw.rounded_rectangle(panel, radius=42, fill=(24, 18, 32, 236), outline=(255, 255, 255, 24), width=1)
-    draw.text((118, 188), "Start • Balance • Pro", fill=WHITE, font=FONT_BOLD)
-    draw.text((118, 270), "Ugyanaz a prémium rendszer, más mélységű támogatással.", fill=MUTED, font=FONT_TEXT)
+    draw_header(draw, "Fix edzések", "A rutinod egy pillantásra követhető és motiváló.", "Nagy, tiszta preview", "Intervallumos flow")
 
-    rows = [
-        ("Start", "4 hét • tiszta struktúra", ["Személyre szabott edzésterv", "Alap táplálkozási rendszer", "1x kontroll és finomhangolás"]),
-        ("Balance", "6 hét • heti követés", ["Edzésrendszer videókkal", "Heti követés és módosítás", "Progresszió és rutintartás"]),
-        ("Pro", "12 hét • maximális támogatás", ["Mély személyre szabás", "Gyakoribb kontroll", "Check-in és teljesebb jelenlét"]),
+    box = (88, 286, 820, 1180)
+    add_shadow(base, (100, 304, 832, 1194), radius=40)
+    panel = Image.new("RGBA", (box[2] - box[0], box[3] - box[1]), (0, 0, 0, 0))
+    pdraw = ImageDraw.Draw(panel)
+    pdraw.rounded_rectangle((0, 0, panel.width - 1, panel.height - 1), radius=38, fill=CARD, outline=(255, 255, 255, 18), width=1)
+    base.alpha_composite(panel, (box[0], box[1]))
+
+    hero = fit_image(ANDROID_ASSETS / "fekvotamasz.png", (660, 348), centering=(0.54, 0.38)).convert("RGBA")
+    hero.putalpha(rounded_mask(hero.size, 28))
+    base.alpha_composite(hero, (124, 320))
+
+    draw.ellipse((684, 336, 766, 418), fill=(214, 91, 244, 255))
+    draw_text(draw, (715, 364), "FL", FONT_SMALL, WHITE)
+
+    draw_text(draw, (126, 714), "Fekvőtámasz", FONT_DISPLAY, WHITE)
+    draw_text(draw, (130, 794), "Felsőtest", FONT_TITLE, PINK)
+    draw.multiline_text((126, 856), "Mell, váll és tricepsz erősítése.\nLetisztult kártya, tiszta ritmus, prémium nézet.", font=FONT_TEXT, fill=MUTED, spacing=10)
+
+    cx = 126
+    for label, accent in [("30 mp munka", GOLD), ("15 mp pihenő", MUTED), ("3 kör", MUTED)]:
+        cx += 0
+        cx += draw_meta_chip(draw, cx, 996, label, accent) + 10
+
+    draw.rounded_rectangle((126, 1080, 432, 1156), radius=38, fill=PINK + (255,), outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (208, 1104), "Indítás", FONT_TITLE, (28, 11, 25))
+    draw.rounded_rectangle((454, 1080, 784, 1156), radius=38, fill=(35, 26, 44, 220), outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (548, 1104), "Részletek", FONT_TITLE, WHITE)
+
+    draw_progress_card(base, 96, 1196, "Napi célok", [("Víz", "6/8", PINK, 0.72), ("Alvás", "7/8", GOLD, 0.84)])
+
+
+def draw_timer_feature(base):
+    draw = ImageDraw.Draw(base)
+    draw_header(draw, "Stopper", "A köridő nem apró részlet, hanem központi élmény.", "Neon köridő", "Flow-os ritmus")
+
+    left = (94, 286, 488, 1148)
+    right = (522, 286, 826, 1148)
+    add_shadow(base, (left[0] + 8, left[1] + 14, left[2] + 8, left[3] + 14), radius=38)
+    add_shadow(base, (right[0] + 8, right[1] + 14, right[2] + 8, right[3] + 14), radius=38)
+    for box in (left, right):
+        panel = Image.new("RGBA", (box[2] - box[0], box[3] - box[1]), (0, 0, 0, 0))
+        ImageDraw.Draw(panel).rounded_rectangle((0, 0, panel.width - 1, panel.height - 1), radius=36, fill=CARD, outline=(255, 255, 255, 18), width=1)
+        base.alpha_composite(panel, (box[0], box[1]))
+
+    image = fit_image(ANDROID_ASSETS / "kitores.png", (356, 286), centering=(0.5, 0.28)).convert("RGBA")
+    image.putalpha(rounded_mask(image.size, 26))
+    base.alpha_composite(image, (112, 314))
+    draw_text(draw, (118, 632), "Fix kártya + stopper", FONT_BOLD, WHITE)
+    draw.multiline_text((118, 690), "A gyakorlat, a köridő és a ritmus együtt jelenik meg,\nígy nincs szétesett felület és nincs keresgélés.", font=FONT_TEXT, fill=MUTED, spacing=10)
+
+    cx, cy = 674, 616
+    ring = Image.new("RGBA", base.size, (0, 0, 0, 0))
+    rdraw = ImageDraw.Draw(ring)
+    rdraw.ellipse((cx - 150, cy - 150, cx + 150, cy + 150), fill=(60, 47, 71, 255))
+    rdraw.pieslice((cx - 150, cy - 150, cx + 150, cy + 150), start=205, end=485, fill=PINK + (255,))
+    rdraw.ellipse((cx - 106, cy - 106, cx + 106, cy + 106), fill=(9, 7, 12, 255))
+    base.alpha_composite(ring)
+    draw_text(draw, (cx - 74, cy - 18), "00:35", FONT_DISPLAY, WHITE)
+    draw_text(draw, (cx - 52, cy + 48), "munkaidő", FONT_SMALL, MUTED)
+    draw_text(draw, (cx - 34, cy + 84), "kör 1/3", FONT_SMALL, GOLD)
+    draw.rounded_rectangle((568, 918, 780, 992), radius=36, fill=PINK + (255,), outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (624, 940), "Indítás", FONT_TITLE, (28, 11, 25))
+    draw.rounded_rectangle((568, 1006, 780, 1080), radius=36, fill=(35, 26, 44, 220), outline=(255, 255, 255, 18), width=1)
+    draw_text(draw, (640, 1028), "Reset", FONT_TITLE, WHITE)
+
+
+def draw_package_feature(base):
+    draw = ImageDraw.Draw(base)
+    draw_header(draw, "Csomagok", "A previewben is látszódjon, hogy nem egyetlen opció létezik.", "Animált kártyapakli", "Prémium rendszer")
+
+    cards = [
+        {
+            "name": "Start",
+            "meta": "4 hét • tiszta indulás",
+            "lines": ["Személyre szabott edzésterv", "Alap táplálkozási rendszer", "1x kontroll és finomhangolás"],
+            "x": 112,
+            "y": 286,
+            "w": 612,
+            "h": 248,
+            "accent": GOLD,
+        },
+        {
+            "name": "Balance",
+            "meta": "6 hét • heti követés",
+            "lines": ["Edzésrendszer videókkal", "Heti követés és módosítás", "Progresszió és rutintartás"],
+            "x": 140,
+            "y": 430,
+            "w": 660,
+            "h": 278,
+            "accent": PINK,
+        },
+        {
+            "name": "Pro",
+            "meta": "12 hét • mély támogatás",
+            "lines": ["Maximális rendszerélmény", "Gyakoribb kontroll", "Check-in és erősebb jelenlét"],
+            "x": 190,
+            "y": 612,
+            "w": 598,
+            "h": 248,
+            "accent": PINK_2,
+        },
     ]
-    card_y = 382
-    for idx, (name, meta, bullets) in enumerate(rows):
-        x1, y1, x2, y2 = 116, card_y, 784, card_y + 258
-        draw.rounded_rectangle((x1, y1, x2, y2), radius=32, fill=CARD_2, outline=(255, 255, 255, 18), width=1)
-        accent = PINK if idx != 1 else GOLD
-        draw.text((146, y1 + 28), name, fill=WHITE, font=FONT_TITLE)
-        draw.text((290, y1 + 32), meta, fill=accent, font=FONT_SMALL)
-        bullet_y = y1 + 92
-        for bullet in bullets:
-            draw.rounded_rectangle((146, bullet_y + 8, 160, bullet_y + 22), radius=7, fill=accent + (255,))
-            draw.text((178, bullet_y), bullet, fill=MUTED, font=FONT_TEXT)
-            bullet_y += 52
-        card_y += 290
 
-    draw.rounded_rectangle((118, 1286, 454, 1368), radius=40, fill=PINK + (255,), outline=(255, 255, 255, 26), width=1)
-    draw.text((154, 1310), "Csomagok", fill=(28, 11, 25), font=FONT_TITLE)
-    draw.rounded_rectangle((474, 1286, 780, 1368), radius=40, fill=(35, 26, 44, 220), outline=(255, 255, 255, 22), width=1)
-    draw.text((526, 1310), "Rendszer", fill=WHITE, font=FONT_TITLE)
+    for idx, card in enumerate(cards):
+        add_shadow(base, (card["x"] + 8, card["y"] + 12, card["x"] + card["w"] + 8, card["y"] + card["h"] + 12), radius=34)
+        panel = Image.new("RGBA", (card["w"], card["h"]), (0, 0, 0, 0))
+        draw_p = ImageDraw.Draw(panel)
+        fill = (24, 17, 32, 242) if idx == 1 else (20, 15, 28, 226)
+        draw_p.rounded_rectangle((0, 0, card["w"] - 1, card["h"] - 1), radius=34, fill=fill, outline=(255, 255, 255, 18), width=1)
+        base.alpha_composite(panel, (card["x"], card["y"]))
+        draw_text(draw, (card["x"] + 30, card["y"] + 26), card["name"], FONT_TITLE, WHITE)
+        draw_text(draw, (card["x"] + 182, card["y"] + 31), card["meta"], FONT_SMALL, card["accent"])
+        by = card["y"] + 86
+        for line in card["lines"]:
+            draw.rounded_rectangle((card["x"] + 32, by + 8, card["x"] + 44, by + 20), radius=6, fill=card["accent"] + (255,))
+            draw_text(draw, (card["x"] + 56, by), line, FONT_SMALL, MUTED)
+            by += 40
+        if idx == 1:
+            draw.rounded_rectangle((card["x"] + 30, card["y"] + card["h"] - 66, card["x"] + 274, card["y"] + card["h"] - 18), radius=24, fill=PINK + (255,))
+            draw_text(draw, (card["x"] + 86, card["y"] + card["h"] - 54), "Legjobb egyensúly", FONT_SMALL, (28, 11, 25))
+
+    draw_progress_card(base, 594, 934, "Rendszer", [("Videó", "program szerint", PINK, 0.86), ("Check-in", "csomaghoz igazítva", GREEN, 0.74)])
 
 
 def build_frames():
-    screenshot_1 = find_path(["aaaaa.jpeg"])
-    screenshot_2 = find_path(["*igaz*.jpeg", "*igaz*.jpg"])
-    portrait = find_path(["edina-about.jpg.jpg", "edina-about*.jpg", "edina-about*.jpeg"])
-    if portrait is None:
-        portrait = ROOT / "hu" / "assets" / "rolam.jpg"
-
     frames = []
-
     frame1 = make_background()
-    draw_phone_frame(
-        frame1,
-        screenshot_1,
-        "Fix edzések",
-        "A napi céloktól egy koppintásra indul a rutin.",
-        "Intervallumos, motiváló felület",
-        "3 kör • időzítő",
-        "Indítás",
-    )
-    draw_stat_card(
-        frame1,
-        88,
-        1218,
-        324,
-        264,
-        "Napi ritmus",
-        [
-            ("Víz", "6/8", PINK),
-            ("Alvás", "7/8", GOLD),
-        ],
-    )
+    draw_exercise_feature(frame1)
     frames.append(frame1)
 
     frame2 = make_background()
-    draw_phone_frame(
-        frame2,
-        screenshot_2,
-        "Stopper + fókusz",
-        "A köridő és a tempó egyszerre motivál és vezet.",
-        "Neon kör stopper",
-        "35 mp munka",
-        "Részletek",
-        scale=1.02,
-    )
-    draw_stat_card(
-        frame2,
-        530,
-        190,
-        282,
-        214,
-        "Check-in",
-        [
-            ("Heti haladás", "+18%", PINK_2),
-        ],
-    )
+    draw_timer_feature(frame2)
     frames.append(frame2)
 
     frame3 = make_background()
-    portrait_img = fit_image(Image.open(portrait), (248, 320)).convert("RGBA")
-    portrait_img.putalpha(rounded_mask(portrait_img.size, 30))
-    shadow = Image.new("RGBA", frame3.size, (0, 0, 0, 0))
-    ImageDraw.Draw(shadow).rounded_rectangle((96, 144, 372, 490), radius=36, fill=(0, 0, 0, 170))
-    shadow = shadow.filter(ImageFilter.GaussianBlur(20))
-    frame3.alpha_composite(shadow)
-    frame3.alpha_composite(portrait_img, (110, 158))
-    draw = ImageDraw.Draw(frame3)
-    draw.text((396, 178), "Személyes támogatás", fill=WHITE, font=FONT_BOLD)
-    draw.text((396, 264), "Nem csak tervet kapsz, hanem rendszert és visszajelzést is.", fill=MUTED, font=FONT_TEXT)
-    draw_stat_card(
-        frame3,
-        404,
-        344,
-        390,
-        318,
-        "Kapcsolat",
-        [
-            ("Check-in", "Hetente", PINK),
-            ("Módosítás", "Program szerint", GOLD),
-            ("Támogatás", "Valós jelenlét", PINK_2),
-        ],
-    )
-    draw_package_card(frame3)
+    draw_package_feature(frame3)
     frames.append(frame3)
-
     return frames
 
 
@@ -278,8 +278,7 @@ def save_outputs(frames):
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     poster = OUT_DIR / "system-preview-poster.jpg"
     animated = OUT_DIR / "system-preview-loop.webp"
-
-    frames[0].convert("RGB").save(poster, quality=92, subsampling=0)
+    frames[1].convert("RGB").save(poster, quality=92, subsampling=0)
     frames[0].save(
         animated,
         save_all=True,
@@ -287,7 +286,7 @@ def save_outputs(frames):
         duration=[1200, 1200, 1400],
         loop=0,
         lossless=False,
-        quality=84,
+        quality=86,
         method=6,
     )
     return poster, animated
