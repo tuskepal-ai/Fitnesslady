@@ -1,11 +1,13 @@
 /* FitnessLady PWA service worker */
-const CACHE = "fl-app-v2";
+const CACHE = "fl-app-v3";
 
 const ASSETS = [
   "/hu/app/",
   "/hu/app/index.html",
   "/hu/app/style.css",
   "/hu/app/app.js",
+  "/hu/app/modules/fixed-exercises-ui.css",
+  "/hu/app/modules/fixed-exercises-ui.js",
   "/hu/app/manifest.webmanifest",
   "/hu/app/offline.html",
   "/hu/app/icons/icon-192.png",

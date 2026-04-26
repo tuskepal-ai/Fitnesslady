@@ -644,6 +644,8 @@ function buildCard(item) {
                 class="fxu-image"
                 src="${escapeHtml(displayImage)}"
                 alt="${escapeHtml(name)}"
+                loading="lazy"
+                decoding="async"
                 data-fxu-img="${escapeHtml(id)}"
                 data-primary-src="${escapeHtml(mappedImage || "")}"
                 data-secondary-src="${escapeHtml(firestoreImage || "")}"
