@@ -1497,12 +1497,13 @@
       }
 
       list.innerHTML = items.map((item) => {
-        const imageUrl = trimStr(item.imageUrl || "");
+        const imageUrl = trimStr(item.imageUrl || item.imageDataUrl || "");
         const title = `Check-in #${item.checkinIndex || item.id?.replace("checkin-", "") || "—"}`;
         const submitted = formatHuDateTime(item.submittedAtISO || item.submittedAt || item.updatedAt);
         const due = formatHuDateTime(item.dueAt);
         const week = item.weekNumber ? `${item.weekNumber}. hét` : "—";
         const note = trimStr(item.note || "");
+        const imageLabel = item.imageDataUrl && !item.imageUrl ? "Tömörített kép megnyitása" : "Kép megnyitása";
 
         const metrics = [
           ["Testsúly", fmtVal(item.weight, " kg")],
@@ -1530,7 +1531,7 @@
                   <div class="checkin-title">${escapeHtml(title)}</div>
                   <div class="checkin-date">Beküldve: ${escapeHtml(submitted)} • Esedékes: ${escapeHtml(due)}</div>
                 </div>
-                ${imageUrl ? `<a class="pill ghost" href="${escapeHtml(imageUrl)}" target="_blank" rel="noopener">Kép megnyitása</a>` : ""}
+                ${imageUrl ? `<a class="pill ghost" href="${escapeHtml(imageUrl)}" target="_blank" rel="noopener">${escapeHtml(imageLabel)}</a>` : ""}
               </div>
               <div class="checkin-metrics">
                 ${metrics.map(([label, value]) => `
@@ -1542,6 +1543,7 @@
               </div>
               <div class="checkin-note">${escapeHtml(note || "Nincs megjegyzés.")}</div>
               ${item.imagePath ? `<div class="debugBox mono">Storage path: ${escapeHtml(item.imagePath)}</div>` : ""}
+              ${item.imageStorageError ? `<div class="debugBox">${escapeHtml(item.imageStorageError)}</div>` : ""}
             </div>
           </article>
         `;

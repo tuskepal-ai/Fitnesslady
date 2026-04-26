@@ -1440,7 +1440,8 @@
       $("#ciThigh").value = doc?.thigh ?? "";
       $("#ciNote").value = doc?.note ?? "";
       $("#ciPhoto").value = "";
-      $("#ciFileName").textContent = doc?.imageUrl ? "Korábban feltöltött kép megőrizve." : "Nincs kép kiválasztva.";
+      const existingImage = doc?.imageUrl || doc?.imageDataUrl || "";
+      $("#ciFileName").textContent = existingImage ? "Korábban feltöltött kép megőrizve." : "Nincs kép kiválasztva.";
       setCheckinSaveStatus("", "");
 
       const previewWrap = $("#ciPreviewWrap");
@@ -1450,8 +1451,8 @@
         state.checkinPreviewUrl = "";
       }
 
-      if(doc?.imageUrl){
-        previewImg.src = doc.imageUrl;
+      if(existingImage){
+        previewImg.src = existingImage;
         previewWrap.classList.add("is-on");
       }else{
         previewImg.removeAttribute("src");
@@ -1519,8 +1520,9 @@
         </div>
       `).join("");
 
-      if(doc.imageUrl){
-        imageLink.href = doc.imageUrl;
+      const savedImage = doc.imageUrl || doc.imageDataUrl || "";
+      if(savedImage){
+        imageLink.href = savedImage;
         imageLink.style.display = "inline-flex";
       }else{
         imageLink.style.display = "none";
@@ -1853,6 +1855,66 @@
       return { imageUrl: url, imagePath: path };
     }
 
+    function canvasToDataUrl(canvas, quality){
+      return new Promise((resolve, reject) => {
+        canvas.toBlob((blob) => {
+          if(!blob) return reject(new Error("A kép tömörítése nem sikerült."));
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(reader.error || new Error("A kép olvasása nem sikerült."));
+          reader.readAsDataURL(blob);
+        }, "image/jpeg", quality);
+      });
+    }
+
+    async function compressCheckinImage(file){
+      const sourceUrl = URL.createObjectURL(file);
+      try{
+        const img = new Image();
+        img.decoding = "async";
+        const loaded = new Promise((resolve, reject) => {
+          img.onload = resolve;
+          img.onerror = () => reject(new Error("A kiválasztott kép nem olvasható."));
+        });
+        img.src = sourceUrl;
+        await loaded;
+
+        const variants = [
+          { max: 900, quality: 0.72 },
+          { max: 720, quality: 0.62 },
+          { max: 560, quality: 0.55 }
+        ];
+
+        let lastDataUrl = "";
+        for(const variant of variants){
+          const scale = Math.min(1, variant.max / Math.max(img.naturalWidth || img.width, img.naturalHeight || img.height));
+          const width = Math.max(1, Math.round((img.naturalWidth || img.width) * scale));
+          const height = Math.max(1, Math.round((img.naturalHeight || img.height) * scale));
+          const canvas = document.createElement("canvas");
+          canvas.width = width;
+          canvas.height = height;
+          const ctx = canvas.getContext("2d", { alpha: false });
+          ctx.fillStyle = "#05030a";
+          ctx.fillRect(0, 0, width, height);
+          ctx.drawImage(img, 0, 0, width, height);
+
+          lastDataUrl = await canvasToDataUrl(canvas, variant.quality);
+          if(lastDataUrl.length < 850000) break;
+        }
+
+        if(!lastDataUrl) throw new Error("Nem sikerült menthető képet készíteni.");
+        if(lastDataUrl.length >= 950000) throw new Error("A kép tömörítés után is túl nagy. Próbálj kisebb képet.");
+
+        return {
+          imageDataUrl: lastDataUrl,
+          imageStorageError: "Firebase Storage feltöltés helyett tömörített check-in kép mentve.",
+          imageName: file.name || "checkin-image.jpg"
+        };
+      }finally{
+        URL.revokeObjectURL(sourceUrl);
+      }
+    }
+
     function withTimeout(promise, ms, message){
       let timer = null;
       const timeout = new Promise((_, reject) => {
@@ -1865,10 +1927,15 @@
 
     function checkinMirrorPatch(payload){
       const key = `i${Number(payload?.checkinIndex ?? 0)}`;
+      const indexPayload = { ...payload };
+      if(indexPayload.imageDataUrl){
+        delete indexPayload.imageDataUrl;
+        indexPayload.hasEmbeddedImage = true;
+      }
       return {
         latestCheckin: payload,
         checkinsByIndex: {
-          [key]: payload
+          [key]: indexPayload
         },
         updatedAt: fs.serverTimestamp()
       };
@@ -1952,6 +2019,10 @@
         if(state.currentCheckinDoc?.imageUrl){
           payload.imageUrl = state.currentCheckinDoc.imageUrl;
           payload.imagePath = state.currentCheckinDoc.imagePath || "";
+        }else if(state.currentCheckinDoc?.imageDataUrl){
+          payload.imageDataUrl = state.currentCheckinDoc.imageDataUrl;
+          payload.imageStorageError = state.currentCheckinDoc.imageStorageError || "Tömörített check-in kép.";
+          payload.imageName = state.currentCheckinDoc.imageName || "";
         }
 
         setCheckinSaveStatus("Adatok mentése…", "warn");
@@ -1964,7 +2035,7 @@
             setCheckinSaveStatus("Kép feltöltése… ez nagyobb képnél pár másodperc is lehet.", "warn");
             const img = await withTimeout(
               uploadCheckinImage(file, state.currentCheckinIndex),
-              20000,
+              8000,
               "A kép feltöltése túl sokáig tartott. Az adatok mentve vannak, próbáld meg újra kisebb képpel vagy stabilabb internettel."
             );
             payload = { ...payload, ...img };
@@ -1972,8 +2043,18 @@
             await persistWeeklyCheckin(payload);
           }catch(imgErr){
             console.error("Check-in image upload/save failed", imgErr);
-            imageWarning = `<br><br><b>Fontos:</b> a szöveges adatok mentve vannak, de a kép mentése nem sikerült: ${escapeHtml(imgErr?.message || String(imgErr))}`;
-            setCheckinSaveStatus(`Az adatok mentve vannak, de a kép mentése nem sikerült: ${imgErr?.message || String(imgErr)}`, "danger");
+            setCheckinSaveStatus("Storage nem válaszolt, mentem a tömörített képet közvetlenül a check-inhez…", "warn");
+            try{
+              const embeddedImg = await compressCheckinImage(file);
+              payload = { ...payload, ...embeddedImg };
+              await persistWeeklyCheckin(payload);
+              imageWarning = "<br><br><b>Fontos:</b> a Firebase Storage nem válaszolt, ezért a képet tömörítve a check-in adatok közé mentettem. Adminban így is látható lesz.";
+              setCheckinSaveStatus("A kép tömörítve mentve lett a check-inhez.", "ok");
+            }catch(embedErr){
+              console.error("Embedded check-in image save failed", embedErr);
+              imageWarning = `<br><br><b>Fontos:</b> a szöveges adatok mentve vannak, de a kép mentése nem sikerült: ${escapeHtml(embedErr?.message || imgErr?.message || String(embedErr || imgErr))}`;
+              setCheckinSaveStatus(`Az adatok mentve vannak, de a kép mentése nem sikerült: ${embedErr?.message || imgErr?.message || String(embedErr || imgErr)}`, "danger");
+            }
           }
         }
 
