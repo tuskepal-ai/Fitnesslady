@@ -1535,6 +1535,151 @@
       width: 136px;
       margin: 10px auto 0;
     }
+    @media (min-width: 981px){
+      .system-grid{
+        grid-template-columns: minmax(0, 1fr) minmax(520px, .92fr);
+        gap: 22px;
+      }
+      .system-stage{
+        min-height: 640px;
+        width: 100%;
+        max-width: 660px;
+        justify-self: end;
+        padding: 0;
+      }
+      .system-one-deck,
+      .system-one-deck .system-showcase{
+        min-height: 640px;
+      }
+      .deck-orbit{
+        inset: 0;
+        border-radius: 30px;
+      }
+      .scene-panel{
+        padding: 16px;
+        border-radius: 24px;
+      }
+      .scene-kicker{
+        font-size: 10px;
+        margin-bottom: 7px;
+      }
+      .scene-panel h3{
+        font-size: clamp(25px, 2.7vw, 34px);
+      }
+      .scene-panel h4{
+        font-size: 16px;
+      }
+      .scene-panel p{
+        margin-top: 9px;
+        font-size: 12.2px;
+        line-height: 1.45;
+      }
+      .scene-panel-phone{
+        left: 18px;
+        top: 20px;
+        width: 262px;
+        height: 350px;
+      }
+      .scene-shot{
+        height: 140px;
+        border-radius: 19px;
+        margin-bottom: 12px;
+      }
+      .scene-brand-ring{
+        width: 52px;
+        height: 52px;
+        right: 14px;
+        top: 14px;
+      }
+      .scene-mini-meta{
+        gap: 6px;
+        margin-top: 11px;
+      }
+      .scene-mini-meta span{
+        padding: 7px 8px;
+        font-size: 10px;
+      }
+      .scene-panel-client{
+        left: 168px;
+        top: 88px;
+        width: 352px;
+        min-height: 246px;
+      }
+      .buyer-flow{
+        gap: 7px;
+        margin-top: 12px;
+      }
+      .buyer-flow div{
+        font-size: 12px;
+        line-height: 1.35;
+      }
+      .scene-panel-videos{
+        right: 28px;
+        top: 42px;
+        width: 230px;
+      }
+      .video-pill-stack{
+        gap: 7px;
+        margin-top: 12px;
+      }
+      .video-pill-stack span{
+        padding: 8px 9px;
+        font-size: 10.5px;
+      }
+      .scene-panel-rhythm{
+        left: 22px;
+        bottom: 46px;
+        width: 238px;
+      }
+      .deck-progress{
+        gap: 9px;
+      }
+      .deck-progress-row{
+        gap: 5px;
+        font-size: 12px;
+      }
+      .deck-bar{
+        height: 8px;
+      }
+      .scene-panel-packages{
+        right: 18px;
+        bottom: 34px;
+        width: 300px;
+        min-height: 274px;
+      }
+      .package-mini-stack{
+        min-height: 178px;
+        margin-top: 12px;
+      }
+      .package-mini{
+        padding: 12px;
+        border-radius: 18px;
+      }
+      .package-mini:nth-child(2){ top: 38px; }
+      .package-mini:nth-child(3){ top: 82px; }
+      .package-mini-head{
+        margin-bottom: 7px;
+        font-size: 12.5px;
+      }
+      .package-mini ul{
+        gap: 6px;
+        font-size: 11px;
+      }
+      .scene-panel-timer{
+        right: 230px;
+        bottom: 24px;
+        width: 156px;
+      }
+      .scene-panel-timer .deck-timer{
+        width: 110px;
+      }
+      .deck-timer-inner strong{
+        font-size: 28px;
+      }
+      .deck-timer-inner span{
+        font-size: 11px;
+      }
+    }
     @keyframes sceneSpotlight{
       0%{
         z-index: 2;
