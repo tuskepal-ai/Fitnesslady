@@ -613,6 +613,71 @@
       box-shadow: 0 10px 30px rgba(0,0,0,.38) !important;
     }
 
+    html.ios,
+    html.ios body{
+      scroll-behavior:auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    html.ios body::before{
+      position:absolute;
+      min-height:100vh;
+      transform:none;
+      opacity:.72;
+    }
+    html.ios .reveal,
+    html.ios .reveal.is-visible{
+      opacity:1 !important;
+      transform:none !important;
+      transition:none !important;
+      transition-delay:0ms !important;
+      will-change:auto !important;
+    }
+    html.ios .interactive,
+    html.ios .interactive::before,
+    html.ios .btn,
+    html.ios .btn::before{
+      transition:none !important;
+      will-change:auto !important;
+    }
+    html.ios .interactive:hover,
+    html.ios .btn:hover{
+      transform:none !important;
+    }
+    html.ios .interactive::before{
+      display:none !important;
+      opacity:0 !important;
+      filter:none !important;
+    }
+    html.ios .glass,
+    html.ios .review-card,
+    html.ios .pkg{
+      box-shadow: 0 12px 34px rgba(0,0,0,.42) !important;
+    }
+    html.ios .review-track{
+      scroll-behavior:auto !important;
+    }
+
+    @supports (-webkit-touch-callout: none){
+      @media (max-width: 980px){
+        body::before{
+          position:absolute;
+          min-height:100vh;
+          transform:none;
+          opacity:.72;
+        }
+        .reveal,
+        .reveal.is-visible{
+          opacity:1 !important;
+          transform:none !important;
+          transition:none !important;
+          transition-delay:0ms !important;
+        }
+        .interactive::before{
+          display:none !important;
+        }
+      }
+    }
+
     @media (max-width: 980px){
       .topbar{ backdrop-filter:none; -webkit-backdrop-filter:none; }
       .badge, .btn, .meta-pill, .glass, .rating, .cta-pill{
@@ -986,6 +1051,13 @@ Edina • Fitnesz Lady
   </footer>
 
   <script>
+    const IS_IOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+      || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+    const IS_TOUCH = matchMedia("(pointer: coarse)").matches;
+    if(IS_IOS){
+      document.documentElement.classList.add("ios");
+    }
+
     document.getElementById("y").textContent = new Date().getFullYear();
 
     /* =========================================================
@@ -1073,6 +1145,7 @@ Edina • Fitnesz Lady
 
     /* ========= Touch “active” glow ========= */
     function enableTapGlow(selector=".interactive"){
+      if(IS_IOS || IS_TOUCH) return;
       document.querySelectorAll(selector).forEach(el=>{
         el.addEventListener("touchstart", ()=>{
           el.classList.add("is-active");
@@ -1087,6 +1160,10 @@ Edina • Fitnesz Lady
     (() => {
       const els = document.querySelectorAll('.reveal');
       if(!els.length) return;
+      if(IS_IOS || IS_TOUCH){
+        els.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
       const io = new IntersectionObserver((entries)=>{
         entries.forEach(e=>{
           if(e.isIntersecting){
@@ -1249,6 +1326,7 @@ Edina • Fitnesz Lady
       }, {passive:true});
 
       function start(){
+        if(IS_IOS || IS_TOUCH) return;
         if(timer) clearInterval(timer);
         timer = setInterval(()=>{
           if(paused) return;
