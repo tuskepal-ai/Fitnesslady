@@ -338,6 +338,123 @@
       line-height: 1.45;
     }
 
+    .checkin-toolbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .checkin-list{
+      display:grid;
+      gap:12px;
+    }
+    .checkin-card{
+      display:grid;
+      grid-template-columns: minmax(220px, .75fr) minmax(0, 1.25fr);
+      gap:14px;
+      padding:12px;
+      border-radius:20px;
+      border:1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(460px 260px at 18% 0%, rgba(255,79,216,.13), transparent 62%),
+        linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+      box-shadow: 0 18px 55px rgba(0,0,0,.28);
+      overflow:hidden;
+    }
+    @media (max-width: 860px){
+      .checkin-card{ grid-template-columns:1fr; }
+    }
+    .checkin-photo{
+      min-height:260px;
+      border-radius:18px;
+      border:1px solid rgba(255,255,255,.10);
+      background: rgba(0,0,0,.24);
+      overflow:hidden;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+    }
+    .checkin-photo img{
+      width:100%;
+      height:100%;
+      min-height:260px;
+      max-height:420px;
+      object-fit:cover;
+      display:block;
+    }
+    .checkin-photo-empty{
+      padding:20px;
+      text-align:center;
+      color:rgba(255,255,255,.62);
+      font-weight:850;
+      line-height:1.45;
+    }
+    .checkin-info{
+      display:grid;
+      gap:10px;
+      align-content:start;
+    }
+    .checkin-head{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .checkin-title{
+      font-family: ui-serif, Georgia, "Times New Roman", Times, serif;
+      font-size:22px;
+      font-weight:950;
+      line-height:1.1;
+    }
+    .checkin-date{
+      margin-top:4px;
+      color:rgba(255,255,255,.64);
+      font-size:12.8px;
+      font-weight:750;
+    }
+    .checkin-metrics{
+      display:grid;
+      grid-template-columns: repeat(4, minmax(0,1fr));
+      gap:8px;
+    }
+    @media (max-width: 760px){
+      .checkin-metrics{ grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+    .checkin-metric{
+      padding:10px;
+      border-radius:14px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.18);
+    }
+    .checkin-metric b{
+      display:block;
+      color:rgba(255,255,255,.56);
+      font-size:11px;
+      text-transform:uppercase;
+      letter-spacing:.7px;
+      margin-bottom:4px;
+    }
+    .checkin-metric span{
+      display:block;
+      color:#fff;
+      font-weight:950;
+      font-size:14px;
+      word-break:break-word;
+    }
+    .checkin-note{
+      padding:12px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.08);
+      background:rgba(0,0,0,.18);
+      color:rgba(255,255,255,.78);
+      line-height:1.55;
+      white-space:pre-wrap;
+    }
+
     .debugBox{
       margin-top: 10px;
       padding: 10px 12px;
@@ -529,6 +646,7 @@
 
       <div class="sideNav" id="sideNav">
         <button class="navBtn active" type="button" data-scroll="#sec-users"><span class="navI">👤</span>Felhasználók</button>
+        <button class="navBtn" type="button" data-scroll="#sec-checkins"><span class="navI">📸</span>Check-in</button>
         <button class="navBtn" type="button" data-scroll="#sec-plan"><span class="navI">📦</span>Plan template</button>
         <button class="navBtn" type="button" data-scroll="#sec-diet"><span class="navI">🍽️</span>Étrend</button>
         <button class="navBtn" type="button" data-scroll="#sec-mot"><span class="navI">💜</span>Motiváció</button>
@@ -674,6 +792,18 @@
             <b>Törlés</b>: a callable <span class="mono">deleteUserFull</span> function törli az Auth usert, az admin oldal pedig utána kitakarítja a Firestore user / chat / override adatokat is. A saját admin account törlése tiltva van.
           </div>
         </div>
+      </div>
+
+      <div class="section" id="sec-checkins">
+        <div class="checkin-toolbar">
+          <div>
+            <h2 class="sectionTitle">Check-in beküldések</h2>
+            <p class="sub">A kiválasztott user saját oldalán kitöltött heti check-in adatai és feltöltött képei.</p>
+          </div>
+          <button class="pill ghost" id="btnRefreshCheckins" type="button">↻ Check-in frissítés</button>
+        </div>
+        <div class="debugBox" id="checkinDebug"><b>Check-in</b>: válassz felhasználót.</div>
+        <div class="checkin-list" id="checkinList"></div>
       </div>
 
       <div class="section" id="sec-plan">
@@ -920,6 +1050,38 @@
 
     const clamp = (n, a, b) => Math.max(a, Math.min(b, n));
     const trimStr = (v) => String(v ?? "").trim();
+    const fmtVal = (v, suffix = "") => (v === null || v === undefined || v === "") ? "—" : `${v}${suffix}`;
+
+    function dateFromAny(value){
+      if(!value) return null;
+      if(value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+      if(typeof value?.toDate === "function") {
+        const d = value.toDate();
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      if(typeof value === "number") {
+        const d = new Date(value);
+        return Number.isNaN(d.getTime()) ? null : d;
+      }
+      const d = new Date(String(value));
+      return Number.isNaN(d.getTime()) ? null : d;
+    }
+
+    function formatHuDateTime(value){
+      const d = dateFromAny(value);
+      if(!d) return "—";
+      return d.toLocaleString("hu-HU", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function checkinSortDate(item){
+      return dateFromAny(item.submittedAtISO || item.submittedAt || item.updatedAt || item.dueAt)?.getTime() || 0;
+    }
 
     function extractErrorMessage(input){
       if(input == null) return "Ismeretlen hiba";
@@ -1262,6 +1424,122 @@
       $("#d_lunch").value = "";
       $("#d_snack2").value = "";
       $("#d_dinner").value = "";
+
+      renderCheckinsEmpty("Válassz felhasználót a check-in adatok megjelenítéséhez.");
+    }
+
+    function renderCheckinsEmpty(message = "Nincs még beküldött check-in ennél a usernél."){
+      const list = $("#checkinList");
+      const debug = $("#checkinDebug");
+      if(debug) debug.innerHTML = `<b>Check-in</b>: ${escapeHtml(message)}`;
+      if(list){
+        list.innerHTML = `
+          <div class="debugBox">
+            <b>Nincs adat</b>: ${escapeHtml(message)}
+          </div>
+        `;
+      }
+    }
+
+    function renderCheckins(items){
+      const list = $("#checkinList");
+      const debug = $("#checkinDebug");
+      if(!list) return;
+
+      if(!items.length){
+        renderCheckinsEmpty();
+        return;
+      }
+
+      if(debug){
+        const latest = items[0];
+        debug.innerHTML = `<b>Check-in</b>: ${items.length} beküldés • legutóbbi: ${escapeHtml(formatHuDateTime(latest.submittedAtISO || latest.submittedAt || latest.updatedAt))}`;
+      }
+
+      list.innerHTML = items.map((item) => {
+        const imageUrl = trimStr(item.imageUrl || "");
+        const title = `Check-in #${item.checkinIndex || item.id?.replace("checkin-", "") || "—"}`;
+        const submitted = formatHuDateTime(item.submittedAtISO || item.submittedAt || item.updatedAt);
+        const due = formatHuDateTime(item.dueAt);
+        const week = item.weekNumber ? `${item.weekNumber}. hét` : "—";
+        const note = trimStr(item.note || "");
+
+        const metrics = [
+          ["Testsúly", fmtVal(item.weight, " kg")],
+          ["Közérzet", fmtVal(item.mood, "/10")],
+          ["Energia", fmtVal(item.energy, "/10")],
+          ["Alvás", fmtVal(item.sleep, " óra")],
+          ["Derék", fmtVal(item.waist, " cm")],
+          ["Csípő", fmtVal(item.hips, " cm")],
+          ["Comb", fmtVal(item.thigh, " cm")],
+          ["Hét", week]
+        ];
+
+        return `
+          <article class="checkin-card">
+            <div class="checkin-photo">
+              ${
+                imageUrl
+                  ? `<a href="${escapeHtml(imageUrl)}" target="_blank" rel="noopener" style="display:block; width:100%; height:100%;"><img src="${escapeHtml(imageUrl)}" alt="${escapeHtml(title)} kép" loading="lazy" onerror="this.closest('.checkin-photo').innerHTML='<div class=&quot;checkin-photo-empty&quot;>A kép URL mentve van, de nem tölthető be.<br><a href=&quot;${escapeHtml(imageUrl)}&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot; style=&quot;color:#ffd38a;&quot;>Megnyitás külön</a></div>';" /></a>`
+                  : `<div class="checkin-photo-empty">Ehhez a check-inhez nincs kép feltöltve.</div>`
+              }
+            </div>
+            <div class="checkin-info">
+              <div class="checkin-head">
+                <div>
+                  <div class="checkin-title">${escapeHtml(title)}</div>
+                  <div class="checkin-date">Beküldve: ${escapeHtml(submitted)} • Esedékes: ${escapeHtml(due)}</div>
+                </div>
+                ${imageUrl ? `<a class="pill ghost" href="${escapeHtml(imageUrl)}" target="_blank" rel="noopener">Kép megnyitása</a>` : ""}
+              </div>
+              <div class="checkin-metrics">
+                ${metrics.map(([label, value]) => `
+                  <div class="checkin-metric">
+                    <b>${escapeHtml(label)}</b>
+                    <span>${escapeHtml(value)}</span>
+                  </div>
+                `).join("")}
+              </div>
+              <div class="checkin-note">${escapeHtml(note || "Nincs megjegyzés.")}</div>
+              ${item.imagePath ? `<div class="debugBox mono">Storage path: ${escapeHtml(item.imagePath)}</div>` : ""}
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    async function loadUserCheckins(uid = SEL_UID){
+      uid = trimStr(uid);
+      if(!uid) {
+        renderCheckinsEmpty("Válassz felhasználót a check-in adatok megjelenítéséhez.");
+        return;
+      }
+
+      const debug = $("#checkinDebug");
+      if(debug) debug.innerHTML = `<b>Check-in</b>: betöltés…`;
+
+      try{
+        const col = fs.collection(db, "users", uid, "checkins");
+        let snap = null;
+        try{
+          snap = await fs.getDocs(fs.query(col, fs.orderBy("submittedAt", "desc"), fs.limit(100)));
+        }catch(e1){
+          try{
+            snap = await fs.getDocs(fs.query(col, fs.orderBy("submittedAtISO", "desc"), fs.limit(100)));
+          }catch(e2){
+            snap = await fs.getDocs(fs.query(col, fs.limit(100)));
+          }
+        }
+
+        const items = snap.docs
+          .map(d => ({ id: d.id, ...(d.data() || {}) }))
+          .sort((a, b) => checkinSortDate(b) - checkinSortDate(a));
+
+        renderCheckins(items);
+      }catch(e){
+        console.error(e);
+        renderCheckinsEmpty(`Nem sikerült betölteni: ${extractErrorMessage(e)}`);
+      }
     }
 
     function fillProfileForm(doc){
@@ -1447,6 +1725,7 @@
 
       await loadDietDay();
       await loadOverride();
+      await loadUserCheckins(uid);
 
       ok("User kiválasztva");
 
@@ -1456,6 +1735,7 @@
     }
 
     $("#btnRefreshUsers").addEventListener("click", ()=>loadUsersList(true));
+    $("#btnRefreshCheckins").addEventListener("click", ()=>loadUserCheckins(SEL_UID));
     $("#userSearch").addEventListener("input", ()=>{
       window.clearTimeout(window.__su);
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
@@ -1480,6 +1760,7 @@
 
     async function cleanupFirestoreUserData(uid){
       await deleteSubcollectionDocs(fs.collection(db, "users", uid, "overridesWeeks"));
+      await deleteSubcollectionDocs(fs.collection(db, "users", uid, "checkins"));
       await deleteSubcollectionDocs(fs.collection(db, "chats", uid, "messages"));
 
       try{ await fs.deleteDoc(fs.doc(db, "chats", uid)); }catch(_){}
