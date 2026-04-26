@@ -262,6 +262,35 @@
       display:grid;
       gap: 8px;
     }
+    .checkin-file-input{
+      position:absolute;
+      width:1px;
+      height:1px;
+      opacity:0;
+      pointer-events:none;
+    }
+    .file-pick-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:46px;
+      padding: 12px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,79,216,.30);
+      background: linear-gradient(135deg, rgba(255,79,216,.24), rgba(177,76,255,.18));
+      color:#fff;
+      font-weight:900;
+      cursor:pointer;
+      box-shadow: 0 12px 28px rgba(255,79,216,.12);
+      user-select:none;
+    }
+    .file-pick-btn:active{ transform: translateY(1px); }
+    .file-name{
+      font-size: 12px;
+      color: rgba(255,255,255,.72);
+      line-height: 1.4;
+      overflow-wrap:anywhere;
+    }
     .file-note{
       font-size: 12px;
       color: rgba(255,255,255,.58);
@@ -290,6 +319,30 @@
       gap: 10px;
       flex-wrap:wrap;
       margin-top: 16px;
+    }
+    .checkin-save-status{
+      display:none;
+      margin-top: 12px;
+      padding: 11px 13px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.05);
+      color: rgba(255,255,255,.78);
+      font-size: 12.5px;
+      line-height: 1.45;
+    }
+    .checkin-save-status.is-on{ display:block; }
+    .checkin-save-status.ok{
+      border-color: rgba(121,247,186,.28);
+      background: rgba(121,247,186,.08);
+    }
+    .checkin-save-status.warn{
+      border-color: rgba(255,211,138,.28);
+      background: rgba(255,211,138,.08);
+    }
+    .checkin-save-status.danger{
+      border-color: rgba(255,94,148,.30);
+      background: rgba(255,94,148,.08);
     }
     .checkin-summary{
       margin-top: 14px;
@@ -849,7 +902,9 @@
                 <div class="checkin-field">
                   <label for="ciPhoto">Kép feltöltés</label>
                   <div class="file-wrap">
-                    <input id="ciPhoto" type="file" accept="image/*" />
+                    <label class="file-pick-btn" for="ciPhoto" id="btnPickCheckinPhoto">Kép kiválasztása</label>
+                    <input class="checkin-file-input" id="ciPhoto" type="file" accept="image/*" />
+                    <div class="file-name" id="ciFileName">Nincs kép kiválasztva.</div>
                     <div class="file-note">Ajánlott: álló kép, jó fényviszonyokkal. JPG vagy PNG.</div>
                   </div>
                 </div>
@@ -868,6 +923,7 @@
                 <button class="pill primary" id="btnSaveWeeklyCheckin" type="button">Check-in mentése</button>
                 <button class="pill ghost" id="btnCancelWeeklyCheckin" type="button">Mégsem</button>
               </div>
+              <div class="checkin-save-status" id="checkinSaveStatus" aria-live="polite"></div>
             </div>
 
             <div class="checkin-summary" id="weeklyCheckinSummary" style="display:none;">
@@ -1384,6 +1440,8 @@
       $("#ciThigh").value = doc?.thigh ?? "";
       $("#ciNote").value = doc?.note ?? "";
       $("#ciPhoto").value = "";
+      $("#ciFileName").textContent = doc?.imageUrl ? "Korábban feltöltött kép megőrizve." : "Nincs kép kiválasztva.";
+      setCheckinSaveStatus("", "");
 
       const previewWrap = $("#ciPreviewWrap");
       const previewImg = $("#ciPreviewImg");
@@ -1417,6 +1475,16 @@
       $("#ciPreviewImg").removeAttribute("src");
       $("#ciPreviewWrap").classList.remove("is-on");
       $("#ciPhoto").value = "";
+      $("#ciFileName").textContent = "Nincs kép kiválasztva.";
+      setCheckinSaveStatus("", "");
+    }
+
+    function setCheckinSaveStatus(message, type = ""){
+      const el = $("#checkinSaveStatus");
+      if(!el) return;
+      const text = String(message || "").trim();
+      el.className = `checkin-save-status${text ? " is-on" : ""}${type ? ` ${type}` : ""}`;
+      el.textContent = text;
     }
 
     function renderWeeklyCheckinSummary(doc){
@@ -1834,7 +1902,10 @@
 
     async function saveWeeklyCheckin(){
       const btn = $("#btnSaveWeeklyCheckin");
+      const originalText = btn.textContent;
       btn.disabled = true;
+      btn.textContent = "Mentés folyamatban…";
+      setCheckinSaveStatus("Mentés indult. Először az adatok mentődnek, utána a kép.", "warn");
 
       try{
         const weight = numberOrNull($("#ciWeight").value);
@@ -1873,18 +1944,22 @@
           payload.imagePath = state.currentCheckinDoc.imagePath || "";
         }
 
+        setCheckinSaveStatus("Adatok mentése…", "warn");
         await persistWeeklyCheckin(payload);
 
         let imageWarning = "";
         const file = $("#ciPhoto").files?.[0] || null;
         if(file){
           try{
+            setCheckinSaveStatus("Kép feltöltése… ez nagyobb képnél pár másodperc is lehet.", "warn");
             const img = await uploadCheckinImage(file, state.currentCheckinIndex);
             payload = { ...payload, ...img };
+            setCheckinSaveStatus("Kép mentése a check-inhez…", "warn");
             await persistWeeklyCheckin(payload);
           }catch(imgErr){
             console.error("Check-in image upload/save failed", imgErr);
             imageWarning = `<br><br><b>Fontos:</b> a szöveges adatok mentve vannak, de a kép mentése nem sikerült: ${escapeHtml(imgErr?.message || String(imgErr))}`;
+            setCheckinSaveStatus(`Az adatok mentve vannak, de a kép mentése nem sikerült: ${imgErr?.message || String(imgErr)}`, "danger");
           }
         }
 
@@ -1895,9 +1970,11 @@
         openInfo("Siker", `A heti check-in adatai sikeresen el lettek mentve.${imageWarning}`);
       }catch(e){
         console.error(e);
+        setCheckinSaveStatus(`Mentési hiba: ${e?.message || String(e)}`, "danger");
         openInfo("Hiba", escapeHtml(e.message || String(e)));
       }finally{
         btn.disabled = false;
+        btn.textContent = originalText;
       }
     }
 
@@ -1910,6 +1987,7 @@
       const file = e.target.files?.[0] || null;
       const previewWrap = $("#ciPreviewWrap");
       const previewImg = $("#ciPreviewImg");
+      const fileName = $("#ciFileName");
 
       if(state.checkinPreviewUrl){
         URL.revokeObjectURL(state.checkinPreviewUrl);
@@ -1919,6 +1997,8 @@
       if(!file){
         previewImg.removeAttribute("src");
         previewWrap.classList.remove("is-on");
+        fileName.textContent = "Nincs kép kiválasztva.";
+        setCheckinSaveStatus("", "");
         return;
       }
 
@@ -1926,6 +2006,9 @@
       state.checkinPreviewUrl = url;
       previewImg.src = url;
       previewWrap.classList.add("is-on");
+      const sizeMb = file.size ? ` • ${(file.size / (1024 * 1024)).toFixed(1)} MB` : "";
+      fileName.textContent = `${file.name || "Kiválasztott kép"}${sizeMb}`;
+      setCheckinSaveStatus("Kép kiválasztva. Nyomd meg a Check-in mentése gombot.", "ok");
     });
 
     $("#btnLogout").addEventListener("click", async ()=>{
