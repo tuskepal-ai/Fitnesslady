@@ -1982,7 +1982,7 @@
       const originalText = btn.textContent;
       btn.disabled = true;
       btn.textContent = "Mentés folyamatban…";
-      setCheckinSaveStatus("Mentés indult. Először az adatok mentődnek, utána a kép.", "warn");
+      setCheckinSaveStatus("Mentés folyamatban…", "warn");
 
       try{
         const weight = numberOrNull($("#ciWeight").value);
@@ -2032,28 +2032,28 @@
         const file = $("#ciPhoto").files?.[0] || null;
         if(file){
           try{
-            setCheckinSaveStatus("Kép feltöltése… ez nagyobb képnél pár másodperc is lehet.", "warn");
+            setCheckinSaveStatus("Kép feltöltése…", "warn");
             const img = await withTimeout(
               uploadCheckinImage(file, state.currentCheckinIndex),
               8000,
               "A kép feltöltése túl sokáig tartott. Az adatok mentve vannak, próbáld meg újra kisebb képpel vagy stabilabb internettel."
             );
             payload = { ...payload, ...img };
-            setCheckinSaveStatus("Kép mentése a check-inhez…", "warn");
+            setCheckinSaveStatus("Kép mentése…", "warn");
             await persistWeeklyCheckin(payload);
           }catch(imgErr){
             console.error("Check-in image upload/save failed", imgErr);
-            setCheckinSaveStatus("Storage nem válaszolt, mentem a tömörített képet közvetlenül a check-inhez…", "warn");
+            setCheckinSaveStatus("Kép mentése…", "warn");
             try{
               const embeddedImg = await compressCheckinImage(file);
               payload = { ...payload, ...embeddedImg };
               await persistWeeklyCheckin(payload);
-              imageWarning = "<br><br><b>Fontos:</b> a Firebase Storage nem válaszolt, ezért a képet tömörítve a check-in adatok közé mentettem. Adminban így is látható lesz.";
-              setCheckinSaveStatus("A kép tömörítve mentve lett a check-inhez.", "ok");
+              imageWarning = "<br><br>A kép is el lett mentve.";
+              setCheckinSaveStatus("Kép elmentve.", "ok");
             }catch(embedErr){
               console.error("Embedded check-in image save failed", embedErr);
-              imageWarning = `<br><br><b>Fontos:</b> a szöveges adatok mentve vannak, de a kép mentése nem sikerült: ${escapeHtml(embedErr?.message || imgErr?.message || String(embedErr || imgErr))}`;
-              setCheckinSaveStatus(`Az adatok mentve vannak, de a kép mentése nem sikerült: ${embedErr?.message || imgErr?.message || String(embedErr || imgErr)}`, "danger");
+              imageWarning = "<br><br>A check-in el lett mentve, de a képet most nem sikerült feltölteni.";
+              setCheckinSaveStatus("Check-in elmentve, a képet próbáld meg újra.", "danger");
             }
           }
         }
@@ -2062,11 +2062,11 @@
         await loadWeeklyCheckins();
         renderWeeklyCheckin();
         closeCheckinForm();
-        openInfo("Siker", `A heti check-in adatai sikeresen el lettek mentve.${imageWarning}`);
+        openInfo("Siker", `A check-in el lett mentve.${imageWarning}`);
       }catch(e){
         console.error(e);
-        setCheckinSaveStatus(`Mentési hiba: ${e?.message || String(e)}`, "danger");
-        openInfo("Hiba", escapeHtml(e.message || String(e)));
+        setCheckinSaveStatus("A mentés nem sikerült. Próbáld újra.", "danger");
+        openInfo("Hiba", "A mentés nem sikerült. Próbáld újra pár pillanat múlva.");
       }finally{
         btn.disabled = false;
         btn.textContent = originalText;
@@ -2103,7 +2103,7 @@
       previewWrap.classList.add("is-on");
       const sizeMb = file.size ? ` • ${(file.size / (1024 * 1024)).toFixed(1)} MB` : "";
       fileName.textContent = `${file.name || "Kiválasztott kép"}${sizeMb}`;
-      setCheckinSaveStatus("Kép kiválasztva. Nyomd meg a Check-in mentése gombot.", "ok");
+      setCheckinSaveStatus("Kép kiválasztva.", "ok");
     });
 
     $("#btnLogout").addEventListener("click", async ()=>{
