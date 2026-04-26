@@ -338,13 +338,31 @@ function injectStyles() {
       display:flex;
       align-items:center;
       justify-content:center;
+      --fxu-progress:360deg;
       background:
         radial-gradient(circle at center, rgba(6,7,14,.98) 0 44%, transparent 46% 100%),
-        conic-gradient(from -90deg, rgba(255,79,216,.96), rgba(177,76,255,.96), rgba(255,255,255,.18), rgba(255,255,255,.18));
+        conic-gradient(from -90deg,
+          rgba(255,79,216,.98) 0deg,
+          rgba(177,76,255,.98) var(--fxu-progress),
+          rgba(255,255,255,.16) var(--fxu-progress),
+          rgba(255,255,255,.16) 360deg
+        );
       box-shadow:
         0 0 40px rgba(255,79,216,.16),
         inset 0 0 22px rgba(255,255,255,.05);
       position:relative;
+    }
+
+    .fxu-timer.is-running{
+      box-shadow:
+        0 0 48px rgba(255,79,216,.24),
+        0 0 22px rgba(177,76,255,.14),
+        inset 0 0 22px rgba(255,255,255,.05);
+    }
+
+    .fxu-timer.is-done{
+      --fxu-progress:0deg;
+      opacity:.82;
     }
 
     .fxu-timer-inner{
@@ -497,11 +515,26 @@ function getTimerState(id, item) {
       phase: "munkaidő",
       isRunning: false,
       isPaused: false,
+      duration: workSec,
       remaining: workSec,
       intervalId: null
     });
   }
   return state.timers.get(id);
+}
+
+function getTimerDuration(timer, item) {
+  const workSec = Number(item.workSec || item.munka_mp || 0);
+  const restSec = Number(item.restSec || item.piheno_mp || 0);
+  const phase = String(timer?.phase || "").toLowerCase();
+  const duration = phase.includes("pihen") ? restSec : (timer?.duration || workSec);
+  return Math.max(1, Number(duration || workSec || 1));
+}
+
+function getTimerProgressDeg(timer, item) {
+  const duration = getTimerDuration(timer, item);
+  const remaining = Math.max(0, Math.min(duration, Number(timer?.remaining || 0)));
+  return Math.round((remaining / duration) * 360);
 }
 
 function stopTimer(id) {
@@ -519,7 +552,8 @@ function resetTimer(id, item) {
   stopTimer(id);
   const timer = getTimerState(id, item);
   timer.phase = "munkaidő";
-  timer.remaining = Number(item.workSec || item.munka_mp || 0);
+  timer.duration = Number(item.workSec || item.munka_mp || 0);
+  timer.remaining = timer.duration;
   render();
 }
 
@@ -551,6 +585,7 @@ function startTimer(id, item) {
 
   if (timer.remaining <= 0) {
     timer.phase = "munkaidő";
+    timer.duration = workSec;
     timer.remaining = workSec;
   }
 
@@ -592,6 +627,12 @@ function buildCard(item) {
   const repsText = item.repsText || item.ismetles_szoveg || "";
   const difficulty = item.difficulty || item.nehezseg || "";
   const type = item.type || item.tipus || "";
+  const progressDeg = getTimerProgressDeg(timer, item);
+  const timerClasses = [
+    "fxu-timer",
+    timer.isRunning ? "is-running" : "",
+    !timer.isRunning && !timer.isPaused && Number(timer.remaining || 0) <= 0 ? "is-done" : ""
+  ].filter(Boolean).join(" ");
 
   return `
     <article class="fxu-card">
@@ -622,7 +663,7 @@ function buildCard(item) {
         <span class="fxu-chip">↻ ${rounds} kör</span>
       </div>
 
-      <div class="fxu-timer">
+      <div class="${timerClasses}" style="--fxu-progress:${progressDeg}deg;">
         <div class="fxu-timer-inner">
           <div class="fxu-time">${formatTime(timer.remaining)}</div>
           <div class="fxu-phase">${escapeHtml(timer.phase)}</div>
