@@ -2,6 +2,11 @@
 // Firebase v9 modular (CDN) — shared helpers
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
+  initializeAnalytics,
+  isSupported as isAnalyticsSupported,
+  logEvent
+} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
+import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -37,6 +42,66 @@ export const firebaseConfig = {
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+let analyticsPromise = null;
+const trackedPageLocations = new Set();
+
+async function initAnalytics(){
+  if(typeof window === "undefined") return null;
+
+  try{
+    const supported = await isAnalyticsSupported();
+    if(!supported) return null;
+
+    return initializeAnalytics(app, {
+      config: {
+        send_page_view: false
+      }
+    });
+  }catch(error){
+    console.info("Firebase Analytics nem indult el ebben a kornyezetben.", error);
+    return null;
+  }
+}
+
+export function getFitnessLadyAnalytics(){
+  if(!analyticsPromise){
+    analyticsPromise = initAnalytics();
+  }
+  return analyticsPromise;
+}
+
+export async function trackPageView(extra = {}){
+  if(typeof window === "undefined") return false;
+
+  try{
+    const analytics = await getFitnessLadyAnalytics();
+    if(!analytics) return false;
+
+    const pageLocation = window.location.href;
+    if(trackedPageLocations.has(pageLocation)) return false;
+    trackedPageLocations.add(pageLocation);
+
+    const pathParts = window.location.pathname.split("/").filter(Boolean);
+    const lang = document.documentElement.lang || pathParts[0] || "hu";
+
+    logEvent(analytics, "page_view", {
+      page_title: document.title || "FitnessLady",
+      page_location: pageLocation,
+      page_path: window.location.pathname + window.location.search,
+      page_language: lang,
+      site_section: pathParts[1] || pathParts[0] || "home",
+      ...extra
+    });
+
+    return true;
+  }catch(error){
+    console.info("Firebase page_view meres kihagyva.", error);
+    return false;
+  }
+}
+
+trackPageView();
 
 // Firestore namespace export
 export const fs = {
