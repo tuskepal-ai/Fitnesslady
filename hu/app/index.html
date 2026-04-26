@@ -1229,6 +1229,11 @@
       return Number.isFinite(n) ? n : null;
     }
 
+    function isDeletedProfile(p){
+      const status = String(p?.status || "").trim().toLowerCase();
+      return status === "deleted" || status === "torolve" || !!p?.deletedAt || p?.hideFromAdmin === true;
+    }
+
     function sanitizeFilename(name){
       return String(name || "photo")
         .toLowerCase()
@@ -2362,6 +2367,10 @@
 
         state.done = lsGet(UID, "done", {}) || {};
         profile = await loadUserProfile(UID) || {};
+        if(isDeletedProfile(profile)){
+          await logout();
+          return toLogin("hu");
+        }
         state.lang = profile.lang || "hu";
 
         planMeta = await loadPlanMeta(profile.planId || "start_v1");

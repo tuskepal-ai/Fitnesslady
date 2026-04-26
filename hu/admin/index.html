@@ -1213,6 +1213,10 @@
     function saveSel(uid){ if(uid) localStorage.setItem(SEL_KEY, uid); }
     function loadSel(){ return (localStorage.getItem(SEL_KEY) || "").trim() || null; }
     function clearSel(){ localStorage.removeItem(SEL_KEY); }
+    function isDeletedUser(u){
+      const status = String(u?.status || "").trim().toLowerCase();
+      return status === "deleted" || status === "torolve" || !!u?.deletedAt || u?.hideFromAdmin === true;
+    }
 
     const chatDrawer = $("#chatDrawer");
     const chatBody = $("#chatBody");
@@ -1657,9 +1661,10 @@
           }
         }
 
-        const raw = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        const rawAll = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        const raw = rawAll.filter(u => !isDeletedUser(u));
         USERS_CACHE = raw;
-        setDebug({count: raw.length, error: null});
+        setDebug({count: raw.length, error: rawAll.length !== raw.length ? `rejtett törölt user: ${rawAll.length - raw.length}` : null});
         fillUserPickDropdown(raw);
 
         const items = raw.filter(u=>{
@@ -1734,6 +1739,17 @@
     }
 
     async function pickUser(uid){
+      const cached = getCachedUser(uid);
+      if(cached && isDeletedUser(cached)){
+        if(SEL_UID === uid){
+          SEL_UID = null;
+          clearSel();
+          clearSelectedProfileUI();
+        }
+        await loadUsersList(true);
+        return err("Ez a felhasználó törölve van, ezért nem választható ki.");
+      }
+
       SEL_UID = uid;
       saveSel(uid);
       $("#selUser").textContent = uid ? `uid=${uid}` : "—";
@@ -1766,6 +1782,14 @@
 
       const snap2 = await fs.getDoc(ref);
       const doc = snap2.data() || {};
+      if(isDeletedUser(doc)){
+        SEL_UID = null;
+        clearSel();
+        clearSelectedProfileUI();
+        await loadUsersList(true);
+        return err("Ez a felhasználó törölve van, ezért nem jelenik meg az admin listában.");
+      }
+
       fillProfileForm(doc);
 
       $("#p_planId").value = doc?.planId || $("#p_planId").value || "start_v1";
@@ -1789,11 +1813,16 @@
     });
 
     async function callDeleteCallable(uid, email){
-      const res = await deleteUserFullCallable({
-        uid,
-        email
-      });
-      return res?.data ?? null;
+      try{
+        const res = await deleteUserFullCallable({
+          uid,
+          email
+        });
+        return { ok:true, data: res?.data ?? null };
+      }catch(e){
+        console.warn("deleteUserFull callable failed, Firestore cleanup continues", e);
+        return { ok:false, error:e };
+      }
     }
 
     async function deleteSubcollectionDocs(colRef){
@@ -1805,13 +1834,29 @@
       }
     }
 
-    async function cleanupFirestoreUserData(uid){
+    async function cleanupFirestoreUserData(uid, { deleteUserDoc = true } = {}){
       await deleteSubcollectionDocs(fs.collection(db, "users", uid, "overridesWeeks"));
       await deleteSubcollectionDocs(fs.collection(db, "users", uid, "checkins"));
+      await deleteSubcollectionDocs(fs.collection(db, "users", uid, "fixedExercises"));
       await deleteSubcollectionDocs(fs.collection(db, "chats", uid, "messages"));
 
       try{ await fs.deleteDoc(fs.doc(db, "chats", uid)); }catch(_){}
-      try{ await fs.deleteDoc(fs.doc(db, "users", uid)); }catch(_){}
+      if(deleteUserDoc){
+        try{ await fs.deleteDoc(fs.doc(db, "users", uid)); }catch(_){}
+      }
+    }
+
+    async function markUserDeleted(uid, email = "", name = ""){
+      await fs.setDoc(fs.doc(db, "users", uid), {
+        status: "deleted",
+        hideFromAdmin: true,
+        deletedAt: fs.serverTimestamp(),
+        deletedBy: CURRENT_AUTH_USER?.uid || "",
+        deletedByEmail: CURRENT_AUTH_USER?.email || "",
+        deletedEmail: email || "",
+        deletedName: name || "",
+        updatedAt: fs.serverTimestamp()
+      }, { merge:true });
     }
 
     async function deleteUserByUid(uid){
@@ -1841,13 +1886,14 @@
         $("#btnDeleteUser").disabled = true;
         $$("[data-delete-user]").forEach(b => b.disabled = true);
 
+        await markUserDeleted(uid, email, name);
+        USERS_CACHE = USERS_CACHE.filter(u => u.id !== uid);
+
         const fnRes = await callDeleteCallable(uid, email);
+        const fnData = fnRes?.data;
+        const authDeleteWarning = !fnRes?.ok || (fnData && (fnData.ok === false || fnData.success === false || fnData.error));
 
-        if(fnRes && (fnRes.ok === false || fnRes.success === false || fnRes.error)){
-          throw new Error(extractErrorMessage(fnRes));
-        }
-
-        await cleanupFirestoreUserData(uid);
+        await cleanupFirestoreUserData(uid, { deleteUserDoc: !authDeleteWarning });
 
         if(SEL_UID === uid){
           SEL_UID = null;
@@ -1859,7 +1905,7 @@
         }
 
         await loadUsersList(true);
-        ok("Felhasználó törölve");
+        ok(authDeleteWarning ? "Felhasználó elrejtve és Firestore adatok törölve. Auth törléshez ellenőrizd a deleteUserFull functiont." : "Felhasználó törölve");
       }catch(e){
         console.error(e);
         err(extractErrorMessage(e));

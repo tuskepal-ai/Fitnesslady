@@ -363,6 +363,11 @@
       return "Guten Abend";
     }
 
+    function isDeletedProfile(p){
+      const status = String(p?.status || "").trim().toLowerCase();
+      return status === "deleted" || status === "torolve" || !!p?.deletedAt || p?.hideFromAdmin === true;
+    }
+
     async function loadUserProfile(uid){
       const snap = await fs.getDoc(fs.doc(db, "users", uid));
       return snap.exists() ? snap.data() : null;
@@ -791,6 +796,10 @@
         state.done = lsGet(UID, "done", {}) || {};
 
         profile = await loadUserProfile(UID) || {};
+        if(isDeletedProfile(profile)){
+          await logout();
+          return toLogin("de");
+        }
 
         // DE app: alapértelmezetten német
         state.lang = "de";

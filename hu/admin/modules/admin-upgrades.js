@@ -1329,7 +1329,10 @@ async function loadUsers() {
     state.users = snap.docs.map((d) => ({
       id: d.id,
       ...(d.data() || {})
-    }));
+    })).filter((u) => {
+      const status = String(u.status || "").trim().toLowerCase();
+      return status !== "deleted" && status !== "torolve" && !u.deletedAt && u.hideFromAdmin !== true;
+    });
     state.filteredUsers = [...state.users];
   } catch (e) {
     console.error(e);
