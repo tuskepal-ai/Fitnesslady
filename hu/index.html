@@ -2797,6 +2797,81 @@
       .cta-pill{ max-width: 96px; }
       .brand span:last-child{ font-size: 15px; }
     }
+
+    @supports (-webkit-touch-callout: none){
+      .deck-scene{
+        perspective: none;
+        transform-style: flat;
+        -webkit-transform-style: flat;
+      }
+      .scene-panel{
+        transform: translate(0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        -webkit-transform: translate(0, 0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+        filter: none;
+        -webkit-filter: none;
+        will-change: transform, opacity;
+        animation-name: iosSceneFocus;
+        -webkit-animation-name: iosSceneFocus;
+        animation-duration: 36s;
+        -webkit-animation-duration: 36s;
+        animation-timing-function: ease-in-out;
+        -webkit-animation-timing-function: ease-in-out;
+        animation-iteration-count: infinite;
+        -webkit-animation-iteration-count: infinite;
+      }
+      @keyframes iosSceneFocus{
+        0%, 4%{
+          z-index: 60;
+          opacity: 1;
+          transform: translateY(-10px) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+          -webkit-transform: translateY(-10px) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+          border-color: rgba(255,79,216,.58);
+          box-shadow: 0 42px 96px rgba(0,0,0,.50), 0 0 68px rgba(255,79,216,.30);
+        }
+        12%, 18%{
+          z-index: 55;
+          opacity: .96;
+          transform: translateY(-4px) rotate(var(--scene-rotation)) scale(var(--spot-on));
+          -webkit-transform: translateY(-4px) rotate(var(--scene-rotation)) scale(var(--spot-on));
+        }
+        25%, 100%{
+          z-index: 2;
+          opacity: var(--spot-rest-opacity);
+          transform: translateY(0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+          -webkit-transform: translateY(0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+          border-color: rgba(255,255,255,.13);
+          box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+        }
+      }
+      @-webkit-keyframes iosSceneFocus{
+        0%, 4%{
+          z-index: 60;
+          opacity: 1;
+          -webkit-transform: translateY(-10px) rotate(var(--scene-rotation)) scale(var(--spot-hold));
+          border-color: rgba(255,79,216,.58);
+          box-shadow: 0 42px 96px rgba(0,0,0,.50), 0 0 68px rgba(255,79,216,.30);
+        }
+        12%, 18%{
+          z-index: 55;
+          opacity: .96;
+          -webkit-transform: translateY(-4px) rotate(var(--scene-rotation)) scale(var(--spot-on));
+        }
+        25%, 100%{
+          z-index: 2;
+          opacity: var(--spot-rest-opacity);
+          -webkit-transform: translateY(0) rotate(var(--scene-rotation)) scale(var(--spot-rest));
+          border-color: rgba(255,255,255,.13);
+          box-shadow: 0 28px 70px rgba(0,0,0,.34), 0 0 34px rgba(177,76,255,.10);
+        }
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      .scene-panel{
+        animation:none !important;
+        -webkit-animation:none !important;
+      }
+    }
   </style>
 </head>
 
