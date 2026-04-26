@@ -1853,6 +1853,16 @@
       return { imageUrl: url, imagePath: path };
     }
 
+    function withTimeout(promise, ms, message){
+      let timer = null;
+      const timeout = new Promise((_, reject) => {
+        timer = window.setTimeout(() => reject(new Error(message)), ms);
+      });
+      return Promise.race([promise, timeout]).finally(() => {
+        if(timer) window.clearTimeout(timer);
+      });
+    }
+
     function checkinMirrorPatch(payload){
       const key = `i${Number(payload?.checkinIndex ?? 0)}`;
       return {
@@ -1952,7 +1962,11 @@
         if(file){
           try{
             setCheckinSaveStatus("Kép feltöltése… ez nagyobb képnél pár másodperc is lehet.", "warn");
-            const img = await uploadCheckinImage(file, state.currentCheckinIndex);
+            const img = await withTimeout(
+              uploadCheckinImage(file, state.currentCheckinIndex),
+              20000,
+              "A kép feltöltése túl sokáig tartott. Az adatok mentve vannak, próbáld meg újra kisebb képpel vagy stabilabb internettel."
+            );
             payload = { ...payload, ...img };
             setCheckinSaveStatus("Kép mentése a check-inhez…", "warn");
             await persistWeeklyCheckin(payload);
