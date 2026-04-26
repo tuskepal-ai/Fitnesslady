@@ -1993,6 +1993,63 @@
     html.ios .review-track{
       scroll-behavior:auto !important;
     }
+    html.ios .system-stage,
+    html.ios .system-one-deck,
+    html.ios .system-one-deck .system-showcase{
+      min-height:auto !important;
+      height:auto !important;
+    }
+    html.ios .system-one-deck .system-showcase{
+      display:block !important;
+      padding:0 !important;
+      overflow: visible !important;
+    }
+    html.ios .deck-orbit{
+      position:relative !important;
+      inset:auto !important;
+      min-height:auto !important;
+      overflow: visible !important;
+      border-radius:28px;
+      padding:12px;
+    }
+    html.ios .deck-scene{
+      position:relative !important;
+      inset:auto !important;
+      display:grid !important;
+      gap:12px;
+      perspective:none !important;
+      transform-style:flat !important;
+    }
+    html.ios .scene-panel{
+      position:relative !important;
+      inset:auto !important;
+      left:auto !important;
+      right:auto !important;
+      top:auto !important;
+      bottom:auto !important;
+      width:100% !important;
+      height:auto !important;
+      min-height:auto !important;
+      transform:none !important;
+      animation:none !important;
+      opacity:1 !important;
+      filter:none !important;
+      z-index:1 !important;
+      will-change:auto !important;
+    }
+    html.ios .scene-panel:hover{
+      transform:none !important;
+    }
+    html.ios .scene-shot{
+      height:150px;
+    }
+    html.ios .scene-panel-packages .package-mini-stack{
+      min-height:168px;
+    }
+    html.ios .scene-panel-timer .deck-timer{
+      width:112px;
+      margin:10px auto 0;
+    }
 
     @supports (-webkit-touch-callout: none){
       @media (max-width: 980px){
@@ -2011,6 +2068,63 @@
         }
         .interactive::before{
           display:none !important;
+        }
+        .system-stage,
+        .system-one-deck,
+        .system-one-deck .system-showcase{
+          min-height:auto !important;
+          height:auto !important;
+        }
+        .system-one-deck .system-showcase{
+          display:block !important;
+          padding:0 !important;
+          overflow: visible !important;
+        }
+        .deck-orbit{
+          position:relative !important;
+          inset:auto !important;
+          min-height:auto !important;
+          overflow: visible !important;
+          border-radius:28px;
+          padding:12px;
+        }
+        .deck-scene{
+          position:relative !important;
+          inset:auto !important;
+          display:grid !important;
+          gap:12px;
+          perspective:none !important;
+          transform-style:flat !important;
+        }
+        .scene-panel{
+          position:relative !important;
+          inset:auto !important;
+          left:auto !important;
+          right:auto !important;
+          top:auto !important;
+          bottom:auto !important;
+          width:100% !important;
+          height:auto !important;
+          min-height:auto !important;
+          transform:none !important;
+          animation:none !important;
+          opacity:1 !important;
+          filter:none !important;
+          z-index:1 !important;
+          will-change:auto !important;
+        }
+        .scene-panel:hover{
+          transform:none !important;
+        }
+        .scene-shot{
+          height:150px;
+        }
+        .scene-panel-packages .package-mini-stack{
+          min-height:168px;
+        }
+        .scene-panel-timer .deck-timer{
+          width:112px;
+          margin:10px auto 0;
         }
       }
     }
