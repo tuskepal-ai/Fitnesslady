@@ -1537,27 +1537,34 @@
     }
     @media (min-width: 981px){
       .system-grid{
-        grid-template-columns: minmax(0, 1fr) minmax(520px, .92fr);
-        gap: 22px;
+        grid-template-columns: minmax(0, 1fr) minmax(500px, .86fr);
+        gap: 20px;
       }
       .system-stage{
-        min-height: 640px;
+        min-height: 600px;
         width: 100%;
-        max-width: 660px;
+        max-width: 620px;
         justify-self: end;
         padding: 0;
       }
       .system-one-deck,
       .system-one-deck .system-showcase{
-        min-height: 640px;
+        min-height: 600px;
       }
       .deck-orbit{
-        inset: 0;
-        border-radius: 30px;
+        inset: 6px;
+        border-radius: 28px;
+      }
+      .deck-scene{
+        inset: 10px;
       }
       .scene-panel{
-        padding: 16px;
-        border-radius: 24px;
+        padding: 14px;
+        border-radius: 22px;
+        --spot-on: 1.045;
+        --spot-hold: 1.065;
+        --spot-rest: .91;
+        --spot-depth: 70px;
       }
       .scene-kicker{
         font-size: 10px;
@@ -1575,21 +1582,21 @@
         line-height: 1.45;
       }
       .scene-panel-phone{
-        left: 18px;
-        top: 20px;
-        width: 262px;
-        height: 350px;
+        left: 12px;
+        top: 16px;
+        width: 236px;
+        height: 322px;
       }
       .scene-shot{
-        height: 140px;
-        border-radius: 19px;
-        margin-bottom: 12px;
+        height: 126px;
+        border-radius: 18px;
+        margin-bottom: 10px;
       }
       .scene-brand-ring{
-        width: 52px;
-        height: 52px;
-        right: 14px;
-        top: 14px;
+        width: 46px;
+        height: 46px;
+        right: 12px;
+        top: 12px;
       }
       .scene-mini-meta{
         gap: 6px;
@@ -1600,10 +1607,10 @@
         font-size: 10px;
       }
       .scene-panel-client{
-        left: 168px;
-        top: 88px;
-        width: 352px;
-        min-height: 246px;
+        left: 138px;
+        top: 76px;
+        width: 312px;
+        min-height: 224px;
       }
       .buyer-flow{
         gap: 7px;
@@ -1614,9 +1621,9 @@
         line-height: 1.35;
       }
       .scene-panel-videos{
-        right: 28px;
-        top: 42px;
-        width: 230px;
+        right: 16px;
+        top: 32px;
+        width: 206px;
       }
       .video-pill-stack{
         gap: 7px;
@@ -1627,9 +1634,9 @@
         font-size: 10.5px;
       }
       .scene-panel-rhythm{
-        left: 22px;
-        bottom: 46px;
-        width: 238px;
+        left: 16px;
+        bottom: 42px;
+        width: 214px;
       }
       .deck-progress{
         gap: 9px;
@@ -1642,10 +1649,10 @@
         height: 8px;
       }
       .scene-panel-packages{
-        right: 18px;
-        bottom: 34px;
-        width: 300px;
-        min-height: 274px;
+        right: 14px;
+        bottom: 30px;
+        width: 270px;
+        min-height: 252px;
       }
       .package-mini-stack{
         min-height: 178px;
@@ -1666,12 +1673,12 @@
         font-size: 11px;
       }
       .scene-panel-timer{
-        right: 230px;
+        right: 198px;
         bottom: 24px;
-        width: 156px;
+        width: 136px;
       }
       .scene-panel-timer .deck-timer{
-        width: 110px;
+        width: 96px;
       }
       .deck-timer-inner strong{
         font-size: 28px;
