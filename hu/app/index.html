@@ -1265,6 +1265,7 @@
       return (
         String(profile?.cycleStart || "").trim() ||
         String(profile?.startDate || "").trim() ||
+        isoDateFromAny(profile?.activatedAt) ||
         isoDateFromAny(profile?.createdAt) ||
         todayISO()
       );
@@ -1296,13 +1297,29 @@
       state.currentCheckinBase = baseIso;
 
       if(passedDays < 7){
+        const doc = state.checkinsByIndex[0] || null;
+
+        if(doc){
+          return {
+            baseIso,
+            passedDays,
+            currentIndex: 0,
+            dueAt: baseIso,
+            status: "submitted",
+            daysUntilDue: 7 - passedDays,
+            doc
+          };
+        }
+
         return {
           baseIso,
           passedDays,
           currentIndex: 0,
-          dueAt: addDaysIso(baseIso, 7),
-          status: "upcoming",
-          daysUntilDue: 7 - passedDays
+          dueAt: baseIso || todayISO(),
+          status: "due",
+          daysUntilDue: 0,
+          doc: null,
+          isFirstCheckin: true
         };
       }
 
@@ -1452,9 +1469,11 @@
       if(meta.status === "due"){
         pill.className = "status-pill ok";
         pill.textContent = "Új check-in elérhető";
-        title.textContent = `Check-in #${meta.currentIndex}`;
-        text.textContent = "Töltsd ki most a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.";
-        due.textContent = `${humanDateLabel(meta.dueAt)} • Ma`;
+        title.textContent = meta.isFirstCheckin ? "Első check-in" : `Check-in #${meta.currentIndex}`;
+        text.textContent = meta.isFirstCheckin
+          ? "Töltsd ki az első állapotfelmérést, hogy lássam honnan indulsz, és ehhez tudjam igazítani a következő lépéseket."
+          : "Töltsd ki most a heti állapotfelmérést, hogy személyre tudjam szabni a következő időszakot.";
+        due.textContent = `${humanDateLabel(meta.dueAt)} • Elérhető`;
         next.textContent = "Beküldés után 7 nap múlva";
         btnOpen.style.display = "inline-flex";
         renderWeeklyCheckinSummary(null);
@@ -1474,7 +1493,7 @@
       if(meta.status === "submitted"){
         pill.className = "status-pill ok";
         pill.textContent = "Check-in elküldve";
-        title.textContent = `Check-in #${meta.currentIndex} rendben`;
+        title.textContent = meta.currentIndex === 0 ? "Első check-in rendben" : `Check-in #${meta.currentIndex} rendben`;
         text.textContent = "Az aktuális heti check-in megérkezett. A következő automatikusan 7 nap múlva lesz elérhető.";
         due.textContent = `${humanDateLabel(meta.dueAt)} • Beküldve`;
         next.textContent = humanDueText(meta.daysUntilDue);
