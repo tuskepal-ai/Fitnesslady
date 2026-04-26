@@ -485,6 +485,70 @@
     .toast.is-on{ display:block; }
     .toast b{ font-weight: 950; }
 
+    .confirmOverlay{
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      background: rgba(0,0,0,.66);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    .confirmOverlay.is-open{ display:flex; }
+    .confirmCard{
+      width:min(560px, 94vw);
+      border-radius:24px;
+      border:1px solid rgba(255,255,255,.14);
+      background: linear-gradient(180deg, rgba(44,22,48,.94), rgba(13,10,18,.96));
+      box-shadow: 0 30px 90px rgba(0,0,0,.65), 0 0 42px rgba(255,79,216,.13);
+      padding:18px;
+    }
+    .confirmTitle{
+      margin:0 0 8px;
+      font-family: ui-serif, Georgia, serif;
+      font-size:24px;
+      letter-spacing:-.3px;
+    }
+    .confirmText{
+      color:rgba(255,255,255,.74);
+      line-height:1.55;
+      margin:0 0 14px;
+    }
+    .confirmTarget{
+      padding:10px 12px;
+      border-radius:14px;
+      border:1px solid rgba(255,211,138,.18);
+      background:rgba(255,211,138,.07);
+      color:#fff;
+      margin-bottom:12px;
+      overflow-wrap:anywhere;
+    }
+    .confirmInput{
+      width:100%;
+      min-height:48px;
+      border-radius:16px;
+      border:1px solid rgba(255,255,255,.14);
+      background:rgba(0,0,0,.22);
+      color:#fff;
+      padding:12px 14px;
+      outline:none;
+      font-size:15px;
+    }
+    .confirmInput:focus{
+      border-color:rgba(255,79,216,.48);
+      box-shadow:0 0 0 4px rgba(255,79,216,.12);
+    }
+    .confirmActions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
     footer{
       padding: 18px 0 46px;
       border-top:1px solid rgba(255,255,255,.08);
@@ -1006,6 +1070,22 @@
 
   <div class="toast" id="toast"></div>
 
+  <div class="confirmOverlay" id="deleteConfirmOverlay" aria-hidden="true">
+    <div class="confirmCard" role="dialog" aria-modal="true" aria-labelledby="deleteConfirmTitle">
+      <h2 class="confirmTitle" id="deleteConfirmTitle">Felhasználó törlése</h2>
+      <p class="confirmText">
+        Ez a művelet elrejti a felhasználót az admin listából, törli a hozzá tartozó Firestore adatokat, és megpróbálja törölni az Auth fiókot is.
+      </p>
+      <div class="confirmTarget mono" id="deleteConfirmTarget">—</div>
+      <label class="sub" for="deleteConfirmInput" style="display:block; margin-bottom:6px;">Megerősítéshez írd be: <b>TORLES</b></label>
+      <input class="confirmInput" id="deleteConfirmInput" type="text" autocomplete="off" placeholder="TORLES" />
+      <div class="confirmActions">
+        <button class="pill ghost" id="btnDeleteConfirmCancel" type="button">Mégsem</button>
+        <button class="pill warn" id="btnDeleteConfirmOk" type="button">Törlés megerősítése</button>
+      </div>
+    </div>
+  </div>
+
   <aside class="chatWin" id="chatDrawer" aria-hidden="true">
     <div class="chatHead">
       <div>
@@ -1171,6 +1251,44 @@
     }
     function ok(msg){ showToast(`<b>OK</b> — ${escapeHtml(msg)}`); }
     function err(msg){ showToast(`<b>HIBA</b> — ${escapeHtml(msg)}`, 5200); }
+
+    const deleteConfirmOverlay = $("#deleteConfirmOverlay");
+    const deleteConfirmTarget = $("#deleteConfirmTarget");
+    const deleteConfirmInput = $("#deleteConfirmInput");
+    const btnDeleteConfirmOk = $("#btnDeleteConfirmOk");
+    const btnDeleteConfirmCancel = $("#btnDeleteConfirmCancel");
+    let deleteConfirmResolve = null;
+
+    function closeDeleteConfirm(result = false){
+      deleteConfirmOverlay.classList.remove("is-open");
+      deleteConfirmOverlay.setAttribute("aria-hidden", "true");
+      const resolve = deleteConfirmResolve;
+      deleteConfirmResolve = null;
+      if(resolve) resolve(result);
+    }
+
+    function askDeleteConfirm(label){
+      deleteConfirmTarget.textContent = label || "Ismeretlen felhasználó";
+      deleteConfirmInput.value = "";
+      deleteConfirmOverlay.classList.add("is-open");
+      deleteConfirmOverlay.setAttribute("aria-hidden", "false");
+      window.setTimeout(() => deleteConfirmInput.focus(), 0);
+      return new Promise(resolve => {
+        deleteConfirmResolve = resolve;
+      });
+    }
+
+    btnDeleteConfirmCancel.addEventListener("click", () => closeDeleteConfirm(false));
+    btnDeleteConfirmOk.addEventListener("click", () => {
+      closeDeleteConfirm(trimStr(deleteConfirmInput.value).toUpperCase() === "TORLES");
+    });
+    deleteConfirmInput.addEventListener("keydown", (e) => {
+      if(e.key === "Enter") closeDeleteConfirm(trimStr(deleteConfirmInput.value).toUpperCase() === "TORLES");
+      if(e.key === "Escape") closeDeleteConfirm(false);
+    });
+    deleteConfirmOverlay.addEventListener("click", (e) => {
+      if(e.target === deleteConfirmOverlay) closeDeleteConfirm(false);
+    });
 
     const dbg = $("#debugBox");
     function setDebug({count=null, error=null}={}){
@@ -1873,13 +1991,8 @@
         const name = trimStr(cached?.name || (SEL_UID === uid ? $("#u_name").value : ""));
         const label = name ? `${name} — ${email || uid}` : (email || uid);
 
-        const confirmed = window.confirm(
-          `Biztosan törlöd ezt a felhasználót?\n\n${label}\n\nEz az Auth usert és a Firestore user adatokat is törli.`
-        );
-        if(!confirmed) return;
-
-        const typed = window.prompt("Biztonsági megerősítéshez írd be pontosan: TORLES", "");
-        if(trimStr(typed).toUpperCase() !== "TORLES"){
+        const confirmed = await askDeleteConfirm(label);
+        if(!confirmed){
           return err("Törlés megszakítva.");
         }
 
