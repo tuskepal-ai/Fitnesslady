@@ -1271,6 +1271,30 @@
       );
     }
 
+    function normalizeCheckinDoc(raw, id = ""){
+      if(!raw || typeof raw !== "object") return null;
+      const fromId = String(id || "").match(/(\d+)$/)?.[1];
+      const checkinIndex = Number(raw.checkinIndex ?? fromId);
+      if(!Number.isFinite(checkinIndex)) return null;
+      return { id: id || `checkin-${checkinIndex}`, ...raw, checkinIndex };
+    }
+
+    function addCheckinToState(raw, id = ""){
+      const item = normalizeCheckinDoc(raw, id);
+      if(!item) return;
+      state.checkinsByIndex[item.checkinIndex] = item;
+    }
+
+    function addProfileCheckinMirrors(){
+      const mirrored = profile?.checkinsByIndex || {};
+      if(mirrored && typeof mirrored === "object"){
+        Object.entries(mirrored).forEach(([key, item]) => addCheckinToState(item, key));
+      }
+      if(profile?.latestCheckin){
+        addCheckinToState(profile.latestCheckin, "latestCheckin");
+      }
+    }
+
     async function loadWeeklyCheckins(){
       state.checkinsByIndex = {};
       try{
@@ -1281,14 +1305,13 @@
         );
         const snap = await fs.getDocs(q);
         snap.forEach(docSnap=>{
-          const d = docSnap.data() || {};
-          if(Number.isFinite(d.checkinIndex)){
-            state.checkinsByIndex[d.checkinIndex] = { id: docSnap.id, ...d };
-          }
+          addCheckinToState(docSnap.data() || {}, docSnap.id);
         });
       }catch(e){
         console.error(e);
       }
+
+      addProfileCheckinMirrors();
     }
 
     function getCurrentCheckinMeta(){
@@ -1762,6 +1785,53 @@
       return { imageUrl: url, imagePath: path };
     }
 
+    function checkinMirrorPatch(payload){
+      const key = `i${Number(payload?.checkinIndex ?? 0)}`;
+      return {
+        latestCheckin: payload,
+        checkinsByIndex: {
+          [key]: payload
+        },
+        updatedAt: fs.serverTimestamp()
+      };
+    }
+
+    async function persistWeeklyCheckin(payload){
+      const errors = [];
+      let savedSubcollection = false;
+      let savedProfileMirror = false;
+
+      try{
+        await fs.setDoc(
+          fs.doc(db, "users", UID, "checkins", `checkin-${payload.checkinIndex}`),
+          payload,
+          { merge: true }
+        );
+        savedSubcollection = true;
+      }catch(e){
+        console.error("Check-in subcollection save failed", e);
+        errors.push(e);
+      }
+
+      try{
+        await fs.setDoc(
+          fs.doc(db, "users", UID),
+          checkinMirrorPatch(payload),
+          { merge: true }
+        );
+        savedProfileMirror = true;
+      }catch(e){
+        console.error("Check-in profile mirror save failed", e);
+        errors.push(e);
+      }
+
+      if(!savedSubcollection && !savedProfileMirror){
+        throw errors[0] || new Error("A check-in mentése nem sikerült.");
+      }
+
+      return { savedSubcollection, savedProfileMirror };
+    }
+
     async function saveWeeklyCheckin(){
       const btn = $("#btnSaveWeeklyCheckin");
       btn.disabled = true;
@@ -1798,25 +1868,31 @@
           updatedAt: fs.serverTimestamp()
         };
 
-        const file = $("#ciPhoto").files?.[0] || null;
-        if(file){
-          const img = await uploadCheckinImage(file, state.currentCheckinIndex);
-          payload = { ...payload, ...img };
-        } else if(state.currentCheckinDoc?.imageUrl){
+        if(state.currentCheckinDoc?.imageUrl){
           payload.imageUrl = state.currentCheckinDoc.imageUrl;
           payload.imagePath = state.currentCheckinDoc.imagePath || "";
         }
 
-        await fs.setDoc(
-          fs.doc(db, "users", UID, "checkins", `checkin-${state.currentCheckinIndex}`),
-          payload,
-          { merge: true }
-        );
+        await persistWeeklyCheckin(payload);
 
+        let imageWarning = "";
+        const file = $("#ciPhoto").files?.[0] || null;
+        if(file){
+          try{
+            const img = await uploadCheckinImage(file, state.currentCheckinIndex);
+            payload = { ...payload, ...img };
+            await persistWeeklyCheckin(payload);
+          }catch(imgErr){
+            console.error("Check-in image upload/save failed", imgErr);
+            imageWarning = `<br><br><b>Fontos:</b> a szöveges adatok mentve vannak, de a kép mentése nem sikerült: ${escapeHtml(imgErr?.message || String(imgErr))}`;
+          }
+        }
+
+        profile = await loadUserProfile(UID) || profile || {};
         await loadWeeklyCheckins();
         renderWeeklyCheckin();
         closeCheckinForm();
-        openInfo("Siker", "A heti check-in sikeresen el lett mentve.");
+        openInfo("Siker", `A heti check-in adatai sikeresen el lettek mentve.${imageWarning}`);
       }catch(e){
         console.error(e);
         openInfo("Hiba", escapeHtml(e.message || String(e)));

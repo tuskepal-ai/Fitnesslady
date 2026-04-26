@@ -1083,6 +1083,46 @@
       return dateFromAny(item.submittedAtISO || item.submittedAt || item.updatedAt || item.dueAt)?.getTime() || 0;
     }
 
+    function normalizeCheckinItem(raw, id = "", source = "checkins"){
+      if(!raw || typeof raw !== "object") return null;
+      const fromId = String(id || "").match(/(\d+)$/)?.[1];
+      const checkinIndex = Number(raw.checkinIndex ?? fromId);
+      if(!Number.isFinite(checkinIndex)) return null;
+      return {
+        id: id || `checkin-${checkinIndex}`,
+        source,
+        ...raw,
+        checkinIndex
+      };
+    }
+
+    function profileCheckinItems(userDoc){
+      const items = [];
+      const mirrored = userDoc?.checkinsByIndex || {};
+      if(mirrored && typeof mirrored === "object"){
+        Object.entries(mirrored).forEach(([key, item]) => {
+          const normalized = normalizeCheckinItem(item, key, "userDoc");
+          if(normalized) items.push(normalized);
+        });
+      }
+      const latest = normalizeCheckinItem(userDoc?.latestCheckin, "latestCheckin", "userDoc");
+      if(latest) items.push(latest);
+      return items;
+    }
+
+    function mergeCheckinItems(items){
+      const byIndex = new Map();
+      items.forEach(item => {
+        const normalized = normalizeCheckinItem(item, item?.id, item?.source || "checkins");
+        if(!normalized) return;
+        const prev = byIndex.get(normalized.checkinIndex);
+        if(!prev || checkinSortDate(normalized) >= checkinSortDate(prev)){
+          byIndex.set(normalized.checkinIndex, normalized);
+        }
+      });
+      return Array.from(byIndex.values()).sort((a, b) => checkinSortDate(b) - checkinSortDate(a));
+    }
+
     function extractErrorMessage(input){
       if(input == null) return "Ismeretlen hiba";
       if(typeof input === "string") return input;
@@ -1519,8 +1559,12 @@
       if(debug) debug.innerHTML = `<b>Check-in</b>: betöltés…`;
 
       try{
+        const userSnap = await fs.getDoc(fs.doc(db, "users", uid));
+        const profileItems = profileCheckinItems(userSnap.exists() ? (userSnap.data() || {}) : {});
+
         const col = fs.collection(db, "users", uid, "checkins");
         let snap = null;
+        let subItems = [];
         try{
           snap = await fs.getDocs(fs.query(col, fs.orderBy("submittedAt", "desc"), fs.limit(100)));
         }catch(e1){
@@ -1531,10 +1575,11 @@
           }
         }
 
-        const items = snap.docs
-          .map(d => ({ id: d.id, ...(d.data() || {}) }))
-          .sort((a, b) => checkinSortDate(b) - checkinSortDate(a));
+        subItems = snap.docs
+          .map(d => normalizeCheckinItem(d.data() || {}, d.id, "checkins"))
+          .filter(Boolean);
 
+        const items = mergeCheckinItems([...subItems, ...profileItems]);
         renderCheckins(items);
       }catch(e){
         console.error(e);
