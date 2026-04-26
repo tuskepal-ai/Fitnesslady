@@ -1996,59 +1996,182 @@
     html.ios .system-stage,
     html.ios .system-one-deck,
     html.ios .system-one-deck .system-showcase{
-      min-height:auto !important;
+      min-height:560px !important;
       height:auto !important;
     }
     html.ios .system-one-deck .system-showcase{
       display:block !important;
       padding:0 !important;
-      overflow: visible !important;
+      overflow: hidden !important;
     }
     html.ios .deck-orbit{
       position:relative !important;
       inset:auto !important;
-      min-height:auto !important;
-      overflow: visible !important;
-      border-radius:28px;
-      padding:12px;
+      min-height:560px !important;
+      overflow:hidden !important;
+      border-radius:34px;
+      padding:0;
+      background:
+        radial-gradient(420px 280px at 12% 0%, rgba(255,79,216,.22), transparent 66%),
+        radial-gradient(440px 340px at 92% 8%, rgba(177,76,255,.20), transparent 68%),
+        linear-gradient(180deg, rgba(38,26,52,.86), rgba(14,10,22,.94));
+      border:1px solid rgba(255,79,216,.28);
+      box-shadow: 0 24px 60px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08);
     }
     html.ios .deck-scene{
-      position:relative !important;
-      inset:auto !important;
-      display:grid !important;
-      gap:12px;
+      position:absolute !important;
+      inset:14px !important;
+      display:block !important;
       perspective:none !important;
       transform-style:flat !important;
     }
     html.ios .scene-panel{
-      position:relative !important;
-      inset:auto !important;
-      left:auto !important;
-      right:auto !important;
-      top:auto !important;
-      bottom:auto !important;
-      width:100% !important;
-      height:auto !important;
-      min-height:auto !important;
+      position:absolute !important;
       transform:none !important;
       animation:none !important;
       opacity:1 !important;
       filter:none !important;
-      z-index:1 !important;
       will-change:auto !important;
+      padding:14px !important;
+      border-radius:24px !important;
+      background:
+        linear-gradient(180deg, rgba(48,34,64,.86), rgba(14,10,22,.88)),
+        radial-gradient(280px 180px at 14% 0%, rgba(255,79,216,.18), transparent 70%);
+      border-color: rgba(255,255,255,.13);
+      box-shadow: 0 18px 42px rgba(0,0,0,.34), 0 0 24px rgba(177,76,255,.10);
     }
     html.ios .scene-panel:hover{
       transform:none !important;
     }
+    html.ios .scene-panel h3{
+      font-size:25px;
+    }
+    html.ios .scene-panel h4{
+      font-size:15px;
+    }
+    html.ios .scene-panel p{
+      margin-top:7px;
+      font-size:11.5px;
+      line-height:1.38;
+    }
+    html.ios .scene-kicker{
+      font-size:9.5px;
+      margin-bottom:6px;
+    }
+    html.ios .scene-panel-phone{
+      left:0 !important;
+      top:0 !important;
+      width:52% !important;
+      height:238px !important;
+      z-index:5 !important;
+    }
+    html.ios .scene-panel-videos{
+      right:0 !important;
+      top:28px !important;
+      width:50% !important;
+      z-index:4 !important;
+    }
+    html.ios .scene-panel-client{
+      left:24px !important;
+      right:10px !important;
+      top:150px !important;
+      width:auto !important;
+      min-height:164px !important;
+      z-index:6 !important;
+    }
+    html.ios .scene-panel-rhythm{
+      left:0 !important;
+      bottom:20px !important;
+      width:46% !important;
+      z-index:7 !important;
+    }
+    html.ios .scene-panel-packages{
+      right:0 !important;
+      bottom:12px !important;
+      width:54% !important;
+      min-height:210px !important;
+      z-index:8 !important;
+    }
+    html.ios .scene-panel-timer{
+      right:34px !important;
+      bottom:86px !important;
+      width:144px !important;
+      z-index:9 !important;
+      text-align:center;
+    }
     html.ios .scene-shot{
-      height:150px;
+      height:104px;
+      border-radius:18px;
+      margin-bottom:10px;
+    }
+    html.ios .scene-brand-ring{
+      width:38px;
+      height:38px;
+      right:10px;
+      top:10px;
+      font-size:12px;
+    }
+    html.ios .scene-mini-meta{
+      gap:6px;
+      margin-top:9px;
+    }
+    html.ios .scene-mini-meta span{
+      padding:6px 7px;
+      font-size:9.5px;
+    }
+    html.ios .video-pill-stack{
+      gap:6px;
+      margin-top:9px;
+    }
+    html.ios .video-pill-stack span{
+      padding:7px 8px;
+      font-size:10px;
+    }
+    html.ios .buyer-flow{
+      gap:6px;
+      margin-top:9px;
+    }
+    html.ios .buyer-flow div{
+      font-size:10.8px;
+      line-height:1.28;
+    }
+    html.ios .deck-progress{
+      gap:7px;
+    }
+    html.ios .deck-progress-row{
+      gap:5px;
+      font-size:11px;
+    }
+    html.ios .deck-bar{
+      height:8px;
     }
     html.ios .scene-panel-packages .package-mini-stack{
-      min-height:168px;
+      min-height:142px;
+      margin-top:10px;
+    }
+    html.ios .package-mini{
+      padding:9px 10px;
+      border-radius:15px;
+    }
+    html.ios .package-mini:nth-child(2){ top:34px; }
+    html.ios .package-mini:nth-child(3){ top:74px; }
+    html.ios .package-mini-head{
+      margin-bottom:6px;
+      font-size:11px;
+    }
+    html.ios .package-mini ul{
+      gap:5px;
+      font-size:10px;
     }
     html.ios .scene-panel-timer .deck-timer{
-      width:112px;
-      margin:10px auto 0;
+      width:92px;
+      margin:8px auto 0;
+    }
+    html.ios .deck-timer-inner strong{
+      font-size:24px;
+    }
+    html.ios .deck-timer-inner span{
+      font-size:10px;
     }
 
     @supports (-webkit-touch-callout: none){
@@ -2072,59 +2195,182 @@
         .system-stage,
         .system-one-deck,
         .system-one-deck .system-showcase{
-          min-height:auto !important;
+          min-height:560px !important;
           height:auto !important;
         }
         .system-one-deck .system-showcase{
           display:block !important;
           padding:0 !important;
-          overflow: visible !important;
+          overflow: hidden !important;
         }
         .deck-orbit{
           position:relative !important;
           inset:auto !important;
-          min-height:auto !important;
-          overflow: visible !important;
-          border-radius:28px;
-          padding:12px;
+          min-height:560px !important;
+          overflow:hidden !important;
+          border-radius:34px;
+          padding:0;
+          background:
+            radial-gradient(420px 280px at 12% 0%, rgba(255,79,216,.22), transparent 66%),
+            radial-gradient(440px 340px at 92% 8%, rgba(177,76,255,.20), transparent 68%),
+            linear-gradient(180deg, rgba(38,26,52,.86), rgba(14,10,22,.94));
+          border:1px solid rgba(255,79,216,.28);
+          box-shadow: 0 24px 60px rgba(0,0,0,.42), inset 0 1px 0 rgba(255,255,255,.08);
         }
         .deck-scene{
-          position:relative !important;
-          inset:auto !important;
-          display:grid !important;
-          gap:12px;
+          position:absolute !important;
+          inset:14px !important;
+          display:block !important;
           perspective:none !important;
           transform-style:flat !important;
         }
         .scene-panel{
-          position:relative !important;
-          inset:auto !important;
-          left:auto !important;
-          right:auto !important;
-          top:auto !important;
-          bottom:auto !important;
-          width:100% !important;
-          height:auto !important;
-          min-height:auto !important;
+          position:absolute !important;
           transform:none !important;
           animation:none !important;
           opacity:1 !important;
           filter:none !important;
-          z-index:1 !important;
           will-change:auto !important;
+          padding:14px !important;
+          border-radius:24px !important;
+          background:
+            linear-gradient(180deg, rgba(48,34,64,.86), rgba(14,10,22,.88)),
+            radial-gradient(280px 180px at 14% 0%, rgba(255,79,216,.18), transparent 70%);
+          border-color: rgba(255,255,255,.13);
+          box-shadow: 0 18px 42px rgba(0,0,0,.34), 0 0 24px rgba(177,76,255,.10);
         }
         .scene-panel:hover{
           transform:none !important;
         }
+        .scene-panel h3{
+          font-size:25px;
+        }
+        .scene-panel h4{
+          font-size:15px;
+        }
+        .scene-panel p{
+          margin-top:7px;
+          font-size:11.5px;
+          line-height:1.38;
+        }
+        .scene-kicker{
+          font-size:9.5px;
+          margin-bottom:6px;
+        }
+        .scene-panel-phone{
+          left:0 !important;
+          top:0 !important;
+          width:52% !important;
+          height:238px !important;
+          z-index:5 !important;
+        }
+        .scene-panel-videos{
+          right:0 !important;
+          top:28px !important;
+          width:50% !important;
+          z-index:4 !important;
+        }
+        .scene-panel-client{
+          left:24px !important;
+          right:10px !important;
+          top:150px !important;
+          width:auto !important;
+          min-height:164px !important;
+          z-index:6 !important;
+        }
+        .scene-panel-rhythm{
+          left:0 !important;
+          bottom:20px !important;
+          width:46% !important;
+          z-index:7 !important;
+        }
+        .scene-panel-packages{
+          right:0 !important;
+          bottom:12px !important;
+          width:54% !important;
+          min-height:210px !important;
+          z-index:8 !important;
+        }
+        .scene-panel-timer{
+          right:34px !important;
+          bottom:86px !important;
+          width:144px !important;
+          z-index:9 !important;
+          text-align:center;
+        }
         .scene-shot{
-          height:150px;
+          height:104px;
+          border-radius:18px;
+          margin-bottom:10px;
+        }
+        .scene-brand-ring{
+          width:38px;
+          height:38px;
+          right:10px;
+          top:10px;
+          font-size:12px;
+        }
+        .scene-mini-meta{
+          gap:6px;
+          margin-top:9px;
+        }
+        .scene-mini-meta span{
+          padding:6px 7px;
+          font-size:9.5px;
+        }
+        .video-pill-stack{
+          gap:6px;
+          margin-top:9px;
+        }
+        .video-pill-stack span{
+          padding:7px 8px;
+          font-size:10px;
+        }
+        .buyer-flow{
+          gap:6px;
+          margin-top:9px;
+        }
+        .buyer-flow div{
+          font-size:10.8px;
+          line-height:1.28;
+        }
+        .deck-progress{
+          gap:7px;
+        }
+        .deck-progress-row{
+          gap:5px;
+          font-size:11px;
+        }
+        .deck-bar{
+          height:8px;
         }
         .scene-panel-packages .package-mini-stack{
-          min-height:168px;
+          min-height:142px;
+          margin-top:10px;
+        }
+        .package-mini{
+          padding:9px 10px;
+          border-radius:15px;
+        }
+        .package-mini:nth-child(2){ top:34px; }
+        .package-mini:nth-child(3){ top:74px; }
+        .package-mini-head{
+          margin-bottom:6px;
+          font-size:11px;
+        }
+        .package-mini ul{
+          gap:5px;
+          font-size:10px;
         }
         .scene-panel-timer .deck-timer{
-          width:112px;
-          margin:10px auto 0;
+          width:92px;
+          margin:8px auto 0;
+        }
+        .deck-timer-inner strong{
+          font-size:24px;
+        }
+        .deck-timer-inner span{
+          font-size:10px;
         }
       }
     }
