@@ -2028,7 +2028,8 @@
     html.ios .scene-panel{
       position:absolute !important;
       transform:translate3d(0,0,0);
-      animation: iosDeckPanel 7.8s ease-in-out infinite !important;
+      animation: iosSceneFocus 36s ease-in-out infinite !important;
+      -webkit-animation: iosSceneFocus 36s ease-in-out infinite !important;
       opacity:.98 !important;
       filter:none !important;
       will-change:auto !important;
@@ -2043,12 +2044,12 @@
     html.ios .scene-panel:hover{
       transform:translate3d(0,0,0);
     }
-    html.ios .scene-panel-phone{ animation-delay: -.8s !important; }
-    html.ios .scene-panel-videos{ animation-delay: -2.2s !important; }
-    html.ios .scene-panel-client{ animation-delay: -3.4s !important; }
-    html.ios .scene-panel-rhythm{ animation-delay: -4.6s !important; }
-    html.ios .scene-panel-packages{ animation-delay: -5.8s !important; }
-    html.ios .scene-panel-timer{ animation-delay: -6.6s !important; }
+    html.ios .scene-panel-client{ animation-delay: 0s !important; -webkit-animation-delay: 0s !important; }
+    html.ios .scene-panel-phone{ animation-delay: -6s !important; -webkit-animation-delay: -6s !important; }
+    html.ios .scene-panel-timer{ animation-delay: -12s !important; -webkit-animation-delay: -12s !important; }
+    html.ios .scene-panel-videos{ animation-delay: -18s !important; -webkit-animation-delay: -18s !important; }
+    html.ios .scene-panel-rhythm{ animation-delay: -24s !important; -webkit-animation-delay: -24s !important; }
+    html.ios .scene-panel-packages{ animation-delay: -30s !important; -webkit-animation-delay: -30s !important; }
     html.ios .deck-orbit{
       animation: iosDeckGlow 9s ease-in-out infinite !important;
     }
@@ -2072,13 +2073,13 @@
       top:0 !important;
       width:52% !important;
       height:238px !important;
-      z-index:5 !important;
+      z-index:5;
     }
     html.ios .scene-panel-videos{
       right:0 !important;
       top:28px !important;
       width:50% !important;
-      z-index:4 !important;
+      z-index:4;
     }
     html.ios .scene-panel-client{
       left:24px !important;
@@ -2086,26 +2087,26 @@
       top:150px !important;
       width:auto !important;
       min-height:164px !important;
-      z-index:6 !important;
+      z-index:6;
     }
     html.ios .scene-panel-rhythm{
       left:0 !important;
       bottom:20px !important;
       width:46% !important;
-      z-index:7 !important;
+      z-index:7;
     }
     html.ios .scene-panel-packages{
       right:0 !important;
       bottom:12px !important;
       width:54% !important;
       min-height:210px !important;
-      z-index:8 !important;
+      z-index:8;
     }
     html.ios .scene-panel-timer{
       right:34px !important;
       bottom:86px !important;
       width:144px !important;
-      z-index:9 !important;
+      z-index:9;
       text-align:center;
     }
     html.ios .scene-shot{
@@ -2260,7 +2261,8 @@
         .scene-panel{
           position:absolute !important;
           transform:translate3d(0,0,0);
-          animation: iosDeckPanel 7.8s ease-in-out infinite !important;
+          animation: iosSceneFocus 36s ease-in-out infinite !important;
+          -webkit-animation: iosSceneFocus 36s ease-in-out infinite !important;
           opacity:.98 !important;
           filter:none !important;
           will-change:auto !important;
@@ -2275,12 +2277,12 @@
         .scene-panel:hover{
           transform:translate3d(0,0,0);
         }
-        .scene-panel-phone{ animation-delay: -.8s !important; }
-        .scene-panel-videos{ animation-delay: -2.2s !important; }
-        .scene-panel-client{ animation-delay: -3.4s !important; }
-        .scene-panel-rhythm{ animation-delay: -4.6s !important; }
-        .scene-panel-packages{ animation-delay: -5.8s !important; }
-        .scene-panel-timer{ animation-delay: -6.6s !important; }
+        .scene-panel-client{ animation-delay: 0s !important; -webkit-animation-delay: 0s !important; }
+        .scene-panel-phone{ animation-delay: -6s !important; -webkit-animation-delay: -6s !important; }
+        .scene-panel-timer{ animation-delay: -12s !important; -webkit-animation-delay: -12s !important; }
+        .scene-panel-videos{ animation-delay: -18s !important; -webkit-animation-delay: -18s !important; }
+        .scene-panel-rhythm{ animation-delay: -24s !important; -webkit-animation-delay: -24s !important; }
+        .scene-panel-packages{ animation-delay: -30s !important; -webkit-animation-delay: -30s !important; }
         .deck-orbit{
           animation: iosDeckGlow 9s ease-in-out infinite !important;
         }
@@ -2304,13 +2306,13 @@
           top:0 !important;
           width:52% !important;
           height:238px !important;
-          z-index:5 !important;
+          z-index:5;
         }
         .scene-panel-videos{
           right:0 !important;
           top:28px !important;
           width:50% !important;
-          z-index:4 !important;
+          z-index:4;
         }
         .scene-panel-client{
           left:24px !important;
@@ -2318,26 +2320,26 @@
           top:150px !important;
           width:auto !important;
           min-height:164px !important;
-          z-index:6 !important;
+          z-index:6;
         }
         .scene-panel-rhythm{
           left:0 !important;
           bottom:20px !important;
           width:46% !important;
-          z-index:7 !important;
+          z-index:7;
         }
         .scene-panel-packages{
           right:0 !important;
           bottom:12px !important;
           width:54% !important;
           min-height:210px !important;
-          z-index:8 !important;
+          z-index:8;
         }
         .scene-panel-timer{
           right:34px !important;
           bottom:86px !important;
           width:144px !important;
-          z-index:9 !important;
+          z-index:9;
           text-align:center;
         }
         .scene-shot{
