@@ -2,11 +2,6 @@
 // Firebase v9 modular (CDN) — shared helpers
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import {
-  initializeAnalytics,
-  isSupported as isAnalyticsSupported,
-  logEvent
-} from "https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js";
-import {
   getAuth,
   onAuthStateChanged,
   signInWithEmailAndPassword,
@@ -45,19 +40,28 @@ export const db = getFirestore(app);
 
 let analyticsPromise = null;
 const trackedPageLocations = new Set();
+const PAGE_VIEW_ENDPOINT = "https://europe-west1-fitneady-15fd0.cloudfunctions.net/trackPageView";
 
 async function initAnalytics(){
   if(typeof window === "undefined") return null;
 
   try{
+    const {
+      initializeAnalytics,
+      isSupported: isAnalyticsSupported,
+      logEvent
+    } = await import("https://www.gstatic.com/firebasejs/9.23.0/firebase-analytics.js");
     const supported = await isAnalyticsSupported();
     if(!supported) return null;
 
-    return initializeAnalytics(app, {
-      config: {
-        send_page_view: false
-      }
-    });
+    return {
+      analytics: initializeAnalytics(app, {
+        config: {
+          send_page_view: false
+        }
+      }),
+      logEvent
+    };
   }catch(error){
     console.info("Firebase Analytics nem indult el ebben a kornyezetben.", error);
     return null;
@@ -71,28 +75,90 @@ export function getFitnessLadyAnalytics(){
   return analyticsPromise;
 }
 
-export async function trackPageView(extra = {}){
+function getVisitorId(){
+  if(typeof window === "undefined") return "";
+
+  try{
+    const key = "fitnesslady_visitor_id";
+    const existing = window.localStorage?.getItem(key);
+    if(existing) return existing;
+
+    const generated = (
+      window.crypto?.randomUUID?.() ||
+      `fl_${Date.now()}_${Math.random().toString(16).slice(2)}`
+    );
+    window.localStorage?.setItem(key, generated);
+    return generated;
+  }catch{
+    return "";
+  }
+}
+
+function getPageViewPayload(extra = {}){
+  const pathParts = window.location.pathname.split("/").filter(Boolean);
+  const lang = document.documentElement.lang || pathParts[0] || "hu";
+
+  return {
+    pageTitle: document.title || "FitnessLady",
+    pageLocation: window.location.href,
+    pagePath: window.location.pathname + window.location.search,
+    pageLanguage: lang,
+    siteSection: pathParts[1] || pathParts[0] || "home",
+    referrer: document.referrer || "",
+    visitorId: getVisitorId(),
+    ...extra
+  };
+}
+
+async function trackAnalyticsPageView(payload){
+  try{
+    const analyticsTools = await getFitnessLadyAnalytics();
+    if(!analyticsTools) return false;
+
+    analyticsTools.logEvent(analyticsTools.analytics, "page_view", {
+      page_title: payload.pageTitle,
+      page_location: payload.pageLocation,
+      page_path: payload.pagePath,
+      page_language: payload.pageLanguage,
+      site_section: payload.siteSection
+    });
+
+    return true;
+  }catch(error){
+    console.info("Firebase Analytics page_view meres kihagyva.", error);
+    return false;
+  }
+}
+
+async function trackFirestorePageView(payload){
+  try{
+    const res = await fetch(PAGE_VIEW_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      keepalive: true
+    });
+
+    return res.ok;
+  }catch(error){
+    console.info("Firestore page_view meres kihagyva.", error);
+    return false;
+  }
+}
+
+export function trackPageView(extra = {}){
   if(typeof window === "undefined") return false;
 
   try{
-    const analytics = await getFitnessLadyAnalytics();
-    if(!analytics) return false;
-
     const pageLocation = window.location.href;
     if(trackedPageLocations.has(pageLocation)) return false;
     trackedPageLocations.add(pageLocation);
 
-    const pathParts = window.location.pathname.split("/").filter(Boolean);
-    const lang = document.documentElement.lang || pathParts[0] || "hu";
-
-    logEvent(analytics, "page_view", {
-      page_title: document.title || "FitnessLady",
-      page_location: pageLocation,
-      page_path: window.location.pathname + window.location.search,
-      page_language: lang,
-      site_section: pathParts[1] || pathParts[0] || "home",
-      ...extra
-    });
+    const payload = getPageViewPayload(extra);
+    Promise.allSettled([
+      trackAnalyticsPageView(payload),
+      trackFirestorePageView(payload)
+    ]);
 
     return true;
   }catch(error){
