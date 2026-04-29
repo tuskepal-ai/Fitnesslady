@@ -8,7 +8,8 @@
 </head>
 <body>
   <script>
-    window.location.replace("/hu/register/" + window.location.search + window.location.hash);
+    const lang = (navigator.language || "").toLowerCase().startsWith("de") ? "de" : "hu";
+    window.location.replace(`/${lang}/register/` + window.location.search + window.location.hash);
   </script>
   <script type="module">
     import "../hu/shared/firebase.js";

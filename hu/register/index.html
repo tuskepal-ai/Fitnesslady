@@ -436,7 +436,8 @@
         await postJson(`${BACKEND_BASE_URL}/completeRegistration`, {
           token,
           password: pass,
-          displayName
+          displayName,
+          lang: "hu"
         });
 
         showMsg("Sikeres aktivacio. Tovabbitunk a bejelentkezeshez...", "ok");

@@ -242,7 +242,8 @@
         await postJson(`${BACKEND_BASE_URL}/completeRegistration`, {
           token,
           password: pass,
-          displayName
+          displayName,
+          lang: "de"
         });
 
         showMsg("Aktivierung erfolgreich. Weiterleitung zum Login...", "ok");
