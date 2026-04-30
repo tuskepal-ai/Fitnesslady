@@ -4,7 +4,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>FitnessLady — Adatkezelési tájékoztató</title>
+  <title>FitnessLady - Adatvédelmi irányelvek</title>
+  <meta name="description" content="A FitnessLady adatvédelmi irányelvei és adatkezelési tájékoztatója." />
+  <link rel="canonical" href="https://fitnesslady.ch/hu/legal/adatkezeles/" />
   <style>
     :root{
       --bg:#07060b; --text:rgba(255,255,255,.92); --muted:rgba(255,255,255,.70);
@@ -12,7 +14,7 @@
       --shadow: 0 18px 55px rgba(0,0,0,.55); --radius:22px; --max: 980px; --hero-url:none;
     }
     *{ box-sizing:border-box; }
-    html,body{ height:100%; }
+    html,body{ min-height:100%; }
     body{
       margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
       background:
@@ -21,20 +23,20 @@
         var(--bg);
       color:var(--text); overflow-x:hidden;
     }
-    body::before{ content:""; position:fixed; inset:0; z-index:-1; background-image:var(--hero-url); background-size:cover; background-position:center; opacity:.92; }
+    body::before{ content:""; position:fixed; inset:0; z-index:-1; background-image:var(--hero-url); background-size:cover; background-position:center; opacity:.28; }
     a{ color:inherit; }
-    .container{ width:min(var(--max), 92vw); margin:0 auto; padding: 18px 0 44px; }
+    .container{ width:min(var(--max), 92vw); margin:0 auto; padding:18px 0 44px; }
     .top{ display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px 0; }
     .brand{ display:flex; align-items:center; gap:10px; font-weight:900; letter-spacing:.2px; }
     .dot{ width:10px;height:10px;border-radius:999px; background: radial-gradient(circle at 30% 30%, #ffd0f6, var(--pink)); box-shadow: 0 0 18px rgba(255,79,216,.7); }
     .pill{ display:inline-flex; align-items:center; justify-content:center; padding:10px 14px; border-radius:999px; border:1px solid rgba(255,255,255,.12); background: rgba(20,12,26,.55); color:var(--text); box-shadow:0 12px 34px rgba(0,0,0,.35); text-decoration:none; }
-    .card{ margin-top:10px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter: blur(16px); padding:16px; }
-    h1{ margin:0 0 6px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; font-size: 38px; letter-spacing:-.3px; }
-    .sub{ margin:0 0 14px; color:var(--muted); line-height:1.6; }
-    h2{ margin:18px 0 8px; font-size:16px; letter-spacing:.2px; }
-    p,li{ color: rgba(255,255,255,.80); line-height:1.65; font-size:13.8px; }
-    ul{ margin:8px 0 0 18px; }
-    .meta{ color: rgba(255,255,255,.62); font-size:12.8px; margin-top: 8px; }
+    .card{ margin-top:10px; background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); border:1px solid var(--stroke); border-radius:var(--radius); box-shadow:var(--shadow); backdrop-filter: blur(16px); padding:clamp(18px, 3vw, 30px); }
+    h1{ margin:0 0 6px; font-family: ui-serif, Georgia, "Times New Roman", Times, serif; font-size: clamp(34px, 6vw, 54px); letter-spacing:-.3px; }
+    .sub{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+    h2{ margin:22px 0 8px; font-size:18px; letter-spacing:.2px; }
+    p,li{ color: rgba(255,255,255,.82); line-height:1.68; font-size:15px; }
+    ul{ margin:8px 0 0 18px; padding:0; }
+    .meta{ color: rgba(255,255,255,.66); font-size:13px; margin-top: 8px; }
     footer{ margin-top:16px; padding:14px 0 0; display:flex; justify-content:space-between; gap:12px; flex-wrap:wrap; color: rgba(255,255,255,.70); font-size:13px; }
   </style>
 </head>
@@ -42,59 +44,69 @@
   <div class="container">
     <div class="top">
       <div class="brand"><span class="dot"></span><span>FitnessLady</span></div>
-      <a class="pill" id="btnBack" href="/hu/">← Vissza</a>
+      <a class="pill" id="btnBack" href="/hu/">Vissza</a>
     </div>
 
-    <div class="card">
-      <h1>Adatkezelési tájékoztató</h1>
-      <p class="sub">Hatályos: <b>2026-02-20</b></p>
+    <main class="card">
+      <h1>Adatvédelmi irányelvek</h1>
+      <p class="sub">Hatályos: <b>2026. április 30.</b></p>
 
       <h2>1. Adatkezelő</h2>
-      <p><b>Adatkezelő:</b> Tüske Farkas Edina (FitnessLady)</p>
+      <p><b>Adatkezelő:</b> FitnessLady / Tüske Farkas Edina</p>
       <p><b>Kapcsolat:</b> fitnesslady92@gmail.com</p>
-      <p><b>Székhely:</b> 3930 Visp, Svájc</p>
+      <p><b>Székhely:</b> Svájc</p>
 
-      <h2>2. Milyen adatokat kezelünk?</h2>
+      <h2>2. Mire vonatkozik ez a tájékoztató?</h2>
+      <p>Ez az adatvédelmi tájékoztató a FitnessLady weboldalra és a FitnessLady Android alkalmazásra vonatkozik. Az app aktív FitnessLady hozzáféréssel használható, és a felhasználó személyre szabott edzésrendszerének megjelenítését támogatja.</p>
+
+      <h2>3. Milyen adatokat kezelünk?</h2>
       <ul>
-        <li><b>Fiók adatok:</b> e-mail cím, (opcionálisan) név</li>
-        <li><b>Belépési azonosítók:</b> Firebase Authentication technikai azonosítók</li>
-        <li><b>Program adatok:</b> csomag (planId), státusz, beállítások</li>
-        <li><b>Admin által rögzített tartalom:</b> étrend, üdvözlő kártya, személyre szabott videók (linkek), technika vault</li>
+        <li><b>Fiókadatok:</b> e-mail cím, név vagy megjelenített név, felhasználói azonosító.</li>
+        <li><b>Belépési adatok:</b> Firebase Authentication technikai azonosítók és bejelentkezési állapot.</li>
+        <li><b>Programadatok:</b> csomag, edzésterv, heti modulok, fix edzések és alkalmazásbeállítások.</li>
+        <li><b>Check-in adatok:</b> heti visszajelzések, víz/alvás jelölések, felhasználó által feltöltött képek, ha ezt a felhasználó használja.</li>
+        <li><b>Üzenetek:</b> támogatási vagy chat üzenetek, amennyiben az appban ilyen funkciót használsz.</li>
+        <li><b>Technikai adatok:</b> az alkalmazás működéséhez szükséges eszköz- és naplóadatok, hibakeresési információk.</li>
       </ul>
 
-      <h2>3. Miért kezeljük?</h2>
+      <h2>4. Miért kezeljük az adatokat?</h2>
       <ul>
-        <li>Fiók létrehozás és belépés biztosítása</li>
-        <li>Szolgáltatás nyújtása (program megjelenítés a vevő oldalon)</li>
-        <li>Ügyfélszolgálati kommunikáció</li>
-        <li>Jogosultságok (admin/user) kezelése</li>
+        <li>FitnessLady fiók létrehozása, aktiválása és beléptetése.</li>
+        <li>A megvásárolt vagy aktivált FitnessLady csomaghoz tartozó tartalom megjelenítése.</li>
+        <li>Személyre szabott edzések, fix gyakorlattár, heti check-in és támogatás biztosítása.</li>
+        <li>Ügyfélszolgálati kommunikáció és hibakeresés.</li>
+        <li>Jogosultságok, adminisztráció és biztonság kezelése.</li>
       </ul>
 
-      <h2>4. Hol tároljuk az adatokat?</h2>
-      <p>Az adatokat a FitnessLady technikai rendszerében tároljuk. A szolgáltatás működéséhez külső technológiák is használhatók (pl. Firebase/Google). Bankkártyaadatokat nem tárolunk.</p>
+      <h2>5. Hol tároljuk az adatokat?</h2>
+      <p>Az alkalmazás a FitnessLady Firebase rendszeréhez kapcsolódik. Az adatok tárolásához és hitelesítéséhez Google Firebase szolgáltatásokat használhatunk, például Firebase Authentication, Cloud Firestore és Firebase Storage. Bankkártyaadatokat az app nem tárol.</p>
 
-      <h2>5. Meddig tároljuk?</h2>
+      <h2>6. Kivel osztjuk meg az adatokat?</h2>
+      <p>Az adatokat nem értékesítjük. Az app működéséhez szükséges technikai szolgáltatók, például Google Firebase, adatfeldolgozóként vehetnek részt a szolgáltatás biztosításában. Fizetés esetén a fizetési folyamat a FitnessLady weboldalon és külső fizetési szolgáltatón keresztül történhet.</p>
+
+      <h2>7. Meddig tároljuk az adatokat?</h2>
       <ul>
         <li>Aktív fiók esetén a szolgáltatás biztosításához szükséges ideig.</li>
-        <li>Fiók törlés vagy kérés esetén a szükségtelen adatok törlésre kerülnek, a jogszabályi kötelezettségek figyelembevételével.</li>
+        <li>Fióktörlés vagy törlési kérés esetén a szükségtelen adatok törlésre kerülnek, kivéve ha jogszabályi vagy jogos üzleti ok miatt megőrzés szükséges.</li>
       </ul>
 
-      <h2>6. Milyen jogaid vannak?</h2>
-      <ul>
-        <li>Hozzáférés kérése a rólad tárolt adatokhoz</li>
-        <li>Helyesbítés kérése</li>
-        <li>Törlés kérése (amennyiben nem ütközik kötelező megőrzéssel)</li>
-        <li>Adatkezelés korlátozása</li>
-      </ul>
-      <p class="meta">Kéréshez írj: <b>fitnesslady92@gmail.com</b></p>
+      <h2>8. Felhasználói jogok</h2>
+      <p>Kérheted az adataidhoz való hozzáférést, azok helyesbítését, törlését vagy az adatkezelés korlátozását. Kérésedet e-mailben tudod elküldeni.</p>
+      <p class="meta">Kapcsolat adatvédelmi ügyekben: <b>fitnesslady92@gmail.com</b></p>
 
-      <h2>7. Cookie-k</h2>
-      <p>A weboldal alap működéséhez szükséges technikai elemeket használhat. Külön marketing-cookie bevezetése esetén ezt a dokumentumot frissítjük.</p>
-    </div>
+      <h2>9. Gyermekek adatainak kezelése</h2>
+      <p>A FitnessLady szolgáltatás nem 13 éves kor alatti gyermekeknek készült, és nem célja gyermekek személyes adatainak gyűjtése.</p>
+
+      <h2>10. Cookie-k és webes technológiák</h2>
+      <p>A weboldal a működéshez szükséges technikai elemeket használhat. Ha később külön marketing- vagy analitikai cookie-k kerülnek bevezetésre, ezt a tájékoztatót frissítjük.</p>
+
+      <h2>11. Módosítások</h2>
+      <p>Az adatvédelmi irányelveket időnként frissíthetjük. Az aktuális verzió mindig ezen az oldalon érhető el.</p>
+    </main>
 
     <footer>
       <div>© <span id="y"></span> FitnessLady</div>
-      <div>Tüske web design</div>
+      <div>FitnessLady</div>
     </footer>
   </div>
 
