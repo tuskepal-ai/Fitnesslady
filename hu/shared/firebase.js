@@ -204,17 +204,42 @@ export function todayISO(){
 export function fmtDate(iso){
   if(!iso) return "—";
   try{
-    const d = new Date(iso);
+    const d = dateFromLooseInput(iso);
+    if(!d) return String(iso);
     return d.toLocaleDateString("hu-HU", { year:"numeric", month:"2-digit", day:"2-digit" });
   }catch{ return String(iso); }
 }
 export function daysBetween(aIso, bIso){
   try{
-    const a = new Date(aIso);
-    const b = new Date(bIso);
+    const a = dateFromLooseInput(aIso);
+    const b = dateFromLooseInput(bIso);
+    if(!a || !b) return 0;
     const ms = b.getTime() - a.getTime();
     return Math.floor(ms / (1000*60*60*24));
   }catch{ return 0; }
+}
+
+function dateFromLooseInput(value){
+  if(!value) return null;
+  if(typeof value?.toDate === "function") return value.toDate();
+  if(value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+
+  const raw = String(value).trim();
+  if(!raw) return null;
+
+  const dotDate = raw.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})\.?$/);
+  if(dotDate){
+    const [, y, m, d] = dotDate;
+    return new Date(Number(y), Number(m) - 1, Number(d), 12, 0, 0);
+  }
+
+  const normalized = raw.replace(
+    /^(\d{4})[./](\d{1,2})[./](\d{1,2})\.?$/,
+    (_, y, m, d) => `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`
+  );
+  const withTime = normalized.includes("T") ? normalized : `${normalized}T12:00:00`;
+  const parsed = new Date(withTime);
+  return Number.isNaN(parsed.getTime()) ? null : parsed;
 }
 
 export function normalizeEmail(email){

@@ -103,6 +103,49 @@
     .progress.blue > span { background: linear-gradient(90deg, #4facfe, #00f2fe); }
     .progress.green > span { background: linear-gradient(90deg, #43e97b, #38f9d7); }
     .progress-label{ display:flex; justify-content: space-between; font-size: 12.5px; color: rgba(255,255,255,.6); margin: 10px 0 6px; font-weight: 600; }
+    .access-renew-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      flex-wrap:wrap;
+      margin-top: 12px;
+    }
+    .access-date-pill{
+      display:inline-flex;
+      align-items:center;
+      gap: 8px;
+      min-height: 38px;
+      padding: 9px 13px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.10);
+      background:
+        radial-gradient(circle at 12% 50%, rgba(255,79,216,.18), transparent 32%),
+        rgba(255,255,255,.055);
+      color: rgba(255,255,255,.78);
+      font-size: 12.8px;
+      font-weight: 850;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .access-date-pill::before{
+      content:"";
+      width: 8px;
+      height: 8px;
+      border-radius:999px;
+      background: linear-gradient(135deg, var(--pink), var(--pink2));
+      box-shadow: 0 0 18px rgba(255,79,216,.55);
+      flex: 0 0 auto;
+    }
+    .renew-inline{
+      min-height: 38px;
+      padding-inline: 16px;
+      box-shadow: 0 14px 28px rgba(255,79,216,.18);
+    }
+    @media (max-width: 560px){
+      .access-renew-row{ align-items:stretch; }
+      .access-date-pill,
+      .renew-inline{ width:100%; }
+    }
 
     .tabs{ display:flex; flex-wrap:wrap; gap: 8px; margin: 8px 0 14px; }
     .tab{ padding: 8px 12px; border-radius: 999px; border: 1px solid rgba(255,255,255,.10); background: rgba(255,255,255,.05); color: rgba(255,255,255,.85); cursor:pointer; font-size: 13px; font-weight: 800; transition: all .2s; user-select:none; }
@@ -891,6 +934,10 @@
         <span id="lblDays">Státusz: —</span>
       </div>
       <div class="progress"><span id="barCycle"></span></div>
+      <div class="access-renew-row">
+        <div class="access-date-pill" id="accessDate">Lejárat: —</div>
+        <button class="pill primary renew-inline" id="btnRenewCurrent" type="button" data-renew-plan="start">Megújítás</button>
+      </div>
 
       <div class="meta-row">
         <div class="meta-pill" id="pillGoal">Cél: —</div>
@@ -1456,19 +1503,76 @@
     }
 
     function calcWeekIndex(p){
-      if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
-      const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
-      const passedDays = clamp(daysBetween(p.cycleStart, todayISO()), 0, totalDays);
+      const start = normalizeCycleDate(p?.cycleStart);
+      const end = normalizeCycleDate(p?.cycleEnd);
+      if(p?.lifetimeAccess || !start || !end) return 0;
+      const totalDays = Math.max(1, daysBetween(start, end));
+      const passedDays = clamp(daysBetween(start, todayISO()), 0, totalDays);
       const weeks = planMeta?.weeks ?? 4;
       const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
       return week - 1;
+    }
+
+    function normalizeCycleDate(value){
+      const fromAny = isoDateFromAny(value);
+      if(fromAny) return fromAny;
+
+      const raw = String(value || "").trim();
+      if(!raw) return "";
+
+      const dotted = raw.match(/^(\d{4})\.(\d{1,2})\.(\d{1,2})\.?$/);
+      if(dotted){
+        const [, y, m, d] = dotted;
+        return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      }
+
+      const slashed = raw.match(/^(\d{4})[\/.](\d{1,2})[\/.](\d{1,2})\.?$/);
+      if(slashed){
+        const [, y, m, d] = slashed;
+        return `${y}-${String(m).padStart(2, "0")}-${String(d).padStart(2, "0")}`;
+      }
+
+      return /^\d{4}-\d{2}-\d{2}$/.test(raw) ? raw : "";
+    }
+
+    function renewalPlanFromProfile(p){
+      const planId = String(p?.planId || "").toLowerCase();
+      if(planId.includes("pro")) return "pro";
+      if(planId.includes("balance")) return "balance";
+      return "start";
+    }
+
+    function accessCycleStats(p){
+      const end = normalizeCycleDate(p?.cycleEnd);
+      const start = normalizeCycleDate(p?.cycleStart);
+      const today = todayISO();
+      const fallbackTotal = Math.max(1, Number(planMeta?.weeks || 4) * 7);
+      const total = start && end ? Math.max(1, daysBetween(start, end)) : fallbackTotal;
+      const remaining = end ? clamp(daysBetween(today, end), 0, total) : total;
+      const percent = p?.lifetimeAccess && !end ? 100 : clamp((remaining / total) * 100, 0, 100);
+
+      return {
+        start,
+        end,
+        total,
+        remaining,
+        percent,
+        expired: isAccessExpired(p),
+        hasDate: !!end
+      };
+    }
+
+    function remainingDaysText(days){
+      if(days <= 0) return "Ma jar le";
+      if(days === 1) return "1 nap van vissza";
+      return `${days} nap van vissza`;
     }
 
     function isAccessExpired(p){
       const status = String(p?.status || "").trim().toLowerCase();
       if(status === "expired" || status === "lejart") return true;
       if(p?.lifetimeAccess) return false;
-      const end = String(p?.cycleEnd || "").trim();
+      const end = normalizeCycleDate(p?.cycleEnd);
       if(!end) return false;
       return end < todayISO();
     }
@@ -1510,7 +1614,7 @@
         return;
       }
 
-      const end = String(profile?.cycleEnd || "").trim();
+      const end = normalizeCycleDate(profile?.cycleEnd);
       const currentPlan = pickLang(planMeta?.name, state.lang, profile?.planId || "csomag");
       $("#renewalText").textContent = end
         ? `A ${currentPlan} hozzaferesed ${fmtDate(end)} datumon lejart. Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod.`
@@ -1803,18 +1907,38 @@
 
     function renderHeader(){
       const p = profile;
+      const cycle = accessCycleStats(p);
+      const renewPlan = renewalPlanFromProfile(p);
+      const currentPlanLabel = pickLang(planMeta?.name, state.lang, p.planId || "—");
+
       $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
       $("#pillGoal").textContent = `Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `Szint: ${p.level ? `${p.level}/4` : "—"}`;
 
       $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
-      if(isAccessExpired(p)){
+      $("#barCycle").style.width = `${cycle.percent}%`;
+
+      const renewBtn = $("#btnRenewCurrent");
+      if(renewBtn){
+        renewBtn.dataset.renewPlan = renewPlan;
+        renewBtn.textContent = `${currentPlanLabel} megújítása`;
+      }
+
+      if(cycle.expired){
         $("#lblDays").textContent = `Lejart`;
-        $("#barCycle").style.width = `100%`;
+        $("#accessDate").textContent = cycle.hasDate ? `Lejart: ${fmtDate(cycle.end)}` : "Hozzaferes lejart";
         $("#subStatus").textContent = `A hozzaferesed lejart. Uj vasarlassal ugyanebben a fiokban folytathatod.`;
+      }else if(p?.lifetimeAccess && !cycle.hasDate){
+        $("#lblDays").textContent = `Korlátlan`;
+        $("#accessDate").textContent = "Korlátlan hozzáférés";
+        $("#subStatus").textContent = `A hozzáférésed aktív.`;
+      }else if(cycle.hasDate){
+        $("#lblDays").textContent = remainingDaysText(cycle.remaining);
+        $("#accessDate").textContent = `Lejárat: ${fmtDate(cycle.end)}`;
+        $("#subStatus").textContent = `${remainingDaysText(cycle.remaining)} a csomagodból. Ha szeretnéd folytatni, megújíthatod ugyanebben a fiókban.`;
       }else{
         $("#lblDays").textContent = `Aktív`;
-        $("#barCycle").style.width = `100%`;
+        $("#accessDate").textContent = "Lejárat: nincs beállítva";
         $("#subStatus").textContent = `Válaszd ki a hetet az edzésekhez.`;
       }
       renderRenewal();
@@ -2318,11 +2442,15 @@
         const plan = btn.dataset.renewPlan || "";
         const url = renewalUrlForPlan(plan);
         if(!url){
-          setRenewalStatus("Nem sikerult elinditani a fizetest. Frissitsd az oldalt es probald ujra.", "danger");
+          const message = "Nem sikerult elinditani a fizetest. Frissitsd az oldalt es probald ujra.";
+          setRenewalStatus(message, "danger");
+          if(!isAccessExpired(profile)) openInfo("Megujitas", escapeHtml(message));
           return;
         }
 
         setRenewalStatus("Atiranyitas a biztonsagos Stripe fizeteshez...");
+        btn.disabled = true;
+        btn.textContent = "Stripe megnyitasa...";
         window.location.href = url;
       });
     });
