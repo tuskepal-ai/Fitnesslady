@@ -1542,6 +1542,18 @@
       return "start";
     }
 
+    function displayPlanName(p){
+      const key = renewalPlanFromProfile(p);
+      const names = {
+        start: "Start",
+        balance: "Balance",
+        pro: "Pro"
+      };
+      const fromMeta = pickLang(planMeta?.name, state.lang, "");
+      if(fromMeta && !String(fromMeta).includes("_")) return fromMeta;
+      return names[key] || "Start";
+    }
+
     function accessCycleStats(p){
       const end = normalizeCycleDate(p?.cycleEnd);
       const start = normalizeCycleDate(p?.cycleStart);
@@ -1615,10 +1627,10 @@
       }
 
       const end = normalizeCycleDate(profile?.cycleEnd);
-      const currentPlan = pickLang(planMeta?.name, state.lang, profile?.planId || "csomag");
+      const currentPlan = displayPlanName(profile);
       $("#renewalText").textContent = end
-        ? `A ${currentPlan} hozzaferesed ${fmtDate(end)} datumon lejart. Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod.`
-        : "Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod. Nem kell ujra regisztralnod.";
+        ? `A ${currentPlan} hozzaferesed ${fmtDate(end)} datumon lejart. Valassz csomagot, es fizetes utan automatikusan ujra aktiv lesz a sajat fiokod.`
+        : "Valassz csomagot, es fizetes utan automatikusan ugyanabban a sajat fiokban folytathatod.";
     }
 
     function getCheckinBaseIso(){
@@ -1909,9 +1921,9 @@
       const p = profile;
       const cycle = accessCycleStats(p);
       const renewPlan = renewalPlanFromProfile(p);
-      const currentPlanLabel = pickLang(planMeta?.name, state.lang, p.planId || "—");
+      const currentPlanLabel = displayPlanName(p);
 
-      $("#chipPackage").textContent = `Csomag: ${pickLang(planMeta?.name, state.lang, p.planId || "—")}`;
+      $("#chipPackage").textContent = `Csomag: ${currentPlanLabel}`;
       $("#pillGoal").textContent = `Cél: ${p.goal || "—"}`;
       $("#pillIntensity").textContent = `Szint: ${p.level ? `${p.level}/4` : "—"}`;
 
@@ -1935,7 +1947,7 @@
       }else if(cycle.hasDate){
         $("#lblDays").textContent = remainingDaysText(cycle.remaining);
         $("#accessDate").textContent = `Lejárat: ${fmtDate(cycle.end)}`;
-        $("#subStatus").textContent = `${remainingDaysText(cycle.remaining)} a csomagodból. Ha szeretnéd folytatni, megújíthatod ugyanebben a fiókban.`;
+        $("#subStatus").textContent = `${remainingDaysText(cycle.remaining)} a csomagodból. Ha folytatnád, egy kattintással meghosszabbíthatod a saját fiókodat.`;
       }else{
         $("#lblDays").textContent = `Aktív`;
         $("#accessDate").textContent = "Lejárat: nincs beállítva";
