@@ -441,6 +441,21 @@
       return s;
     }
 
+    function hasVideoOverride(override){
+      return !!String(override?.vimeoId || override?.video || "").trim();
+    }
+
+    function withWeekOneVideoFallback(currentOverride, weekOneOverride){
+      if(hasVideoOverride(currentOverride) || !hasVideoOverride(weekOneOverride)) {
+        return currentOverride;
+      }
+
+      return {
+        ...(currentOverride || {}),
+        vimeoId: String(weekOneOverride?.vimeoId || weekOneOverride?.video || "").trim()
+      };
+    }
+
     function calcWeekIndex(p){
       if(p?.lifetimeAccess || !p?.cycleStart || !p?.cycleEnd) return 0;
       const totalDays = Math.max(1, daysBetween(p.cycleStart, p.cycleEnd));
@@ -583,14 +598,24 @@
       const pId = profile?.planId || "start_v1";
       const templateWeek = await loadPlanWeek(pId, weekNo);
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
+      const weekOneOverrides = weekNo === 1 ? overridesWeek : await loadOverridesWeek(UID, 1);
 
       const ovWorkouts = overridesWeek?.workouts || {};
       const ovSlots = overridesWeek?.slots || {};
+      const baseWorkouts = weekOneOverrides?.workouts || {};
+      const baseSlots = weekOneOverrides?.slots || {};
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => mergeWorkout(w, ovWorkouts[w.id], state.lang)),
-        slots: (templateWeek.slots || []).map(s => mergeSlot(s, ovSlots[String(s.slotIndex)], state.lang))
+        workouts: (templateWeek.workouts || []).map(w => {
+          const override = withWeekOneVideoFallback(ovWorkouts[w.id], baseWorkouts[w.id]);
+          return mergeWorkout(w, override, state.lang);
+        }),
+        slots: (templateWeek.slots || []).map(s => {
+          const key = String(s.slotIndex);
+          const override = withWeekOneVideoFallback(ovSlots[key], baseSlots[key]);
+          return mergeSlot(s, override, state.lang);
+        })
       };
       weekCache.set(weekNo, { merged });
       return weekCache.get(weekNo);
