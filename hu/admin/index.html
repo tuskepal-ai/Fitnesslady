@@ -2288,12 +2288,19 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
+    function hasPersonalNote(slot){
+      const note = slot?.note;
+      if(!note) return false;
+      if(typeof note === "string") return !!note.trim();
+      return !!String(note.hu || note.de || "").trim();
+    }
+
     function personalSlotWithWeekOneFallback(currentSlot, weekOneSlot){
       const current = currentSlot || {};
       const base = weekOneSlot || {};
       return {
         vimeoId: trimStr(current.vimeoId || current.video || base.vimeoId || base.video || ""),
-        note: current.note || base.note || null
+        note: hasPersonalNote(current) ? current.note : (hasPersonalNote(base) ? base.note : null)
       };
     }
 

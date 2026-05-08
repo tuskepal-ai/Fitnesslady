@@ -445,11 +445,18 @@
       return !!String(override?.vimeoId || override?.video || "").trim();
     }
 
+    function hasNoteOverride(override){
+      const note = override?.note;
+      if(!note) return false;
+      if(typeof note === "string") return !!note.trim();
+      return !!String(note.hu || note.de || "").trim();
+    }
+
     function withWeekOneVideoFallback(currentOverride, weekOneOverride){
       const hasCurrentVideo = hasVideoOverride(currentOverride);
       const hasBaseVideo = hasVideoOverride(weekOneOverride);
-      const hasCurrentNote = !!currentOverride?.note;
-      const hasBaseNote = !!weekOneOverride?.note;
+      const hasCurrentNote = hasNoteOverride(currentOverride);
+      const hasBaseNote = hasNoteOverride(weekOneOverride);
 
       if((hasCurrentVideo || !hasBaseVideo) && (hasCurrentNote || !hasBaseNote)) {
         return currentOverride;
@@ -463,6 +470,14 @@
         merged.note = weekOneOverride.note;
       }
       return merged;
+    }
+
+    function workoutTemplatesForWeek(templateWeek, weekOneTemplate){
+      const currentWorkouts = Array.isArray(templateWeek?.workouts) ? templateWeek.workouts : [];
+      if(currentWorkouts.length) return currentWorkouts;
+
+      const weekOneWorkouts = Array.isArray(weekOneTemplate?.workouts) ? weekOneTemplate.workouts : [];
+      return weekOneWorkouts;
     }
 
     function slotTemplatesForWeek(templateWeek, weekOneTemplate, baseSlots){
@@ -629,11 +644,12 @@
       const ovSlots = overridesWeek?.slots || {};
       const baseWorkouts = weekOneOverrides?.workouts || {};
       const baseSlots = weekOneOverrides?.slots || {};
+      const workoutTemplates = workoutTemplatesForWeek(templateWeek, weekOneTemplate);
       const slotTemplates = slotTemplatesForWeek(templateWeek, weekOneTemplate, baseSlots);
 
       const merged = {
         weekNo,
-        workouts: (templateWeek.workouts || []).map(w => {
+        workouts: workoutTemplates.map(w => {
           const override = withWeekOneVideoFallback(ovWorkouts[w.id], baseWorkouts[w.id]);
           return mergeWorkout(w, override, state.lang);
         }),
