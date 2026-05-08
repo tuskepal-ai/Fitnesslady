@@ -1526,6 +1526,21 @@
       return merged;
     }
 
+    function slotTemplatesForWeek(templateWeek, weekOneTemplate, baseSlots){
+      const currentSlots = Array.isArray(templateWeek?.slots) ? templateWeek.slots : [];
+      if(currentSlots.length) return currentSlots;
+
+      const weekOneSlots = Array.isArray(weekOneTemplate?.slots) ? weekOneTemplate.slots : [];
+      if(weekOneSlots.length) return weekOneSlots;
+
+      return Object.keys(baseSlots || {})
+        .sort((a, b) => Number(a) - Number(b))
+        .map((key) => ({
+          slotIndex: Number(key) || key,
+          title: { hu: `${key}. Személyes feladat`, de: `${key}. Persönliche Aufgabe` }
+        }));
+    }
+
     function calcWeekIndex(p){
       const start = normalizeCycleDate(p?.cycleStart);
       const end = normalizeCycleDate(p?.cycleEnd);
@@ -2077,6 +2092,7 @@
 
       const pId = profile?.planId || "start_v1";
       const templateWeek = await loadPlanWeek(pId, weekNo);
+      const weekOneTemplate = weekNo === 1 ? templateWeek : await loadPlanWeek(pId, 1);
       const overridesWeek = await loadOverridesWeek(UID, weekNo);
       const weekOneOverrides = weekNo === 1 ? overridesWeek : await loadOverridesWeek(UID, 1);
 
@@ -2084,6 +2100,7 @@
       const ovSlots = overridesWeek?.slots || {};
       const baseWorkouts = weekOneOverrides?.workouts || {};
       const baseSlots = weekOneOverrides?.slots || {};
+      const slotTemplates = slotTemplatesForWeek(templateWeek, weekOneTemplate, baseSlots);
 
       const merged = {
         weekNo,
@@ -2091,7 +2108,7 @@
           const override = withWeekOneVideoFallback(ovWorkouts[w.id], baseWorkouts[w.id]);
           return mergeWorkout(w, override, state.lang);
         }),
-        slots: (templateWeek.slots || []).map(s => {
+        slots: slotTemplates.map(s => {
           const key = String(s.slotIndex);
           const override = withWeekOneVideoFallback(ovSlots[key], baseSlots[key]);
           return mergeSlot(s, override, state.lang);
