@@ -403,6 +403,115 @@
        ✅ CHAT (Vevő) — 3D bubble + Apple-like half-sheet
     ========================== */
 
+    .renewal-card{
+      display:none;
+      position:relative;
+      overflow:hidden;
+      border-color: rgba(255,79,216,.22);
+      background:
+        radial-gradient(900px 360px at 10% 5%, rgba(255,79,216,.24), transparent 58%),
+        radial-gradient(900px 360px at 96% 18%, rgba(177,76,255,.20), transparent 58%),
+        rgba(18,12,26,.70);
+      box-shadow:
+        0 24px 70px rgba(0,0,0,.48),
+        0 0 42px rgba(255,79,216,.10);
+    }
+    .renewal-card.is-on{ display:block; }
+    .renewal-card::before{
+      content:"";
+      position:absolute;
+      inset: -40% -20% auto auto;
+      width: 260px;
+      height: 260px;
+      border-radius:999px;
+      background: radial-gradient(circle, rgba(255,79,216,.24), transparent 62%);
+      pointer-events:none;
+    }
+    .renewal-kicker{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding: 7px 11px;
+      border-radius:999px;
+      border:1px solid rgba(255,211,138,.20);
+      background: rgba(255,211,138,.08);
+      color: #ffe6af;
+      font-size: 12px;
+      font-weight: 950;
+      letter-spacing:.2px;
+    }
+    .renewal-title{
+      margin: 12px 0 8px;
+      font-family: ui-serif, Georgia, serif;
+      font-size: clamp(28px, 5vw, 48px);
+      line-height: .98;
+      letter-spacing:-.8px;
+      max-width: 760px;
+    }
+    .renewal-text{
+      max-width: 760px;
+      color: rgba(255,255,255,.76);
+      line-height:1.65;
+      margin: 0 0 16px;
+    }
+    .renewal-plans{
+      display:grid;
+      grid-template-columns: repeat(3, minmax(0,1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+    .renewal-plan{
+      position:relative;
+      padding: 16px;
+      border-radius: 20px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.055);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.10);
+      min-height: 156px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 12px;
+    }
+    .renewal-plan strong{
+      display:block;
+      font-family: ui-serif, Georgia, serif;
+      font-size: 24px;
+      line-height:1;
+    }
+    .renewal-plan span{
+      display:block;
+      margin-top: 8px;
+      color: rgba(255,255,255,.68);
+      font-size: 13px;
+      line-height:1.45;
+    }
+    .renewal-status{
+      margin-top: 12px;
+      display:none;
+      padding: 11px 13px;
+      border-radius: 15px;
+      border: 1px solid rgba(255,255,255,.10);
+      background: rgba(255,255,255,.06);
+      color: rgba(255,255,255,.78);
+      font-size: 12.8px;
+      line-height:1.45;
+    }
+    .renewal-status.is-on{ display:block; }
+    .renewal-status.danger{
+      border-color: rgba(255,128,151,.30);
+      background: rgba(255,128,151,.08);
+    }
+    body.access-expired .grid,
+    body.access-expired #technika,
+    body.access-expired .chat-fab{
+      display:none !important;
+    }
+    @media (max-width: 820px){
+      .renewal-plans{ grid-template-columns: 1fr; }
+      .renewal-plan{ min-height: auto; }
+    }
+
     .chat-fab{
       position: fixed;
       right: 18px;
@@ -789,6 +898,38 @@
       </div>
     </section>
 
+    <section id="renewalCard" class="glass card renewal-card" aria-live="polite">
+      <div class="renewal-kicker">Hozzaferes megujitasa</div>
+      <h2 class="renewal-title">A programod lejart, de a fiokod megmarad.</h2>
+      <p class="renewal-text" id="renewalText">
+        Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod. Nem kell ujra regisztralnod.
+      </p>
+      <div class="renewal-plans">
+        <article class="renewal-plan">
+          <div>
+            <strong>Start</strong>
+            <span>4 hetes tiszta ujrainditas, ha gyorsan visszalepnel a rendszerbe.</span>
+          </div>
+          <button class="pill primary" type="button" data-renew-plan="start">Start megujitasa</button>
+        </article>
+        <article class="renewal-plan">
+          <div>
+            <strong>Balance</strong>
+            <span>6 hetes kovetes es stabil ritmus, ha hosszabban szeretnel haladni.</span>
+          </div>
+          <button class="pill primary" type="button" data-renew-plan="balance">Balance megujitasa</button>
+        </article>
+        <article class="renewal-plan">
+          <div>
+            <strong>Pro</strong>
+            <span>12 hetes melyebb tamogatas, ha komolyabb rendszerben folytatnad.</span>
+          </div>
+          <button class="pill primary" type="button" data-renew-plan="pro">Pro megujitasa</button>
+        </article>
+      </div>
+      <div class="renewal-status" id="renewalStatus"></div>
+    </section>
+
     <div class="grid">
       <section id="program" class="glass card">
         <h3>Heti edzések</h3>
@@ -1056,6 +1197,7 @@
     </div>
   </div>
 
+  <script src="../../Shared/stripe-links.js"></script>
   <script type="module">
     import {
       getStorage,
@@ -1320,6 +1462,59 @@
       const weeks = planMeta?.weeks ?? 4;
       const week = clamp(Math.floor((passedDays / totalDays) * weeks) + 1, 1, weeks);
       return week - 1;
+    }
+
+    function isAccessExpired(p){
+      const status = String(p?.status || "").trim().toLowerCase();
+      if(status === "expired" || status === "lejart") return true;
+      if(p?.lifetimeAccess) return false;
+      const end = String(p?.cycleEnd || "").trim();
+      if(!end) return false;
+      return end < todayISO();
+    }
+
+    function renewalUrlForPlan(plan){
+      const mode = window.getFitnessLadyStripeMode ? window.getFitnessLadyStripeMode("live") : "live";
+      const url = window.getFitnessLadyStripeUrl ? window.getFitnessLadyStripeUrl(plan, { mode }) : "";
+      if(!url) return "";
+
+      const u = new URL(url);
+      const email = String(profile?.email || auth.currentUser?.email || "").trim().toLowerCase();
+      u.searchParams.set("client_reference_id", `renew_${UID}`);
+      if(email){
+        u.searchParams.set("locked_prefilled_email", email);
+        u.searchParams.set("prefilled_email", email);
+      }
+      u.searchParams.set("utm_source", "fitnesslady_app");
+      u.searchParams.set("utm_medium", "renewal");
+      u.searchParams.set("utm_campaign", String(plan || "renewal"));
+      return u.toString();
+    }
+
+    function setRenewalStatus(message, type = ""){
+      const el = $("#renewalStatus");
+      if(!el) return;
+      el.textContent = String(message || "");
+      el.className = `renewal-status${message ? " is-on" : ""}${type ? ` ${type}` : ""}`;
+    }
+
+    function renderRenewal(){
+      const expired = isAccessExpired(profile);
+      document.body.classList.toggle("access-expired", expired);
+
+      const card = $("#renewalCard");
+      if(!card) return;
+      card.classList.toggle("is-on", expired);
+      if(!expired) {
+        setRenewalStatus("");
+        return;
+      }
+
+      const end = String(profile?.cycleEnd || "").trim();
+      const currentPlan = pickLang(planMeta?.name, state.lang, profile?.planId || "csomag");
+      $("#renewalText").textContent = end
+        ? `A ${currentPlan} hozzaferesed ${fmtDate(end)} datumon lejart. Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod.`
+        : "Valassz csomagot, fizess Stripe-on keresztul, es ugyanazzal a fiokkal folytathatod. Nem kell ujra regisztralnod.";
     }
 
     function getCheckinBaseIso(){
@@ -1613,9 +1808,16 @@
       $("#pillIntensity").textContent = `Szint: ${p.level ? `${p.level}/4` : "—"}`;
 
       $("#lblWeek").textContent = `Hét: ${state.weekIdx + 1}/${planMeta?.weeks || 4}`;
-      $("#lblDays").textContent = `Aktív`;
-      $("#barCycle").style.width = `100%`;
-      $("#subStatus").textContent = `Válaszd ki a hetet az edzésekhez.`;
+      if(isAccessExpired(p)){
+        $("#lblDays").textContent = `Lejart`;
+        $("#barCycle").style.width = `100%`;
+        $("#subStatus").textContent = `A hozzaferesed lejart. Uj vasarlassal ugyanebben a fiokban folytathatod.`;
+      }else{
+        $("#lblDays").textContent = `Aktív`;
+        $("#barCycle").style.width = `100%`;
+        $("#subStatus").textContent = `Válaszd ki a hetet az edzésekhez.`;
+      }
+      renderRenewal();
     }
 
     function renderTrackers(){
@@ -2109,6 +2311,20 @@
       const sizeMb = file.size ? ` • ${(file.size / (1024 * 1024)).toFixed(1)} MB` : "";
       fileName.textContent = `${file.name || "Kiválasztott kép"}${sizeMb}`;
       setCheckinSaveStatus("Kép kiválasztva.", "ok");
+    });
+
+    $$("[data-renew-plan]").forEach((btn)=>{
+      btn.addEventListener("click", ()=>{
+        const plan = btn.dataset.renewPlan || "";
+        const url = renewalUrlForPlan(plan);
+        if(!url){
+          setRenewalStatus("Nem sikerult elinditani a fizetest. Frissitsd az oldalt es probald ujra.", "danger");
+          return;
+        }
+
+        setRenewalStatus("Atiranyitas a biztonsagos Stripe fizeteshez...");
+        window.location.href = url;
+      });
     });
 
     $("#btnLogout").addEventListener("click", async ()=>{

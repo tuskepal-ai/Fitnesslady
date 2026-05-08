@@ -150,9 +150,9 @@
   <div class="wrap">
     <div class="card">
       <div class="top">
-        <div class="badge"><span class="dot"></span> Sikeres vasarlas</div>
-        <h1>Koszonjuk!</h1>
-        <p class="sub">A regisztracios linket automatikusan elkuldjuk arra az e-mail cimre, amit a fizetesnel megadtal.</p>
+        <div class="badge"><span class="dot"></span> <span id="successBadge">Sikeres vasarlas</span></div>
+        <h1 id="successTitle">Koszonjuk!</h1>
+        <p class="sub" id="successSub">A regisztracios linket automatikusan elkuldjuk arra az e-mail cimre, amit a fizetesnel megadtal.</p>
       </div>
 
       <div class="body">
@@ -164,15 +164,15 @@
         </div>
 
         <div class="panel">
-          <p class="msg">
+          <p class="msg" id="successMsg">
             A fizetes rendben beerkezett. Nezd meg a Bejovo, Spam vagy Promociok mappat is.
             A levelben lesz a fiok-letrehozo linked.
           </p>
           <div class="btns">
-            <a class="btn" href="/hu/login/?success=1&from=stripe">Tovabb a bejelentkezeshez</a>
+            <a class="btn" id="successPrimaryLink" href="/hu/login/?success=1&from=stripe">Tovabb a bejelentkezeshez</a>
             <a class="btn ghost" href="/hu/">Vissza a fooldalra</a>
           </div>
-          <p class="small">
+          <p class="small" id="successSmall">
             Teszt modban (0 CHF) is ugyanigy lefut a folyamat. Az e-mail mar nem innen megy ki, hanem automatikusan a webhook kuldi.
           </p>
         </div>
@@ -189,6 +189,17 @@
       pro: "Pro csomag"
     };
     document.getElementById("planLabel").textContent = planMap[planRaw] || "Start csomag";
+
+    const isRenewal = qs.get("utm_medium") === "renewal" || qs.get("utm_source") === "fitnesslady_app";
+    if(isRenewal){
+      document.getElementById("successBadge").textContent = "Sikeres megujitas";
+      document.getElementById("successTitle").textContent = "A hozzaferesed frissul.";
+      document.getElementById("successSub").textContent = "A csomagod ugyanahhoz a FitnessLady fiokhoz kapcsolodik, nem kell ujra regisztralnod.";
+      document.getElementById("successMsg").textContent = "A fizetes rendben beerkezett. Lepj vissza a sajat oldaladra; ha meg nem latod az uj idoszakot, varj par masodpercet es frissits.";
+      document.getElementById("successPrimaryLink").href = "/hu/app/?renewal=success";
+      document.getElementById("successPrimaryLink").textContent = "Vissza a sajat oldalamra";
+      document.getElementById("successSmall").textContent = "A hozzaferest a Stripe webhook aktivalja automatikusan a meglevo fiokodon.";
+    }
   </script>
   <script type="module">
     import "../shared/firebase.js";

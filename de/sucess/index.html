@@ -56,9 +56,9 @@
   <div class="wrap">
     <div class="card">
       <div class="top">
-        <div class="badge"><span class="dot"></span> Kauf erfolgreich</div>
-        <h1>Vielen Dank!</h1>
-        <p class="sub">Den Registrierungslink senden wir automatisch an die E-Mail-Adresse, die du beim Bezahlen angegeben hast.</p>
+        <div class="badge"><span class="dot"></span> <span id="successBadge">Kauf erfolgreich</span></div>
+        <h1 id="successTitle">Vielen Dank!</h1>
+        <p class="sub" id="successSub">Den Registrierungslink senden wir automatisch an die E-Mail-Adresse, die du beim Bezahlen angegeben hast.</p>
       </div>
       <div class="body">
         <div class="panel">
@@ -68,15 +68,15 @@
           </div>
         </div>
         <div class="panel">
-          <p class="msg">
+          <p class="msg" id="successMsg">
             Die Zahlung ist erfolgreich eingegangen. Bitte prüfe auch deinen Posteingang, Spam- oder Werbeordner.
             In der E-Mail findest du den Link zur Kontoerstellung.
           </p>
           <div class="btns">
-            <a class="btn" href="/de/login/?success=1&from=stripe">Weiter zum Login</a>
+            <a class="btn" id="successPrimaryLink" href="/de/login/?success=1&from=stripe">Weiter zum Login</a>
             <a class="btn ghost" href="/de/">Zurück zur Startseite</a>
           </div>
-          <p class="small">
+          <p class="small" id="successSmall">
             Auch im Testmodus (0 CHF) läuft der Prozess gleich ab. Die E-Mail wird nicht von dieser Seite gesendet, sondern automatisch über den Webhook.
           </p>
         </div>
@@ -88,6 +88,17 @@
     const planRaw = (qs.get("plan") || "").toLowerCase().trim();
     const planMap = { start: "Start Paket", balance: "Balance Paket", pro: "Pro Paket" };
     document.getElementById("planLabel").textContent = planMap[planRaw] || "Start Paket";
+
+    const isRenewal = qs.get("utm_medium") === "renewal" || qs.get("utm_source") === "fitnesslady_app";
+    if(isRenewal){
+      document.getElementById("successBadge").textContent = "Verlaengerung erfolgreich";
+      document.getElementById("successTitle").textContent = "Dein Zugang wird aktualisiert.";
+      document.getElementById("successSub").textContent = "Das Paket wird mit deinem bestehenden FitnessLady Konto verbunden. Du musst kein neues Konto erstellen.";
+      document.getElementById("successMsg").textContent = "Die Zahlung ist eingegangen. Gehe zurueck in deinen Bereich; falls der neue Zeitraum noch nicht sichtbar ist, warte kurz und lade die Seite neu.";
+      document.getElementById("successPrimaryLink").href = "/de/app/?renewal=success";
+      document.getElementById("successPrimaryLink").textContent = "Zurueck zu meinem Bereich";
+      document.getElementById("successSmall").textContent = "Der Zugang wird automatisch per Stripe Webhook auf deinem bestehenden Konto aktiviert.";
+    }
   </script>
   <script type="module">
     import "../shared/firebase.js";
