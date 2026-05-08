@@ -2288,22 +2288,39 @@
     $("#btnLoadTemplateWeek").addEventListener("click", loadTemplateWeek);
     $("#btnSaveTemplateWeek").addEventListener("click", saveTemplateWeek);
 
+    function personalSlotWithWeekOneFallback(currentSlot, weekOneSlot){
+      const current = currentSlot || {};
+      const base = weekOneSlot || {};
+      return {
+        vimeoId: trimStr(current.vimeoId || current.video || base.vimeoId || base.video || ""),
+        note: current.note || base.note || null
+      };
+    }
+
+    function fillPersonalSlot(index, slot){
+      $(`#ov_slot${index}_vid`).value = slot?.vimeoId || "";
+      $(`#ov_slot${index}_note`).value = getStr(slot?.note);
+    }
+
     async function loadOverride(){
       try{
         if(!SEL_UID) return;
         const weekNo = clamp(parseInt($("#ov_week").value || "1", 10), 1, 24);
         const snap = await fs.getDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", String(weekNo)));
+        const weekOneSnap = weekNo === 1
+          ? snap
+          : await fs.getDoc(fs.doc(db, "users", SEL_UID, "overridesWeeks", "1"));
 
         $("#ov_slot1_vid").value = ""; $("#ov_slot1_note").value = "";
         $("#ov_slot2_vid").value = ""; $("#ov_slot2_note").value = "";
         $("#ov_slot3_vid").value = ""; $("#ov_slot3_note").value = "";
 
-        if(!snap.exists()) return;
-        const slots = (snap.data() || {}).slots || {};
+        const slots = snap.exists() ? ((snap.data() || {}).slots || {}) : {};
+        const weekOneSlots = weekOneSnap.exists() ? ((weekOneSnap.data() || {}).slots || {}) : {};
 
-        if(slots["1"]) { $("#ov_slot1_vid").value = slots["1"].vimeoId || ""; $("#ov_slot1_note").value = getStr(slots["1"].note); }
-        if(slots["2"]) { $("#ov_slot2_vid").value = slots["2"].vimeoId || ""; $("#ov_slot2_note").value = getStr(slots["2"].note); }
-        if(slots["3"]) { $("#ov_slot3_vid").value = slots["3"].vimeoId || ""; $("#ov_slot3_note").value = getStr(slots["3"].note); }
+        for(let i = 1; i <= 3; i++){
+          fillPersonalSlot(i, personalSlotWithWeekOneFallback(slots[String(i)], weekOneSlots[String(i)]));
+        }
       }catch(e){
         err(extractErrorMessage(e));
       }

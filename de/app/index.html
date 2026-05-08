@@ -446,14 +446,23 @@
     }
 
     function withWeekOneVideoFallback(currentOverride, weekOneOverride){
-      if(hasVideoOverride(currentOverride) || !hasVideoOverride(weekOneOverride)) {
+      const hasCurrentVideo = hasVideoOverride(currentOverride);
+      const hasBaseVideo = hasVideoOverride(weekOneOverride);
+      const hasCurrentNote = !!currentOverride?.note;
+      const hasBaseNote = !!weekOneOverride?.note;
+
+      if((hasCurrentVideo || !hasBaseVideo) && (hasCurrentNote || !hasBaseNote)) {
         return currentOverride;
       }
 
-      return {
-        ...(currentOverride || {}),
-        vimeoId: String(weekOneOverride?.vimeoId || weekOneOverride?.video || "").trim()
-      };
+      const merged = { ...(currentOverride || {}) };
+      if(!hasCurrentVideo && hasBaseVideo){
+        merged.vimeoId = String(weekOneOverride?.vimeoId || weekOneOverride?.video || "").trim();
+      }
+      if(!hasCurrentNote && hasBaseNote){
+        merged.note = weekOneOverride.note;
+      }
+      return merged;
     }
 
     function calcWeekIndex(p){
