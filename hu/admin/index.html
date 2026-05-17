@@ -757,6 +757,79 @@
         </div>
 
         <div class="section">
+          <h2 class="sectionTitle">Készpénzes vevő létrehozása</h2>
+          <p class="sub">Ha valaki kézpénzben fizet, itt teljes értékű Auth + vevő hozzáférést kapsz neki. A köszönő email németül megy ki.</p>
+
+          <div class="miniRow" style="margin-top:10px;">
+            <div class="field">
+              <label for="cash_name">Név</label>
+              <input id="cash_name" type="text" placeholder="pl. Anna Müller" />
+            </div>
+            <div class="field">
+              <label for="cash_email">Email</label>
+              <input id="cash_email" type="email" placeholder="kunde@email.ch" />
+            </div>
+          </div>
+
+          <div class="miniRow">
+            <div class="field">
+              <label for="cash_password">Jelszó</label>
+              <input id="cash_password" type="text" placeholder="min. 6 karakter" />
+            </div>
+            <div class="field">
+              <label for="cash_plan">Csomag</label>
+              <select id="cash_plan">
+                <option value="start_v1">Start</option>
+                <option value="balance_v1">Balance</option>
+                <option value="pro_v1">Pro</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="miniRow">
+            <div class="field">
+              <label for="cash_cycleStart">Kezdés</label>
+              <input id="cash_cycleStart" type="date" />
+            </div>
+            <div class="field">
+              <label for="cash_cycleEnd">Vége</label>
+              <input id="cash_cycleEnd" type="date" />
+            </div>
+          </div>
+
+          <div class="miniRow">
+            <div class="field">
+              <label for="cash_lang">Email / vevő nyelve</label>
+              <select id="cash_lang">
+                <option value="de">de</option>
+                <option value="hu">hu</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="cash_lifetime">Lifetime access</label>
+              <select id="cash_lifetime">
+                <option value="false">false</option>
+                <option value="true">true</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="cash_note">Admin megjegyzés</label>
+            <input id="cash_note" type="text" placeholder="pl. készpénz, személyesen rendezve" />
+          </div>
+
+          <label class="sub" style="display:flex; gap:10px; align-items:center; margin-top:10px;">
+            <input id="cash_sendEmail" type="checkbox" checked style="width:auto;" />
+            Küldjön német köszönő emailt a belépési adatokkal és szabályzat linkekkel
+          </label>
+
+          <div class="actions">
+            <button class="pill primary" id="btnCreateCashUser" type="button">Készpénzes vevő létrehozása</button>
+          </div>
+        </div>
+
+        <div class="section">
           <h2 class="sectionTitle">User profil</h2>
           <p class="sub">A kiválasztott user adatai + chat megnyitás + teljes törlés.</p>
 
@@ -1120,6 +1193,7 @@
 
     const functions = getFunctions(app, "us-central1");
     const deleteUserFullCallable = httpsCallable(functions, "deleteUserFull");
+    const createManualCashUserCallable = httpsCallable(functions, "createManualCashUser");
 
     const escapeHtml = (s) => String(s ?? "")
       .replaceAll("&","&amp;")
@@ -1523,6 +1597,48 @@
         planCustom.value = "";
       }
     });
+
+    function isoToday(){
+      return new Date().toISOString().slice(0, 10);
+    }
+
+    function addDaysIsoLocal(baseIso, days){
+      const base = /^\d{4}-\d{2}-\d{2}$/.test(String(baseIso || ""))
+        ? new Date(`${baseIso}T00:00:00`)
+        : new Date();
+      base.setDate(base.getDate() + Number(days || 0));
+      return base.toISOString().slice(0, 10);
+    }
+
+    function planWeeksLocal(planId){
+      const v = String(planId || "").toLowerCase();
+      if(v.includes("pro")) return 12;
+      if(v.includes("balance")) return 6;
+      return 4;
+    }
+
+    function packageNameLocal(planId){
+      const v = String(planId || "").toLowerCase();
+      if(v.includes("pro")) return "Pro";
+      if(v.includes("balance")) return "Balance";
+      return "Start";
+    }
+
+    function refreshCashCycleEnd(){
+      const start = trimStr($("#cash_cycleStart")?.value) || isoToday();
+      const planId = trimStr($("#cash_plan")?.value) || "start_v1";
+      const lifetime = $("#cash_lifetime")?.value === "true";
+      if($("#cash_cycleStart") && !$("#cash_cycleStart").value) $("#cash_cycleStart").value = start;
+      if($("#cash_cycleEnd")) {
+        $("#cash_cycleEnd").disabled = lifetime;
+        $("#cash_cycleEnd").value = lifetime ? "" : addDaysIsoLocal(start, planWeeksLocal(planId) * 7);
+      }
+    }
+
+    $("#cash_cycleStart")?.addEventListener("change", refreshCashCycleEnd);
+    $("#cash_plan")?.addEventListener("change", refreshCashCycleEnd);
+    $("#cash_lifetime")?.addEventListener("change", refreshCashCycleEnd);
+    refreshCashCycleEnd();
 
     function fillWelcomeForm(doc){
       const wc = doc?.welcomeCard || doc?.welcome || null;
@@ -1928,6 +2044,55 @@
     $("#userSearch").addEventListener("input", ()=>{
       window.clearTimeout(window.__su);
       window.__su = window.setTimeout(()=>loadUsersList(true), 220);
+    });
+
+    $("#btnCreateCashUser")?.addEventListener("click", async ()=>{
+      const btn = $("#btnCreateCashUser");
+      try{
+        const email = trimStr($("#cash_email").value).toLowerCase();
+        const password = String($("#cash_password").value || "");
+        const displayName = trimStr($("#cash_name").value);
+        const planId = trimStr($("#cash_plan").value) || "start_v1";
+        const lifetimeAccess = $("#cash_lifetime").value === "true";
+
+        if(!email || !email.includes("@")) return err("Adj meg ervenyes email cimet.");
+        if(password.length < 6) return err("A jelszo legalabb 6 karakter legyen.");
+
+        btn.disabled = true;
+        btn.textContent = "Letrehozas...";
+
+        const res = await createManualCashUserCallable({
+          email,
+          password,
+          displayName,
+          planId,
+          packageName: packageNameLocal(planId),
+          language: $("#cash_lang").value || "de",
+          lifetimeAccess,
+          cycleStart: trimStr($("#cash_cycleStart").value),
+          cycleEnd: lifetimeAccess ? "" : trimStr($("#cash_cycleEnd").value),
+          note: trimStr($("#cash_note").value),
+          sendEmail: $("#cash_sendEmail").checked
+        });
+
+        const data = res?.data || {};
+        ok(data.emailSent ? "Keszpenzes vevo letrehozva, nemet email elkuldve." : "Keszpenzes vevo letrehozva.");
+
+        $("#cash_name").value = "";
+        $("#cash_email").value = "";
+        $("#cash_password").value = "";
+        $("#cash_note").value = "";
+        refreshCashCycleEnd();
+
+        await loadUsersList(true);
+        if(data.uid) await pickUser(data.uid);
+      }catch(e){
+        console.error(e);
+        err(extractErrorMessage(e));
+      }finally{
+        btn.disabled = false;
+        btn.textContent = "Készpénzes vevő létrehozása";
+      }
     });
 
     async function callDeleteCallable(uid, email){
